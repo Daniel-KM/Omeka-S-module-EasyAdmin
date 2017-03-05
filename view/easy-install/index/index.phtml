@@ -1,9 +1,16 @@
 <?php
+use Omeka\Stdlib\Message;
+
 $form->prepare();
 $escapeHtml = $this->plugin('escapeHtml');
 ?>
 
 <?php echo $this->pageTitle($this->translate('Easy Install')); ?>
+<p class="explanation">
+    <?php echo $this->translate(new Message('For more information on addons, see the pages %smodules%s and %sthemes%s.',
+        '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html">', '</a>',
+        '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html">', '</a>')); ?>
+</p>
 <p class="explanation">
     <?php echo $this->translate('Addons with an asterisk are already downloaded.'); ?>
 </p>

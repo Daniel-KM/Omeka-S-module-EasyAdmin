@@ -7,6 +7,8 @@ and https://gitlab.com).
 
 The idea comes from the plugin [Escher] for [Omeka Classic].
 
+See more details on [modules] and [themes].
+
 
 Installation
 ------------
@@ -76,6 +78,8 @@ Copyright
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
 [Omeka Classic]: https://omeka.org
+[modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
+[themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
