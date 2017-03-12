@@ -43,8 +43,15 @@ class UploadForm extends Form
                 'options' => [
                     'label' => $addonLabels[$addonType],
                     'info'  => '',
+                    'empty_option' => 'Select Below', // @translate
                     'value_options' => $valueOptions,
                 ],
+            ]);
+
+            $inputFilter = $this->getInputFilter();
+            $inputFilter->add([
+                'name' => $addonType,
+                'required' => false,
             ]);
         }
     }
