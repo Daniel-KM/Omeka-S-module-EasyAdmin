@@ -21,7 +21,7 @@ Uncompress files in the module directory and rename module folder `EasyInstall`.
 Usage
 -----
 
-Simply select the desired module or theme and click "upload".
+Simply select either the desired module or the desired theme and click "upload".
 
 
 Warning
