@@ -1,6 +1,8 @@
 Easy Install (module for Omeka S)
 =================================
 
+[![Build Status](https://travis-ci.org/Daniel-KM/Omeka-S-module-EasyInstall.svg?branch=master)](https://travis-ci.org/Daniel-KM/Omeka-S-module-EasyInstall)
+
 [Easy Install ] is a module for [Omeka Semantic] that allows to install Omeka S
 modules and themes from https://omeka.org and from the web (https://github.com
 and https://gitlab.com).
@@ -27,8 +29,8 @@ Warning
 
 Use it at your own risk.
 
-It’s always recommended to backup your files and database regularly so you can
-roll back if needed.
+It’s always recommended to backup and to check your files and database regularly
+so you can roll back if needed.
 
 
 Troubleshooting
