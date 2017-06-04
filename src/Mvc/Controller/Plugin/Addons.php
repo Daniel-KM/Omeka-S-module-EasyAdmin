@@ -198,10 +198,10 @@ class Addons extends AbstractPlugin
                     $zip = $url . '/archive/master.zip';
                     break;
                 case 'gitlab.com':
-                    $zip = $url .'/repository/archive.zip';
+                    $zip = $url . '/repository/archive.zip';
                     break;
                 default:
-                    $zip = $url .'/master.zip';
+                    $zip = $url . '/master.zip';
                     break;
             }
 
