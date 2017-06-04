@@ -32,7 +32,8 @@ class UploadForm extends Form
             $valueOptions = [];
             $valueOptions[''] = 'Select Below'; // @translate
             foreach ($addonsForType as $url => $addon) {
-                $label = $addon['name'] . ' [v' . $addon['version'] . ']';
+                $label = $addon['name'];
+                $label .= $addon['version'] ? ' [v' . $addon['version'] . ']' : '[]';
                 $label .= $addons->dirExists($addon) ? ' *' : '';
                 $valueOptions[$url] = $label;
             }
