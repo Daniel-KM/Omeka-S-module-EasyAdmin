@@ -1,5 +1,5 @@
 <?php
-namespace EasyInstall\Controller;
+namespace EasyInstall\Controller\Admin;
 
 use EasyInstall\Form\UploadForm;
 use Zend\Mvc\Controller\AbstractActionController;

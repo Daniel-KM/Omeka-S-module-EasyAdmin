@@ -1,14 +1,15 @@
 <?php
+namespace EasyInstall;
 
 return [
     'controllers' => [
         'invokables' => [
-            'EasyInstall\Controller\Index' => 'EasyInstall\Controller\IndexController',
+            'EasyInstall\Controller\Index' => Controller\Admin\IndexController::class,
         ],
     ],
     'controller_plugins' => [
         'invokables' => [
-            'easyInstallAddons' => 'EasyInstall\Mvc\Controller\Plugin\Addons',
+            'easyInstallAddons' => Mvc\Controller\Plugin\Addons::class,
         ],
     ],
     'view_manager' => [
@@ -18,7 +19,7 @@ return [
     ],
     'form_elements' => [
         'factories' => [
-            'EasyInstall\Form\UploadForm' => 'EasyInstall\Service\Form\UploadFormFactory',
+            'EasyInstall\Form\UploadForm' => Service\Form\UploadFormFactory::class,
         ],
     ],
     'router' => [
@@ -46,7 +47,7 @@ return [
             [
                 'label' => 'Easy Install',
                 'route' => 'admin/easyinstall',
-                'resource' => 'EasyInstall\Controller\Index',
+                'resource' => Controller\Admin\IndexController::class,
             ],
         ],
     ],
