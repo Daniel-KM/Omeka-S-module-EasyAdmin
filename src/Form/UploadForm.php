@@ -16,7 +16,7 @@ class UploadForm extends Form
 
     public function init()
     {
-        $this->setAttribute('action', 'easyinstall');
+        $this->setAttribute('action', 'easy-install');
 
         $addonLabels = [
             'module' => 'Modules', // @translate
