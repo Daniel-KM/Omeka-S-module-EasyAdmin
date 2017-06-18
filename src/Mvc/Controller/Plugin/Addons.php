@@ -161,12 +161,44 @@ class Addons extends AbstractPlugin
         }
         $source = $this->data[$type]['source'];
 
-        $content = @file_get_contents($source);
+        $content = $this->fileGetContents($source);
         if (empty($content)) {
             return [];
         }
 
         return $this->extractAddonList($content, $type);
+    }
+
+    /**
+     * Helper to get content from an external url.
+     *
+     * @param string $url
+     * @return string
+     */
+    protected function fileGetContents($url)
+    {
+        if (ini_get('allow_url_fopen') && ini_get('allow_url_include')) {
+            return @file_get_contents($url);
+        }
+
+        $userAgent = 'Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox';
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        if (curl_errno($ch) || $response === false) {
+            $this->getController()->messenger()->addError(
+                sprintf('Unable to fetch the url %s.', $url) // @translate
+                . ' ' . 'You should enable "allow_url_fopen" and "allow_url_include" in php.ini.' // @translate
+                . ' ' . curl_error($ch));
+            $response = null;
+        }
+        curl_close($ch);
+        return $response;
     }
 
     /**
