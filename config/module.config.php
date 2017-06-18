@@ -26,10 +26,10 @@ return [
         'routes' => [
             'admin' => [
                 'child_routes' => [
-                    'easyinstall' => [
+                    'easy-install' => [
                         'type' => 'Literal',
                         'options' => [
-                            'route' => '/easyinstall',
+                            'route' => '/easy-install',
                             'defaults' => [
                                 '__NAMESPACE__' => 'EasyInstall\Controller',
                                 'controller' => 'Index',
@@ -46,8 +46,7 @@ return [
         'AdminModule' => [
             [
                 'label' => 'Easy Install',
-                'route' => 'admin/easyinstall',
-                'resource' => Controller\Admin\IndexController::class,
+                'route' => 'admin/easy-install',
             ],
         ],
     ],
