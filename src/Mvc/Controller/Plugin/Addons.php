@@ -9,7 +9,6 @@ use Zend\Session\Container;
  */
 class Addons extends AbstractPlugin
 {
-
     /**
      * Source of data and destination of addons.
      *
@@ -29,14 +28,14 @@ class Addons extends AbstractPlugin
     /**
      * Expiration seconds.
      *
-     * @var integer
+     * @var int
      */
     protected $expirationSeconds = 86400;
 
     /**
      * Expiration hops.
      *
-     * @var integer
+     * @var int
      */
     protected $expirationHops = 50;
 
@@ -80,8 +79,6 @@ class Addons extends AbstractPlugin
 
     /**
      * Helper to save addons in the cache.
-     *
-     * @return void
      */
     protected function cacheAddons()
     {
@@ -94,7 +91,7 @@ class Addons extends AbstractPlugin
     /**
      * Check if the lists of addons are empty.
      *
-     * @return boolean
+     * @return bool
      */
     public function isEmpty()
     {
@@ -137,7 +134,7 @@ class Addons extends AbstractPlugin
      * Check if an addon is installed.
      *
      * @param array $addon
-     * @return boolean
+     * @return bool
      */
     public function dirExists($addon)
     {
@@ -270,7 +267,7 @@ class Addons extends AbstractPlugin
             return [];
         }
 
-        $list = array_filter(array_diff(scandir($dir), ['.', '..']), function($file) use ($dir) {
+        $list = array_filter(array_diff(scandir($dir), ['.', '..']), function ($file) use ($dir) {
             return is_dir($dir . DIRECTORY_SEPARATOR . $file);
         });
 

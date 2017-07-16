@@ -10,7 +10,6 @@ use Omeka\Stdlib\Message;
 
 class IndexController extends AbstractActionController
 {
-
     public function indexAction()
     {
         $view = new ViewModel;
@@ -64,7 +63,6 @@ class IndexController extends AbstractActionController
      * Helper to install an addon.
      *
      * @param array $addon
-     * @return void
      */
     protected function installAddon(array $addon)
     {
@@ -90,7 +88,6 @@ class IndexController extends AbstractActionController
         // Add a message for security hole.
         $this->messenger()->addWarning(new Message(
             'Don’t forget to protect the %s directory from writing after installation.', $type)); // @translate
-
 
         // Local zip file path.
         $zipFile = $destination . DIRECTORY_SEPARATOR . basename($addon['zip']);
@@ -131,8 +128,7 @@ class IndexController extends AbstractActionController
                 $message);
             $this->messenger()->addSuccess(new Message(
                 '%s uploaded successfully', ucfirst($type))); // @translate
-        }
-        else {
+        } else {
             $this->messenger()->addError(new Message(
                 'An error occurred during the unzipping of the %s "%s".', // @translate
                     $type, $addon['name']));
@@ -144,7 +140,7 @@ class IndexController extends AbstractActionController
      *
      * @param string $source
      * @param string $destination
-     * @return boolean
+     * @return bool
      */
     protected function downloadFile($source, $destination)
     {
@@ -162,7 +158,7 @@ class IndexController extends AbstractActionController
      *
      * @param string $source A local file.
      * @param string $destination A writeable dir.
-     * @return boolean
+     * @return bool
      */
     protected function unzipFile($source, $destination)
     {
@@ -208,7 +204,7 @@ class IndexController extends AbstractActionController
      * @todo Get the directory name from the zip.
      *
      * @param string $addon
-     * @return boolean
+     * @return bool
      */
     protected function moveAddon($addon)
     {
@@ -316,7 +312,7 @@ class IndexController extends AbstractActionController
      * @see Omeka_File_Derivative_Strategy_ExternalImageMagick::executeCommand()
      *
      * @param string $command
-     * @param integer $status
+     * @param int $status
      * @param string $output
      * @param array $errors
      * @throws Exception

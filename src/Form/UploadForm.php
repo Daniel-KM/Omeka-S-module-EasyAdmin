@@ -6,13 +6,12 @@ use EasyInstall\Mvc\Controller\Plugin\Addons;
 
 class UploadForm extends Form
 {
-
     /**
      * List of addons.
      *
      * @var array
      */
-    protected $addons = array();
+    protected $addons = [];
 
     public function init()
     {
@@ -25,7 +24,7 @@ class UploadForm extends Form
 
         $addons = $this->getAddons();
         $list = $addons();
-        foreach($list as $addonType => $addonsForType) {
+        foreach ($list as $addonType => $addonsForType) {
             if (empty($addonsForType)) {
                 continue;
             }
@@ -43,7 +42,7 @@ class UploadForm extends Form
                 'type' => 'select',
                 'options' => [
                     'label' => $addonLabels[$addonType],
-                    'info'  => '',
+                    'info' => '',
                     'empty_option' => 'Select Below', // @translate
                     'value_options' => $valueOptions,
                 ],
@@ -59,7 +58,6 @@ class UploadForm extends Form
 
     /**
      * @param Addons $addons
-     * @return void
      */
     public function setAddons(Addons $addons)
     {
