@@ -4,7 +4,7 @@ namespace EasyInstall;
 return [
     'controllers' => [
         'invokables' => [
-            'EasyInstall\Controller\Index' => Controller\Admin\IndexController::class,
+            'EasyInstall\Controller\Admin\Index' => Controller\Admin\IndexController::class,
         ],
     ],
     'controller_plugins' => [
@@ -31,7 +31,7 @@ return [
                         'options' => [
                             'route' => '/easy-install',
                             'defaults' => [
-                                '__NAMESPACE__' => 'EasyInstall\Controller',
+                                '__NAMESPACE__' => 'EasyInstall\Controller\Admin',
                                 'controller' => 'Index',
                                 'action' => 'index',
                             ],
