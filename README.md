@@ -3,7 +3,7 @@ Easy Install (module for Omeka S)
 
 [![Build Status](https://travis-ci.org/Daniel-KM/Omeka-S-module-EasyInstall.svg?branch=master)](https://travis-ci.org/Daniel-KM/Omeka-S-module-EasyInstall)
 
-[Easy Install ] is a module for [Omeka Semantic] that allows to install Omeka S
+[Easy Install] is a module for [Omeka Semantic] that allows to install Omeka S
 modules and themes from https://omeka.org and from the web (https://github.com
 and https://gitlab.com).
 
@@ -76,7 +76,7 @@ Copyright
 * Copyright Daniel Berthereau, 2017
 
 
-[EasyInstall]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall
+[Easy Install]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
 [Omeka Classic]: https://omeka.org
