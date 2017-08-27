@@ -2,7 +2,7 @@
 
 namespace EasyInstallTest\Controller;
 
-class PresentationControllerTest extends EasyInstallControllerTestCase
+class IndexControllerTest extends EasyInstallControllerTestCase
 {
     public function testIndexActionCanBeAccessed()
     {
