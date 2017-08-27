@@ -14,7 +14,7 @@ return [
     ],
     'view_manager' => [
         'template_path_stack' => [
-            OMEKA_PATH . '/modules/EasyInstall/view',
+            __DIR__ . '/../view',
         ],
     ],
     'form_elements' => [
