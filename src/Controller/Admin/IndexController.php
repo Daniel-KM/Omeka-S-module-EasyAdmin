@@ -1,12 +1,12 @@
 <?php
 namespace EasyInstall\Controller\Admin;
 
-use EasyInstall\Form\UploadForm;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 use Doctrine\Common\Inflector\Inflector;
+use EasyInstall\Form\UploadForm;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 
 class IndexController extends AbstractActionController
 {
@@ -309,13 +309,13 @@ class IndexController extends AbstractActionController
     /**
      * Execute a shell command without exec().
      *
-     * @see Omeka_File_Derivative_Strategy_ExternalImageMagick::executeCommand()
+     * @see \Omeka\Stdlib\Cli::send()
      *
      * @param string $command
      * @param int $status
      * @param string $output
      * @param array $errors
-     * @throws Exception
+     * @throws \Exception
      */
     protected function executeCommand($command, &$status, &$output, &$errors)
     {

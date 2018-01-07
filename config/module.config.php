@@ -2,6 +2,16 @@
 namespace EasyInstall;
 
 return [
+    'view_manager' => [
+        'template_path_stack' => [
+            dirname(__DIR__) . '/view',
+        ],
+    ],
+    'form_elements' => [
+        'factories' => [
+            'EasyInstall\Form\UploadForm' => Service\Form\UploadFormFactory::class,
+        ],
+    ],
     'controllers' => [
         'invokables' => [
             'EasyInstall\Controller\Admin\Index' => Controller\Admin\IndexController::class,
@@ -10,16 +20,6 @@ return [
     'controller_plugins' => [
         'invokables' => [
             'easyInstallAddons' => Mvc\Controller\Plugin\Addons::class,
-        ],
-    ],
-    'view_manager' => [
-        'template_path_stack' => [
-            __DIR__ . '/../view',
-        ],
-    ],
-    'form_elements' => [
-        'factories' => [
-            'EasyInstall\Form\UploadForm' => Service\Form\UploadFormFactory::class,
         ],
     ],
     'router' => [
@@ -36,7 +36,6 @@ return [
                                 'action' => 'index',
                             ],
                         ],
-                        'may_terminate' => true,
                     ],
                 ],
             ],
