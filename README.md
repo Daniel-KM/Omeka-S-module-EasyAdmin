@@ -73,7 +73,7 @@ Current maintainers:
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017
+* Copyright Daniel Berthereau, 2017-2018
 
 
 [Easy Install]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall

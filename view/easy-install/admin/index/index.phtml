@@ -7,9 +7,10 @@ $escapeHtml = $this->plugin('escapeHtml');
 
 <?php echo $this->pageTitle($this->translate('Easy Install')); ?>
 <p class="explanation">
-    <?php echo $this->translate(new Message('For more information on addons, see the pages %smodules%s and %sthemes%s.',
+    <?php echo new Message($this->translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html">', '</a>',
-        '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html">', '</a>')); ?>
+        '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html">', '</a>',
+        '<a href="https://omeka.org/s">', '</a>'); ?>
 </p>
 <p class="explanation">
     <?php echo $this->translate('Select either a module or a theme.'); ?>

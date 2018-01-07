@@ -1,8 +1,9 @@
 <?php
 namespace EasyInstall\Form;
 
-use Zend\Form\Form;
 use EasyInstall\Mvc\Controller\Plugin\Addons;
+use Zend\Form\Element\Select;
+use Zend\Form\Form;
 
 class UploadForm extends Form
 {
@@ -18,8 +19,10 @@ class UploadForm extends Form
         $this->setAttribute('action', 'easy-install');
 
         $addonLabels = [
-            'module' => 'Modules', // @translate
-            'theme' => 'Themes', // @translate
+            'omekamodule' => 'Modules Omeka.org', // @translate
+            'omekatheme' => 'Themes Omeka.org', // @translate
+            'module' => 'Modules web', // @translate
+            'theme' => 'Themes web', // @translate
         ];
 
         $addons = $this->getAddons();
@@ -39,7 +42,7 @@ class UploadForm extends Form
 
             $this->add([
                 'name' => $addonType,
-                'type' => 'Select',
+                'type' => Select::class,
                 'options' => [
                     'label' => $addonLabels[$addonType],
                     'info' => '',

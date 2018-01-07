@@ -1,6 +1,8 @@
 <?php
 namespace EasyInstall\Mvc\Controller\Plugin;
 
+use DOMDocument;
+use DOMXPath;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Session\Container;
 
@@ -15,6 +17,14 @@ class Addons extends AbstractPlugin
      * @var array
      */
     protected $data = [
+        'omekamodule' => array(
+            'source' => 'https://omeka.org/s/modules/',
+            'destination' => '/modules',
+        ),
+        'omekatheme' => array(
+            'source' => 'https://omeka.org/s/themes/',
+            'destination' => '/themes',
+        ),
         'module' => [
             'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/docs/_data/omeka_s_modules.csv',
             'destination' => '/modules',
@@ -163,7 +173,14 @@ class Addons extends AbstractPlugin
             return [];
         }
 
-        return $this->extractAddonList($content, $type);
+        switch ($type) {
+            case 'module':
+            case 'theme':
+                return $this->extractAddonList($content, $type);
+            case 'omekamodule':
+            case 'omekatheme':
+                return $this->extractAddonListFromOmeka($content, $type);
+        }
     }
 
     /**
@@ -238,6 +255,84 @@ class Addons extends AbstractPlugin
             $addon['type'] = $type;
             $addon['name'] = $name;
             $addon['basename'] = basename($url);
+            $addon['dir'] = $addonName;
+            $addon['version'] = $version;
+            $addon['zip'] = $zip;
+            $addon['server'] = $server;
+
+            $list[$url] = $addon;
+        }
+
+        return $list;
+    }
+
+    /**
+     * Helper to parse html to get urls and names of addons.
+     *
+     * @param string $html
+     * @param string $type
+     * @return array
+     */
+    protected function extractAddonListFromOmeka($html, $type)
+    {
+        $list = array();
+
+        libxml_use_internal_errors(true);
+        $pokemon_doc = new DOMDocument();
+        $result = $pokemon_doc->loadHTML($html);
+        $pokemon_xpath = new DOMXPath($pokemon_doc);
+
+        // New format is the one of Github: /TagVersion/NameGivenByAuthor.zip.
+        switch ($type) {
+            case 'omekamodule':
+                $query = '//div[@id="module-list"]/div[@class="module"]/div[@class="download"]/a[@class="button"]/@href';
+                break;
+            case 'omekatheme':
+                $query = '//div[@id="theme-list"]/div[@class="theme"]/div[@class="download"]/a[@class="button"]/@href';
+                break;
+            default:
+                return [];
+        }
+
+        $pokemon_row = $pokemon_xpath->query($query);
+        if ($pokemon_row->length <= 0) {
+            // Check if the site is still broken.
+            $html = str_replace('</footer>', '</nav></footer>', $html);
+            $pokemon_doc = new DOMDocument();
+            $result = $pokemon_doc->loadHTML($html);
+            $pokemon_xpath = new DOMXPath($pokemon_doc);
+            $pokemon_row = $pokemon_xpath->query($query);
+            if ($pokemon_row->length <= 0) {
+                return array();
+            }
+        }
+
+        foreach ($pokemon_row as $row) {
+            $url = $row->nodeValue;
+            $filename = basename(parse_url($url, PHP_URL_PATH));
+            $query = '//a[@href="' . $url . '"]/../../div/h4/a';
+            $name_row = $pokemon_xpath->query($query);
+            if (empty($name_row)) {
+                continue;
+            }
+            $name = $name_row->item(0)->nodeValue;
+
+            $query = '//a[@href="' . $url . '"]/../span[@class="version"]';
+            $version_row = $pokemon_xpath->query($query);
+            $version = $version_row->item(0)->nodeValue;
+            $version = trim(str_replace('Latest Version:', '', $version));
+
+            $query = '//a[@href="' . $url . '"]/../../div/h4/a/@href';
+            $addon_row = $pokemon_xpath->query($query);
+            $addonName = $addon_row->item(0)->nodeValue;
+
+            $server = strtolower(parse_url($url, PHP_URL_HOST));
+            $zip = $url;
+
+            $addon = array();
+            $addon['type'] = $type;
+            $addon['name'] = $name;
+            $addon['basename'] = $addonName;
             $addon['dir'] = $addonName;
             $addon['version'] = $version;
             $addon['zip'] = $zip;
