@@ -26,11 +26,11 @@ class Addons extends AbstractPlugin
             'destination' => '/themes',
         ),
         'module' => [
-            'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/docs/_data/omeka_s_modules.csv',
+            'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/_data/omeka_s_modules.csv',
             'destination' => '/modules',
         ],
         'theme' => [
-            'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/docs/_data/omeka_s_themes.csv',
+            'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/_data/omeka_s_themes.csv',
             'destination' => '/themes',
         ],
     ];

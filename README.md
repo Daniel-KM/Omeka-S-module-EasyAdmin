@@ -79,7 +79,7 @@ Copyright
 [Easy Install]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
-[Omeka Classic]: https://omeka.org
+[Omeka Classic]: https://omeka.org/classic
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
 [themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall/issues
