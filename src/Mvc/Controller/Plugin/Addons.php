@@ -40,14 +40,14 @@ class Addons extends AbstractPlugin
      *
      * @var int
      */
-    protected $expirationSeconds = 86400;
+    protected $expirationSeconds = 3600;
 
     /**
      * Expiration hops.
      *
      * @var int
      */
-    protected $expirationHops = 50;
+    protected $expirationHops = 10;
 
     /**
      * Cache for the list of addons.
