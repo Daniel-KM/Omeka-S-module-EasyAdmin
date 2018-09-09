@@ -1,8 +1,9 @@
 <?php
 use Omeka\Stdlib\Message;
 
-$form->prepare();
+$translate = $this->plugin('translate');
 $escapeHtml = $this->plugin('escapeHtml');
+$form->prepare();
 ?>
 
 <?php echo $this->pageTitle($this->translate('Easy Install')); ?>

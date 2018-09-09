@@ -148,7 +148,7 @@ class IndexController extends AbstractActionController
         if (empty($handle)) {
             return false;
         }
-        $result = (boolean) file_put_contents($destination, $handle);
+        $result = (bool) file_put_contents($destination, $handle);
         @fclose($handle);
         return $result;
     }

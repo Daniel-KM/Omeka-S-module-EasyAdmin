@@ -52,7 +52,7 @@ class Addons extends AbstractPlugin
     /**
      * Cache for the list of addons.
      *
-     * @var string
+     * @var array
      */
     protected $addons;
 
