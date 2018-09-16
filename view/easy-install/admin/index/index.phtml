@@ -1,26 +1,24 @@
 <?php
-use Omeka\Stdlib\Message;
-
 $translate = $this->plugin('translate');
 $escapeHtml = $this->plugin('escapeHtml');
 $form->prepare();
 ?>
 
-<?php echo $this->pageTitle($this->translate('Easy Install')); ?>
+<?php echo $this->pageTitle($translate('Easy Install')); ?>
 <p class="explanation">
-    <?php echo new Message($this->translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
+    <?php echo sprintf($translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html">', '</a>',
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html">', '</a>',
         '<a href="https://omeka.org/s">', '</a>'); ?>
 </p>
 <p class="explanation">
-    <?php echo $this->translate('Select either a module or a theme.'); ?>
-    <?php echo $this->translate('Addons with an asterisk are already downloaded.'); ?>
+    <?php echo $translate('Select either a module or a theme.'); ?>
+    <?php echo $translate('Addons with an asterisk are already downloaded.'); ?>
 </p>
 
 <?php echo $this->form()->openTag($form); ?>
 <?php echo $this->formCollection($form, false); ?>
 <fieldset id='upload'>
-    <button type="submit"><?php echo $this->translate('Upload'); ?></button>
+    <button type="submit"><?php echo $translate('Upload'); ?></button>
 </fieldset>
 <?php echo $this->form()->closeTag($form); ?>
