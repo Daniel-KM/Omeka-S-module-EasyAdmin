@@ -236,19 +236,23 @@ class Addons extends AbstractPlugin
 
             $url = $row[$headers['Url']];
             $name = $row[$headers['Name']];
-            $version = $row[$headers['Last Version']];
+            $version = $row[$headers['Last version']];
             $addonName = preg_replace('~[^A-Za-z0-9]~', '', $name);
             $server = strtolower(parse_url($url, PHP_URL_HOST));
-            switch ($server) {
-                case 'github.com':
-                    $zip = $url . '/archive/master.zip';
-                    break;
-                case 'gitlab.com':
-                    $zip = $url . '/repository/archive.zip';
-                    break;
-                default:
-                    $zip = $url . '/master.zip';
-                    break;
+
+            $zip = $row[$headers['Last released zip']];
+            if (!$zip) {
+                switch ($server) {
+                    case 'github.com':
+                        $zip = $url . '/archive/master.zip';
+                        break;
+                    case 'gitlab.com':
+                        $zip = $url . '/repository/archive.zip';
+                        break;
+                    default:
+                        $zip = $url . '/master.zip';
+                        break;
+                }
             }
 
             $addon = [];
