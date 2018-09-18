@@ -296,8 +296,6 @@ class Addons extends AbstractPlugin
 
         $pokemon_row = $pokemon_xpath->query($query);
         if ($pokemon_row->length <= 0) {
-            // Check if the site is still broken.
-            $html = str_replace('</footer>', '</nav></footer>', $html);
             $pokemon_doc = new DOMDocument();
             $pokemon_doc->loadHTML($html);
             $pokemon_xpath = new DOMXPath($pokemon_doc);
