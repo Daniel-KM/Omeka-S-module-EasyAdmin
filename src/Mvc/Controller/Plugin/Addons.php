@@ -279,7 +279,7 @@ class Addons extends AbstractPlugin
 
         libxml_use_internal_errors(true);
         $pokemon_doc = new DOMDocument();
-        $result = $pokemon_doc->loadHTML($html);
+        $pokemon_doc->loadHTML($html);
         $pokemon_xpath = new DOMXPath($pokemon_doc);
 
         // New format is the one of Github: /TagVersion/NameGivenByAuthor.zip.
@@ -299,7 +299,7 @@ class Addons extends AbstractPlugin
             // Check if the site is still broken.
             $html = str_replace('</footer>', '</nav></footer>', $html);
             $pokemon_doc = new DOMDocument();
-            $result = $pokemon_doc->loadHTML($html);
+            $pokemon_doc->loadHTML($html);
             $pokemon_xpath = new DOMXPath($pokemon_doc);
             $pokemon_row = $pokemon_xpath->query($query);
             if ($pokemon_row->length <= 0) {
@@ -309,7 +309,7 @@ class Addons extends AbstractPlugin
 
         foreach ($pokemon_row as $row) {
             $url = $row->nodeValue;
-            $filename = basename(parse_url($url, PHP_URL_PATH));
+            // $filename = basename(parse_url($url, PHP_URL_PATH));
             $query = '//a[@href="' . $url . '"]/../../div/h4/a';
             $name_row = $pokemon_xpath->query($query);
             if (empty($name_row)) {

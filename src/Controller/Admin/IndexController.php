@@ -176,6 +176,7 @@ class IndexController extends AbstractActionController
         else {
             // Check if the zip command exists.
             try {
+                $status = $output = $errors = null;
                 $this->executeCommand('unzip', $status, $output, $errors);
             } catch (\Exception $e) {
                 $status = 1;
@@ -328,6 +329,7 @@ class IndexController extends AbstractActionController
             1 => ['pipe', 'w'], //STDOUT
             2 => ['pipe', 'w'], //STDERR
         ];
+        $pipes = [];
         if ($proc = proc_open($command, $descriptorSpec, $pipes, getcwd())) {
             $output = stream_get_contents($pipes[1]);
             $errors = stream_get_contents($pipes[2]);
