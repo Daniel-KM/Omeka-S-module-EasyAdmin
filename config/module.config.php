@@ -46,6 +46,8 @@ return [
             [
                 'label' => 'Easy Install',
                 'route' => 'admin/easy-install',
+                'resource' => 'Omeka\Controller\Admin\Module',
+                'privilege' => 'browse',
             ],
         ],
     ],
