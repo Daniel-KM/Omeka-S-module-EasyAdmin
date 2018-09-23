@@ -30,11 +30,22 @@
 namespace EasyInstall;
 
 use Omeka\Module\AbstractModule;
+use Omeka\Module\Exception\ModuleCannotInstallException;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
+    }
+
+    public function install(ServiceLocatorInterface $serviceLocator)
+    {
+        if (!(ini_get('allow_url_fopen') && ini_get('allow_url_include')) && !extension_loaded('curl')) {
+            $translator = $serviceLocator->get('MvcTranslator');
+            $message = $translator->translate('Currently, EasyInstall requires either the options "allow_url_fopen" and "allow_url_include", either the PHP curl extension. See readme.');
+            throw new ModuleCannotInstallException($message);
+        }
     }
 }

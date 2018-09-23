@@ -15,7 +15,12 @@ See more details on [modules] and [themes].
 Installation
 ------------
 
-Uncompress files in the module directory and rename module folder `EasyInstall`.
+Requirement: The current release requires either the options `allow_url_fopen`
+and `allow_url_include` set to true, either the php extension `curl`.
+
+Uncompress files in the directory `modules` and rename folder `EasyInstall`.
+
+See general end user documentation for [Installing a module](http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules).
 
 
 Usage
