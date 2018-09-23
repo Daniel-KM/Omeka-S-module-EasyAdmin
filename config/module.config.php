@@ -18,8 +18,8 @@ return [
         ],
     ],
     'controller_plugins' => [
-        'invokables' => [
-            'easyInstallAddons' => Mvc\Controller\Plugin\Addons::class,
+        'factories' => [
+            'easyInstallAddons' => Service\ControllerPlugin\AddonsFactory::class,
         ],
     ],
     'router' => [

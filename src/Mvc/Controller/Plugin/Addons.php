@@ -3,14 +3,23 @@ namespace EasyInstall\Mvc\Controller\Plugin;
 
 use DOMDocument;
 use DOMXPath;
+use Omeka\Stdlib\Message;
+use Zend\Http\Client as HttpClient;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Session\Container;
+use Zend\Uri\Http as HttpUri;
+
 
 /**
  * List addons for Omeka.
  */
 class Addons extends AbstractPlugin
 {
+    /**
+     * @var HttpClient
+     */
+    protected $httpClient;
+
     /**
      * Source of data and destination of addons.
      *
@@ -55,6 +64,14 @@ class Addons extends AbstractPlugin
      * @var array
      */
     protected $addons;
+
+    /**
+     * @param HTTPClient
+     */
+    public function __construct(HttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
 
     /**
      * Return the addon list.
@@ -191,27 +208,18 @@ class Addons extends AbstractPlugin
      */
     protected function fileGetContents($url)
     {
-        if (ini_get('allow_url_fopen') && ini_get('allow_url_include')) {
-            return @file_get_contents($url);
-        }
+        $uri = new HttpUri($url);
+        $client = $this->httpClient;
+        $client->reset();
+        $client->setUri($uri);
+        $response = $client->send();
+        $response = $response->isOk() ? $response->getBody() : null;
 
-        $userAgent = 'Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($ch);
-        if (curl_errno($ch) || $response === false) {
+        if (empty($response)) {
             $this->getController()->messenger()->addError(
-                sprintf('Unable to fetch the url %s.', $url) // @translate
-                . ' ' . 'You should enable "allow_url_fopen" and "allow_url_include" in php.ini.' // @translate
-                . ' ' . curl_error($ch));
-            $response = null;
+                new Message('Unable to fetch the url %s.', $url)); // @translate
         }
-        curl_close($ch);
+
         return $response;
     }
 
