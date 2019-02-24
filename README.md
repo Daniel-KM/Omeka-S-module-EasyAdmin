@@ -17,7 +17,7 @@ Checks that are doable:
 Installation
 ------------
 
-This module requires the module [Log].
+This module requires the modules [`Generic`] and [`Log`].
 
 See general end user documentation for [installing a module].
 
@@ -43,6 +43,7 @@ TODO
 ----
 
 - Output results as tsv (`/files/check/tsv_date_time.tsv`).
+- Integrate the similar module [`Derivative Images`]?
 
 
 Warning
@@ -100,7 +101,9 @@ Copyright
 [Omeka S]: https://omeka.org/s
 [Archive Repertory]: https://github.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
-[Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
+[`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
+[`Log`]: https://github.com/Daniel-KM/Omeka-S-module-Log
+[`Derivative Images`]: https://github.com/Daniel-KM/Omeka-S-module-DerivativeImages
 [`BulkCheck.zip`]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/issues
