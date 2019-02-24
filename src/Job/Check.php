@@ -87,7 +87,7 @@ class Check extends AbstractJob
                 break;
             case 'files_excess_move':
                 if (!$this->createDir($this->basePath . '/check')) {
-                    $this->logger->error(
+                    $this->logger->err(
                         'Unable to prepare directory "{path}". Check rights.', // @translate
                         ['path' => '/files/check']
                     );
@@ -114,7 +114,7 @@ class Check extends AbstractJob
         if ($move) {
             $path = $this->basePath . '/check/original';
             if (!$this->createDir($path)) {
-                $this->logger->error(
+                $this->logger->err(
                     'Unable to prepare directory "{path}". Check rights.', // @translate
                     ['path' => '/files/check/original']
                 );
@@ -131,7 +131,7 @@ class Check extends AbstractJob
             if ($move) {
                 $path = $this->basePath . '/check/' . $type;
                 if (!$this->createDir($path)) {
-                    $this->logger->error(
+                    $this->logger->err(
                         'Unable to prepare directory "{path}". Check rights.', // @translate
                         ['path' => '/files/check/' . $type]
                     );
@@ -218,7 +218,7 @@ class Check extends AbstractJob
                 $dirname = dirname($movePath . '/' . $filename);
                 if ($dirname !== $movePath) {
                     if (!$this->createDir($dirname)) {
-                        $this->logger->error(
+                        $this->logger->err(
                             'Unable to prepare directory "{path}". Check rights.', // @translate
                             ['path' => '/files/check/' . $type . '/' . dirname($filename)]
                         );
@@ -232,7 +232,7 @@ class Check extends AbstractJob
                         ['filename' => $filename, 'type' => $type, 'processed' => $i, 'total' => $total]
                     );
                 } else {
-                    $this->logger->error(
+                    $this->logger->err(
                         'File "{filename}" (type "{type}") doesn’t exist in database, and cannot be moved.', // @translate
                         ['filename' => $filename, 'type' => $type]
                     );
