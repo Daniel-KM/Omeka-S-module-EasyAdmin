@@ -6,6 +6,13 @@ use Omeka\Job\AbstractJob;
 class Check extends AbstractJob
 {
     /**
+     * Limit for the loop to avoid heavy sql requests.
+     *
+     * @var integer
+     */
+    const SQL_LIMIT = 100;
+
+    /**
      * @var \Zend\Log\Logger
      */
     protected $logger;
@@ -58,6 +65,8 @@ class Check extends AbstractJob
         $processModes = [
             'files_excess',
             'files_excess_move',
+            // TODO Check files with the wrong extension.
+            'files_missing',
         ];
         if (!in_array($processMode, $processModes)) {
             $this->logger->info(
@@ -84,6 +93,9 @@ class Check extends AbstractJob
                     return;
                 }
                 $this->checkExcessFiles(true);
+                break;
+            case 'files_missing':
+                $this->checkMissingFiles();
                 break;
         }
 
@@ -145,8 +157,6 @@ class Check extends AbstractJob
             $this->createDir(dirname($movePath));
         }
 
-        $pathLength = strlen($path) + 1;
-
         $files = $this->listFilesInFolder($path);
 
         $total = count($files);
@@ -159,7 +169,7 @@ class Check extends AbstractJob
         );
 
         $i = 0;
-        foreach ($files as $filepath) {
+        foreach ($files as $filename) {
             if (($i % 100 === 0) && $i) {
                 $this->logger->info(
                     '{processed}/{total} files processed.', // @translate
@@ -174,7 +184,6 @@ class Check extends AbstractJob
             }
             ++$i;
 
-            $filename = substr($filepath, $pathLength);
             if ($isOriginal) {
                 $extension = pathinfo($filename, PATHINFO_EXTENSION);
                 $storageId = strlen($extension)
@@ -251,14 +260,138 @@ class Check extends AbstractJob
         return true;
     }
 
+    protected function checkMissingFiles()
+    {
+        $result = $this->checkMissingFilesForTypes(['original']);
+        if (!$result) {
+            return false;
+        }
+        $result = $this->checkMissingFilesForTypes(array_keys($this->config['thumbnails']['types']));
+        return $result;
+    }
+
+    protected function checkMissingFilesForTypes(array $types)
+    {
+        $criteria = [];
+        $isOriginal = in_array('original', $types);
+        if ($isOriginal) {
+            $criteria['hasOriginal'] = 1;
+            $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
+            $totalToProcess = $this->connection->query($sql)->fetchColumn();
+            $this->logger->info(
+                'Checking {total} media with original files.', // @translate
+                ['total' => $totalToProcess]
+            );
+        } else {
+            $criteria['hasThumbnails'] = 1;
+            $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
+            $totalToProcess = $this->connection->query($sql)->fetchColumn();
+            $this->logger->info(
+                'Checking {total} media with thumbnails.', // @translate
+                ['total' => $totalToProcess]
+            );
+        }
+
+        if (empty($totalToProcess)) {
+            $this->logger->info(
+                'No media to process.' // @translate
+            );
+            return true;
+        }
+
+        // First, list files.
+        $types = array_flip($types);
+        foreach (array_keys($types) as $type) {
+            $path = $this->basePath . '/' . $type;
+            $types[$type] = $this->listFilesInFolder($path);
+        }
+
+        // Second, loop all media data.
+        $offset = 0;
+        $key = 0;
+        $totalProcessed = 0;
+        $totalSucceed = 0;
+        $totalFailed = 0;
+        while (true) {
+            // Entity are used, because it's not possible to get the value
+            // "has_original" or "has_thumbnails" via api.
+            /** @var \Omeka\Entity\Media[] $medias */
+            $medias = $this->mediaRepository->findBy($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
+            if (!count($medias)) {
+                break;
+            }
+
+            if ($offset) {
+                $this->logger->info(
+                    '{processed}/{total} media processed.', // @translate
+                    ['processed' => $offset, 'total' => $totalToProcess]
+                );
+
+                if ($this->shouldStop()) {
+                    $this->logger->warn(
+                        'The job was stopped.' // @translate
+                    );
+                    return false;
+                }
+            }
+
+            foreach ($medias as $key => $media) {
+                foreach ($types as $type => $files) {
+                    $filename = $isOriginal ? $media->getFilename() : ($media->getStorageId() . '.jpg');
+                    if (in_array($filename, $files)) {
+                        ++$totalSucceed;
+                    } else {
+                        ++$totalFailed;
+                        $this->logger->warn(
+                            'Media #{media_id} ({processed}/{total}): file "{filename}" does not exist for type "{type}".', // @translate
+                            [
+                                'media_id' => $media->getId(),
+                                'processed' => $offset + $key + 1,
+                                'total' => $totalToProcess,
+                                'filename' => $filename,
+                                'type' => $type,
+                            ]
+                        );
+                    }
+                }
+
+                ++$totalProcessed;
+
+                // Avoid memory issue.
+                unset($media);
+            }
+
+            // Avoid memory issue.
+            unset($medias);
+            $this->mediaRepository->clear();
+
+            $offset += self::SQL_LIMIT;
+        }
+
+        $this->logger->info(
+            'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
+            [
+                'processed' => $totalProcessed,
+                'total' => $totalToProcess,
+                'total_succeed' => $totalSucceed,
+                'total_failed' => $totalFailed,
+                'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
+            ]
+        );
+
+        return true;
+    }
+
     /**
-     * Get full path of files filtered by extensions recursively in a directory.
+     * Get a relative or full path of files filtered by extensions recursively
+     * in a directory.
      *
      * @param string $dir
+     * @param bool $absolute
      * @param string $extensions
      * @return array
      */
-    protected  static function listFilesInFolder($dir, array $extensions = [])
+    protected function listFilesInFolder($dir, $absolute = false, array $extensions = [])
     {
         if (empty($dir) || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
             return [];
@@ -270,8 +403,15 @@ class Check extends AbstractJob
         $iterator = new \RecursiveIteratorIterator($directory);
         $regex = new \RegexIterator($iterator, $regex, \RecursiveRegexIterator::GET_MATCH);
         $files = [];
-        foreach ($regex as $file) {
-            $files[] = reset($file);
+        if ($absolute) {
+            foreach ($regex as $file) {
+                $files[] = reset($file);
+            }
+        } else {
+            $dirLength = strlen($dir) + 1;
+            foreach ($regex as $file) {
+                $files[] = substr(reset($file), $dirLength);
+            }
         }
         sort($files);
         return $files;

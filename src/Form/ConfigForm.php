@@ -16,6 +16,7 @@ class ConfigForm extends Form
                 'value_options' => [
                     'files_excess' => 'List files that are present in "/files/", but not in database', // @translate
                     'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
+                    'files_missing' => 'List files that are present in database, not in "/files/"', // @translate
                 ],
             ],
             'attributes' => [
