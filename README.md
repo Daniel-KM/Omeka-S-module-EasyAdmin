@@ -10,6 +10,8 @@ Checks that are doable:
 - files in the database, but not in the file system (original and thumbnails)
 - remove empty directories in file system (original and thumbnails, mainly for
   module [Archive Repertory])
+- check and update file size of media (required to fix Omeka installed before
+  Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
 
 
 Installation
@@ -97,6 +99,7 @@ Copyright
 [Bulk Check]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Omeka S]: https://omeka.org/s
 [Archive Repertory]: https://github.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
+[omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
 [Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
 [`BulkCheck.zip`]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules

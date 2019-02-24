@@ -18,6 +18,8 @@ class ConfigForm extends Form
                     'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
                     'files_missing' => 'List files that are present in database, not in "/files/"', // @translate
                     'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
+                    'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
+                    'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                 ],
             ],
             'attributes' => [
