@@ -2,7 +2,6 @@
 namespace BulkCheck\Job;
 
 use Omeka\Job\AbstractJob;
-use Zend\Log\Logger;
 
 class Check extends AbstractJob
 {
@@ -53,6 +52,8 @@ class Check extends AbstractJob
         $this->config = $services->get('Config');
         $this->basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
+        // TODO Add a tsv output in /check/process_date_time.tsv.
+
         $processMode = $this->getArg('process_mode');
         $processModes = [
             'files_excess',
@@ -101,10 +102,15 @@ class Check extends AbstractJob
                     'Unable to prepare directory "{path}". Check rights.', // @translate
                     ['path' => '/files/check/original']
                 );
-                return;
+                return false;
             }
         }
-        $this->checkExcessFilesForType('original', $move);
+
+        $result = $this->checkExcessFilesForType('original', $move);
+        if (!$result) {
+            return false;
+        }
+
         foreach (array_keys($this->config['thumbnails']['types']) as $type) {
             if ($move) {
                 $path = $this->basePath . '/check/' . $type;
@@ -113,11 +119,17 @@ class Check extends AbstractJob
                         'Unable to prepare directory "{path}". Check rights.', // @translate
                         ['path' => '/files/check/' . $type]
                     );
-                    return;
+                    return false;
                 }
             }
-            $this->checkExcessFilesForType($type, $move);
+
+            $result = $this->checkExcessFilesForType($type, $move);
+            if (!$result) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     protected function checkExcessFilesForType($type, $move)
@@ -148,13 +160,20 @@ class Check extends AbstractJob
 
         $i = 0;
         foreach ($files as $filepath) {
-            ++$i;
-            if ($i % 100 === 0) {
+            if (($i % 100 === 0) && $i) {
                 $this->logger->info(
                     '{processed}/{total} files processed.', // @translate
                     ['processed' => $i, 'total' => $total]
                 );
+                if ($this->shouldStop()) {
+                    $this->logger->warn(
+                        'The job was stopped.' // @translate
+                    );
+                    return false;
+                }
             }
+            ++$i;
+
             $filename = substr($filepath, $pathLength);
             if ($isOriginal) {
                 $extension = pathinfo($filename, PATHINFO_EXTENSION);
@@ -190,7 +209,7 @@ class Check extends AbstractJob
                             'Unable to prepare directory "{path}". Check rights.', // @translate
                             ['path' => '/files/check/' . $type . '/' . dirname($filename)]
                         );
-                        return;
+                        return false;
                     }
                 }
                 $result = @rename($path . '/' . $filename, $movePath . '/' . $filename);
@@ -204,7 +223,7 @@ class Check extends AbstractJob
                         'File "{filename}" (type "{type}") doesn’t exist in database, and cannot be moved.', // @translate
                         ['filename' => $filename, 'type' => $type]
                     );
-                    return;
+                    return false;
                 }
             } else {
                 $this->logger->warn(
@@ -228,6 +247,8 @@ class Check extends AbstractJob
                 ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
             );
         }
+
+        return true;
     }
 
     /**
