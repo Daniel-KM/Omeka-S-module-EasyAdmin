@@ -17,6 +17,7 @@ class ConfigForm extends Form
                     'files_excess' => 'List files that are present in "/files/", but not in database', // @translate
                     'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
                     'files_missing' => 'List files that are present in database, not in "/files/"', // @translate
+                    'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                 ],
             ],
             'attributes' => [

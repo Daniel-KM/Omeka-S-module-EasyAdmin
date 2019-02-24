@@ -67,6 +67,7 @@ class Check extends AbstractJob
             'files_excess_move',
             // TODO Check files with the wrong extension.
             'files_missing',
+            'dirs_excess',
         ];
         if (!in_array($processMode, $processModes)) {
             $this->logger->info(
@@ -96,6 +97,9 @@ class Check extends AbstractJob
                 break;
             case 'files_missing':
                 $this->checkMissingFiles();
+                break;
+            case 'dirs_excess':
+                $this->removeEmptyDirs();
                 break;
         }
 
@@ -382,6 +386,34 @@ class Check extends AbstractJob
         return true;
     }
 
+    protected function removeEmptyDirs()
+    {
+        $result = $this->removeEmptyDirsForType('original');
+        if (!$result) {
+            return false;
+        }
+
+        foreach (array_keys($this->config['thumbnails']['types']) as $type) {
+            $result = $this->removeEmptyDirsForType($type);
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function removeEmptyDirsForType($type)
+    {
+        $path = $this->basePath . '/' . $type;
+        $this->logger->info(
+            'Processing type "{type}".', // @translate
+            ['type' => $type]
+        );
+        $this->removeEmptySubFolders($path, true);
+        return true;
+    }
+
     /**
      * Get a relative or full path of files filtered by extensions recursively
      * in a directory.
@@ -415,6 +447,24 @@ class Check extends AbstractJob
         }
         sort($files);
         return $files;
+    }
+
+    /**
+     * Remove empty sub-folders recursively.
+     *
+     * @see https://stackoverflow.com/questions/1833518/remove-empty-subfolders-with-php
+     *
+     * @param string $path
+     * @param bool $root
+     * @return bool
+     */
+    protected function removeEmptySubFolders($path, $root = false)
+    {
+        $empty = true;
+        foreach (glob($path . DIRECTORY_SEPARATOR . '{,.}[!.,!..]*', GLOB_MARK | GLOB_BRACE) as $file) {
+            $empty &= is_dir($file) && $this->removeEmptySubFolders($file);
+        }
+        return $empty && !$root && rmdir($path);
     }
 
     protected function createDir($path)

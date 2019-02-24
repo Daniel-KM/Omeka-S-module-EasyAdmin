@@ -8,6 +8,8 @@ Checks that are doable:
 
 - files in the file system (original and thumbnails), but not in the database
 - files in the database, but not in the file system (original and thumbnails)
+- remove empty directories in file system (original and thumbnails, mainly for
+  module [Archive Repertory])
 
 
 Installation
@@ -94,6 +96,8 @@ Copyright
 
 [Bulk Check]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Omeka S]: https://omeka.org/s
+[Archive Repertory]: https://github.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
+[Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
 [`BulkCheck.zip`]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/issues
