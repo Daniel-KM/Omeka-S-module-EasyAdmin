@@ -90,7 +90,10 @@ class IndexController extends AbstractActionController
             foreach ($addon['dependencies'] as $dependency) {
                 $module = $this->getModule($dependency);
                 if (empty($module)
-                    || $module->getJsonLd()['o:state'] !== \Omeka\Module\Manager::STATE_ACTIVE
+                    || (
+                        $dependency !== 'Generic'
+                        && $module->getJsonLd()['o:state'] !== \Omeka\Module\Manager::STATE_ACTIVE
+                    )
                 ) {
                     $missingDependencies[] = $dependency;
                 }
@@ -168,6 +171,30 @@ class IndexController extends AbstractActionController
 
         // Move the addon to its destination.
         $result = $this->moveAddon($addon);
+
+        // Check the special case of dependency Generic to avoid a fatal error.
+        // This is used only for modules downloaded from omeka.org, since the
+        // dependencies are not available here.
+        // TODO Get the dependencies for the modules on omeka.org.
+        if ($type === 'module') {
+            $moduleFile = $destination . DIRECTORY_SEPARATOR . $addon['dir'] . DIRECTORY_SEPARATOR . 'Module.php';
+            if (file_exists($moduleFile) && filesize($moduleFile)) {
+                $modulePhp = file_get_contents($moduleFile);
+                if (strpos($modulePhp, 'use Generic\AbstractModule;')) {
+                    $module = $this->getModule('Generic');
+                    if (empty($module)) {
+                        $this->messenger()->addError(new Message(
+                            'The module "%s" requires the dependency "Generic" available first.', // @translate
+                            $addon['name']
+                        ));
+                        // Remove the folder to avoid a fatal error (Generic is a
+                        // required abstract class).
+                        $this->rmDir($destination . DIRECTORY_SEPARATOR . $addon['dir']);
+                        return;
+                    }
+                }
+            }
+        }
 
         $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
             $addon['name'], Inflector::pluralize($type));
@@ -413,5 +440,28 @@ class IndexController extends AbstractActionController
                 $command
             ));
         }
+    }
+
+    /**
+     * Remove a dir from filesystem.
+     *
+     * @param string $dirpath Absolute path.
+     * @return bool
+     */
+    private function rmDir($dirPath)
+    {
+        if (!file_exists($dirPath)) {
+            return true;
+        }
+        $files = array_diff(scandir($dirPath), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dirPath . '/' . $file;
+            if (is_dir($path)) {
+                $this->rmDir($path);
+            } else {
+                unlink($path);
+            }
+        }
+        return rmdir($dirPath);
     }
 }
