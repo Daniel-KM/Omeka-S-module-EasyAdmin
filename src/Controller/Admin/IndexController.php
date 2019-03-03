@@ -20,7 +20,8 @@ class IndexController extends AbstractActionController
         $addons = $form->getAddons();
         if ($addons->isEmpty()) {
             $this->messenger()->addWarning(
-                'No addon to list: check your connection.'); // @translate
+                'No addon to list: check your connection.' // @translate
+            );
             return $view;
         }
 
@@ -34,7 +35,8 @@ class IndexController extends AbstractActionController
 
         if (!$form->isValid()) {
             $this->messenger()->addError(
-                'There was an error on the form. Please try again.'); // @translate
+                'There was an error on the form. Please try again.' // @translate
+            );
             return $view;
         }
 
@@ -46,7 +48,10 @@ class IndexController extends AbstractActionController
                     // Hack to get a clean message.
                     $type = str_replace('omeka', '', $type);
                     $this->messenger()->addError(new Message(
-                        'The %s "%s" is already downloaded.', $type, $addon['name'])); // @translate
+                        'The %s "%s" is already downloaded.', // @translate
+                        $type,
+                        $addon['name']
+                    ));
                     return $this->redirect()->toRoute(null, ['action' => 'index'], true);
                 }
                 $this->installAddon($addon);
@@ -55,7 +60,8 @@ class IndexController extends AbstractActionController
         }
 
         $this->messenger()->addError(
-            'Nothing processed. Please try again.'); // @translate
+            'Nothing processed. Please try again.' // @translate
+        );
         return $this->redirect()->toRoute(null, ['action' => 'index'], true);
     }
 
@@ -82,12 +88,16 @@ class IndexController extends AbstractActionController
         $isWriteableDestination = is_writeable($destination);
         if (!$isWriteableDestination) {
             $this->messenger()->addError(new Message(
-                'The %s directory is not writeable by the server.', $type)); // @translate
+                'The %s directory is not writeable by the server.', // @translate
+                $type
+            ));
             return;
         }
         // Add a message for security hole.
         $this->messenger()->addWarning(new Message(
-            'Don’t forget to protect the %s directory from writing after installation.', $type)); // @translate
+            'Don’t forget to protect the %s directory from writing after installation.', // @translate
+            $type
+        ));
 
         // Local zip file path.
         $zipFile = $destination . DIRECTORY_SEPARATOR . basename($addon['zip']);
@@ -95,14 +105,19 @@ class IndexController extends AbstractActionController
             $result = @unlink($zipFile);
             if (!$result) {
                 $this->messenger()->addError(new Message(
-                    'A zipfile exists with the same name in the %s directory and cannot be removed.', $type)); // @translate
+                    'A zipfile exists with the same name in the %s directory and cannot be removed.', // @translate
+                    $type
+                ));
                 return;
             }
         }
 
         if (file_exists($destination . DIRECTORY_SEPARATOR . $addon['dir'])) {
             $this->messenger()->addError(new Message(
-                'The %s directory "%s" already exists.', $type, $addon['dir'])); // @translate
+                'The %s directory "%s" already exists.', // @translate
+                $type,
+                $addon['dir']
+            ));
             return;
         }
 
@@ -110,7 +125,10 @@ class IndexController extends AbstractActionController
         $result = $this->downloadFile($addon['zip'], $zipFile);
         if (!$result) {
             $this->messenger()->addError(new Message(
-                'Unable to fetch the %s "%s".', $type, $addon['name'])); // @translate
+                'Unable to fetch the %s "%s".', // @translate
+                $type,
+                $addon['name']
+            ));
             return;
         }
 
@@ -119,20 +137,26 @@ class IndexController extends AbstractActionController
 
         unlink($zipFile);
 
-        if ($result) {
-            $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
-                $addon['name'], Inflector::pluralize($type));
-            $result = $this->moveAddon($addon);
-            $this->messenger()->add(
-                $result ? Messenger::NOTICE : Messenger::WARNING,
-                $message);
-            $this->messenger()->addSuccess(new Message(
-                '%s uploaded successfully', ucfirst($type))); // @translate
-        } else {
+        if (!$result) {
             $this->messenger()->addError(new Message(
                 'An error occurred during the unzipping of the %s "%s".', // @translate
-                    $type, $addon['name']));
+                $type,
+                $addon['name']
+            ));
+            return;
         }
+
+        $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
+            $addon['name'], Inflector::pluralize($type));
+        $result = $this->moveAddon($addon);
+        $this->messenger()->add(
+            $result ? Messenger::NOTICE : Messenger::WARNING,
+            $message
+        );
+        $this->messenger()->addSuccess(new Message(
+            '%s uploaded successfully', // @translate
+            ucfirst($type)
+        ));
     }
 
     /**
@@ -200,8 +224,9 @@ class IndexController extends AbstractActionController
     /**
      * Helper to rename the directory of an addon.
      *
-     * @internal The name of the directory is unknown, because it is a subfolder
-     * inside the zip file.
+     * The name of the directory is unknown, because it is a subfolder inside
+     * the zip file, and the name of the module may be different from the name
+     * of the directory.
      * @todo Get the directory name from the zip.
      *
      * @param string $addon
@@ -217,7 +242,7 @@ class IndexController extends AbstractActionController
                 $destination = OMEKA_PATH . '/themes';
                 break;
             default:
-                return;
+                return false;
         }
 
         // Allows to manage case like AddItemLink, where the project name on
@@ -264,34 +289,34 @@ class IndexController extends AbstractActionController
             ['omeka_S_Theme_', '-master'],
         ];
 
-        $name = '';
+        $source = '';
         foreach ($loop as $addonName) {
             foreach ($checks as $check) {
-                $checkName = $destination . DIRECTORY_SEPARATOR
+                $sourceCheck = $destination . DIRECTORY_SEPARATOR
                     . $check[0] . $addonName . $check[1];
-                if (file_exists($checkName)) {
-                    $name = $checkName;
+                if (file_exists($sourceCheck)) {
+                    $source = $sourceCheck;
                     break 2;
                 }
                 // Allows to manage case like name is "Ead", not "EAD".
-                $checkName = $destination . DIRECTORY_SEPARATOR
+                $sourceCheck = $destination . DIRECTORY_SEPARATOR
                     . $check[0] . ucfirst(strtolower($addonName)) . $check[1];
-                if (file_exists($checkName)) {
-                    $name = $checkName;
+                if (file_exists($sourceCheck)) {
+                    $source = $sourceCheck;
                     $addonName = ucfirst(strtolower($addonName));
                     break 2;
                 }
                 if ($check[0]) {
-                    $checkName = $destination . DIRECTORY_SEPARATOR
+                    $sourceCheck = $destination . DIRECTORY_SEPARATOR
                         . ucfirst($check[0]) . $addonName . $check[1];
-                    if (file_exists($checkName)) {
-                        $name = $checkName;
+                    if (file_exists($sourceCheck)) {
+                        $source = $sourceCheck;
                         break 2;
                     }
-                    $checkName = $destination . DIRECTORY_SEPARATOR
+                    $sourceCheck = $destination . DIRECTORY_SEPARATOR
                         . ucfirst($check[0]) . ucfirst(strtolower($addonName)) . $check[1];
-                    if (file_exists($checkName)) {
-                        $name = $checkName;
+                    if (file_exists($sourceCheck)) {
+                        $source = $sourceCheck;
                         $addonName = ucfirst(strtolower($addonName));
                         break 2;
                     }
@@ -299,12 +324,16 @@ class IndexController extends AbstractActionController
             }
         }
 
-        if (empty($name)) {
+        if ($source === '') {
             return false;
         }
 
         $path = $destination . DIRECTORY_SEPARATOR . $addon['dir'];
-        return rename($name, $path);
+        if ($source === $path) {
+            return true;
+        }
+
+        return rename($source, $path);
     }
 
     /**
@@ -339,7 +368,9 @@ class IndexController extends AbstractActionController
             $status = proc_close($proc);
         } else {
             throw new \Exception(new Message(
-                'Failed to execute command: %s', $command));
+                'Failed to execute command: %s', // @translate
+                $command
+            ));
         }
     }
 }

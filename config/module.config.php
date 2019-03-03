@@ -9,7 +9,7 @@ return [
     ],
     'form_elements' => [
         'factories' => [
-            'EasyInstall\Form\UploadForm' => Service\Form\UploadFormFactory::class,
+            Form\UploadForm::class => Service\Form\UploadFormFactory::class,
         ],
     ],
     'controllers' => [
@@ -27,7 +27,7 @@ return [
             'admin' => [
                 'child_routes' => [
                     'easy-install' => [
-                        'type' => 'Literal',
+                        'type' => \Zend\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/easy-install',
                             'defaults' => [

@@ -14,4 +14,3 @@ class AddonsFactory implements FactoryInterface
         );
     }
 }
-

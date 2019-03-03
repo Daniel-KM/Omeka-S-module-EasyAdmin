@@ -32,7 +32,6 @@ class UploadForm extends Form
                 continue;
             }
             $valueOptions = [];
-            $valueOptions[''] = 'Select below'; // @translate
             foreach ($addonsForType as $url => $addon) {
                 $label = $addon['name'];
                 $label .= $addon['version'] ? ' [v' . $addon['version'] . ']' : '[]';
@@ -46,8 +45,13 @@ class UploadForm extends Form
                 'options' => [
                     'label' => $addonLabels[$addonType],
                     'info' => '',
-                    'empty_option' => 'Select below', // @translate
+                    'empty_option' => '',
                     'value_options' => $valueOptions,
+                ],
+                'attributes' => [
+                    'id' => $addonType,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select below…', // @translate
                 ],
             ]);
 

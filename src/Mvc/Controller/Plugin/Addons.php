@@ -9,7 +9,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\Session\Container;
 use Zend\Uri\Http as HttpUri;
 
-
 /**
  * List addons for Omeka.
  */
@@ -217,7 +216,8 @@ class Addons extends AbstractPlugin
 
         if (empty($response)) {
             $this->getController()->messenger()->addError(
-                new Message('Unable to fetch the url %s.', $url)); // @translate
+                new Message('Unable to fetch the url %s.', $url) // @translate
+            );
         }
 
         return $response;
@@ -290,9 +290,9 @@ class Addons extends AbstractPlugin
         $list = array();
 
         libxml_use_internal_errors(true);
-        $pokemon_doc = new DOMDocument();
-        $pokemon_doc->loadHTML($html);
-        $pokemon_xpath = new DOMXPath($pokemon_doc);
+        $htmlDom = new DOMDocument();
+        $htmlDom->loadHTML($html);
+        $xpath = new DOMXPath($htmlDom);
 
         // New format is the one of Github: /TagVersion/NameGivenByAuthor.zip.
         switch ($type) {
@@ -306,35 +306,35 @@ class Addons extends AbstractPlugin
                 return [];
         }
 
-        $pokemon_row = $pokemon_xpath->query($query);
-        if ($pokemon_row->length <= 0) {
-            $pokemon_doc = new DOMDocument();
-            $pokemon_doc->loadHTML($html);
-            $pokemon_xpath = new DOMXPath($pokemon_doc);
-            $pokemon_row = $pokemon_xpath->query($query);
-            if ($pokemon_row->length <= 0) {
-                return array();
+        $rows = $xpath->query($query);
+        if ($rows->length <= 0) {
+            $htmlDom = new DOMDocument();
+            $htmlDom->loadHTML($html);
+            $xpath = new DOMXPath($htmlDom);
+            $rows = $xpath->query($query);
+            if ($rows->length <= 0) {
+                return [];
             }
         }
 
-        foreach ($pokemon_row as $row) {
+        foreach ($rows as $row) {
             $url = $row->nodeValue;
             // $filename = basename(parse_url($url, PHP_URL_PATH));
             $query = '//a[@href="' . $url . '"]/../../div/h4/a';
-            $name_row = $pokemon_xpath->query($query);
-            if (empty($name_row)) {
+            $nameRows = $xpath->query($query);
+            if (empty($nameRows)) {
                 continue;
             }
-            $name = $name_row->item(0)->nodeValue;
+            $name = $nameRows->item(0)->nodeValue;
 
             $query = '//a[@href="' . $url . '"]/../span[@class="version"]';
-            $version_row = $pokemon_xpath->query($query);
-            $version = $version_row->item(0)->nodeValue;
+            $versionRows = $xpath->query($query);
+            $version = $versionRows->item(0)->nodeValue;
             $version = trim(str_replace('Latest Version:', '', $version));
 
             $query = '//a[@href="' . $url . '"]/../../div/h4/a/@href';
-            $addon_row = $pokemon_xpath->query($query);
-            $addonName = $addon_row->item(0)->nodeValue;
+            $addonRows = $xpath->query($query);
+            $addonName = $addonRows->item(0)->nodeValue;
 
             $server = strtolower(parse_url($url, PHP_URL_HOST));
             $zip = $url;
