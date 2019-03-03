@@ -85,6 +85,26 @@ class IndexController extends AbstractActionController
                 return;
         }
 
+        $missingDependencies = [];
+        if (!empty($addon['dependencies'])) {
+            foreach ($addon['dependencies'] as $dependency) {
+                $module = $this->getModule($dependency);
+                if (empty($module)
+                    || $module->getJsonLd()['o:state'] !== \Omeka\Module\Manager::STATE_ACTIVE
+                ) {
+                    $missingDependencies[] = $dependency;
+                }
+            }
+        }
+        if ($missingDependencies) {
+            $this->messenger()->addError(new Message(
+                'The module "%s" requires the dependencies "%s" installed and enabled first.', // @translate
+                $addon['name'],
+                implode('", "', $missingDependencies)
+            ));
+            return;
+        }
+
         $isWriteableDestination = is_writeable($destination);
         if (!$isWriteableDestination) {
             $this->messenger()->addError(new Message(
@@ -146,9 +166,11 @@ class IndexController extends AbstractActionController
             return;
         }
 
+        // Move the addon to its destination.
+        $result = $this->moveAddon($addon);
+
         $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
             $addon['name'], Inflector::pluralize($type));
-        $result = $this->moveAddon($addon);
         $this->messenger()->add(
             $result ? Messenger::NOTICE : Messenger::WARNING,
             $message
@@ -156,6 +178,10 @@ class IndexController extends AbstractActionController
         $this->messenger()->addSuccess(new Message(
             '%s uploaded successfully', // @translate
             ucfirst($type)
+        ));
+
+        $this->messenger()->addNotice(new Message(
+            'It is always recommended to read the original readme or help of the addon.' // @translate
         ));
     }
 
@@ -334,6 +360,21 @@ class IndexController extends AbstractActionController
         }
 
         return rename($source, $path);
+    }
+
+    /**
+     * Get a module by its name.
+     *
+     * @todo Modules cannot be api read or fetch one by one by the api (core issue).
+     *
+     * @param string $module
+     * @return \Omeka\Api\Representation\ModuleRepresentation|null
+     */
+    protected function getModule($module)
+    {
+        /** @var \Omeka\Api\Representation\ModuleRepresentation[] $modules */
+        $modules = $this->api()->search('modules', ['id' => $module])->getContent();
+        return isset($modules[$module]) ? $modules[$module] : null;
     }
 
     /**

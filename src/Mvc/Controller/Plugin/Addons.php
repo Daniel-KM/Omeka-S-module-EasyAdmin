@@ -247,6 +247,9 @@ class Addons extends AbstractPlugin
             $version = $row[$headers['Last version']];
             $addonName = preg_replace('~[^A-Za-z0-9]~', '', $name);
             $server = strtolower(parse_url($url, PHP_URL_HOST));
+            $dependencies = empty($headers['Dependencies']) || empty($row[$headers['Dependencies']])
+                ? []
+                : array_filter(array_map('trim', explode(',', $row[$headers['Dependencies']])));
 
             $zip = $row[$headers['Last released zip']];
             if (!$zip) {
@@ -271,6 +274,7 @@ class Addons extends AbstractPlugin
             $addon['version'] = $version;
             $addon['zip'] = $zip;
             $addon['server'] = $server;
+            $addon['dependencies'] = $dependencies;
 
             $list[$url] = $addon;
         }
@@ -280,6 +284,8 @@ class Addons extends AbstractPlugin
 
     /**
      * Helper to parse html to get urls and names of addons.
+     *
+     * @todo Manage dependencies for addon from omeka.org.
      *
      * @param string $html
      * @param string $type
@@ -347,6 +353,7 @@ class Addons extends AbstractPlugin
             $addon['version'] = $version;
             $addon['zip'] = $zip;
             $addon['server'] = $server;
+            $addon['dependencies'] = [];
 
             $list[$url] = $addon;
         }
