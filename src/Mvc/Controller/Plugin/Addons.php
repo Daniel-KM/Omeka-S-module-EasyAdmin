@@ -25,14 +25,14 @@ class Addons extends AbstractPlugin
      * @var array
      */
     protected $data = [
-        'omekamodule' => array(
+        'omekamodule' => [
             'source' => 'https://omeka.org/s/modules/',
             'destination' => '/modules',
-        ),
-        'omekatheme' => array(
+        ],
+        'omekatheme' => [
             'source' => 'https://omeka.org/s/themes/',
             'destination' => '/themes',
-        ),
+        ],
         'module' => [
             'source' => 'https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/_data/omeka_s_modules.csv',
             'destination' => '/modules',
@@ -293,7 +293,7 @@ class Addons extends AbstractPlugin
      */
     protected function extractAddonListFromOmeka($html, $type)
     {
-        $list = array();
+        $list = [];
 
         libxml_use_internal_errors(true);
         $htmlDom = new DOMDocument();
@@ -345,7 +345,7 @@ class Addons extends AbstractPlugin
             $server = strtolower(parse_url($url, PHP_URL_HOST));
             $zip = $url;
 
-            $addon = array();
+            $addon = [];
             $addon['type'] = $type;
             $addon['name'] = $name;
             $addon['basename'] = $addonName;
