@@ -268,6 +268,7 @@ class Addons extends AbstractPlugin
 
             $addon = [];
             $addon['type'] = $type;
+            $addon['server'] = $server;
             $addon['name'] = $name;
             $addon['basename'] = basename($url);
             $addon['dir'] = $addonName;
@@ -303,9 +304,11 @@ class Addons extends AbstractPlugin
         // New format is the one of Github: /TagVersion/NameGivenByAuthor.zip.
         switch ($type) {
             case 'omekamodule':
+                $type = 'module';
                 $query = '//div[@id="module-list"]/div[@class="module"]/div[@class="download"]/a[@class="button"]/@href';
                 break;
             case 'omekatheme':
+                $type = 'theme';
                 $query = '//div[@id="theme-list"]/div[@class="theme"]/div[@class="download"]/a[@class="button"]/@href';
                 break;
             default:
@@ -347,6 +350,7 @@ class Addons extends AbstractPlugin
 
             $addon = [];
             $addon['type'] = $type;
+            $addon['server'] = 'omeka.org';
             $addon['name'] = $name;
             $addon['basename'] = $addonName;
             $addon['dir'] = $addonName;
