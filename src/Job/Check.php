@@ -73,7 +73,7 @@ class Check extends AbstractJob
         ];
         if (!in_array($processMode, $processModes)) {
             $this->logger->info(
-                'Process mode "process_mode}" is unknown.', // @translate
+                'Process mode "{process_mode}" is unknown.', // @translate
                 ['process_mode' => $processMode]
             );
             return;
