@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-25 00:00+0100\n"
+"POT-Creation-Date: 2019-10-28 00:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:33
+#: Module.php:37
 msgid "Process"
 msgstr ""
 
-#: Module.php:43
+#: src/Generic/AbstractModule.php:498
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:518
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:586
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+
+#: Module.php:47
 msgid ""
 "Checking data and files in background ({link_open}job #{jobId}{link_close})"
 msgstr ""
@@ -70,129 +87,139 @@ msgstr ""
 msgid "Run in background"
 msgstr ""
 
-#: src/Job/Check.php:76
-msgid "Process mode \"process_mode}\" is unknown."
+#: src/Job/Check.php:78
+msgid "Process mode \"{process_mode}\" is unknown."
 msgstr ""
 
-#: src/Job/Check.php:83
+#: src/Job/Check.php:85
 msgid "Starting \"{process_mode}\"."
 msgstr ""
 
-#: src/Job/Check.php:93 src/Job/Check.php:124 src/Job/Check.php:141
-#: src/Job/Check.php:228
+#: src/Job/Check.php:95 src/Job/Check.php:130 src/Job/Check.php:147
+#: src/Job/Check.php:234
 msgid "Unable to prepare directory \"{path}\". Check rights."
 msgstr ""
 
-#: src/Job/Check.php:113
+#: src/Job/Check.php:119
 msgid "Process \"{process_mode}\" completed."
 msgstr ""
 
-#: src/Job/Check.php:177
+#: src/Job/Check.php:183
 msgid "Starting check of {total} files for type {type}."
 msgstr ""
 
-#: src/Job/Check.php:185
+#: src/Job/Check.php:191
 msgid "{processed}/{total} files processed."
 msgstr ""
 
-#: src/Job/Check.php:190 src/Job/Check.php:342 src/Job/Check.php:499
+#: src/Job/Check.php:196 src/Job/Check.php:348 src/Job/Check.php:534
 msgid "The job was stopped."
 msgstr ""
 
-#: src/Job/Check.php:237
+#: src/Job/Check.php:243
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database and was moved."
 msgstr ""
 
-#: src/Job/Check.php:242
+#: src/Job/Check.php:248
 msgid ""
 "File \"{filename}\" (type \"{type}\") doesn’t exist in database, and cannot "
 "be moved."
 msgstr ""
 
-#: src/Job/Check.php:249
+#: src/Job/Check.php:255
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database."
 msgstr ""
 
-#: src/Job/Check.php:260
+#: src/Job/Check.php:266
 msgid ""
 "End check of {total} files for type {type}: {total_excess} files in excess."
 msgstr ""
 
-#: src/Job/Check.php:265
+#: src/Job/Check.php:271
 msgid ""
 "End check of {total} files for type {type}: {total_excess} files in excess "
 "moved."
 msgstr ""
 
-#: src/Job/Check.php:292 src/Job/Check.php:456
+#: src/Job/Check.php:298 src/Job/Check.php:499
 msgid "Checking {total} media with original files."
 msgstr ""
 
-#: src/Job/Check.php:300
+#: src/Job/Check.php:306
 msgid "Checking {total} media with thumbnails."
 msgstr ""
 
-#: src/Job/Check.php:307 src/Job/Check.php:462
+#: src/Job/Check.php:313 src/Job/Check.php:505
 msgid "No media to process."
 msgstr ""
 
-#: src/Job/Check.php:336 src/Job/Check.php:493
+#: src/Job/Check.php:342 src/Job/Check.php:528
 msgid "{processed}/{total} media processed."
 msgstr ""
 
-#: src/Job/Check.php:356
+#: src/Job/Check.php:362
 msgid ""
 "Media #{media_id} ({processed}/{total}): file \"{filename}\" does not exist "
 "for type \"{type}\"."
 msgstr ""
 
-#: src/Job/Check.php:382
+#: src/Job/Check.php:388
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
 msgstr ""
 
-#: src/Job/Check.php:416
+#: src/Job/Check.php:422
 msgid "Processing type \"{type}\"."
 msgstr ""
 
-#: src/Job/Check.php:435
+#: src/Job/Check.php:462
+msgid "Column {type} does not exist or cannot be checked."
+msgstr ""
+
+#: src/Job/Check.php:478
 msgid ""
-"{total_size}/{total_no} media have no original file, but a size, and were "
+"{total_size}/{total_no} media have no original file, but a {type}, and were "
 "fixed."
 msgstr ""
 
-#: src/Job/Check.php:440
-msgid "{total_size}/{total_no} media have no original file, but a size."
+#: src/Job/Check.php:483
+msgid "{total_size}/{total_no} media have no original file, but a {type}."
 msgstr ""
 
-#: src/Job/Check.php:446
-msgid "{total_no} media have no original file, so no size."
+#: src/Job/Check.php:489
+msgid "{total_no} media have no original file, so no {type}."
 msgstr ""
 
-#: src/Job/Check.php:520
+#: src/Job/Check.php:569
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" "
+"updated with {type} = {real_value}."
+msgstr ""
+
+#: src/Job/Check.php:584
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" has no "
-"size."
+"{type}, but should be {real_value}."
 msgstr ""
 
-#: src/Job/Check.php:531
+#: src/Job/Check.php:597
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" has a "
-"different size."
+"different {type}: {db_value} ≠ {real_value}."
 msgstr ""
 
-#: src/Job/Check.php:546
+#: src/Job/Check.php:615
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" does "
 "not exist\"."
 msgstr ""
 
-#: src/Job/Check.php:568
+#: src/Job/Check.php:636
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed."
