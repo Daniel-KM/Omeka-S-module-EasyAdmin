@@ -8,7 +8,7 @@ class Check extends AbstractJob
     /**
      * Limit for the loop to avoid heavy sql requests.
      *
-     * @var integer
+     * @var int
      */
     const SQL_LIMIT = 100;
 
@@ -429,8 +429,8 @@ class Check extends AbstractJob
     /**
      * Check the size of the files.
      *
-     * @param boolean $fix
-     * @return boolean
+     * @param bool $fix
+     * @return bool
      */
     protected function checkFilesize($fix = false)
     {
@@ -440,8 +440,8 @@ class Check extends AbstractJob
     /**
      * Check the hash of the files.
      *
-     * @param boolean $fix
-     * @return boolean
+     * @param bool $fix
+     * @return bool
      */
     protected function checkFilehash($fix = false)
     {
@@ -452,8 +452,8 @@ class Check extends AbstractJob
      * Check the size or the hash of the files.
      *
      * @param string $column
-     * @param boolean $fix
-     * @return boolean
+     * @param bool $fix
+     * @return bool
      */
     protected function checkFileData($column, $fix = false)
     {
@@ -474,7 +474,7 @@ class Check extends AbstractJob
             if ($fix) {
                 $sql = "UPDATE media SET $column = NULL WHERE has_original != 1 AND $column IS NOT NULL";
                 $this->connection->exec($sql);
-                $this->logger->notice (
+                $this->logger->notice(
                     '{total_size}/{total_no} media have no original file, but a {type}, and were fixed.', // @translate
                     ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal, 'type' => $column]
                 );
@@ -507,23 +507,8 @@ class Check extends AbstractJob
             return true;
         }
 
-        // First, prepare the list of files and file data to check.
-        $path = $this->basePath . '/original';
-        $filedata = $this->listFilesInFolder($path, true);
-        $filedata = array_fill_keys($filedata, null);
-        foreach ($filedata as $filepath => &$filecheck) {
-            switch ($column) {
-                case 'size':
-                    $filecheck = filesize($filepath);
-                    break;
-                case 'sha256':
-                    $filecheck = hash_file('sha256', $filepath);
-                    break;
-            }
-        }
-        unset($filecheck);
-
-        // Second, loop all media data.
+        // Loop all media with original files.
+        $originalPath = $this->basePath . '/original';
         $offset = 0;
         $key = 0;
         $totalProcessed = 0;
@@ -554,53 +539,70 @@ class Check extends AbstractJob
 
             foreach ($medias as $key => $media) {
                 $filename = $media->getFilename();
-                $filepath = $path . '/' . $filename;
-                if (array_key_exists($filepath, $filedata)) {
+                $filepath = $originalPath . '/' . $filename;
+                if (file_exists($filepath)) {
                     switch ($column) {
                         case 'size':
-                            $check = $media->getSize();
+                            $dbValue = $media->getSize();
+                            $realValue = filesize($filepath);
                             break;
                         case 'sha256':
-                            $check = $media->getSha256();
+                            $dbValue = $media->getSha256();
+                            $realValue = hash_file('sha256', $filepath);
                             break;
                     }
 
+                    $isDifferent = $dbValue != $realValue;
                     if ($fix) {
-                        if ($check != $filedata[$filepath]) {
+                        if ($isDifferent) {
                             switch ($column) {
                                 case 'size':
-                                    $media->setSize($filedata[$filepath]);
+                                    $media->setSize($realValue);
                                     break;
                                 case 'sha256':
-                                    $media->setSha256($filedata[$filepath]);
+                                    $media->setSha256($realValue);
                                     break;
                             }
                             $this->entityManager->persist($media);
                         }
+                        $this->logger->info(
+                            'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value}.', // @translate
+                            [
+                                'media_id' => $media->getId(),
+                                'processed' => $offset + $key + 1,
+                                'total' => $totalToProcess,
+                                'filename' => $filename,
+                                'type' => $column,
+                                'real_value' => $realValue,
+                            ]
+                        );
                         ++$totalSucceed;
                     } else {
-                        if (is_null($check)) {
+                        if (is_null($dbValue)) {
                             ++$totalFailed;
                             $this->logger->warn(
-                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has no {type}.', // @translate
+                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has no {type}, but should be {real_value}.', // @translate
                                 [
                                     'media_id' => $media->getId(),
                                     'processed' => $offset + $key + 1,
                                     'total' => $totalToProcess,
                                     'filename' => $filename,
                                     'type' => $column,
+                                    'real_value' => $realValue,
                                 ]
                             );
-                        } elseif ($check != $filedata[$filepath]) {
+                        } elseif ($isDifferent) {
                             ++$totalFailed;
                             $this->logger->warn(
-                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has a different {type}.', // @translate
+                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has a different {type}: {db_value} ≠ {real_value}.', // @translate
                                 [
                                     'media_id' => $media->getId(),
                                     'processed' => $offset + $key + 1,
                                     'total' => $totalToProcess,
                                     'filename' => $filename,
                                     'type' => $column,
+                                    'db_value' => $dbValue,
+                                    'real_value' => $realValue,
                                 ]
                             );
                         } else {
@@ -621,7 +623,6 @@ class Check extends AbstractJob
                 }
 
                 ++$totalProcessed;
-
             }
 
             $this->entityManager->flush();
