@@ -20,6 +20,8 @@ class ConfigForm extends Form
                     'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                     'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
                     'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
+                    'filehash_check' => 'Check sha256 hashes of files', // @translate
+                    'filehash_fix' => 'Fix wrong sha256 of files', // @translate
                 ],
             ],
             'attributes' => [

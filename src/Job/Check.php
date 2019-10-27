@@ -70,6 +70,8 @@ class Check extends AbstractJob
             'dirs_excess',
             'filesize_check',
             'filesize_fix',
+            'filehash_check',
+            'filehash_fix',
         ];
         if (!in_array($processMode, $processModes)) {
             $this->logger->info(
@@ -106,6 +108,10 @@ class Check extends AbstractJob
             case 'filesize_check':
             case 'filesize_fix':
                 $this->checkFilesize($processMode === 'filesize_fix');
+                break;
+            case 'filehash_check':
+            case 'filehash_fix':
+                $this->checkFilehash($processMode === 'filehash_fix');
                 break;
         }
 
@@ -420,31 +426,68 @@ class Check extends AbstractJob
         return true;
     }
 
+    /**
+     * Check the size of the files.
+     *
+     * @param boolean $fix
+     * @return boolean
+     */
     protected function checkFilesize($fix = false)
     {
+        return $this->checkFileData('size', $fix);
+    }
+
+    /**
+     * Check the hash of the files.
+     *
+     * @param boolean $fix
+     * @return boolean
+     */
+    protected function checkFilehash($fix = false)
+    {
+        return $this->checkFileData('sha256', $fix);
+    }
+
+    /**
+     * Check the size or the hash of the files.
+     *
+     * @param string $column
+     * @param boolean $fix
+     * @return boolean
+     */
+    protected function checkFileData($column, $fix = false)
+    {
+        if (!in_array($column, ['size', 'sha256'])) {
+            $this->logger->error(
+                'Column {type} does not exist or cannot be checked.', // @translate
+                ['type' => $column]
+            );
+            return false;
+        }
+
         // This total should be 0.
-        $sql = 'SELECT COUNT(id) FROM media WHERE has_original != 1 AND size IS NOT NULL';
+        $sql = "SELECT COUNT(id) FROM media WHERE has_original != 1 AND $column IS NOT NULL";
         $totalNoOriginalSize = $this->connection->query($sql)->fetchColumn();
         $sql = 'SELECT COUNT(id) FROM media WHERE has_original != 1';
         $totalNoOriginal = $this->connection->query($sql)->fetchColumn();
         if ($totalNoOriginalSize) {
             if ($fix) {
-                $sql = 'UPDATE media SET size = NULL WHERE has_original != 1 AND size IS NOT NULL';
+                $sql = "UPDATE media SET $column = NULL WHERE has_original != 1 AND $column IS NOT NULL";
                 $this->connection->exec($sql);
                 $this->logger->notice (
-                    '{total_size}/{total_no} media have no original file, but a size, and were fixed.', // @translate
-                    ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal]
+                    '{total_size}/{total_no} media have no original file, but a {type}, and were fixed.', // @translate
+                    ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal, 'type' => $column]
                 );
             } else {
                 $this->logger->warn(
-                    '{total_size}/{total_no} media have no original file, but a size.', // @translate
-                    ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal]
+                    '{total_size}/{total_no} media have no original file, but a {type}.', // @translate
+                    ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal, 'type' => $column]
                 );
             }
         } else {
             $this->logger->notice(
-                '{total_no} media have no original file, so no size.', // @translate
-                ['total_no' => $totalNoOriginal]
+                '{total_no} media have no original file, so no {type}.', // @translate
+                ['total_no' => $totalNoOriginal, 'type' => $column]
             );
         }
 
@@ -464,14 +507,21 @@ class Check extends AbstractJob
             return true;
         }
 
-        // First, prepare the list of files and file sizes.
+        // First, prepare the list of files and file data to check.
         $path = $this->basePath . '/original';
-        $filesizes = $this->listFilesInFolder($path, true);
-        $filesizes = array_fill_keys($filesizes, null);
-        foreach ($filesizes as $filepath => &$filesize) {
-            $filesize = filesize($filepath);
+        $filedata = $this->listFilesInFolder($path, true);
+        $filedata = array_fill_keys($filedata, null);
+        foreach ($filedata as $filepath => &$filecheck) {
+            switch ($column) {
+                case 'size':
+                    $filecheck = filesize($filepath);
+                    break;
+                case 'sha256':
+                    $filecheck = hash_file('sha256', $filepath);
+                    break;
+            }
         }
-        unset($filesize);
+        unset($filecheck);
 
         // Second, loop all media data.
         $offset = 0;
@@ -505,35 +555,52 @@ class Check extends AbstractJob
             foreach ($medias as $key => $media) {
                 $filename = $media->getFilename();
                 $filepath = $path . '/' . $filename;
-                if (array_key_exists($filepath, $filesizes)) {
-                    $size = $media->getSize();
+                if (array_key_exists($filepath, $filedata)) {
+                    switch ($column) {
+                        case 'size':
+                            $check = $media->getSize();
+                            break;
+                        case 'sha256':
+                            $check = $media->getSha256();
+                            break;
+                    }
+
                     if ($fix) {
-                        if ($size != $filesizes[$filepath]) {
-                            $media->setSize($filesizes[$filepath]);
+                        if ($check != $filedata[$filepath]) {
+                            switch ($column) {
+                                case 'size':
+                                    $media->setSize($filedata[$filepath]);
+                                    break;
+                                case 'sha256':
+                                    $media->setSha256($filedata[$filepath]);
+                                    break;
+                            }
                             $this->entityManager->persist($media);
                         }
                         ++$totalSucceed;
                     } else {
-                        if (is_null($size)) {
+                        if (is_null($check)) {
                             ++$totalFailed;
                             $this->logger->warn(
-                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has no size.', // @translate
+                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has no {type}.', // @translate
                                 [
                                     'media_id' => $media->getId(),
                                     'processed' => $offset + $key + 1,
                                     'total' => $totalToProcess,
                                     'filename' => $filename,
+                                    'type' => $column,
                                 ]
                             );
-                        } elseif ($size != $filesizes[$filepath]) {
+                        } elseif ($check != $filedata[$filepath]) {
                             ++$totalFailed;
                             $this->logger->warn(
-                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has a different size.', // @translate
+                                'Media #{media_id} ({processed}/{total}): original file "{filename}" has a different {type}.', // @translate
                                 [
                                     'media_id' => $media->getId(),
                                     'processed' => $offset + $key + 1,
                                     'total' => $totalToProcess,
                                     'filename' => $filename,
+                                    'type' => $column,
                                 ]
                             );
                         } else {
