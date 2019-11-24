@@ -66,8 +66,8 @@ class Check extends AbstractJob
 
         // TODO Add a tsv output in /check/process_date_time.tsv.
 
-        $processMode = $this->getArg('process_mode');
-        $processModes = [
+        $process = $this->getArg('process');
+        $processs = [
             'files_excess',
             'files_excess_move',
             // TODO Check files with the wrong extension.
@@ -80,19 +80,19 @@ class Check extends AbstractJob
             'db_session_check',
             'db_session_clean',
         ];
-        if (!in_array($processMode, $processModes)) {
+        if (!in_array($process, $processs)) {
             $this->logger->info(
-                'Process mode "{process_mode}" is unknown.', // @translate
-                ['process_mode' => $processMode]
+                'Process "{process}" is unknown.', // @translate
+                ['process' => $process]
             );
             return;
         }
 
         $this->logger->notice(
-            'Starting "{process_mode}".', // @translate
-            ['process_mode' => $processMode]
+            'Starting "{process}".', // @translate
+            ['process' => $process]
         );
-        switch ($processMode) {
+        switch ($process) {
             case 'files_excess':
                 $this->checkExcessFiles();
                 break;
@@ -114,21 +114,21 @@ class Check extends AbstractJob
                 break;
             case 'filesize_check':
             case 'filesize_fix':
-                $this->checkFilesize($processMode === 'filesize_fix');
+                $this->checkFilesize($process === 'filesize_fix');
                 break;
             case 'filehash_check':
             case 'filehash_fix':
-                $this->checkFilehash($processMode === 'filehash_fix');
+                $this->checkFilehash($process === 'filehash_fix');
                 break;
             case 'db_session_check':
             case 'db_session_clean':
-                $this->checkDbSession($processMode === 'db_session_clean');
+                $this->checkDbSession($process === 'db_session_clean');
                 break;
         }
 
         $this->logger->notice(
-            'Process "{process_mode}" completed.', // @translate
-            ['process_mode' => $processMode]
+            'Process "{process}" completed.', // @translate
+            ['process' => $process]
         );
     }
 
