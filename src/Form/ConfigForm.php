@@ -22,6 +22,8 @@ class ConfigForm extends Form
                     'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                     'filehash_check' => 'Check sha256 hashes of files', // @translate
                     'filehash_fix' => 'Fix wrong sha256 of files', // @translate
+                    'db_session_check' => 'Check the size of of the database table of sessions (see logs)', // @translate
+                    'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
                 ],
             ],
             'attributes' => [

@@ -13,6 +13,11 @@ class Check extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
+     * @var integer
+     */
+    const SESSION_OLD_DAYS = 100;
+
+    /**
      * @var \Zend\Log\Logger
      */
     protected $logger;
@@ -72,6 +77,8 @@ class Check extends AbstractJob
             'filesize_fix',
             'filehash_check',
             'filehash_fix',
+            'db_session_check',
+            'db_session_clean',
         ];
         if (!in_array($processMode, $processModes)) {
             $this->logger->info(
@@ -112,6 +119,10 @@ class Check extends AbstractJob
             case 'filehash_check':
             case 'filehash_fix':
                 $this->checkFilehash($processMode === 'filehash_fix');
+                break;
+            case 'db_session_check':
+            case 'db_session_clean':
+                $this->checkDbSession($processMode === 'db_session_clean');
                 break;
         }
 
@@ -643,6 +654,42 @@ class Check extends AbstractJob
         );
 
         return true;
+    }
+
+    /**
+     * Check the size of the db table session.
+     *
+     * @param bool $fix
+     * @return bool
+     */
+    protected function checkDbSession($fix = false)
+    {
+        $dbname = $this->connection->getDatabase();
+        $sqlSize = <<<SQL
+SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
+FROM information_schema.TABLES
+WHERE table_schema = "$dbname"
+    AND table_name = "session";
+SQL;
+        $size = $this->connection->query($sqlSize)->fetchColumn();
+        $sql = 'SELECT COUNT(id) FROM session WHERE modified < (UNIX_TIMESTAMP() - 86400 * ' . self::SESSION_OLD_DAYS . ');';
+        $old = $this->connection->query($sql)->fetchColumn();
+        $sql = 'SELECT COUNT(id) FROM session;';
+        $all = $this->connection->query($sql)->fetchColumn();
+        $this->logger->info(
+            'The table "session" has a size of {size} MB. {old}/{all} records are older than 100 days.', // @translate
+            ['size' => $size, 'old' => $old, 'all' => $all]
+        );
+
+        if ($fix) {
+            $sql = 'DELETE FROM `session` WHERE modified < (UNIX_TIMESTAMP() - 86400 * ' . self::SESSION_OLD_DAYS . ');';
+            $this->connection->exec($sql);
+            $size = $this->connection->query($sqlSize)->fetchColumn();
+            $this->logger->info(
+                'Records older than {days} days were removed. The table "session" has a size of {size} MB.', // @translate
+                ['days' => self::SESSION_OLD_DAYS, 'size' => $size]
+            );
+        }
     }
 
     /**
