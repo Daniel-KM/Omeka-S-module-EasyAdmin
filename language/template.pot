@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 00:00+0100\n"
+"POT-Creation-Date: 2019-11-25 00:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,210 +17,239 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:37
-msgid "Process"
-msgstr ""
-
-#: src/Generic/AbstractModule.php:498
+#: src/Generic/AbstractModule.php:518
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:538
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:586
+#: src/Generic/AbstractModule.php:606
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
 
-#: Module.php:47
-msgid ""
-"Checking data and files in background ({link_open}job #{jobId}{link_close})"
+#: view/bulk/admin/check/index.phtml:15
+msgid "Bulk check"
 msgstr ""
 
-#: src/Form/ConfigForm.php:15
-msgid "Check to process"
+#: view/bulk/admin/check/index.phtml:17
+msgid "Available checkers"
 msgstr ""
 
-#: src/Form/ConfigForm.php:17
+#: src/Form/BulkCheckForm.php:16
+msgid "Processers"
+msgstr ""
+
+#: src/Form/BulkCheckForm.php:18
 msgid "List files that are present in \"/files/\", but not in database"
 msgstr ""
 
-#: src/Form/ConfigForm.php:18
+#: src/Form/BulkCheckForm.php:19
 msgid ""
 "Move files that are present in \"/files/\", but not in database, into /files/"
 "check/"
 msgstr ""
 
-#: src/Form/ConfigForm.php:19
+#: src/Form/BulkCheckForm.php:20
 msgid "List files that are present in database, not in \"/files/\""
 msgstr ""
 
-#: src/Form/ConfigForm.php:20
+#: src/Form/BulkCheckForm.php:21
 msgid "Remove empty directories in \"/files/\" (for module Archive Repertory)"
 msgstr ""
 
-#: src/Form/ConfigForm.php:21
+#: src/Form/BulkCheckForm.php:22
 msgid ""
 "Check missing file sizes in database (not managed during upgrade to Omeka "
 "1.2.0)"
 msgstr ""
 
-#: src/Form/ConfigForm.php:22
+#: src/Form/BulkCheckForm.php:23
 msgid "Fix all file sizes in database (for example after hard import)"
 msgstr ""
 
-#: src/Form/ConfigForm.php:23
+#: src/Form/BulkCheckForm.php:24
 msgid "Check sha256 hashes of files"
 msgstr ""
 
-#: src/Form/ConfigForm.php:24
+#: src/Form/BulkCheckForm.php:25
 msgid "Fix wrong sha256 of files"
 msgstr ""
 
-#: src/Form/ConfigForm.php:39
-msgid "Run in background"
+#: src/Form/BulkCheckForm.php:26
+msgid "Check the size of of the database table of sessions"
 msgstr ""
 
-#: src/Job/Check.php:78
-msgid "Process mode \"{process_mode}\" is unknown."
+#: src/Form/BulkCheckForm.php:27
+msgid "Remove old sessions (more than 100 days)"
+msgstr ""
+
+#: src/Controller/Admin/BulkCheckController.php:32
+msgid "No process submitted."
+msgstr ""
+
+#: src/Controller/Admin/BulkCheckController.php:43
+msgid ""
+"Checking database and files in background (job {link_open_job}#{jobId}"
+"{link_close}, {link_open_log}logs{link_close})."
 msgstr ""
 
 #: src/Job/Check.php:85
-msgid "Starting \"{process_mode}\"."
+msgid "Process \"{process}\" is unknown."
 msgstr ""
 
-#: src/Job/Check.php:95 src/Job/Check.php:130 src/Job/Check.php:147
-#: src/Job/Check.php:234
+#: src/Job/Check.php:92
+msgid "Starting \"{process}\"."
+msgstr ""
+
+#: src/Job/Check.php:102 src/Job/Check.php:141 src/Job/Check.php:158
+#: src/Job/Check.php:245
 msgid "Unable to prepare directory \"{path}\". Check rights."
 msgstr ""
 
-#: src/Job/Check.php:119
-msgid "Process \"{process_mode}\" completed."
+#: src/Job/Check.php:130
+msgid "Process \"{process}\" completed."
 msgstr ""
 
-#: src/Job/Check.php:183
+#: src/Job/Check.php:194
 msgid "Starting check of {total} files for type {type}."
 msgstr ""
 
-#: src/Job/Check.php:191
+#: src/Job/Check.php:202
 msgid "{processed}/{total} files processed."
 msgstr ""
 
-#: src/Job/Check.php:196 src/Job/Check.php:348 src/Job/Check.php:534
+#: src/Job/Check.php:207 src/Job/Check.php:359 src/Job/Check.php:545
 msgid "The job was stopped."
 msgstr ""
 
-#: src/Job/Check.php:243
+#: src/Job/Check.php:254
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database and was moved."
 msgstr ""
 
-#: src/Job/Check.php:248
+#: src/Job/Check.php:259
 msgid ""
 "File \"{filename}\" (type \"{type}\") doesn’t exist in database, and cannot "
 "be moved."
 msgstr ""
 
-#: src/Job/Check.php:255
+#: src/Job/Check.php:266
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database."
 msgstr ""
 
-#: src/Job/Check.php:266
+#: src/Job/Check.php:277
 msgid ""
 "End check of {total} files for type {type}: {total_excess} files in excess."
 msgstr ""
 
-#: src/Job/Check.php:271
+#: src/Job/Check.php:282
 msgid ""
 "End check of {total} files for type {type}: {total_excess} files in excess "
 "moved."
 msgstr ""
 
-#: src/Job/Check.php:298 src/Job/Check.php:499
+#: src/Job/Check.php:309 src/Job/Check.php:510
 msgid "Checking {total} media with original files."
 msgstr ""
 
-#: src/Job/Check.php:306
+#: src/Job/Check.php:317
 msgid "Checking {total} media with thumbnails."
 msgstr ""
 
-#: src/Job/Check.php:313 src/Job/Check.php:505
+#: src/Job/Check.php:324 src/Job/Check.php:516
 msgid "No media to process."
 msgstr ""
 
-#: src/Job/Check.php:342 src/Job/Check.php:528
+#: src/Job/Check.php:353 src/Job/Check.php:539
 msgid "{processed}/{total} media processed."
 msgstr ""
 
-#: src/Job/Check.php:362
+#: src/Job/Check.php:373
 msgid ""
 "Media #{media_id} ({processed}/{total}): file \"{filename}\" does not exist "
 "for type \"{type}\"."
 msgstr ""
 
-#: src/Job/Check.php:388
+#: src/Job/Check.php:399
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
 msgstr ""
 
-#: src/Job/Check.php:422
+#: src/Job/Check.php:433
 msgid "Processing type \"{type}\"."
 msgstr ""
 
-#: src/Job/Check.php:462
+#: src/Job/Check.php:473
 msgid "Column {type} does not exist or cannot be checked."
 msgstr ""
 
-#: src/Job/Check.php:478
+#: src/Job/Check.php:489
 msgid ""
 "{total_size}/{total_no} media have no original file, but a {type}, and were "
 "fixed."
 msgstr ""
 
-#: src/Job/Check.php:483
+#: src/Job/Check.php:494
 msgid "{total_size}/{total_no} media have no original file, but a {type}."
 msgstr ""
 
-#: src/Job/Check.php:489
+#: src/Job/Check.php:500
 msgid "{total_no} media have no original file, so no {type}."
 msgstr ""
 
-#: src/Job/Check.php:569
+#: src/Job/Check.php:580
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" "
 "updated with {type} = {real_value}."
 msgstr ""
 
-#: src/Job/Check.php:584
+#: src/Job/Check.php:595
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" has no "
 "{type}, but should be {real_value}."
 msgstr ""
 
-#: src/Job/Check.php:597
+#: src/Job/Check.php:608
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" has a "
 "different {type}: {db_value} ≠ {real_value}."
 msgstr ""
 
-#: src/Job/Check.php:615
+#: src/Job/Check.php:626
 msgid ""
 "Media #{media_id} ({processed}/{total}): original file \"{filename}\" does "
 "not exist\"."
 msgstr ""
 
-#: src/Job/Check.php:636
+#: src/Job/Check.php:647
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed."
+msgstr ""
+
+#: src/Job/Check.php:680
+msgid ""
+"The table \"session\" has a size of {size} MB. {old}/{all} records are older "
+"than 100 days."
+msgstr ""
+
+#: src/Job/Check.php:689
+msgid ""
+"Records older than {days} days were removed. The table \"session\" has a "
+"size of {size} MB."
+msgstr ""
+
+#: config/module.config.php:27
+msgid "Bulk Check"
 msgstr ""
