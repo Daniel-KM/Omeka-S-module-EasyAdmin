@@ -55,7 +55,13 @@ class Check extends AbstractJob
     public function perform()
     {
         $services = $this->getServiceLocator();
+
+        // The reference id is the job id for now.
+        $referenceIdProcessor = new \Zend\Log\Processor\ReferenceId();
+        $referenceIdProcessor->setReferenceId('bulk/check/job_' . $this->job->getId());
+
         $this->logger = $services->get('Omeka\Logger');
+        $this->logger->addProcessor($referenceIdProcessor);
         $this->api = $services->get('ControllerPluginManager')->get('api');
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $services->get('Omeka\Connection');
