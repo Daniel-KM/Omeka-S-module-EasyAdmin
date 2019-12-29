@@ -13,7 +13,7 @@ class Check extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
-     * @var integer
+     * @var int
      */
     const SESSION_OLD_DAYS = 100;
 
@@ -77,6 +77,8 @@ class Check extends AbstractJob
             'filesize_fix',
             'filehash_check',
             'filehash_fix',
+            'db_job_check',
+            'db_job_clean',
             'db_session_check',
             'db_session_clean',
         ];
@@ -119,6 +121,10 @@ class Check extends AbstractJob
             case 'filehash_check':
             case 'filehash_fix':
                 $this->checkFilehash($process === 'filehash_fix');
+                break;
+            case 'db_job_check':
+            case 'db_job_clean':
+                $this->checkDbJob($process === 'db_job_clean');
                 break;
             case 'db_session_check':
             case 'db_session_clean':
@@ -654,6 +660,78 @@ class Check extends AbstractJob
         );
 
         return true;
+    }
+
+    /**
+     * Check the never ending jobs.
+     *
+     * @param bool $fix
+     * @return bool
+     */
+    protected function checkDbJob($fix = false)
+    {
+        $sql = <<<SQL
+SELECT id, pid, status
+FROM job
+WHERE id != :jobid
+    AND status IN ("starting", "stopping", "in_progress")
+ORDER BY id ASC;
+SQL;
+
+        // Fetch all: jobs are few, except if admin never checks result of jobs.
+        $result = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Unselect processes with an existing pid.
+        foreach ($result as $id => $row) {
+            // TODO The check of the pid works only with Linux.
+            if ($row['pid'] && file_exists('/proc/' . $row['pid'])) {
+                unset($result[$id]);
+            }
+        }
+
+        if (empty($result)) {
+            $this->logger->notice(
+                'There is no dead job.' // @translate
+            );
+            return;
+        }
+
+        $this->logger->notice(
+            'The following {count} jobs are dead: {jobs}.', // @translate
+            [
+                'count' => count($result),
+                'jobs' => implode(', ', array_map(function ($v) {
+                    return '#' . $v['id'];
+                }, $result)),
+            ]
+        );
+
+        if ($fix) {
+            $stopped = [];
+            $errored = [];
+            foreach ($result as $value) {
+                if ($value['status'] === 'in_progress') {
+                    $errored[] = (int) $value['id'];
+                } else {
+                    $stopped[] = (int) $value['id'];
+                }
+            }
+
+            if ($stopped) {
+                $sql = 'UPDATE job SET status = "stopped" WHERE id IN (' . implode(',', $stopped) . ')';
+                $this->connection->exec($sql);
+            }
+
+            if ($errored) {
+                $sql = 'UPDATE job SET status = "error" WHERE id IN (' . implode(',', $errored) . ')';
+                $this->connection->exec($sql);
+            }
+
+            $this->logger->notice(
+                'A total of {count} dead jobs have been cleaned.', // @translate
+                ['count' => count($result)]
+            );
+        }
     }
 
     /**

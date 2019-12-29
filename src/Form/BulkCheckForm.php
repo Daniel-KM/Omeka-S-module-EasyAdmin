@@ -13,7 +13,7 @@ class BulkCheckForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => 'Processers', // @translate
+                    'label' => 'Processors', // @translate
                     'value_options' => [
                         'files_excess' => 'List files that are present in "/files/", but not in database', // @translate
                         'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
@@ -23,7 +23,9 @@ class BulkCheckForm extends Form
                         'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                         'filehash_check' => 'Check sha256 hashes of files', // @translate
                         'filehash_fix' => 'Fix wrong sha256 of files', // @translate
-                        'db_session_check' => 'Check the size of of the database table of sessions', // @translate
+                        'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
+                        'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended.', // @translate
+                        'db_session_check' => 'Check the size of the database table of sessions', // @translate
                         'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
                     ],
                 ],
