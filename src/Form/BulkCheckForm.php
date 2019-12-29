@@ -25,6 +25,7 @@ class BulkCheckForm extends Form
                         'filehash_fix' => 'Fix wrong sha256 of files', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended.', // @translate
+                        'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot).', // @translate
                         'db_session_check' => 'Check the size of the database table of sessions', // @translate
                         'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
                     ],

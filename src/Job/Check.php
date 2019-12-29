@@ -79,6 +79,7 @@ class Check extends AbstractJob
             'filehash_fix',
             'db_job_check',
             'db_job_clean',
+            'db_job_clean_all',
             'db_session_check',
             'db_session_clean',
         ];
@@ -125,6 +126,9 @@ class Check extends AbstractJob
             case 'db_job_check':
             case 'db_job_clean':
                 $this->checkDbJob($process === 'db_job_clean');
+                break;
+            case 'db_job_clean_all':
+                $this->checkDbJob(true, true);
                 break;
             case 'db_session_check':
             case 'db_session_clean':
@@ -666,9 +670,10 @@ class Check extends AbstractJob
      * Check the never ending jobs.
      *
      * @param bool $fix
+     * @param bool $fixAll
      * @return bool
      */
-    protected function checkDbJob($fix = false)
+    protected function checkDbJob($fix = false, $fixAll = false)
     {
         $sql = <<<SQL
 SELECT id, pid, status
@@ -687,6 +692,37 @@ SQL;
             if ($row['pid'] && file_exists('/proc/' . $row['pid'])) {
                 unset($result[$id]);
             }
+        }
+
+        if ($fixAll) {
+            $sql = 'SELECT COUNT(id) FROM job';
+            $countJobs = $this->connection->query($sql)->fetchColumn();
+
+            $sql = <<<SQL
+UPDATE job
+SET status = "stopped"
+WHERE id != :jobid
+    AND status IN ("starting", "stopping");
+SQL;
+            $stopped = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->rowCount();
+
+            $sql = <<<SQL
+UPDATE job
+SET status = "error"
+WHERE id != :jobid
+    AND status IN ("in_progress");
+SQL;
+            $error = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->rowCount();
+
+            $this->logger->notice(
+                'Dead jobs were cleaned: {count_stopped} marked "stopped" and {count_error} marked "error" on a total of {count_jobs}.', // @translate
+                [
+                    'count_stopped' => $stopped,
+                    'count_error' => $error,
+                    'count_jobs' => $countJobs,
+                ]
+            );
+            return;
         }
 
         if (empty($result)) {
