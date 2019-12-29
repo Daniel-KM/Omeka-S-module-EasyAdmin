@@ -664,6 +664,8 @@ class Check extends AbstractJob
      */
     protected function checkDbSession($fix = false)
     {
+        $timestamp = time() - 86400 * self::SESSION_OLD_DAYS;
+
         $dbname = $this->connection->getDatabase();
         $sqlSize = <<<SQL
 SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
@@ -672,8 +674,11 @@ WHERE table_schema = "$dbname"
     AND table_name = "session";
 SQL;
         $size = $this->connection->query($sqlSize)->fetchColumn();
-        $sql = 'SELECT COUNT(id) FROM session WHERE modified < (UNIX_TIMESTAMP() - 86400 * ' . self::SESSION_OLD_DAYS . ');';
-        $old = $this->connection->query($sql)->fetchColumn();
+        $sql = 'SELECT COUNT(id) FROM session WHERE modified < :timestamp;';
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue(':timestamp', $timestamp);
+        $stmt->execute();
+        $old = $stmt->fetchColumn();
         $sql = 'SELECT COUNT(id) FROM session;';
         $all = $this->connection->query($sql)->fetchColumn();
         $this->logger->notice(
@@ -682,12 +687,15 @@ SQL;
         );
 
         if ($fix) {
-            $sql = 'DELETE FROM `session` WHERE modified < (UNIX_TIMESTAMP() - 86400 * ' . self::SESSION_OLD_DAYS . ');';
-            $this->connection->exec($sql);
+            $sql = 'DELETE FROM `session` WHERE modified < :timestamp;';
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':timestamp', $timestamp);
+            $stmt->execute();
+            $count = $stmt->rowCount();
             $size = $this->connection->query($sqlSize)->fetchColumn();
             $this->logger->notice(
-                'Records older than {days} days were removed. The table "session" has a size of {size} MB.', // @translate
-                ['days' => self::SESSION_OLD_DAYS, 'size' => $size]
+                '{count} records older than {days} days were removed. The table "session" has a size of {size} MB.', // @translate
+                ['count' => $count, 'days' => self::SESSION_OLD_DAYS, 'size' => $size]
             );
         }
     }
