@@ -81,7 +81,7 @@ class Check extends AbstractJob
             'db_session_clean',
         ];
         if (!in_array($process, $processs)) {
-            $this->logger->info(
+            $this->logger->notice(
                 'Process "{process}" is unknown.', // @translate
                 ['process' => $process]
             );
@@ -190,7 +190,7 @@ class Check extends AbstractJob
         $totalSuccess = 0;
         $totalExcess = 0;
 
-        $this->logger->info(
+        $this->logger->notice(
             'Starting check of {total} files for type {type}.', // @translate
             ['total' => $total]
         );
@@ -198,7 +198,7 @@ class Check extends AbstractJob
         $i = 0;
         foreach ($files as $filename) {
             if (($i % 100 === 0) && $i) {
-                $this->logger->info(
+                $this->logger->notice(
                     '{processed}/{total} files processed.', // @translate
                     ['processed' => $i, 'total' => $total]
                 );
@@ -273,12 +273,12 @@ class Check extends AbstractJob
         }
 
         if ($move) {
-            $this->logger->info(
+            $this->logger->notice(
                 'End check of {total} files for type {type}: {total_excess} files in excess.', // @translate
                 ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
             );
         } else {
-            $this->logger->info(
+            $this->logger->notice(
                 'End check of {total} files for type {type}: {total_excess} files in excess moved.', // @translate
                 ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
             );
@@ -305,7 +305,7 @@ class Check extends AbstractJob
             $criteria['hasOriginal'] = 1;
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
             $totalToProcess = $this->connection->query($sql)->fetchColumn();
-            $this->logger->info(
+            $this->logger->notice(
                 'Checking {total} media with original files.', // @translate
                 ['total' => $totalToProcess]
             );
@@ -313,14 +313,14 @@ class Check extends AbstractJob
             $criteria['hasThumbnails'] = 1;
             $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
             $totalToProcess = $this->connection->query($sql)->fetchColumn();
-            $this->logger->info(
+            $this->logger->notice(
                 'Checking {total} media with thumbnails.', // @translate
                 ['total' => $totalToProcess]
             );
         }
 
         if (empty($totalToProcess)) {
-            $this->logger->info(
+            $this->logger->notice(
                 'No media to process.' // @translate
             );
             return true;
@@ -349,7 +349,7 @@ class Check extends AbstractJob
             }
 
             if ($offset) {
-                $this->logger->info(
+                $this->logger->notice(
                     '{processed}/{total} media processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );
@@ -395,7 +395,7 @@ class Check extends AbstractJob
             $offset += self::SQL_LIMIT;
         }
 
-        $this->logger->info(
+        $this->logger->notice(
             'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
             [
                 'processed' => $totalProcessed,
@@ -429,7 +429,7 @@ class Check extends AbstractJob
     protected function removeEmptyDirsForType($type)
     {
         $path = $this->basePath . '/' . $type;
-        $this->logger->info(
+        $this->logger->notice(
             'Processing type "{type}".', // @translate
             ['type' => $type]
         );
@@ -506,13 +506,13 @@ class Check extends AbstractJob
         $criteria['hasOriginal'] = 1;
         $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
         $totalToProcess = $this->connection->query($sql)->fetchColumn();
-        $this->logger->info(
+        $this->logger->notice(
             'Checking {total} media with original files.', // @translate
             ['total' => $totalToProcess]
         );
 
         if (empty($totalToProcess)) {
-            $this->logger->info(
+            $this->logger->notice(
                 'No media to process.' // @translate
             );
             return true;
@@ -535,7 +535,7 @@ class Check extends AbstractJob
             }
 
             if ($offset) {
-                $this->logger->info(
+                $this->logger->notice(
                     '{processed}/{total} media processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );
@@ -576,7 +576,7 @@ class Check extends AbstractJob
                             }
                             $this->entityManager->persist($media);
                         }
-                        $this->logger->info(
+                        $this->logger->notice(
                             'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value}.', // @translate
                             [
                                 'media_id' => $media->getId(),
@@ -643,7 +643,7 @@ class Check extends AbstractJob
             $offset += self::SQL_LIMIT;
         }
 
-        $this->logger->info(
+        $this->logger->notice(
             'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed.', // @translate
             [
                 'processed' => $totalProcessed,
@@ -676,7 +676,7 @@ SQL;
         $old = $this->connection->query($sql)->fetchColumn();
         $sql = 'SELECT COUNT(id) FROM session;';
         $all = $this->connection->query($sql)->fetchColumn();
-        $this->logger->info(
+        $this->logger->notice(
             'The table "session" has a size of {size} MB. {old}/{all} records are older than 100 days.', // @translate
             ['size' => $size, 'old' => $old, 'all' => $all]
         );
@@ -685,7 +685,7 @@ SQL;
             $sql = 'DELETE FROM `session` WHERE modified < (UNIX_TIMESTAMP() - 86400 * ' . self::SESSION_OLD_DAYS . ');';
             $this->connection->exec($sql);
             $size = $this->connection->query($sqlSize)->fetchColumn();
-            $this->logger->info(
+            $this->logger->notice(
                 'Records older than {days} days were removed. The table "session" has a size of {size} MB.', // @translate
                 ['days' => self::SESSION_OLD_DAYS, 'size' => $size]
             );
