@@ -40,13 +40,13 @@ class BulkCheckController extends AbstractActionController
         $job = $dispatcher->dispatch(\BulkCheck\Job\Check::class, $params);
         $urlHelper = $this->url();
         $message = new PsrMessage(
-            'Checking database and files in background (job {link_open_job}#{jobId}{link_close}, {link_open_log}logs{link_close}).', // @translate
+            'Checking database and files in background (job {link_open_job}#{job_id}{link_close}, {link_open_log}logs{link_close}).', // @translate
             [
                 'link_open_job' => sprintf(
                     '<a href="%s">',
                     htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
                 ),
-                'jobId' => $job->getId(),
+                'job_id' => $job->getId(),
                 'link_close' => '</a>',
                 'link_open_log' => sprintf(
                     '<a href="%s">',

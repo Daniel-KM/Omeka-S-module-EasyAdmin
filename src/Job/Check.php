@@ -292,12 +292,12 @@ class Check extends AbstractJob
 
         if ($move) {
             $this->logger->notice(
-                'End check of {total} files for type {type}: {total_excess} files in excess.', // @translate
+                'End check of {total} files for type {type}: {total_excess} files in excess moved.', // @translate
                 ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
             );
         } else {
             $this->logger->notice(
-                'End check of {total} files for type {type}: {total_excess} files in excess moved.', // @translate
+                'End check of {total} files for type {type}: {total_excess} files in excess.', // @translate
                 ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
             );
         }
