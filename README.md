@@ -42,8 +42,9 @@ results are in the log of the job.
 TODO
 ----
 
-- Output results as tsv (`/files/check/tsv_date_time.tsv`).
+- Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport.
 - Integrate the similar module [`Derivative Images`]?
+- Check files with the wrong extension.
 
 
 Warning

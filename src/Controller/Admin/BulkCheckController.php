@@ -37,7 +37,40 @@ class BulkCheckController extends AbstractActionController
         unset($params['csrf']);
 
         $dispatcher = $this->jobDispatcher();
-        $job = $dispatcher->dispatch(\BulkCheck\Job\Check::class, $params);
+
+        switch ($params['process']) {
+            case 'files_excess':
+            case 'files_excess_move':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $params);
+                break;
+            case 'files_missing':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $params);
+                break;
+            case 'dirs_excess':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DirExcess::class, $params);
+                break;
+            case 'filesize_check':
+            case 'filesize_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileSize::class, $params);
+                break;
+            case 'filehash_check':
+            case 'filehash_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $params);
+                break;
+            case 'db_job_check':
+            case 'db_job_clean':
+            case 'db_job_clean_all':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbJob::class, $params);
+                break;
+            case 'db_session_check':
+            case 'db_session_clean':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $params);
+                break;
+            default:
+                $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
+                return $view;
+        }
+
         $urlHelper = $this->url();
         $message = new PsrMessage(
             'Checking database and files in background (job {link_open_job}#{job_id}{link_close}, {link_open_log}logs{link_close}).', // @translate
