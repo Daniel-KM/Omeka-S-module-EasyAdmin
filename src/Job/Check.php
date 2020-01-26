@@ -232,19 +232,21 @@ class Check extends AbstractJob
                 $storageId = strlen($extension)
                     ? substr($filename, 0, strrpos($filename, '.'))
                     : $filename;
-                $column = 'hasOriginal';
+                $media = $this->mediaRepository->findOneBy([
+                    'storageId' => $storageId,
+                    'extension' => $extension,
+                    'hasOriginal' => 1,
+                ]);
             } else {
-                $extension = 'jpg';
+                // The extension of the original file is unknown, but it doesn't
+                // matter, since each filepath is unique.
                 $storageId = substr($filename, 0, strrpos($filename, '.'));
-                $column = 'hasThumbnails';
+                $media = $this->mediaRepository->findOneBy([
+                    'storageId' => $storageId,
+                    'hasThumbnails' => 1,
+                ]);
             }
 
-            // TODO Find original file with a different extension.
-            $media = $this->mediaRepository->findOneBy([
-                'storageId' => $storageId,
-                'extension' => $extension,
-                $column => 1,
-            ]);
             if ($media) {
                 ++$totalSuccess;
                 $this->mediaRepository->clear();
@@ -739,10 +741,10 @@ SQL;
         }
 
         $this->logger->notice(
-            'The following {count} jobs are dead: {jobs}.', // @translate
+            'The following {count} jobs are dead: {job_ids}.', // @translate
             [
                 'count' => count($result),
-                'jobs' => implode(', ', array_map(function ($v) {
+                'job_ids' => implode(', ', array_map(function ($v) {
                     return '#' . $v['id'];
                 }, $result)),
             ]
