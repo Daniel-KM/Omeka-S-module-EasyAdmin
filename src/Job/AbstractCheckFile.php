@@ -13,7 +13,7 @@ abstract class AbstractCheckFile extends AbstractCheck
     protected function checkFileData($column, $fix = false)
     {
         if (!in_array($column, ['size', 'sha256'])) {
-            $this->logger->error(
+            $this->logger->err(
                 'Column {type} does not exist or cannot be checked.', // @translate
                 ['type' => $column]
             );
@@ -226,9 +226,9 @@ abstract class AbstractCheckFile extends AbstractCheck
                 $files[] = reset($file);
             }
         } else {
-            $dirLength = strlen($dir) + 1;
+            $dirLength = mb_strlen($dir) + 1;
             foreach ($regex as $file) {
-                $files[] = substr(reset($file), $dirLength);
+                $files[] = mb_substr(reset($file), $dirLength);
             }
         }
         sort($files);
