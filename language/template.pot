@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-30 00:00+0100\n"
+"POT-Creation-Date: 2020-03-30 00:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:598
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:538
+#: src/Generic/AbstractModule.php:618
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:606
+#: src/Generic/AbstractModule.php:686
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -83,25 +83,33 @@ msgid "Fix wrong sha256 of files"
 msgstr ""
 
 #: src/Form/BulkCheckForm.php:26
-msgid "Check dead jobs (living in database, but non-existent in system)"
+msgid "Check positions of media (start from 1, without missing number)"
 msgstr ""
 
 #: src/Form/BulkCheckForm.php:27
+msgid "Fix wrong positions of media "
+msgstr ""
+
+#: src/Form/BulkCheckForm.php:28
+msgid "Check dead jobs (living in database, but non-existent in system)"
+msgstr ""
+
+#: src/Form/BulkCheckForm.php:29
 msgid ""
 "Set status \"stopped\" for jobs that never started, and \"error\" for the "
 "jobs that never ended."
 msgstr ""
 
-#: src/Form/BulkCheckForm.php:28
+#: src/Form/BulkCheckForm.php:30
 msgid ""
 "Fix status as above for all jobs (when check cannot be done after a reboot)."
 msgstr ""
 
-#: src/Form/BulkCheckForm.php:29
+#: src/Form/BulkCheckForm.php:31
 msgid "Check the size of the database table of sessions"
 msgstr ""
 
-#: src/Form/BulkCheckForm.php:30
+#: src/Form/BulkCheckForm.php:32
 msgid "Remove old sessions (more than 100 days)"
 msgstr ""
 
@@ -109,178 +117,204 @@ msgstr ""
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/Admin/BulkCheckController.php:43
+#: src/Controller/Admin/BulkCheckController.php:74
+msgid "process"
+msgstr ""
+
+#: src/Controller/Admin/BulkCheckController.php:80
 msgid ""
-"Checking database and files in background (job {link_open_job}#{jobId}"
+"Checking database and files in background (job {link_open_job}#{job_id}"
 "{link_close}, {link_open_log}logs{link_close})."
 msgstr ""
 
-#: src/Job/Check.php:94
-msgid "Process \"{process}\" is unknown."
-msgstr ""
-
-#: src/Job/Check.php:101
-msgid "Starting \"{process}\"."
-msgstr ""
-
-#: src/Job/Check.php:111 src/Job/Check.php:157 src/Job/Check.php:174
-#: src/Job/Check.php:261
+#: src/Job/FileExcess.php:14 src/Job/FileExcess.php:34
+#: src/Job/FileExcess.php:51 src/Job/FileExcess.php:140
 msgid "Unable to prepare directory \"{path}\". Check rights."
 msgstr ""
 
-#: src/Job/Check.php:146
+#: src/Job/FileExcess.php:23 src/Job/DirExcess.php:15 src/Job/FileHash.php:15
+#: src/Job/MediaPosition.php:25 src/Job/FileMissing.php:15
+#: src/Job/DbSession.php:20 src/Job/DbJob.php:23 src/Job/FileSize.php:15
 msgid "Process \"{process}\" completed."
 msgstr ""
 
-#: src/Job/Check.php:210
+#: src/Job/FileExcess.php:87
 msgid "Starting check of {total} files for type {type}."
 msgstr ""
 
-#: src/Job/Check.php:218
+#: src/Job/FileExcess.php:95
 msgid "{processed}/{total} files processed."
 msgstr ""
 
-#: src/Job/Check.php:223 src/Job/Check.php:375 src/Job/Check.php:561
+#: src/Job/FileExcess.php:100 src/Job/MediaPosition.php:70
+#: src/Job/FileMissing.php:89 src/Job/AbstractCheckFile.php:89
 msgid "The job was stopped."
 msgstr ""
 
-#: src/Job/Check.php:270
+#: src/Job/FileExcess.php:149
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database and was moved."
 msgstr ""
 
-#: src/Job/Check.php:275
+#: src/Job/FileExcess.php:154
 msgid ""
 "File \"{filename}\" (type \"{type}\") doesn’t exist in database, and cannot "
 "be moved."
 msgstr ""
 
-#: src/Job/Check.php:282
+#: src/Job/FileExcess.php:161
 msgid ""
 "File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
 "database."
 msgstr ""
 
-#: src/Job/Check.php:293
-msgid ""
-"End check of {total} files for type {type}: {total_excess} files in excess."
-msgstr ""
-
-#: src/Job/Check.php:298
+#: src/Job/FileExcess.php:172
 msgid ""
 "End check of {total} files for type {type}: {total_excess} files in excess "
 "moved."
 msgstr ""
 
-#: src/Job/Check.php:325 src/Job/Check.php:526
-msgid "Checking {total} media with original files."
-msgstr ""
-
-#: src/Job/Check.php:333
-msgid "Checking {total} media with thumbnails."
-msgstr ""
-
-#: src/Job/Check.php:340 src/Job/Check.php:532
-msgid "No media to process."
-msgstr ""
-
-#: src/Job/Check.php:369 src/Job/Check.php:555
-msgid "{processed}/{total} media processed."
-msgstr ""
-
-#: src/Job/Check.php:389
+#: src/Job/FileExcess.php:177
 msgid ""
-"Media #{media_id} ({processed}/{total}): file \"{filename}\" does not exist "
-"for type \"{type}\"."
+"End check of {total} files for type {type}: {total_excess} files in excess."
 msgstr ""
 
-#: src/Job/Check.php:415
-msgid ""
-"End of process: {processed}/{total} processed, {total_succeed} succeed, "
-"{total_failed} failed ({mode})."
-msgstr ""
-
-#: src/Job/Check.php:449
+#: src/Job/DirExcess.php:41
 msgid "Processing type \"{type}\"."
 msgstr ""
 
-#: src/Job/Check.php:489
-msgid "Column {type} does not exist or cannot be checked."
+#: src/Job/MediaPosition.php:36 src/Job/FileMissing.php:54
+#: src/Job/AbstractCheckFile.php:60
+msgid "No media to process."
 msgstr ""
 
-#: src/Job/Check.php:505
-msgid ""
-"{total_size}/{total_no} media have no original file, but a {type}, and were "
-"fixed."
+#: src/Job/MediaPosition.php:45
+msgid "No item to process."
 msgstr ""
 
-#: src/Job/Check.php:510
-msgid "{total_size}/{total_no} media have no original file, but a {type}."
+#: src/Job/MediaPosition.php:64
+msgid "{processed}/{total} items processed."
 msgstr ""
 
-#: src/Job/Check.php:516
-msgid "{total_no} media have no original file, so no {type}."
+#: src/Job/MediaPosition.php:110
+msgid "Fixed item #{item_id} wrong media positions."
 msgstr ""
 
-#: src/Job/Check.php:596
-msgid ""
-"Media #{media_id} ({processed}/{total}): original file \"{filename}\" "
-"updated with {type} = {real_value}."
+#: src/Job/MediaPosition.php:118
+msgid "Item #{item_id} has wrong media positions."
 msgstr ""
 
-#: src/Job/Check.php:611
-msgid ""
-"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has no "
-"{type}, but should be {real_value}."
-msgstr ""
-
-#: src/Job/Check.php:624
-msgid ""
-"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has a "
-"different {type}: {db_value} ≠ {real_value}."
-msgstr ""
-
-#: src/Job/Check.php:642
-msgid ""
-"Media #{media_id} ({processed}/{total}): original file \"{filename}\" does "
-"not exist\"."
-msgstr ""
-
-#: src/Job/Check.php:663
+#: src/Job/MediaPosition.php:134 src/Job/AbstractCheckFile.php:191
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed."
 msgstr ""
 
-#: src/Job/Check.php:724
+#: src/Job/MediaPosition.php:144
 msgid ""
-"Dead jobs were cleaned: {count_stopped} marked \"stopped\" and {count_error} "
-"marked \"error\" on a total of {count_jobs}."
+"End of process: {processed}/{total} processed, {total_succeed} items has "
+"wrong positions."
 msgstr ""
 
-#: src/Job/Check.php:736
-msgid "There is no dead job."
+#: src/Job/FileMissing.php:39 src/Job/AbstractCheckFile.php:54
+msgid "Checking {total} media with original files."
 msgstr ""
 
-#: src/Job/Check.php:742
-msgid "The following {count} jobs are dead: {jobs}."
+#: src/Job/FileMissing.php:47
+msgid "Checking {total} media with thumbnails."
 msgstr ""
 
-#: src/Job/Check.php:773
-msgid "A total of {count} dead jobs have been cleaned."
+#: src/Job/FileMissing.php:83 src/Job/AbstractCheckFile.php:83
+msgid "{processed}/{total} media processed."
 msgstr ""
 
-#: src/Job/Check.php:805
+#: src/Job/FileMissing.php:103
+msgid ""
+"Media #{media_id} ({processed}/{total}): file \"{filename}\" does not exist "
+"for type \"{type}\"."
+msgstr ""
+
+#: src/Job/FileMissing.php:129
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed ({mode})."
+msgstr ""
+
+#: src/Job/DbSession.php:51
 msgid ""
 "The table \"session\" has a size of {size} MB. {old}/{all} records are older "
 "than 100 days."
 msgstr ""
 
-#: src/Job/Check.php:817
+#: src/Job/DbSession.php:63
 msgid ""
 "{count} records older than {days} days were removed. The table \"session\" "
 "has a size of {size} MB."
+msgstr ""
+
+#: src/Job/AbstractCheck.php:76
+msgid "Starting \"{process}\"."
+msgstr ""
+
+#: src/Job/DbJob.php:77
+msgid ""
+"Dead jobs were cleaned: {count_stopped} marked \"stopped\" and {count_error} "
+"marked \"error\" on a total of {count_jobs}."
+msgstr ""
+
+#: src/Job/DbJob.php:89
+msgid "There is no dead job."
+msgstr ""
+
+#: src/Job/DbJob.php:95
+msgid "The following {count} jobs are dead: {job_ids}."
+msgstr ""
+
+#: src/Job/DbJob.php:126
+msgid "A total of {count} dead jobs have been cleaned."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:17
+msgid "Column {type} does not exist or cannot be checked."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:33
+msgid ""
+"{total_size}/{total_no} media have no original file, but a {type}, and were "
+"fixed."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:38
+msgid "{total_size}/{total_no} media have no original file, but a {type}."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:44
+msgid "{total_no} media have no original file, so no {type}."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:124
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" "
+"updated with {type} = {real_value}."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:139
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has no "
+"{type}, but should be {real_value}."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:152
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has a "
+"different {type}: {db_value} ≠ {real_value}."
+msgstr ""
+
+#: src/Job/AbstractCheckFile.php:170
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" does "
+"not exist\"."
 msgstr ""
 
 #: config/module.config.php:27
