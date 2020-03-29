@@ -15,7 +15,7 @@ class BulkCheckForm extends Form
                 'options' => [
                     'label' => 'Processors', // @translate
                     'value_options' => [
-                        'files_excess' => 'List files that are present in "/files/", but not in database', // @translate
+                        'files_excess_check' => 'List files that are present in "/files/", but not in database', // @translate
                         'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
                         'files_missing' => 'List files that are present in database, not in "/files/"', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
@@ -23,6 +23,8 @@ class BulkCheckForm extends Form
                         'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                         'filehash_check' => 'Check sha256 hashes of files', // @translate
                         'filehash_fix' => 'Fix wrong sha256 of files', // @translate
+                        'media_position_check' => 'Check positions of media (start from 1, without missing number)', // @translate
+                        'media_position_fix' => 'Fix wrong positions of media ', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended.', // @translate
                         'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot).', // @translate

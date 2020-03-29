@@ -35,6 +35,11 @@ abstract class AbstractCheck extends AbstractJob
     /**
      * @var \Doctrine\ORM\EntityRepository
      */
+    protected $itemRepository;
+
+        /**
+     * @var \Doctrine\ORM\EntityRepository
+     */
     protected $mediaRepository;
 
     /**
@@ -61,6 +66,7 @@ abstract class AbstractCheck extends AbstractJob
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $services->get('Omeka\Connection');
         $this->connection = $this->entityManager->getConnection();
+        $this->itemRepository = $this->entityManager->getRepository(\Omeka\Entity\Item::class);
         $this->mediaRepository = $this->entityManager->getRepository(\Omeka\Entity\Media::class);
         $this->config = $services->get('Config');
         $this->basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');

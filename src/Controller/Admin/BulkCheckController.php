@@ -39,7 +39,7 @@ class BulkCheckController extends AbstractActionController
         $dispatcher = $this->jobDispatcher();
 
         switch ($params['process']) {
-            case 'files_excess':
+            case 'files_excess_check':
             case 'files_excess_move':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $params);
                 break;
@@ -56,6 +56,10 @@ class BulkCheckController extends AbstractActionController
             case 'filehash_check':
             case 'filehash_fix':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $params);
+                break;
+            case 'media_position_check':
+            case 'media_position_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $params);
                 break;
             case 'db_job_check':
             case 'db_job_clean':
