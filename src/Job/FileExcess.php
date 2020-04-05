@@ -91,7 +91,7 @@ class FileExcess extends AbstractCheckFile
         $i = 0;
         foreach ($files as $filename) {
             if (($i % 100 === 0) && $i) {
-                $this->logger->notice(
+                $this->logger->info(
                     '{processed}/{total} files processed.', // @translate
                     ['processed' => $i, 'total' => $total]
                 );

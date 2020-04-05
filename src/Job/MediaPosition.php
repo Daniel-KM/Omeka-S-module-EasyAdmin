@@ -60,7 +60,7 @@ class MediaPosition extends AbstractCheck
             }
 
             if ($offset) {
-                $this->logger->notice(
+                $this->logger->info(
                     '{processed}/{total} items processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );

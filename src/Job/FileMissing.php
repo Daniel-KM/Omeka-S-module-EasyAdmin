@@ -79,7 +79,7 @@ class FileMissing extends AbstractCheckFile
             }
 
             if ($offset) {
-                $this->logger->notice(
+                $this->logger->info(
                     '{processed}/{total} media processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );
