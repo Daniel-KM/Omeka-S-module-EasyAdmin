@@ -2,16 +2,28 @@ Bulk Check (module for Omeka S)
 ===============================
 
 [Bulk Check] is a module for [Omeka S] that allows to check your metadata and
-files.
+files and to fix some common issues.
 
-Checks that are doable:
+Checks and fixes that are doable:
 
-- files in the file system (original and thumbnails), but not in the database
-- files in the database, but not in the file system (original and thumbnails)
+- list files in the file system (original and thumbnails), but not in the
+  database
+- remove useless files in the files directory (moved to files/check)
+- list files in the database, but not in the file system (for original and
+  thumbnails)
+- copy original files from a directory, for example after a disk crash or an
+  inadvertent deletion; files are copied via the hash, and they can be anywhere
+  in the directory or in subdirectories of the source path.
+- rebuild derivative files
 - remove empty directories in file system (original and thumbnails, mainly for
   module [Archive Repertory])
 - check and update file size of media (required to fix Omeka installed before
   Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
+- check and fix sha256 hashes of files
+- check and fix positions of media (start from 1, without missing number)
+- check and stop dead jobs (living in database, but non-existent in system)
+- check the size of the database table of sessions
+- remove old sessions
 
 
 Installation
@@ -35,16 +47,19 @@ the module to `BulkCheck`.
 Quick start
 -----------
 
-Currently, the form to process the checks is in the config of the module and
-results are in the log of the job.
+Go to the menu "Bulk Check", select your process, set your options if needed,
+and click the submit buttons. The results are available in logs currently.
 
 
 TODO
 ----
 
-- Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport.
-- Integrate the similar module [`Derivative Images`]?
+- Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in
+  a table.
 - Check files with the wrong extension.
+- Add width/height/duration as data for image/audio/video to avoid to get them
+  each time (modules [Iiif Server] and [Image Server]).
+- Remove old logs.
 
 
 Warning
@@ -95,7 +110,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitHub)
 
 
 [Bulk Check]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck
@@ -105,6 +120,8 @@ Copyright
 [`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
 [`Log`]: https://github.com/Daniel-KM/Omeka-S-module-Log
 [`Derivative Images`]: https://github.com/Daniel-KM/Omeka-S-module-DerivativeImages
+[Iiif Server]: https://github.com/Daniel-KM/Omeka-S-module-IiifServer
+[Image Server]: https://github.com/Daniel-KM/Omeka-S-module-ImageServer
 [`BulkCheck.zip`]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/issues
