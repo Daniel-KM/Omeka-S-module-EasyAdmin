@@ -52,6 +52,12 @@ class FileMissing extends AbstractCheckFile
             $total = count($this->files);
 
             // Prepare a list of hash of all files one time.
+            $this->logger->info(
+                'Preparing hashes of {total} iles (this may take a long time).', // @translate
+                ['total' => $total]
+            );
+
+            $count = 0;
             foreach ($this->files as $key => $file) {
                 $filepath = $dir . '/' . $file;
                 if (is_readable($filepath)) {
@@ -63,6 +69,17 @@ class FileMissing extends AbstractCheckFile
                     );
                 }
                 unset($this->files[$key]);
+
+                ++$count;
+                if ($count % 100 === 0) {
+                    $this->logger->info(
+                        '{count}/{total} hashes prepared.', // @translate
+                        [
+                            'count' => $count,
+                            'total' => $total,
+                        ]
+                    );
+                }
             }
 
             $this->logger->notice(
