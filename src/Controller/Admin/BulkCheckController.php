@@ -44,8 +44,9 @@ class BulkCheckController extends AbstractActionController
             case 'files_excess_move':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $defaultParams);
                 break;
-            case 'files_missing':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $defaultParams);
+            case 'files_missing_check':
+            case 'files_missing_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $params['files_missing'] + $defaultParams);
                 break;
             case 'files_derivative':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\FileDerivative::class, $params['files_derivative'] + $defaultParams);

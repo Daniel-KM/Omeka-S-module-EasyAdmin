@@ -25,7 +25,8 @@ class BulkCheckForm extends Form
                     'value_options' => [
                         'files_excess_check' => 'List files that are present in "/files/", but not in database', // @translate
                         'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
-                        'files_missing' => 'List files that are present in database, not in "/files/"', // @translate
+                        'files_missing_check' => 'List files that are present in database, not in "/files/"', // @translate
+                        'files_missing_fix' => 'Copy missing files via hashes from the specified source directory below', // @translate
                         'files_derivative' => 'Rebuild derivative images with options below', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                         'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
@@ -47,6 +48,27 @@ class BulkCheckForm extends Form
                 ],
             ]);
 
+        $this
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'files_missing',
+                'options' => [
+                    'label' => 'Options for fix missing files', // @translate
+                ],
+            ]);
+        $this->get('files_missing')
+            ->add([
+                'name' => 'source_dir',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Source', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'source_dir',
+                    'data-placeholder' => '/server/path/to/my/source/directory', // @translate
+                ],
+            ])
+        ;
         $this
             ->add([
                 'type' => Fieldset::class,

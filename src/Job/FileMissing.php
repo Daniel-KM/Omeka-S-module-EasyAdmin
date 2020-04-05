@@ -3,23 +3,97 @@ namespace BulkCheck\Job;
 
 class FileMissing extends AbstractCheckFile
 {
+    /**
+     * @var string
+     */
+    protected $sourceDir;
+
+    /**
+     * @var array
+     */
+    protected $files;
+
     public function perform()
     {
         parent::perform();
 
         $process = $this->getArg('process');
 
-        $this->checkMissingFiles();
+        $fix = $process === 'files_missing_fix';
+        if ($fix) {
+            $dir = rtrim($this->getArg('source_dir'), '/');
+            if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
+                $this->logger->err(
+                    'Source directory "{path}" is not set or not readable.', // @translate
+                    ['path' => $dir]
+                );
+                return;
+            }
+
+            if (realpath($dir) !== $dir || strlen($dir) <= 1) {
+                $this->logger->err(
+                    'Source directory "{path}" should be a real path.', // @translate
+                    ['path' => $dir]
+                );
+                return;
+            }
+
+            $this->files = $this->listFilesInFolder($dir);
+            if (!count($this->files)) {
+                $this->logger->err(
+                    'Source directory "{path}" is empty.', // @translate
+                    ['path' => $dir]
+                );
+                return;
+            }
+
+            $this->sourceDir = $dir;
+
+            $total = count($this->files);
+
+            // Prepare a list of hash of all files one time.
+            foreach ($this->files as $key => $file) {
+                $filepath = $dir . '/' . $file;
+                if (is_readable($filepath)) {
+                    $this->files[hash_file('sha256', $filepath)] = $file;
+                } else {
+                    $this->logger->err(
+                        'Source file "{path}" is not readable.', // @translate
+                        ['path' => $file]
+                    );
+                }
+                unset($this->files[$key]);
+            }
+
+            $this->logger->notice(
+                'The source directory contains {total} readable files.', // @translate
+                ['total' => count($this->files)]
+            );
+            if ($total !== count($this->files)) {
+                $this->logger->notice(
+                    'The source directory contains {total} duplicate files.', // @translate
+                    ['total' => $total - count($this->files)]
+                );
+            }
+        }
+
+        $this->checkMissingFiles($fix);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
             ['process' => $process]
         );
+
+        if ($fix) {
+            $this->logger->warn(
+                'The derivative files are not rebuilt automatically. Check them and recreate them via the other processes.' // @translate
+            );
+        }
     }
 
-    protected function checkMissingFiles()
+    protected function checkMissingFiles($fix = false)
     {
-        $result = $this->checkMissingFilesForTypes(['original']);
+        $result = $this->checkMissingFilesForTypes(['original'], $fix);
         if (!$result) {
             return false;
         }
@@ -27,7 +101,7 @@ class FileMissing extends AbstractCheckFile
         return $result;
     }
 
-    protected function checkMissingFilesForTypes(array $types)
+    protected function checkMissingFilesForTypes(array $types, $fix = false)
     {
         $criteria = [];
         $isOriginal = in_array('original', $types);
@@ -97,6 +171,51 @@ class FileMissing extends AbstractCheckFile
                     $filename = $isOriginal ? $media->getFilename() : ($media->getStorageId() . '.jpg');
                     if (in_array($filename, $files)) {
                         ++$totalSucceed;
+                    } elseif ($fix) {
+                        if ($type !== 'original') {
+                            break;
+                        }
+                        $hash = $media->getSha256();
+                        if (isset($this->files[$hash])) {
+                            $result = copy(
+                                $this->sourceDir . '/' . $this->files[$hash],
+                                $this->basePath . '/original/' . $filename
+                            );
+                            if ($result) {
+                                ++$totalSucceed;
+                                $this->logger->info(
+                                    'Media #{media_id} ({processed}/{total}): original file copied from source "{filepath}".', // @translate
+                                    [
+                                        'media_id' => $media->getId(),
+                                        'processed' => $offset + $key + 1,
+                                        'total' => $totalToProcess,
+                                        'filepath' => $this->files[$hash],
+                                    ]
+                                );
+                            } else {
+                                ++$totalFailed;
+                                $this->logger->warn(
+                                    'Media #{media_id} ({processed}/{total}): unable to copy original file "{filepath}".', // @translate
+                                    [
+                                        'media_id' => $media->getId(),
+                                        'processed' => $offset + $key + 1,
+                                        'total' => $totalToProcess,
+                                        'filepath' => $this->files[$hash],
+                                    ]
+                                );
+                            }
+                        } else {
+                            ++$totalFailed;
+                            $this->logger->warn(
+                                'Media #{media_id} ({processed}/{total}): file "{filename}" does not does not have a source to copy.', // @translate
+                                [
+                                    'media_id' => $media->getId(),
+                                    'processed' => $offset + $key + 1,
+                                    'total' => $totalToProcess,
+                                    'filename' => $filename,
+                                ]
+                            );
+                        }
                     } else {
                         ++$totalFailed;
                         $this->logger->warn(
