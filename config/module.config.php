@@ -11,8 +11,8 @@ return [
         ],
     ],
     'form_elements' => [
-        'invokables' => [
-            Form\BulkCheckForm::class => Form\BulkCheckForm::class,
+        'factories' => [
+            Form\BulkCheckForm::class => Service\Form\BulkCheckFormFactory::class,
         ],
     ],
     'controllers' => [

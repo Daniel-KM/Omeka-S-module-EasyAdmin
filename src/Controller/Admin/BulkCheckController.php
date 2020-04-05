@@ -38,37 +38,41 @@ class BulkCheckController extends AbstractActionController
 
         $dispatcher = $this->jobDispatcher();
 
+        $defaultParams = ['process' => $params['process']];
         switch ($params['process']) {
             case 'files_excess_check':
             case 'files_excess_move':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $defaultParams);
                 break;
             case 'files_missing':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $defaultParams);
+                break;
+            case 'files_derivative':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileDerivative::class, $params['files_derivative'] + $defaultParams);
                 break;
             case 'dirs_excess':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DirExcess::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DirExcess::class, $defaultParams);
                 break;
             case 'filesize_check':
             case 'filesize_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileSize::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileSize::class, $defaultParams);
                 break;
             case 'filehash_check':
             case 'filehash_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $defaultParams);
                 break;
             case 'media_position_check':
             case 'media_position_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $defaultParams);
                 break;
             case 'db_job_check':
             case 'db_job_clean':
             case 'db_job_clean_all':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbJob::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbJob::class, $defaultParams);
                 break;
             case 'db_session_check':
             case 'db_session_clean':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $params);
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $defaultParams);
                 break;
             default:
                 $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
