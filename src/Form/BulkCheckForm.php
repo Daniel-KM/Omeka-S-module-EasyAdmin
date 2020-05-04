@@ -26,7 +26,7 @@ class BulkCheckForm extends Form
                         'files_excess_check' => 'List files that are present in "/files/", but not in database', // @translate
                         'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
                         'files_missing_check' => 'List files that are present in database, not in "/files/"', // @translate
-                        'files_missing_fix' => 'Copy missing files via hashes from the specified source directory below', // @translate
+                        'files_missing_fix' => 'Copy missing files from the source directory below (recover a disaster)', // @translate
                         'files_derivative' => 'Rebuild derivative images with options below', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                         'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
@@ -40,6 +40,7 @@ class BulkCheckForm extends Form
                         'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot).', // @translate
                         'db_session_check' => 'Check the size of the database table of sessions', // @translate
                         'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
+                        'db_fulltext_index' => 'Index full-text search (core job)', // @translate
                     ],
                 ],
                 'attributes' => [

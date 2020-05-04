@@ -36,6 +36,7 @@ class BulkCheckController extends AbstractActionController
         $params = $form->getData();
         unset($params['csrf']);
 
+        /** @var \Omeka\Mvc\Controller\Plugin\JobDispatcher $dispatcher */
         $dispatcher = $this->jobDispatcher();
 
         $defaultParams = ['process' => $params['process']];
@@ -75,6 +76,9 @@ class BulkCheckController extends AbstractActionController
             case 'db_session_clean':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $defaultParams);
                 break;
+            case 'db_fulltext_index':
+                $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
+                break;
             default:
                 $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
                 return $view;
@@ -82,7 +86,7 @@ class BulkCheckController extends AbstractActionController
 
         $urlHelper = $this->url();
         $message = new PsrMessage(
-            'Checking database and files in background (job {link_open_job}#{job_id}{link_close}, {link_open_log}logs{link_close}).', // @translate
+            'Processing checks in background (job {link_open_job}#{job_id}{link_close}, {link_open_log}logs{link_close}).', // @translate
             [
                 'link_open_job' => sprintf(
                     '<a href="%s">',
