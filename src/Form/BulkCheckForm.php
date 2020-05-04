@@ -41,6 +41,7 @@ class BulkCheckForm extends Form
                         'db_session_check' => 'Check the size of the database table of sessions', // @translate
                         'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
+                        'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
                 ],
                 'attributes' => [

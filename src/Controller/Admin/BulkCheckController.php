@@ -79,6 +79,9 @@ class BulkCheckController extends AbstractActionController
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
                 break;
+            case 'db_thesaurus_index':
+                $job = $dispatcher->dispatch(\Thesaurus\Job\Indexing::class);
+                break;
             default:
                 $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
                 return $view;
