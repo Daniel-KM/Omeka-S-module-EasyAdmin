@@ -88,6 +88,11 @@ DQL;
             }
         }
 
+        $withoutThumbnails = $this->getArg('original_without_thumbnails');
+        if ($withoutThumbnails) {
+            $criteria->andWhere($expr->eq('hasThumbnails', 0));
+        }
+
         $totalResources = $api->search('media', ['limit' => 1])->getTotalResults();
 
         // TODO Manage creation of thumbnails for media without original (youtube…).

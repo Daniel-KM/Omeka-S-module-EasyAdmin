@@ -153,6 +153,16 @@ class BulkCheckForm extends Form
                     'placeholder' => '2-6 8 38-52 80-', // @ translate
                 ],
             ])
+            ->add([
+                'name' => 'original_without_thumbnails',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Originals without thumbnails', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'original_without_thumbnails',
+                ],
+            ])
         ;
 
         // Fix the formatting issue of the label in Omeka.
