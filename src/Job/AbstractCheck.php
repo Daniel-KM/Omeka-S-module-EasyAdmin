@@ -37,7 +37,7 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected $itemRepository;
 
-        /**
+    /**
      * @var \Doctrine\ORM\EntityRepository
      */
     protected $mediaRepository;

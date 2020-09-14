@@ -53,7 +53,7 @@ class FileMissing extends AbstractCheckFile
 
             // Prepare a list of hash of all files one time.
             $this->logger->info(
-                'Preparing hashes of {total} iles (this may take a long time).', // @translate
+                'Preparing hashes of {total} files (this may take a long time).', // @translate
                 ['total' => $total]
             );
 

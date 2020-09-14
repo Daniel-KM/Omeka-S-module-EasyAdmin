@@ -192,7 +192,6 @@ class BulkCheckForm extends Form
                 'name' => 'media_types',
                 'required' => false,
             ]);
-        ;
     }
 
     /**

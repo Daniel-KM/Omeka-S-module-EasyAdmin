@@ -1,9 +1,6 @@
 <?php
 namespace BulkCheck\Job;
 
-use Doctrine\Common\Collections\Criteria;
-use Omeka\Stdlib\Message;
-
 class MediaPosition extends AbstractCheck
 {
     /**
