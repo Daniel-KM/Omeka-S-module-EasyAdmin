@@ -24,7 +24,7 @@ class BulkCheckForm extends Form
                     'label' => 'Processors', // @translate
                     'value_options' => [
                         'files_excess_check' => 'List files that are present in "/files/", but not in database', // @translate
-                        'files_excess_move' => 'Move files that are present in "/files/", but not in database, into /files/check/', // @translate
+                        'files_excess_move' => 'Move files that are present in "/files/", but not in database, into "/files/check/"', // @translate
                         'files_missing_check' => 'List files that are present in database, not in "/files/"', // @translate
                         'files_missing_fix' => 'Copy missing files from the source directory below (recover a disaster)', // @translate
                         'files_derivative' => 'Rebuild derivative images with options below', // @translate
@@ -34,10 +34,10 @@ class BulkCheckForm extends Form
                         'filehash_check' => 'Check sha256 hashes of files', // @translate
                         'filehash_fix' => 'Fix wrong sha256 of files', // @translate
                         'media_position_check' => 'Check positions of media (start from 1, without missing number)', // @translate
-                        'media_position_fix' => 'Fix wrong positions of media ', // @translate
+                        'media_position_fix' => 'Fix wrong positions of media', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
-                        'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended.', // @translate
-                        'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot).', // @translate
+                        'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
+                        'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
                         'db_session_check' => 'Check the size of the database table of sessions', // @translate
                         'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate

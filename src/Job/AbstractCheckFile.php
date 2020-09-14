@@ -167,7 +167,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                 } else {
                     ++$totalFailed;
                     $this->logger->warn(
-                        'Media #{media_id} ({processed}/{total}): original file "{filename}" does not exist".', // @translate
+                        'Media #{media_id} ({processed}/{total}): original file "{filename}" does not exist.', // @translate
                         [
                             'media_id' => $media->getId(),
                             'processed' => $offset + $key + 1,
