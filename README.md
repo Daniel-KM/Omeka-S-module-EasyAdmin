@@ -29,13 +29,13 @@ Checks and fixes that are doable:
 Installation
 ------------
 
-This module requires the modules [`Generic`] and [`Log`].
+This module requires the modules [Generic] and [Log].
 
 See general end user documentation for [installing a module].
 
 * From the zip
 
-Download the last release [`BulkCheck.zip`] from the list of releases, and
+Download the last release [BulkCheck.zip] from the list of releases, and
 uncompress it in the `modules` directory.
 
 * From the source and for development
@@ -117,12 +117,12 @@ Copyright
 [Omeka S]: https://omeka.org/s
 [Archive Repertory]: https://github.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
-[`Generic`]: https://github.com/Daniel-KM/Omeka-S-module-Generic
-[`Log`]: https://github.com/Daniel-KM/Omeka-S-module-Log
-[`Derivative Images`]: https://github.com/Daniel-KM/Omeka-S-module-DerivativeImages
+[Generic]: https://github.com/Daniel-KM/Omeka-S-module-Generic
+[Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
+[Derivative Images]: https://github.com/Daniel-KM/Omeka-S-module-DerivativeImages
 [Iiif Server]: https://github.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://github.com/Daniel-KM/Omeka-S-module-ImageServer
-[`BulkCheck.zip`]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
+[BulkCheck.zip]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
