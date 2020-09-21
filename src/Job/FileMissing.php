@@ -17,6 +17,8 @@ class FileMissing extends AbstractCheckFile
     {
         parent::perform();
 
+        $includeDerivatives = $this->getArg('include_derivatives', false);
+
         $process = $this->getArg('process');
 
         $fix = $process === 'files_missing_fix';
@@ -94,7 +96,7 @@ class FileMissing extends AbstractCheckFile
             }
         }
 
-        $this->checkMissingFiles($fix);
+        $this->checkMissingFiles($fix, ['include_derivatives' => $includeDerivatives]);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -108,13 +110,15 @@ class FileMissing extends AbstractCheckFile
         }
     }
 
-    protected function checkMissingFiles($fix = false)
+    protected function checkMissingFiles($fix = false, array $options)
     {
         $result = $this->checkMissingFilesForTypes(['original'], $fix);
         if (!$result) {
             return false;
         }
-        $result = $this->checkMissingFilesForTypes(array_keys($this->config['thumbnails']['types']));
+        if (!empty($options['include_derivatives'])) {
+            $result = $this->checkMissingFilesForTypes(array_keys($this->config['thumbnails']['types']));
+        }
         return $result;
     }
 
