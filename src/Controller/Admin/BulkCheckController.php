@@ -39,7 +39,13 @@ class BulkCheckController extends AbstractActionController
         /** @var \Omeka\Mvc\Controller\Plugin\JobDispatcher $dispatcher */
         $dispatcher = $this->jobDispatcher();
 
-        $defaultParams = ['process' => $params['process']];
+        $defaultParams = [
+            'process' => $params['process'],
+            // Save the base url of files in order to be able to set the good
+            // url for the result file in background job.
+            'base_files' => $this->viewHelpers()-> get('BasePath')->__invoke('/files'),
+        ];
+
         switch ($params['process']) {
             case 'files_excess_check':
             case 'files_excess_move':
