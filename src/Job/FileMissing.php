@@ -1,4 +1,5 @@
 <?php
+
 namespace BulkCheck\Job;
 
 class FileMissing extends AbstractCheckFile
@@ -17,82 +18,20 @@ class FileMissing extends AbstractCheckFile
     {
         parent::perform();
 
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
+
         $includeDerivatives = $this->getArg('include_derivatives', false);
 
         $process = $this->getArg('process');
 
         $fix = $process === 'files_missing_fix';
         if ($fix) {
-            $dir = rtrim($this->getArg('source_dir'), '/');
-            if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
-                $this->logger->err(
-                    'Source directory "{path}" is not set or not readable.', // @translate
-                    ['path' => $dir]
-                );
+            $this->prepareSourceDirectory();
+            if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
                 return;
-            }
-
-            if (realpath($dir) !== $dir || strlen($dir) <= 1) {
-                $this->logger->err(
-                    'Source directory "{path}" should be a real path.', // @translate
-                    ['path' => $dir]
-                );
-                return;
-            }
-
-            $this->files = $this->listFilesInFolder($dir);
-            if (!count($this->files)) {
-                $this->logger->err(
-                    'Source directory "{path}" is empty.', // @translate
-                    ['path' => $dir]
-                );
-                return;
-            }
-
-            $this->sourceDir = $dir;
-
-            $total = count($this->files);
-
-            // Prepare a list of hash of all files one time.
-            $this->logger->info(
-                'Preparing hashes of {total} files (this may take a long time).', // @translate
-                ['total' => $total]
-            );
-
-            $count = 0;
-            foreach ($this->files as $key => $file) {
-                $filepath = $dir . '/' . $file;
-                if (is_readable($filepath)) {
-                    $this->files[hash_file('sha256', $filepath)] = $file;
-                } else {
-                    $this->logger->err(
-                        'Source file "{path}" is not readable.', // @translate
-                        ['path' => $file]
-                    );
-                }
-                unset($this->files[$key]);
-
-                ++$count;
-                if ($count % 100 === 0) {
-                    $this->logger->info(
-                        '{count}/{total} hashes prepared.', // @translate
-                        [
-                            'count' => $count,
-                            'total' => $total,
-                        ]
-                    );
-                }
-            }
-
-            $this->logger->notice(
-                'The source directory contains {total} readable files.', // @translate
-                ['total' => count($this->files)]
-            );
-            if ($total !== count($this->files)) {
-                $this->logger->notice(
-                    'The source directory contains {total} duplicate files.', // @translate
-                    ['total' => $total - count($this->files)]
-                );
             }
         }
 
@@ -103,11 +42,118 @@ class FileMissing extends AbstractCheckFile
             ['process' => $process]
         );
 
+        $this->messageResultFile();
+
         if ($fix) {
             $this->logger->warn(
                 'The derivative files are not rebuilt automatically. Check them and recreate them via the other processes.' // @translate
             );
         }
+    }
+
+    protected function initializeOutput()
+    {
+        parent::initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return $this;
+        }
+
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $row = [
+            $translator->translate('Item'), // @translate
+            $translator->translate('Media'), // @translate
+            $translator->translate('Filename'), // @translate
+            $translator->translate('Type'), // @translate
+            $translator->translate('Exists'), // @translate
+            $translator->translate('Source'), // @translate
+            $translator->translate('Fixed'), // @translate
+        ];
+        $this->writeRow($row);
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    protected function prepareSourceDirectory()
+    {
+        $dir = rtrim($this->getArg('source_dir'), '/');
+        if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Source directory "{path}" is not set or not readable.', // @translate
+                ['path' => $dir]
+            );
+            return $this;
+        }
+
+        if (realpath($dir) !== $dir || strlen($dir) <= 1) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Source directory "{path}" should be a real path.', // @translate
+                ['path' => $dir]
+            );
+            return $this;
+        }
+
+        $this->files = $this->listFilesInFolder($dir);
+        if (!count($this->files)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Source directory "{path}" is empty.', // @translate
+                ['path' => $dir]
+            );
+            return $this;
+        }
+
+        $this->sourceDir = $dir;
+
+        $total = count($this->files);
+
+        // Prepare a list of hash of all files one time.
+        $this->logger->info(
+            'Preparing hashes of {total} files (this may take a long time).', // @translate
+            ['total' => $total]
+        );
+
+        $count = 0;
+        foreach ($this->files as $key => $file) {
+            $filepath = $dir . '/' . $file;
+            if (is_readable($filepath)) {
+                $this->files[hash_file('sha256', $filepath)] = $file;
+            } else {
+                $this->logger->warn(
+                    'Source file "{path}" is not readable.', // @translate
+                    ['path' => $file]
+                );
+            }
+            unset($this->files[$key]);
+
+            ++$count;
+            if ($count % 100 === 0) {
+                $this->logger->info(
+                    '{count}/{total} hashes prepared.', // @translate
+                    [
+                        'count' => $count,
+                        'total' => $total,
+                    ]
+                );
+            }
+        }
+
+        $this->logger->notice(
+            'The source directory contains {total} readable files.', // @translate
+            ['total' => count($this->files)]
+        );
+        if ($total !== count($this->files)) {
+            $this->logger->notice(
+                'The source directory contains {total} duplicate files.', // @translate
+                ['total' => $total - count($this->files)]
+            );
+        }
+
+        return $this;
     }
 
     protected function checkMissingFiles($fix = false, array $options)
@@ -158,9 +204,14 @@ class FileMissing extends AbstractCheckFile
             $types[$type] = $this->listFilesInFolder($path);
         }
 
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+        $no = $translator->translate('No'); // @translate
+        $noSource = $translator->translate('No source'); // @translate
+        $copyIssue = $translator->translate('Copy issue'); // @translate
+
         // Second, loop all media data.
         $offset = 0;
-        $key = 0;
         $totalProcessed = 0;
         $totalSucceed = 0;
         $totalFailed = 0;
@@ -187,69 +238,55 @@ class FileMissing extends AbstractCheckFile
                 }
             }
 
-            foreach ($medias as $key => $media) {
+            foreach ($medias as $media) {
+                $itemId = $media->getItem()->getId();
                 foreach ($types as $type => $files) {
                     $filename = $isOriginal ? $media->getFilename() : ($media->getStorageId() . '.jpg');
+                    $row = [
+                        'item' => $itemId,
+                        'media' => $media->getId(),
+                        'filename' => $filename,
+                        'type' => $type,
+                        'exists' => '',
+                        'source' => '',
+                        'fixed' => '',
+                    ];
                     if (in_array($filename, $files)) {
+                        $row['exists'] = $yes;
                         ++$totalSucceed;
                     } elseif ($fix) {
+                        $row['exists'] = $no;
                         if ($type !== 'original') {
+                            $row['fixed'] = $no;
+                            $this->writeRow($row);
                             break;
                         }
                         $hash = $media->getSha256();
                         if (isset($this->files[$hash])) {
+                            $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
                             $result = copy(
                                 $this->sourceDir . '/' . $this->files[$hash],
                                 $this->basePath . '/original/' . $filename
                             );
                             if ($result) {
+                                $row['fixed'] = $yes;
                                 ++$totalSucceed;
-                                $this->logger->info(
-                                    'Media #{media_id} ({processed}/{total}): original file copied from source "{filepath}".', // @translate
-                                    [
-                                        'media_id' => $media->getId(),
-                                        'processed' => $offset + $key + 1,
-                                        'total' => $totalToProcess,
-                                        'filepath' => $this->files[$hash],
-                                    ]
-                                );
                             } else {
+                                $row['fixed'] = $copyIssue;
                                 ++$totalFailed;
-                                $this->logger->warn(
-                                    'Media #{media_id} ({processed}/{total}): unable to copy original file "{filepath}".', // @translate
-                                    [
-                                        'media_id' => $media->getId(),
-                                        'processed' => $offset + $key + 1,
-                                        'total' => $totalToProcess,
-                                        'filepath' => $this->files[$hash],
-                                    ]
-                                );
                             }
                         } else {
+                            $row['source'] = $no;
+                            $row['fixed'] = $noSource;
                             ++$totalFailed;
-                            $this->logger->warn(
-                                'Media #{media_id} ({processed}/{total}): file "{filename}" does not does not have a source to copy.', // @translate
-                                [
-                                    'media_id' => $media->getId(),
-                                    'processed' => $offset + $key + 1,
-                                    'total' => $totalToProcess,
-                                    'filename' => $filename,
-                                ]
-                            );
                         }
                     } else {
+                        $row['exists'] = $no;
+                        $row['source'] = $no;
+                        $row['fixed'] = $noSource;
                         ++$totalFailed;
-                        $this->logger->warn(
-                            'Media #{media_id} ({processed}/{total}): file "{filename}" does not exist for type "{type}".', // @translate
-                            [
-                                'media_id' => $media->getId(),
-                                'processed' => $offset + $key + 1,
-                                'total' => $totalToProcess,
-                                'filename' => $filename,
-                                'type' => $type,
-                            ]
-                        );
                     }
+                    $this->writeRow($row);
                 }
 
                 ++$totalProcessed;
