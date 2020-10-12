@@ -14,7 +14,7 @@ abstract class AbstractCheck extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
-     * @var \Zend\Log\Logger
+     * @var \Laminas\Log\Logger
      */
     protected $logger;
 
@@ -74,7 +74,7 @@ abstract class AbstractCheck extends AbstractJob
         $services = $this->getServiceLocator();
 
         // The reference id is the job id for now.
-        $referenceIdProcessor = new \Zend\Log\Processor\ReferenceId();
+        $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
         $referenceIdProcessor->setReferenceId('bulk/check/job_' . $this->job->getId());
 
         $this->logger = $services->get('Omeka\Logger');

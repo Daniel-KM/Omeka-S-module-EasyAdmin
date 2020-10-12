@@ -37,7 +37,7 @@ return [
             'admin' => [
                 'child_routes' => [
                     'bulk-check' => [
-                        'type' => \Zend\Router\Http\Literal::class,
+                        'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/bulk-check',
                             'defaults' => [

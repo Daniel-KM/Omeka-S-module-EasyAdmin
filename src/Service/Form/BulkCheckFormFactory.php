@@ -3,7 +3,7 @@ namespace BulkCheck\Service\Form;
 
 use BulkCheck\Form\BulkCheckForm;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class BulkCheckFormFactory implements FactoryInterface
 {
