@@ -27,13 +27,16 @@ class FileMissing extends AbstractCheckFile
 
         $process = $this->getArg('process');
 
-        $fix = $process === 'files_missing_fix';
-        if ($fix) {
+        if ($process === 'files_missing_fix') {
             $this->prepareSourceDirectory();
             if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
                 return;
             }
         }
+
+        $fix = in_array($process, ['files_missing_fix', 'files_missing_fix_db'])
+            ? $process
+            : false;
 
         $this->checkMissingFiles($fix, ['include_derivatives' => $includeDerivatives]);
 
@@ -44,7 +47,7 @@ class FileMissing extends AbstractCheckFile
 
         $this->messageResultFile();
 
-        if ($fix) {
+        if ($process === 'files_missing_fix') {
             $this->logger->warn(
                 'The derivative files are not rebuilt automatically. Check them and recreate them via the other processes.' // @translate
             );
@@ -156,6 +159,11 @@ class FileMissing extends AbstractCheckFile
         return $this;
     }
 
+    /**
+     * @param string|bool $fix
+     * @param array $options
+     * @return bool
+     */
     protected function checkMissingFiles($fix = false, array $options)
     {
         $result = $this->checkMissingFilesForTypes(['original'], $fix);
@@ -168,6 +176,11 @@ class FileMissing extends AbstractCheckFile
         return $result;
     }
 
+    /**
+     * @param array $types
+     * @param string|bool $fix
+     * @return bool
+     */
     protected function checkMissingFilesForTypes(array $types, $fix = false)
     {
         $criteria = [];
@@ -209,6 +222,8 @@ class FileMissing extends AbstractCheckFile
         $no = $translator->translate('No'); // @translate
         $noSource = $translator->translate('No source'); // @translate
         $copyIssue = $translator->translate('Copy issue'); // @translate
+        $itemRemoved = $translator->translate('Item removed'); // @translate
+        $itemNotRemoved = $translator->translate('Item not removed: more than one media'); // @translate
 
         // Second, loop all media data.
         $offset = 0;
@@ -239,7 +254,8 @@ class FileMissing extends AbstractCheckFile
             }
 
             foreach ($medias as $media) {
-                $itemId = $media->getItem()->getId();
+                $item = $media->getItem();
+                $itemId = $item->getId();
                 foreach ($types as $type => $files) {
                     $filename = $isOriginal ? $media->getFilename() : ($media->getStorageId() . '.jpg');
                     $row = [
@@ -256,29 +272,40 @@ class FileMissing extends AbstractCheckFile
                         ++$totalSucceed;
                     } elseif ($fix) {
                         $row['exists'] = $no;
-                        if ($type !== 'original') {
-                            $row['fixed'] = $no;
-                            $this->writeRow($row);
-                            break;
-                        }
-                        $hash = $media->getSha256();
-                        if (isset($this->files[$hash])) {
-                            $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
-                            $result = copy(
-                                $this->sourceDir . '/' . $this->files[$hash],
-                                $this->basePath . '/original/' . $filename
-                            );
-                            if ($result) {
-                                $row['fixed'] = $yes;
-                                ++$totalSucceed;
+                        if ($fix === 'files_missing_fix_db') {
+                            // TODO Fix items with more than one missing file.
+                            if ($item->getMedia()->count() === 1) {
+                                $row['fixed'] = $itemRemoved;
+                                $this->entityManager->remove($item);
+                                $this->entityManager->flush($item);
                             } else {
-                                $row['fixed'] = $copyIssue;
-                                ++$totalFailed;
+                                $row['fixed'] = $itemNotRemoved;
                             }
                         } else {
-                            $row['source'] = $no;
-                            $row['fixed'] = $noSource;
-                            ++$totalFailed;
+                            if ($type !== 'original') {
+                                $row['fixed'] = $no;
+                                $this->writeRow($row);
+                                break;
+                            }
+                            $hash = $media->getSha256();
+                            if (isset($this->files[$hash])) {
+                                $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
+                                $result = copy(
+                                    $this->sourceDir . '/' . $this->files[$hash],
+                                    $this->basePath . '/original/' . $filename
+                                );
+                                if ($result) {
+                                    $row['fixed'] = $yes;
+                                    ++$totalSucceed;
+                                } else {
+                                    $row['fixed'] = $copyIssue;
+                                    ++$totalFailed;
+                                }
+                            } else {
+                                $row['source'] = $no;
+                                $row['fixed'] = $noSource;
+                                ++$totalFailed;
+                            }
                         }
                     } else {
                         $row['exists'] = $no;

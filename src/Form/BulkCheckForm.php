@@ -28,6 +28,7 @@ class BulkCheckForm extends Form
                         'files_missing_check' => 'List files that are present in database, not in "/files/" (original only)', // @translate
                         'files_missing_check_full' => 'List files that are present in database, not in "/files/" (include derivatives)', // @translate
                         'files_missing_fix' => 'Copy missing original files from the source directory below (recover a disaster)', // @translate
+                        'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
                         'files_derivative' => 'Rebuild derivative images with options below', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                         'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
