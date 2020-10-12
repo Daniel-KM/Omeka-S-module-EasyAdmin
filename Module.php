@@ -8,8 +8,8 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
-use Log\Stdlib\PsrMessage;
 use Omeka\Module\Exception\ModuleCannotInstallException;
+use Omeka\Stdlib\Message;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 
@@ -24,9 +24,9 @@ class Module extends AbstractModule
         $config = $this->getServiceLocator()->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         if (!$this->checkDestinationDir($basePath . '/bulk_check')) {
-            $message = new PsrMessage(
-                'The directory "{path}" is not writeable.', // @translate
-                ['path' => $basePath]
+            $message = new Message(
+                'The directory "%s" is not writeable.', // @translate
+                $basePath
             );
             throw new ModuleCannotInstallException($message);
         }

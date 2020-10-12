@@ -1,7 +1,7 @@
 <?php
 namespace BulkCheck\Controller\Admin;
 
-use Log\Stdlib\PsrMessage;
+use Omeka\Stdlib\Message;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -97,20 +97,22 @@ class BulkCheckController extends AbstractActionController
         }
 
         $urlHelper = $this->url();
-        $message = new PsrMessage(
-            'Processing checks in background (job {link_open_job}#{job_id}{link_close}, {link_open_log}logs{link_close}).', // @translate
-            [
-                'link_open_job' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-                ),
-                'job_id' => $job->getId(),
-                'link_close' => '</a>',
-                'link_open_log' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlHelper->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
-                ),
-            ]
+        // TODO Don't use PsrMessage for now to fix issues with Doctrine and inexisting file to remove.
+        $message = new Message(
+            'Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s).', // @translate
+            sprintf(
+                '<a href="%s">',
+                htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+            ),
+            $job->getId(),
+            '</a>',
+            sprintf(
+                '<a href="%s">',
+                // Check if module Log is enabled (avoid issue when disabled).
+                htmlspecialchars(class_exists(\Log\Stdlib\PsrMessage::class)
+                    ? $urlHelper->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
+                    : $urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log'])
+            ))
         );
         $message->setEscapeHtml(false);
         $this->messenger()->addSuccess($message);
