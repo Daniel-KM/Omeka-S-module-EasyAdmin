@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-09-21 00:00+0000\n"
-"PO-Revision-Date: 2020-09-21 00:00+0000\n"
+"PO-Revision-Date: 2020-10-12 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -38,7 +38,7 @@ msgstr ""
 
 #: view/bulk/admin/check/index.phtml:15
 msgid "Bulk check"
-msgstr "Vérification en lot"
+msgstr "Vérifications"
 
 #: view/bulk/admin/check/index.phtml:17
 msgid "Available checkers"
@@ -595,4 +595,4 @@ msgstr ""
 
 #: config/module.config.php:27
 msgid "Bulk Check"
-msgstr "Vérification en lot"
+msgstr "Vérifications"
