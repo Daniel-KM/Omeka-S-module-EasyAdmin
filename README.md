@@ -78,7 +78,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -114,25 +114,25 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitLab)
 
 
-[Bulk Check]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck
+[Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Omeka S]: https://omeka.org/s
-[Archive Repertory]: https://github.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
+[Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
-[Generic]: https://github.com/Daniel-KM/Omeka-S-module-Generic
-[Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
-[Derivative Images]: https://github.com/Daniel-KM/Omeka-S-module-DerivativeImages
-[Iiif Server]: https://github.com/Daniel-KM/Omeka-S-module-IiifServer
-[Image Server]: https://github.com/Daniel-KM/Omeka-S-module-ImageServer
-[BulkCheck.zip]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/releases
+[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
+[Derivative Images]: https://gitlab.com/Daniel-KM/Omeka-S-module-DerivativeImages
+[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
+[Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
+[BulkCheck.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/releases
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkCheck/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [MIT]: https://github.com/sandywalker/webui-popover/blob/master/LICENSE.txt
 [GitLab]: https://gitlab.com/Daniel-KM
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
