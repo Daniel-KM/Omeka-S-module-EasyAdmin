@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace BulkCheck\Job;
 
@@ -14,7 +14,7 @@ class FileMissing extends AbstractCheckFile
      */
     protected $files;
 
-    public function perform()
+    public function perform(): void
     {
         parent::perform();
 

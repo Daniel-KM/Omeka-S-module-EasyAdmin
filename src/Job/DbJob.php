@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Job;
 
 class DbJob extends AbstractCheck
 {
-    public function perform()
+    public function perform(): void
     {
         parent::perform();
 

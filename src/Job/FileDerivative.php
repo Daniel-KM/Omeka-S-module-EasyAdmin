@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Job;
 
 use Doctrine\Common\Collections\Criteria;
@@ -13,7 +13,7 @@ class FileDerivative extends AbstractJob
      */
     const SQL_LIMIT = 25;
 
-    public function perform()
+    public function perform(): void
     {
         /**
          * @var array $config

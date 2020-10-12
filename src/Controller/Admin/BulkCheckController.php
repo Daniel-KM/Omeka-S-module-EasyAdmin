@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Controller\Admin;
 
 use Omeka\Stdlib\Message;
@@ -43,7 +43,7 @@ class BulkCheckController extends AbstractActionController
             'process' => $params['process'],
             // Save the base url of files in order to be able to set the good
             // url for the result file in background job.
-            'base_files' => $this->viewHelpers()-> get('BasePath')->__invoke('/files'),
+            'base_files' => $this->viewHelpers()->get('BasePath')->__invoke('/files'),
         ];
 
         switch ($params['process']) {

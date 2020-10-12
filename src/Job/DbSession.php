@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Job;
 
 class DbSession extends AbstractCheck
@@ -8,7 +8,7 @@ class DbSession extends AbstractCheck
      */
     const SESSION_OLD_DAYS = 100;
 
-    public function perform()
+    public function perform(): void
     {
         parent::perform();
 

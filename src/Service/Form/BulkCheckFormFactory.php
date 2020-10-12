@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Service\Form;
 
 use BulkCheck\Form\BulkCheckForm;

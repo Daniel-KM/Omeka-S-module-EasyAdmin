@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace BulkCheck\Job;
 
@@ -69,7 +69,7 @@ abstract class AbstractCheck extends AbstractJob
         'escape' => 0,
     ];
 
-    public function perform()
+    public function perform(): void
     {
         $services = $this->getServiceLocator();
 

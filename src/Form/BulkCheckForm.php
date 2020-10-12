@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck\Form;
 
 use Doctrine\DBAL\Connection;
@@ -14,7 +14,7 @@ class BulkCheckForm extends Form
      */
     protected $connection;
 
-    public function init()
+    public function init(): void
     {
         $this
             ->add([

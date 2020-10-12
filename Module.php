@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace BulkCheck;
 
 if (!class_exists(\Generic\AbstractModule::class)) {
@@ -19,7 +19,7 @@ class Module extends AbstractModule
 
     protected $dependency = 'Log';
 
-    protected function preInstall()
+    protected function preInstall(): void
     {
         $config = $this->getServiceLocator()->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
@@ -32,7 +32,7 @@ class Module extends AbstractModule
         }
     }
 
-    protected function preUninstall()
+    protected function preUninstall(): void
     {
         if (!empty($_POST['remove-bulk-checks'])) {
             $config = $this->getServiceLocator()->get('Config');
@@ -41,7 +41,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function warnUninstall(Event $event)
+    public function warnUninstall(Event $event): void
     {
         $view = $event->getTarget();
         $module = $view->vars()->module;
@@ -74,7 +74,7 @@ class Module extends AbstractModule
         echo $html;
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         // Display a warn before uninstalling.
         $sharedEventManager->attach(
