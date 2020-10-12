@@ -188,7 +188,7 @@ abstract class AbstractCheck extends AbstractJob
         }
 
         $label = $this->getArg('process', '');
-        $base = preg_replace('/[^A-Za-z0-9 ]/', '_', $label);
+        $base = preg_replace('/[^A-Za-z0-9]/', '_', $label);
         $base = $base ? preg_replace('/_+/', '_', $base) . '-' : '';
         $date = (new \DateTime())->format('Ymd-His');
         $extension = 'tsv';
