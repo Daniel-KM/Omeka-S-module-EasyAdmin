@@ -30,6 +30,8 @@ class BulkCheckForm extends Form
                         'files_missing_fix' => 'Copy missing original files from the source directory below (recover a disaster)', // @translate
                         'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
                         'files_derivative' => 'Rebuild derivative images with options below', // @translate
+                        'files_media_no_original' => 'Check media rendered has "file", but without original', // @translate
+                        'files_media_no_original_fix' => 'Remove media rendered has "file", but without original (WARNING: export your media first)', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                         'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
                         'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate

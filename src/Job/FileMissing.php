@@ -47,6 +47,8 @@ class FileMissing extends AbstractCheckFile
 
         $this->messageResultFile();
 
+        $this->finalizeOutput();
+
         if ($process === 'files_missing_fix') {
             $this->logger->warn(
                 'The derivative files are not rebuilt automatically. Check them and recreate them via the other processes.' // @translate
