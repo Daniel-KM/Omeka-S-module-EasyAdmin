@@ -177,15 +177,13 @@ abstract class AbstractCheck extends AbstractJob
     /**
      * Create the unique file name compatible on various os.
      *
+     * Note: the destination dir is created during install.
+     *
      * @return self
      */
     protected function prepareFilename()
     {
         $destinationDir = $this->basePath . '/bulk_check';
-        $this->prepareDir($destinationDir);
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return $this;
-        }
 
         $label = $this->getArg('process', '');
         $base = preg_replace('/[^A-Za-z0-9]/', '_', $label);
@@ -231,34 +229,6 @@ abstract class AbstractCheck extends AbstractJob
         } while (++$i);
 
         $this->filepath = $filePath;
-        return $this;
-    }
-
-    /**
-     * @param string $dirPath
-     * @return self
-     */
-    protected function prepareDir($dirPath)
-    {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writable($dirPath)) {
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                $this->logger->err(
-                    'The directory "{path}" is not writeable.', // @translate
-                    ['path' => $dirPath]
-                );
-            }
-            return $this;
-        }
-
-        $result = mkdir($dirPath, 0775, true);
-        if (!$result) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
-                'The directory "{path}" is not writeable.', // @translate
-                ['path' => $dirPath]
-            );
-        }
         return $this;
     }
 }
