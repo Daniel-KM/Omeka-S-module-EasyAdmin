@@ -54,12 +54,13 @@ and click the submit buttons. The results are available in logs currently.
 TODO
 ----
 
-- Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in
-  a table.
-- Check files with the wrong extension.
-- Add width/height/duration as data for image/audio/video to avoid to get them
-  each time (modules [Iiif Server] and [Image Server]).
-- Remove old logs.
+- [ ] Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in
+  a table (done for missing file; to do for all processors).
+- [ ] Check files with the wrong extension.
+- [ ] Add width/height/duration as data for image/audio/video to avoid to get them
+  each time (ready in modules [Iiif Server] and [Image Server]).
+- [ ] Remove old logs.
+- [ ] A main cleaning task.
 
 
 Warning
@@ -80,7 +81,7 @@ See online issues on the [module issues] page on GitHub.
 License
 -------
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
