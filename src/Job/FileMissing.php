@@ -33,8 +33,6 @@ class FileMissing extends AbstractCheckFile
             return;
         }
 
-        $includeDerivatives = $this->getArg('include_derivatives', false);
-
         $process = $this->getArg('process');
 
         if ($process === 'files_missing_fix') {
@@ -47,6 +45,10 @@ class FileMissing extends AbstractCheckFile
         $fix = in_array($process, ['files_missing_fix', 'files_missing_fix_db'])
             ? $process
             : false;
+
+        // Don't include derivative during fix, neither for files or database.
+        // Do not remove media from database if only a derivative is missing!
+        $includeDerivatives = !$fix && $this->getArg('include_derivatives', false);
 
         $this->checkMissingFiles($fix, ['include_derivatives' => $includeDerivatives]);
 
@@ -160,7 +162,8 @@ class FileMissing extends AbstractCheckFile
         if (!$result) {
             return false;
         }
-        if (!empty($options['include_derivatives'])) {
+        // Do not remove media from database if only a derivative is missing!
+        if (!$fix && !empty($options['include_derivatives'])) {
             $result = $this->checkMissingFilesForTypes(array_keys($this->config['thumbnails']['types']));
         }
         return $result;
@@ -207,6 +210,8 @@ class FileMissing extends AbstractCheckFile
             $types[$type] = $this->listFilesInFolder($path);
         }
 
+        $fixDb =$fix === 'files_missing_fix_db';
+
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
@@ -220,6 +225,7 @@ class FileMissing extends AbstractCheckFile
         $totalProcessed = 0;
         $totalSucceed = 0;
         $totalFailed = 0;
+        $totalFixed = 0;
         while (true) {
             // Entity are used, because it's not possible to get the value
             // "has_original" or "has_thumbnails" via api.
@@ -229,18 +235,41 @@ class FileMissing extends AbstractCheckFile
                 break;
             }
 
-            if ($offset) {
+            if ($this->shouldStop()) {
+                if ($fixDb) {
+                    $this->logger->notice(
+                        'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
+                        [
+                            'processed' => $totalProcessed,
+                            'total' => $totalToProcess,
+                            'total_succeed' => $totalSucceed,
+                            'total_failed' => $totalFailed,
+                            'total_fixed' => $totalFixed,
+                        ]
+                    );
+                } else {
+                    $this->logger->notice(
+                        'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
+                        [
+                            'processed' => $totalProcessed,
+                            'total' => $totalToProcess,
+                            'total_succeed' => $totalSucceed,
+                            'total_failed' => $totalFailed,
+                            'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
+                        ]
+                    );
+                }
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return false;
+            }
+
+            if ($totalProcessed) {
                 $this->logger->info(
                     '{processed}/{total} media processed.', // @translate
-                    ['processed' => $offset, 'total' => $totalToProcess]
+                    ['processed' => $totalProcessed, 'total' => $totalToProcess]
                 );
-
-                if ($this->shouldStop()) {
-                    $this->logger->warn(
-                        'The job was stopped.' // @translate
-                    );
-                    return false;
-                }
             }
 
             foreach ($medias as $media) {
@@ -262,12 +291,13 @@ class FileMissing extends AbstractCheckFile
                         ++$totalSucceed;
                     } elseif ($fix) {
                         $row['exists'] = $no;
-                        if ($fix === 'files_missing_fix_db') {
+                        if ($fixDb) {
                             // TODO Fix items with more than one missing file.
                             if ($item->getMedia()->count() === 1) {
-                                $row['fixed'] = $itemRemoved;
                                 $this->entityManager->remove($item);
                                 $this->entityManager->flush($item);
+                                $row['fixed'] = $itemRemoved;
+                                ++$totalFixed;
                             } else {
                                 $row['fixed'] = $itemNotRemoved;
                             }
@@ -316,19 +346,34 @@ class FileMissing extends AbstractCheckFile
             unset($medias);
             $this->mediaRepository->clear();
 
-            $offset += self::SQL_LIMIT;
+            // Since the fixed medias are no more available in the database, the
+            // total fixed medias should be removed from the offset.
+            $offset += self::SQL_LIMIT - $totalFixed;
         }
 
-        $this->logger->notice(
-            'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
-            [
-                'processed' => $totalProcessed,
-                'total' => $totalToProcess,
-                'total_succeed' => $totalSucceed,
-                'total_failed' => $totalFailed,
-                'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
-            ]
-        );
+        if ($fixDb) {
+            $this->logger->notice(
+                'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
+                [
+                    'processed' => $totalProcessed,
+                    'total' => $totalToProcess,
+                    'total_succeed' => $totalSucceed,
+                    'total_failed' => $totalFailed,
+                    'total_fixed' => $totalFixed,
+                ]
+            );
+        } else {
+            $this->logger->notice(
+                'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
+                [
+                    'processed' => $totalProcessed,
+                    'total' => $totalToProcess,
+                    'total_succeed' => $totalSucceed,
+                    'total_failed' => $totalFailed,
+                    'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
+                ]
+            );
+        }
 
         return true;
     }

@@ -64,6 +64,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
         // Loop all media without original files.
         $offset = 0;
         $totalProcessed = 0;
+        $totalFixed = 0;
         while (true) {
             /** @var \Omeka\Entity\Media[] $medias */
             $medias = $this->mediaRepository->findBy($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
@@ -71,18 +72,29 @@ class FileMediaNoOriginal extends AbstractCheckFile
                 break;
             }
 
-            if ($offset) {
+            if ($this->shouldStop()) {
+                if ($fix) {
+                    $this->logger->notice(
+                        'Job stopped: {processed}/{total} processed, {total_fixed} fixed.', // @translate
+                        ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_fixed' => $totalFixed]
+                    );
+                } else {
+                    $this->logger->notice(
+                        'Job stopped: {processed}/{total} processed.', // @translate
+                        ['processed' => $totalProcessed, 'total' => $totalToProcess, ]
+                    );
+                }
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return false;
+            }
+
+            if ($totalProcessed) {
                 $this->logger->info(
                     '{processed}/{total} media processed.', // @translate
-                    ['processed' => $offset, 'total' => $totalToProcess]
+                    ['processed' => $totalProcessed, 'total' => $totalToProcess]
                 );
-
-                if ($this->shouldStop()) {
-                    $this->logger->warn(
-                        'The job was stopped.' // @translate
-                    );
-                    return false;
-                }
             }
 
             foreach ($medias as $media) {
@@ -93,8 +105,9 @@ class FileMediaNoOriginal extends AbstractCheckFile
                     'has_original' => '0',
                 ];
                 if ($fix) {
-                    $row['fixed'] = $yes;
                     $this->entityManager->remove($media);
+                    $row['fixed'] = $yes;
+                    ++$totalFixed;
                 } else {
                     $row['fixed'] = $no;
                 }
@@ -106,16 +119,22 @@ class FileMediaNoOriginal extends AbstractCheckFile
             $this->mediaRepository->clear();
             unset($medias);
 
-            $offset += self::SQL_LIMIT;
+            // Since the fixed medias are no more available in the database, the
+            // total fixed medias should be removed from the offset.
+            $offset += self::SQL_LIMIT - $totalFixed;
         }
 
-        $this->logger->notice(
-            'End of process: {processed}/{total} processed.', // @translate
-            [
-                'processed' => $totalProcessed,
-                'total' => $totalToProcess,
-            ]
-        );
+        if ($fix) {
+            $this->logger->notice(
+                'End of process: {processed}/{total} processed, {total_fixed} fixed.', // @translate
+                ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_fixed' => $totalFixed]
+            );
+        } else {
+            $this->logger->notice(
+                'End of process: {processed}/{total} processed.', // @translate
+                ['processed' => $totalProcessed, 'total' => $totalToProcess, ]
+            );
+        }
 
         return true;
     }
