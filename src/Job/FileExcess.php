@@ -1,11 +1,26 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class FileExcess extends AbstractCheckFile
 {
+    protected $columns = [
+        'filename' => 'Filename', // @translate
+        'type' => 'Type', // @translate
+        'exists' => 'Exists', // @translate
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     public function perform(): void
     {
         parent::perform();
+
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
 
         $process = $this->getArg('process');
 
@@ -23,6 +38,10 @@ class FileExcess extends AbstractCheckFile
             'Process "{process}" completed.', // @translate
             ['process' => $process]
         );
+
+        $this->messageResultFile();
+
+        $this->finalizeOutput();
     }
 
     protected function checkExcessFiles($move = false)
@@ -83,6 +102,10 @@ class FileExcess extends AbstractCheckFile
         $totalSuccess = 0;
         $totalExcess = 0;
 
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+        $no = $translator->translate('No'); // @translate
+
         $this->logger->notice(
             'Starting check of {total} files for type {type}.', // @translate
             ['total' => $total]
@@ -124,11 +147,26 @@ class FileExcess extends AbstractCheckFile
                 ]);
             }
 
+            $row = [
+                'filename' => $filename,
+                'type' => $type,
+                'exists' => '',
+                'item' => '',
+                'media' => '',
+                'fixed' => '',
+            ];
+
             if ($media) {
+                $row['exists'] = $yes;
+                $row['item'] = $media->getItem()->getId();
+                $row['media'] = $media->getId();
                 ++$totalSuccess;
                 $this->mediaRepository->clear();
+                $this->writeRow($row);
                 continue;
             }
+
+            $row['exists'] = $no;
 
             if ($move) {
                 // Creation of a folder is required for module ArchiveRepertory
@@ -136,6 +174,8 @@ class FileExcess extends AbstractCheckFile
                 $dirname = dirname($movePath . '/' . $filename);
                 if ($dirname !== $movePath) {
                     if (!$this->createDir($dirname)) {
+                        $row['fixed'] = $no;
+                        $this->writeRow($row);
                         $this->logger->err(
                             'Unable to prepare directory "{path}". Check rights.', // @translate
                             ['path' => '/files/check/' . $type . '/' . dirname($filename)]
@@ -145,11 +185,14 @@ class FileExcess extends AbstractCheckFile
                 }
                 $result = @rename($path . '/' . $filename, $movePath . '/' . $filename);
                 if ($result) {
+                    $row['fixed'] = $yes;
                     $this->logger->warn(
                         'File "{filename}" ("{type}", {processed}/{total}) doesn’t exist in database and was moved.', // @translate
                         ['filename' => $filename, 'type' => $type, 'processed' => $i, 'total' => $total]
                     );
                 } else {
+                    $row['fixed'] = $no;
+                    $this->writeRow($row);
                     $this->logger->err(
                         'File "{filename}" (type "{type}") doesn’t exist in database, and cannot be moved.', // @translate
                         ['filename' => $filename, 'type' => $type]
@@ -162,6 +205,8 @@ class FileExcess extends AbstractCheckFile
                     ['filename' => $filename, 'type' => $type, 'processed' => $i, 'total' => $total]
                 );
             }
+
+            $this->writeRow($row);
 
             ++$totalExcess;
             $this->mediaRepository->clear();
