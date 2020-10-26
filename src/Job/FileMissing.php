@@ -4,6 +4,16 @@ namespace BulkCheck\Job;
 
 class FileMissing extends AbstractCheckFile
 {
+    protected $columns = [
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'filename' => 'filename', // @translate
+        'type' => 'Type', // @translate
+        'exists' => 'Exists', // @translate
+        'source' => 'Source', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     /**
      * @var string
      */
@@ -54,28 +64,6 @@ class FileMissing extends AbstractCheckFile
                 'The derivative files are not rebuilt automatically. Check them and recreate them via the other processes.' // @translate
             );
         }
-    }
-
-    protected function initializeOutput()
-    {
-        parent::initializeOutput();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return $this;
-        }
-
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
-        $row = [
-            $translator->translate('Item'), // @translate
-            $translator->translate('Media'), // @translate
-            $translator->translate('Filename'), // @translate
-            $translator->translate('Type'), // @translate
-            $translator->translate('Exists'), // @translate
-            $translator->translate('Source'), // @translate
-            $translator->translate('Fixed'), // @translate
-        ];
-        $this->writeRow($row);
-
-        return $this;
     }
 
     /**

@@ -69,6 +69,13 @@ abstract class AbstractCheck extends AbstractJob
         'escape' => 0,
     ];
 
+    /**
+     * List of columns keys and labels for the output spreadsheet.
+     *
+     * @var array
+     */
+    protected $columns = [];
+
     public function perform(): void
     {
         $services = $this->getServiceLocator();
@@ -119,6 +126,11 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function initializeOutput()
     {
+        if (empty($this->columns)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            return $this;
+        }
+
         $this->prepareFilename();
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             return $this;
@@ -143,6 +155,13 @@ abstract class AbstractCheck extends AbstractJob
         if ($this->options['escape'] === 0) {
             $this->options['escape'] = chr(0);
         }
+
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $row = [];
+        foreach ($this->columns as $column) {
+            $row[] = $translator->translate($column);
+        }
+        $this->writeRow($row);
 
         return $this;
     }

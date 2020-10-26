@@ -1,8 +1,17 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class FileMediaNoOriginal extends AbstractCheckFile
 {
+    protected $columns = [
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'renderer' => 'Renderer', // @translate
+        'has_original' => 'Has original', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     public function perform(): void
     {
         parent::perform();
@@ -16,34 +25,14 @@ class FileMediaNoOriginal extends AbstractCheckFile
 
         $this->checkMediaNoOriginal($process === 'files_media_no_original_fix');
 
-        $this->messageResultFile();
-
-        $this->finalizeOutput();
-
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
             ['process' => $process]
         );
-    }
 
-    protected function initializeOutput()
-    {
-        parent::initializeOutput();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return $this;
-        }
+        $this->messageResultFile();
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
-        $row = [
-            $translator->translate('Item'), // @translate
-            $translator->translate('Media'), // @translate
-            $translator->translate('Renderer'), // @translate
-            $translator->translate('Has original'), // @translate
-            $translator->translate('Fixed'), // @translate
-        ];
-        $this->writeRow($row);
-
-        return $this;
+        $this->finalizeOutput();
     }
 
     /**
