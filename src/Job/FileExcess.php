@@ -39,8 +39,6 @@ class FileExcess extends AbstractCheckFile
             ['process' => $process]
         );
 
-        $this->messageResultFile();
-
         $this->finalizeOutput();
     }
 
@@ -230,7 +228,7 @@ class FileExcess extends AbstractCheckFile
     protected function createDir($path)
     {
         return file_exists($path)
-            ? (is_dir($path) ? is_writeable($path) : false)
+            ? is_dir($path) && is_writeable($path)
             : @mkdir($path, 0775, true);
     }
 }

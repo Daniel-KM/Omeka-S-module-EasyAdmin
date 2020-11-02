@@ -30,8 +30,6 @@ class FileMediaNoOriginal extends AbstractCheckFile
             ['process' => $process]
         );
 
-        $this->messageResultFile();
-
         $this->finalizeOutput();
     }
 

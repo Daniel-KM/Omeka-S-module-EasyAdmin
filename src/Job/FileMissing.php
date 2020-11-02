@@ -57,8 +57,6 @@ class FileMissing extends AbstractCheckFile
             ['process' => $process]
         );
 
-        $this->messageResultFile();
-
         $this->finalizeOutput();
 
         if ($process === 'files_missing_fix') {

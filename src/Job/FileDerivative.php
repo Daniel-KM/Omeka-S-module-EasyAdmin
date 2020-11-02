@@ -92,7 +92,7 @@ DQL;
             $criteria->andWhere($expr->eq('hasThumbnails', 0));
         }
 
-        $totalResources = $api->search('media', ['limit' => 1])->getTotalResults();
+        $totalResources = $api->search('media', ['limit' => 0])->getTotalResults();
 
         // TODO Manage creation of thumbnails for media without original (youtube…).
         // Check only media with an original file.

@@ -103,21 +103,6 @@ abstract class AbstractCheck extends AbstractJob
     }
 
     /**
-     * Add a  message with the url to the file.
-     *
-     * @return self
-     */
-    protected function messageResultFile()
-    {
-        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getArg('base_files', '/files');
-        $this->logger->notice(
-            'Results are available in this spreadsheet: {url}.', // @translate
-            ['url' => $baseUrl . '/bulk_check/' . mb_substr($this->filepath, mb_strlen($this->basePath . '/bulk_check/'))]
-        );
-        return $this;
-    }
-
-    /**
      * Prepare an output file.
      *
      * @todo Use a temporary file and copy result at the end of the process.
@@ -185,11 +170,35 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function finalizeOutput()
     {
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            if ($this->handle) {
+                fclose($this->handle);
+                @unlink($this->filepath);
+            }
+            return;
+        }
+
         if (!$this->handle) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return $this;
         }
         fclose($this->handle);
+        $this->messageResultFile();
+        return $this;
+    }
+
+    /**
+     * Add a  message with the url to the file.
+     *
+     * @return self
+     */
+    protected function messageResultFile()
+    {
+        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getArg('base_files', '/files');
+        $this->logger->notice(
+            'Results are available in this spreadsheet: {url}.', // @translate
+            ['url' => $baseUrl . '/bulk_check/' . mb_substr($this->filepath, mb_strlen($this->basePath . '/bulk_check/'))]
+        );
         return $this;
     }
 
