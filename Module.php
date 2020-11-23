@@ -28,7 +28,7 @@ class Module extends AbstractModule
                 'The directory "%s" is not writeable.', // @translate
                 $basePath
             );
-            throw new ModuleCannotInstallException($message);
+            throw new ModuleCannotInstallException((string) $message);
         }
     }
 
