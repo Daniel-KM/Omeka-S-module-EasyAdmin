@@ -17,8 +17,6 @@ class FileSize extends AbstractCheckFile
     public function perform(): void
     {
         parent::perform();
-
-        $this->initializeOutput();
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             return;
         }

@@ -88,12 +88,18 @@ abstract class AbstractCheck extends AbstractJob
         $this->logger->addProcessor($referenceIdProcessor);
         $this->api = $services->get('ControllerPluginManager')->get('api');
         $this->entityManager = $services->get('Omeka\EntityManager');
-        $this->connection = $services->get('Omeka\Connection');
+        // These two connections are not the same.
+        // $this->connection = $services->get('Omeka\Connection');
         $this->connection = $this->entityManager->getConnection();
         $this->itemRepository = $this->entityManager->getRepository(\Omeka\Entity\Item::class);
         $this->mediaRepository = $this->entityManager->getRepository(\Omeka\Entity\Media::class);
         $this->config = $services->get('Config');
         $this->basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
 
         $process = $this->getArg('process');
         $this->logger->notice(
@@ -112,7 +118,6 @@ abstract class AbstractCheck extends AbstractJob
     protected function initializeOutput()
     {
         if (empty($this->columns)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return $this;
         }
 
@@ -170,12 +175,16 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function finalizeOutput()
     {
+        if (empty($this->columns)) {
+            return $this;
+        }
+
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             if ($this->handle) {
                 fclose($this->handle);
                 @unlink($this->filepath);
             }
-            return;
+            return $this;
         }
 
         if (!$this->handle) {
