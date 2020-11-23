@@ -52,10 +52,16 @@ class FileMediaNoOriginal extends AbstractCheckFile
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
 
-        $criteria = [];
-        $criteria['renderer'] = 'file';
-        $criteria['hasOriginal'] = 0;
-        $criteria['hasThumbnails'] = 0;
+        $baseCriteria = new \Doctrine\Common\Collections\Criteria();
+        $expr = $baseCriteria->expr();
+        $baseCriteria
+            ->where($expr->eq('renderer', 'file'))
+            ->andWhere($expr->eq('hasOriginal', 0))
+            ->andWhere($expr->eq('hasThumbnails', 0));
+
+        // Since the fixed medias are no more available in the database, the
+        // loop should take care of them, so a check is done on it.
+        $lastId = 0;
 
         // Loop all media without original files.
         $offset = 0;
@@ -63,7 +69,9 @@ class FileMediaNoOriginal extends AbstractCheckFile
         $totalFixed = 0;
         while (true) {
             /** @var \Omeka\Entity\Media[] $medias */
-            $medias = $this->mediaRepository->findBy($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
+            $criteria = clone $baseCriteria;
+            $criteria->andWhere($expr->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
             if (!count($medias)) {
                 break;
             }
@@ -94,6 +102,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
             }
 
             foreach ($medias as $media) {
+                $lastId = $media->getId();
                 $row = [
                     'item' => $media->getItem()->getId(),
                     'media' => $media->getId(),
@@ -115,9 +124,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
             $this->mediaRepository->clear();
             unset($medias);
 
-            // Since the fixed medias are no more available in the database, the
-            // total fixed medias should be removed from the offset.
-            $offset += self::SQL_LIMIT - $totalFixed;
+            $offset += self::SQL_LIMIT;
         }
 
         if ($fix) {

@@ -172,10 +172,12 @@ class FileMissing extends AbstractCheckFile
      */
     protected function checkMissingFilesForTypes(array $types, $fix = false)
     {
-        $criteria = [];
+        $baseCriteria = new \Doctrine\Common\Collections\Criteria();
+        $expr = $baseCriteria->expr();
+
         $isOriginal = in_array('original', $types);
         if ($isOriginal) {
-            $criteria['hasOriginal'] = 1;
+            $baseCriteria->where($expr->eq('hasOriginal', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
             $totalToProcess = $this->connection->query($sql)->fetchColumn();
             $this->logger->notice(
@@ -183,7 +185,7 @@ class FileMissing extends AbstractCheckFile
                 ['total' => $totalToProcess]
             );
         } else {
-            $criteria['hasThumbnails'] = 1;
+            $baseCriteria->where($expr->eq('hasThumbnails', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
             $totalToProcess = $this->connection->query($sql)->fetchColumn();
             $this->logger->notice(
@@ -216,6 +218,10 @@ class FileMissing extends AbstractCheckFile
         $itemRemoved = $translator->translate('Item removed'); // @translate
         $itemNotRemoved = $translator->translate('Item not removed: more than one media'); // @translate
 
+        // Since the fixed medias are no more available in the database, the
+        // loop should take care of them, so a check is done on it.
+        $lastId = 0;
+
         // Second, loop all media data.
         $offset = 0;
         $totalProcessed = 0;
@@ -226,7 +232,9 @@ class FileMissing extends AbstractCheckFile
             // Entity are used, because it's not possible to get the value
             // "has_original" or "has_thumbnails" via api.
             /** @var \Omeka\Entity\Media[] $medias */
-            $medias = $this->mediaRepository->findBy($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
+            $criteria = clone $baseCriteria;
+            $criteria->andWhere($expr->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
             if (!count($medias)) {
                 break;
             }
@@ -269,6 +277,7 @@ class FileMissing extends AbstractCheckFile
             }
 
             foreach ($medias as $media) {
+                $lastId = $media->getId();
                 $item = $media->getItem();
                 $itemId = $item->getId();
                 foreach ($types as $type => $files) {
@@ -342,9 +351,7 @@ class FileMissing extends AbstractCheckFile
             unset($medias);
             $this->mediaRepository->clear();
 
-            // Since the fixed medias are no more available in the database, the
-            // total fixed medias should be removed from the offset.
-            $offset += self::SQL_LIMIT - $totalFixed;
+            $offset += self::SQL_LIMIT;
         }
 
         if ($fixDb) {
