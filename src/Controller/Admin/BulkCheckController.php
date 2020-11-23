@@ -81,6 +81,10 @@ class BulkCheckController extends AbstractActionController
             case 'media_position_fix':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $defaultParams);
                 break;
+            case 'item_no_value':
+            case 'item_no_value_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\ItemNoValue::class, $defaultParams);
+                break;
             case 'db_job_check':
             case 'db_job_clean':
             case 'db_job_clean_all':

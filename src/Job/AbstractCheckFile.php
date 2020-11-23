@@ -225,6 +225,13 @@ abstract class AbstractCheckFile extends AbstractCheck
         return true;
     }
 
+    protected function createDir($path): bool
+    {
+        return file_exists($path)
+            ? is_dir($path) && is_writeable($path)
+            : @mkdir($path, 0775, true);
+    }
+
     /**
      * Get a relative or full path of files filtered by extensions recursively
      * in a directory.

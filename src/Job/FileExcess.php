@@ -174,7 +174,7 @@ class FileExcess extends AbstractCheckFile
                         $this->writeRow($row);
                         $this->logger->err(
                             'Unable to prepare directory "{path}". Check rights.', // @translate
-                            ['path' => '/files/check/' . $type . '/' . dirname($filename)]
+                            ['path' => '/files/check/' . $type . '/' . $filename]
                         );
                         return false;
                     }
@@ -221,12 +221,5 @@ class FileExcess extends AbstractCheckFile
         }
 
         return true;
-    }
-
-    protected function createDir($path)
-    {
-        return file_exists($path)
-            ? is_dir($path) && is_writeable($path)
-            : @mkdir($path, 0775, true);
     }
 }
