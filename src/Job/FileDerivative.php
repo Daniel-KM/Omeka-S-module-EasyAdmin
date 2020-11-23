@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 use Doctrine\Common\Collections\Criteria;
-use Omeka\Job\AbstractJob;
 
-class FileDerivative extends AbstractJob
+class FileDerivative extends AbstractCheck
 {
     /**
      * Limit for the loop to avoid heavy sql requests.
@@ -13,36 +13,38 @@ class FileDerivative extends AbstractJob
      */
     const SQL_LIMIT = 25;
 
+    protected $columns = [
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'filename' => 'filename', // @translate
+        'exists' => 'Exists', // @translate
+        'has_thumbnails' => 'Has thumbnails', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     public function perform(): void
     {
+        // The api cannot update value "has_thumbnails", so use entity manager.
+
+        parent::perform();
+
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
+
         /**
-         * @var array $config
-         * @var \Omeka\Mvc\Controller\Plugin\Logger $logger
-         * @var \Omeka\Api\Manager $api
          * @var \Omeka\File\TempFileFactory $tempFileFactory
-         * @var \Doctrine\ORM\EntityManager $entityManager
-         * @var \Doctrine\DBAL\Connection $connection
          */
         $services = $this->getServiceLocator();
-        $config = $services->get('Config');
-        $logger = $services->get('Omeka\Logger');
-        $api = $services->get('Omeka\ApiManager');
         $tempFileFactory = $services->get('Omeka\File\TempFileFactory');
-        // The api cannot update value "has_thumbnails", so use entity manager.
-        $entityManager = $services->get('Omeka\EntityManager');
-        $connection = $entityManager->getConnection();
 
-        // The reference id is the job id for now.
-        $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-        $referenceIdProcessor->setReferenceId('derivative/images/job_' . $this->job->getId());
+        $basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
-        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-
-        $types = array_keys($config['thumbnails']['types']);
+        $types = array_keys($this->config['thumbnails']['types']);
 
         // Prepare the list of medias.
 
-        $repository = $entityManager->getRepository(\Omeka\Entity\Media::class);
         $criteria = Criteria::create();
         $expr = $criteria->expr();
 
@@ -58,7 +60,7 @@ FROM Omeka\Entity\Item item
 JOIN item.itemSets item_set
 WHERE item_set.id IN (:item_set_ids)
 DQL;
-            $query = $entityManager->createQuery($dql);
+            $query = $this->entityManager->createQuery($dql);
             $query->setParameter('item_set_ids', $itemSets, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
             $itemIds = array_column($query->getArrayResult(), 'id');
             $criteria->andWhere($expr->in('item', $itemIds));
@@ -92,7 +94,7 @@ DQL;
             $criteria->andWhere($expr->eq('hasThumbnails', 0));
         }
 
-        $totalResources = $api->search('media', ['limit' => 0])->getTotalResults();
+        $totalResources = $this->api->search('media', ['limit' => 0])->getTotalResults();
 
         // TODO Manage creation of thumbnails for media without original (youtube…).
         // Check only media with an original file.
@@ -100,23 +102,30 @@ DQL;
 
         $criteria->orderBy(['id' => 'ASC']);
 
-        $collection = $repository->matching($criteria);
+        $collection = $this->mediaRepository->matching($criteria);
         $totalToProcess = $collection->count();
 
         if (empty($totalToProcess)) {
-            $logger->info(
+            $this->logger->info(
                 'No media to process for creation of derivative files (on a total of {total} medias). You may check your query.', // @translate
                 ['total' => $totalResources]
             );
             return;
         }
 
-        $logger->info(
+        $this->logger->info(
             'Processing creation of derivative files of {total_process} medias (on a total of {total} medias).', // @translate
             ['total_process' => $totalToProcess, 'total' => $totalResources]
         );
 
         // Do the process.
+
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+        $no = $translator->translate('No'); // @translate
+        $notReadable = $translator->translate('Not readable'); // @translate
+        $notWriteable = $translator->translate('Not writeable'); // @translate
+        $failed = $translator->translate('Failed'); // @translate
 
         $offset = 0;
         $key = 0;
@@ -130,7 +139,7 @@ DQL;
             $criteria
                 ->setMaxResults(self::SQL_LIMIT)
                 ->setFirstResult($offset);
-            $medias = $repository->matching($criteria);
+                $medias = $this->mediaRepository->matching($criteria);
             if (!count($medias)) {
                 break;
             }
@@ -138,30 +147,43 @@ DQL;
             /** @var \Omeka\Entity\Media $media */
             foreach ($medias as $key => $media) {
                 if ($this->shouldStop()) {
-                    $logger->warn(
+                    $this->logger->warn(
                         'The job "Derivative Images" was stopped: {count]/{total} resources processed.', // @translate
                         ['count' => $offset + $key, 'total' => $totalToProcess]
                     );
                     break 2;
                 }
 
+                $row = [
+                    'item' => $media->getItem()->getId(),
+                    'media' => $media->getId(),
+                    'filename' => $media->getFilename(),
+                    'exists' => '',
+                    'has_thumbnails' => '',
+                    'fixed' => '',
+                ];
+
                 // Thumbnails are created only if the original file exists.
                 $filename = $media->getFilename();
                 $sourcePath = $basePath . '/original/' . $filename;
 
                 if (!file_exists($sourcePath)) {
-                    $logger->warn(
+                    $this->logger->warn(
                         'Media #{media_id} ({index}/{total}): the original file "{filename}" does not exist.', // @translate
                         ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess, 'filename' => $filename]
                     );
+                    $row['exists'] = $no;
+                    $this->writeRow($row);
                     continue;
                 }
 
                 if (!is_readable($sourcePath)) {
-                    $logger->warn(
+                    $this->logger->warn(
                         'Media #{media_id} ({index}/{total}): the original file "{filename}" is not readable.', // @translate
                         ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess, 'filename' => $filename]
                     );
+                    $row['exists'] = $notReadable;
+                    $this->writeRow($row);
                     continue;
                 }
 
@@ -169,16 +191,18 @@ DQL;
                 foreach ($types as $type) {
                     $derivativePath = $basePath . '/' . $type . '/' . $filename;
                     if (file_exists($derivativePath) && !is_writeable($derivativePath)) {
-                        $logger->warn(
+                        $this->logger->warn(
                             'Media #{media_id} ({index}/{total}): derivative file "{filename}" is not writeable (type "{type}").', // @translate
                             ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess, 'filename' => $filename, 'type' => $type]
                         );
                         $offset += self::SQL_LIMIT;
+                        $row['exists'] = $notWriteable;
+                        $this->writeRow($row);
                         continue 2;
                     }
                 }
 
-                $logger->info(
+                $this->logger->info(
                     'Media #{media_id} ({index}/{total}): creating derivative files.', // @translate
                     ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess]
                 );
@@ -191,25 +215,30 @@ DQL;
                 $result = $tempFile->storeThumbnails();
                 if ($hasThumbnails !== $result) {
                     $media->setHasThumbnails($result);
-                    $entityManager->persist($media);
-                    $entityManager->flush();
+                    $this->entityManager->persist($media);
+                    $this->entityManager->flush();
                 }
-
-                ++$totalProcessed;
 
                 if ($result) {
                     ++$totalSucceed;
-                    $logger->info(
+                    $this->logger->info(
                         'Media #{media_id} ({index}/{total}): derivative files created.', // @translate
                         ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess]
                     );
                 } else {
                     ++$totalFailed;
-                    $logger->notice(
+                    $this->logger->notice(
                         'Media #{media_id} ({index}/{total}): derivative files not created.', // @translate
                         ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess]
                     );
                 }
+
+                $row['exists'] = $yes;
+                $row['has_thumbnails'] = $hasThumbnails ? $yes : $no;
+                $row['fixed'] = $result ? $yes : $failed;
+                $this->writeRow($row);
+
+                ++$totalProcessed;
 
                 // Avoid memory issue.
                 unset($media);
@@ -217,15 +246,17 @@ DQL;
 
             // Avoid memory issue.
             unset($medias);
-            $entityManager->clear();
+            $this->entityManager->clear();
 
             $offset += self::SQL_LIMIT;
         }
 
-        $logger->info(
+        $this->logger->info(
             'End of the creation of derivative files: {count}/{total} processed, {skipped} skipped, {succeed} succeed, {failed} failed.', // @translate
             ['count' => $totalProcessed, 'total' => $totalToProcess, 'skipped' => $totalToProcess - $totalProcessed, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
         );
+
+        $this->finalizeOutput();
     }
 
     /**
