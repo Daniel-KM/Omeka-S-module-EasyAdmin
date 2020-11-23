@@ -62,6 +62,10 @@ abstract class AbstractCheckFile extends AbstractCheck
             return true;
         }
 
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+        $no = $translator->translate('No'); // @translate
+
         // Loop all media with original files.
         $originalPath = $this->basePath . '/original';
         $offset = 0;
@@ -95,7 +99,19 @@ abstract class AbstractCheckFile extends AbstractCheck
             foreach ($medias as $key => $media) {
                 $filename = $media->getFilename();
                 $filepath = $originalPath . '/' . $filename;
+
+                $row = [
+                    'item' => $media->getItem()->getId(),
+                    'media' => $media->getId(),
+                    'filename' => $filename,
+                    'exists' => '',
+                    $column => '',
+                    "real_$column" => '',
+                    'fixed' => '',
+                ];
+
                 if (file_exists($filepath)) {
+                    $row['exists'] = $yes;
                     switch ($column) {
                         case 'size':
                             $dbValue = $media->getSize();
@@ -108,6 +124,10 @@ abstract class AbstractCheckFile extends AbstractCheck
                     }
 
                     $isDifferent = $dbValue != $realValue;
+
+                    $row[$column] = $dbValue;
+                    $row["real_$column"] = $realValue;
+
                     if ($fix) {
                         if ($isDifferent) {
                             switch ($column) {
@@ -132,6 +152,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                             ]
                         );
                         ++$totalSucceed;
+                        $row['fixed'] = $yes;
                     } else {
                         if (is_null($dbValue)) {
                             ++$totalFailed;
@@ -175,7 +196,11 @@ abstract class AbstractCheckFile extends AbstractCheck
                             'filename' => $filename,
                         ]
                     );
+
+                    $row['exists'] = $no;
                 }
+
+                $this->writeRow($row);
 
                 ++$totalProcessed;
             }

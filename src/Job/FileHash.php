@@ -1,11 +1,27 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class FileHash extends AbstractCheckFile
 {
+    protected $columns = [
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'filename' => 'filename', // @translate
+        'exists' => 'Exists', // @translate
+        'sha256' => 'Database hash', // @translate
+        'real_sha256' => 'Real hash', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     public function perform(): void
     {
         parent::perform();
+
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
 
         $process = $this->getArg('process');
 
@@ -15,6 +31,8 @@ class FileHash extends AbstractCheckFile
             'Process "{process}" completed.', // @translate
             ['process' => $process]
         );
+
+        $this->finalizeOutput();
     }
 
     /**

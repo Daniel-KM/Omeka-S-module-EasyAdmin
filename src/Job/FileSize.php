@@ -1,11 +1,27 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class FileSize extends AbstractCheckFile
 {
+    protected $columns = [
+        'item' => 'Item', // @translate
+        'media' => 'Media', // @translate
+        'filename' => 'filename', // @translate
+        'exists' => 'Exists', // @translate
+        'size' => 'Database size', // @translate
+        'real_size' => 'Real size', // @translate
+        'fixed' => 'Fixed', // @translate
+    ];
+
     public function perform(): void
     {
         parent::perform();
+
+        $this->initializeOutput();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
 
         $process = $this->getArg('process');
 
@@ -15,6 +31,8 @@ class FileSize extends AbstractCheckFile
             'Process "{process}" completed.', // @translate
             ['process' => $process]
         );
+
+        $this->finalizeOutput();
     }
 
     /**
