@@ -193,6 +193,8 @@ class BulkCheckForm extends Form
                     'value_options' => [
                         'value' => 'Resources values', // @translate
                         'resource_title' => 'Resources titles', // @translate
+                        'page_title' => 'Pages titles', // @translate
+                        'page_block' => 'Pages blocks', // @translate
                     ],
                 ],
                 'attributes' => [

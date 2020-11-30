@@ -5,6 +5,7 @@ namespace BulkCheck\Job;
 class DbUtf8Encode extends AbstractCheck
 {
     protected $columns = [
+        'type' => 'Type', // @translate
         'resource' => 'Resource', // @translate
         'value' => 'Value id', // @translate
         'term' => 'Term', // @translate
@@ -33,10 +34,10 @@ class DbUtf8Encode extends AbstractCheck
         $processFix = $process === 'db_utf8_encode_fix';
 
         $typeResources = $this->getArg('type_resources', []);
-        $typeResources = array_intersect($typeResources, ['value', 'resource_title']);
+        $typeResources = array_intersect($typeResources, ['value', 'resource_title', 'page_block', 'page_title']);
         if (!count($typeResources)) {
             $this->logger->warn(
-                'You should specify the types of resources to check or fix.' // @translate
+                'You should specify the types of records to check or fix.' // @translate
             );
             return;
         }
@@ -72,6 +73,7 @@ class DbUtf8Encode extends AbstractCheck
     {
         switch ($recordData) {
             case 'value':
+                $type = 'Value';
                 $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Value::class);
                 $table = 'value';
                 $column = 'value';
@@ -79,8 +81,25 @@ class DbUtf8Encode extends AbstractCheck
                 $methodSet = 'setValue';
                 break;
             case 'resource_title':
+                $type = 'Resource title';
                 $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Resource::class);
                 $table = 'resource';
+                $column = 'title';
+                $methodGet = 'getTitle';
+                $methodSet = 'setTitle';
+                break;
+            case 'page_block':
+                $type = 'Page block';
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);
+                $table = 'site_page_block';
+                $column = 'data';
+                $methodGet = 'getData';
+                $methodSet = 'setData';
+                break;
+            case 'page_title':
+                $type = 'Page title';
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\SitePage::class);
+                $table = 'site_page';
                 $column = 'title';
                 $methodGet = 'getTitle';
                 $methodSet = 'setTitle';
@@ -141,6 +160,9 @@ class DbUtf8Encode extends AbstractCheck
                 ++$totalProcessed;
 
                 $string = $entity->$methodGet();
+                if ($recordData === 'page_block') {
+                    $string = json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+                }
                 // Same, but may be useful for a more complex check.
                 // $iso = mb_convert_encoding($string, 'UTF-8', 'ISO-8859-15');
                 $iso = utf8_decode($string);
@@ -176,6 +198,7 @@ class DbUtf8Encode extends AbstractCheck
                 switch ($recordData) {
                     case 'value':
                         $row = [
+                            'type' => $type,
                             'resource' => $entity->getResource()->getId(),
                             'value' => $entity->getId(),
                             'term' => $this->properties[$entity->getProperty()->getId()],
@@ -183,6 +206,23 @@ class DbUtf8Encode extends AbstractCheck
                         break;
                     case 'resource_title':
                         $row = [
+                            'type' => $type,
+                            'resource' => $entity->getId(),
+                            'value' => '',
+                            'term' => 'title',
+                        ];
+                        break;
+                    case 'page_block':
+                        $row = [
+                            'type' => $type,
+                            'resource' => $entity->getPage()->getId(),
+                            'value' => $entity->getId(),
+                            'term' => $entity->getLayout(),
+                        ];
+                        break;
+                    case 'page_title':
+                        $row = [
+                            'type' => $type,
                             'resource' => $entity->getId(),
                             'value' => '',
                             'term' => 'title',
@@ -195,6 +235,9 @@ class DbUtf8Encode extends AbstractCheck
                 $row['fixed'] = $fix ? $yes : '';
 
                 if ($fix) {
+                    if ($recordData === 'page_block') {
+                        $iso = json_decode($iso, true);
+                    }
                     // The iso value will be a utf8 value in the database.
                     $entity->$methodSet($iso);
                     $this->entityManager->persist($entity);
@@ -214,12 +257,13 @@ class DbUtf8Encode extends AbstractCheck
         }
 
         $this->logger->notice(
-            'End of process: {processed}/{total} processed, {total_utf8} already utf-8, {total_succeed} converted.', // @translate
+            'End of process: {processed}/{total} processed, {total_utf8} already utf-8, {total_succeed} converted ({type}).', // @translate
             [
                 'processed' => $totalProcessed,
                 'total' => $totalToProcess,
                 'total_utf8' => $totalUtf8,
                 'total_succeed' => $totalSucceed,
+                'type' => $type,
             ]
         );
 
