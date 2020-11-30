@@ -34,19 +34,24 @@ class DbUtf8Encode extends AbstractCheck
         $processFix = $process === 'db_utf8_encode_fix';
 
         $typeResources = $this->getArg('type_resources', []);
-        $typeResources = array_intersect($typeResources, [
+        $availables = [
             'resource_title',
             'value',
             'site_title',
             'site_summary',
             'page_title',
             'page_block',
-        ]);
-        if (!count($typeResources)) {
-            $this->logger->warn(
-                'You should specify the types of records to check or fix.' // @translate
-            );
-            return;
+        ];
+        if (in_array('all', $typeResources)) {
+            $typeResources = $availables;
+        } else {
+            $typeResources = array_intersect($typeResources, $availables);
+            if (!count($typeResources)) {
+                $this->logger->warn(
+                    'You should specify the types of records to check or fix.' // @translate
+                );
+                return;
+            }
         }
 
         $this->getProperties();
