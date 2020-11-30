@@ -34,7 +34,14 @@ class DbUtf8Encode extends AbstractCheck
         $processFix = $process === 'db_utf8_encode_fix';
 
         $typeResources = $this->getArg('type_resources', []);
-        $typeResources = array_intersect($typeResources, ['value', 'resource_title', 'page_block', 'page_title']);
+        $typeResources = array_intersect($typeResources, [
+            'resource_title',
+            'value',
+            'site_title',
+            'site_summary',
+            'page_title',
+            'page_block',
+        ]);
         if (!count($typeResources)) {
             $this->logger->warn(
                 'You should specify the types of records to check or fix.' // @translate
@@ -88,13 +95,21 @@ class DbUtf8Encode extends AbstractCheck
                 $methodGet = 'getTitle';
                 $methodSet = 'setTitle';
                 break;
-            case 'page_block':
-                $type = 'Page block';
-                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);
-                $table = 'site_page_block';
-                $column = 'data';
-                $methodGet = 'getData';
-                $methodSet = 'setData';
+            case 'site_title':
+                $type = 'Site title';
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Site::class);
+                $table = 'site';
+                $column = 'title';
+                $methodGet = 'getTitle';
+                $methodSet = 'setTitle';
+                break;
+            case 'site_summary':
+                $type = 'Site summary';
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Site::class);
+                $table = 'site';
+                $column = 'summary';
+                $methodGet = 'getSummary';
+                $methodSet = 'setSummary';
                 break;
             case 'page_title':
                 $type = 'Page title';
@@ -103,6 +118,14 @@ class DbUtf8Encode extends AbstractCheck
                 $column = 'title';
                 $methodGet = 'getTitle';
                 $methodSet = 'setTitle';
+                break;
+            case 'page_block':
+                $type = 'Page block';
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);
+                $table = 'site_page_block';
+                $column = 'data';
+                $methodGet = 'getData';
+                $methodSet = 'setData';
                 break;
             default:
                 return false;
@@ -212,20 +235,29 @@ class DbUtf8Encode extends AbstractCheck
                             'term' => 'title',
                         ];
                         break;
-                    case 'page_block':
+                    case 'site_title':
+                    case 'site_summary':
                         $row = [
                             'type' => $type,
-                            'resource' => $entity->getPage()->getId(),
+                            'resource' => $entity->getId() . ' [' . $entity->getSlug() . ']',
                             'value' => $entity->getId(),
-                            'term' => $entity->getLayout(),
+                            'term' => $column,
                         ];
                         break;
                     case 'page_title':
                         $row = [
                             'type' => $type,
                             'resource' => $entity->getId(),
-                            'value' => '',
+                            'value' => $entity->getSlug(),
                             'term' => 'title',
+                        ];
+                        break;
+                    case 'page_block':
+                        $row = [
+                            'type' => $type,
+                            'resource' => $entity->getPage()->getId() . ' [' . $entity->getPage()->getSlug() . ']',
+                            'value' => $entity->getId(),
+                            'term' => $entity->getLayout(),
                         ];
                         break;
                     default:
