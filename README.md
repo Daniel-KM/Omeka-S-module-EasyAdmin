@@ -2,7 +2,8 @@ Bulk Check (module for Omeka S)
 ===============================
 
 > __New versions of this module and support for Omeka S version 3.0 and above
-> are available on [GitLab], which seems to respect users and privacy better.__
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
 
 [Bulk Check] is a module for [Omeka S] that allows to check your metadata and
 files and to fix some common issues.
@@ -25,8 +26,10 @@ Checks and fixes that are doable:
 - check and fix sha256 hashes of files
 - check and fix positions of media (start from 1, without missing number)
 - check and stop dead jobs (living in database, but non-existent in system)
-- check the size of the database table of sessions
-- remove old sessions
+- check the size of the database table of sessions and remove them
+- check the size of the database table of logs and remove them
+- check and fix the encoding (iso-8859 to utf-8) of resource values and page
+  contents
 
 
 Installation
