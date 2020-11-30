@@ -94,6 +94,10 @@ class BulkCheckController extends AbstractActionController
             case 'db_session_clean':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $params['db_session'] + $defaultParams);
                 break;
+            case 'db_log_check':
+            case 'db_log_clean':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbLog::class, $params['db_log'] + $defaultParams);
+                break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
                 break;

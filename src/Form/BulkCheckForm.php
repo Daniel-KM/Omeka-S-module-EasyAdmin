@@ -46,6 +46,8 @@ class BulkCheckForm extends Form
                         'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
                         'db_session_check' => 'Check the size of the table of sessions in database', // @translate
                         'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
+                        'db_log_check' => 'Check the size of the table of logs in database(module Log)', // @translate
+                        'db_log_clean' => 'Remove old logs (options below)', // @translate
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
                         'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
@@ -191,6 +193,46 @@ class BulkCheckForm extends Form
                 ],
             ]);
 
+        $this
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_log',
+                'options' => [
+                    'label' => 'Options to remove logs (module Log)', // @translate
+                ],
+            ]);
+        $this->get('db_log')
+            ->add([
+                'name' => 'days',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Older than this number of days', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'days',
+                ],
+            ])
+            ->add([
+                'name' => 'severity',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Maximum severity', // @translate
+                    'value_options' => [
+                        '0' => 'Emergency', // @translate
+                        '1' => 'Alert', // @translate
+                        '2' => 'Critical', // @translate
+                        '3' => 'Error', // @translate
+                        '4' => 'Warning', // @translate
+                        '5' => 'Notice', // @translate
+                        '6' => 'Info', // @translate
+                        '7' => 'Debug', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'severity',
+                ],
+            ]);
+
         // Fix the formatting issue of the label in Omeka.
         $this
             ->get('process')->setLabelAttributes(['style' => 'display: inline-block']);
@@ -219,6 +261,11 @@ class BulkCheckForm extends Form
                 'required' => false,
             ]);
         $inputFilter->get('db_session')
+            ->add([
+                'name' => 'days',
+                'required' => false,
+            ]);
+        $inputFilter->get('db_log')
             ->add([
                 'name' => 'days',
                 'required' => false,
