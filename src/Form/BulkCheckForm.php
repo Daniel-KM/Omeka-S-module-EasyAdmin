@@ -41,8 +41,8 @@ class BulkCheckForm extends Form
                         'media_position_fix' => 'Fix wrong positions of media', // @translate
                         'item_no_value' => 'Check items without value (media values are not checked)', // @translate
                         'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
-                        'db_utf8encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
-                        'db_utf8encode_fix' => 'Fix utf-8 encoding issues', // @translate
+                        'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é", options below)', // @translate
+                        'db_utf8_encode_fix' => 'Fix utf-8 encoding issues (options below)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
@@ -179,6 +179,30 @@ class BulkCheckForm extends Form
         $this
             ->add([
                 'type' => Fieldset::class,
+                'name' => 'db_utf8_encode',
+                'options' => [
+                    'label' => 'Options for utf-8 encoding', // @translate
+                ],
+            ]);
+        $this->get('db_utf8_encode')
+            ->add([
+                'name' => 'type_resources',
+                'type' => Element\MultiCheckbox::class,
+                'options' => [
+                    'label' => 'Types of resources to process', // @translate
+                    'value_options' => [
+                        'value' => 'Resources values', // @translate
+                        'resource_title' => 'Resources titles', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'type_resources',
+                ],
+            ]);
+
+        $this
+            ->add([
+                'type' => Fieldset::class,
                 'name' => 'db_session',
                 'options' => [
                     'label' => 'Options to remove sessions', // @translate
@@ -261,6 +285,11 @@ class BulkCheckForm extends Form
             ])
             ->add([
                 'name' => 'media_types',
+                'required' => false,
+            ]);
+        $inputFilter->get('db_utf8_encode')
+            ->add([
+                'name' => 'type_resources',
                 'required' => false,
             ]);
         $inputFilter->get('db_session')

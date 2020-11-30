@@ -6,7 +6,7 @@ class DbUtf8Encode extends AbstractCheck
 {
     protected $columns = [
         'resource' => 'Resource', // @translate
-        'value' => 'Value', // @translate
+        'value' => 'Value id', // @translate
         'term' => 'Term', // @translate
         'content' => 'Content', // @translate
         'fixed' => 'Fixed', // @translate
@@ -15,7 +15,7 @@ class DbUtf8Encode extends AbstractCheck
     /**
      * @var \Doctrine\ORM\EntityRepository
      */
-    protected $valueRepository;
+    protected $repository;
 
     /**
      * @var array
@@ -30,11 +30,22 @@ class DbUtf8Encode extends AbstractCheck
         }
 
         $process = $this->getArg('process');
-        $processFix = $process === 'db_utf8encode_fix';
+        $processFix = $process === 'db_utf8_encode_fix';
+
+        $typeResources = $this->getArg('type_resources', []);
+        $typeResources = array_intersect($typeResources, ['value', 'resource_title']);
+        if (!count($typeResources)) {
+            $this->logger->warn(
+                'You should specify the types of resources to check or fix.' // @translate
+            );
+            return;
+        }
 
         $this->getProperties();
 
-        $this->checkDbUtf8Encode($processFix);
+        foreach ($typeResources as $typeResource) {
+            $this->checkDbUtf8Encode($processFix, $typeResource);
+        }
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -51,28 +62,47 @@ class DbUtf8Encode extends AbstractCheck
     }
 
     /**
-     * Check the content encoding for values.
+     * Check the content encoding for resource values and titles.
      *
      * @param bool $fix
+     * @param string $recordData
      * @return bool
      */
-    protected function checkDbUtf8Encode($fix = false): bool
+    protected function checkDbUtf8Encode(bool $fix, string $recordData): bool
     {
-        $this->valueRepository = $this->entityManager->getRepository(\Omeka\Entity\Value::class);
+        switch ($recordData) {
+            case 'value':
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Value::class);
+                $table = 'value';
+                $column = 'value';
+                $methodGet = 'getValue';
+                $methodSet = 'setValue';
+                break;
+            case 'resource_title':
+                $this->repository = $this->entityManager->getRepository(\Omeka\Entity\Resource::class);
+                $table = 'resource';
+                $column = 'title';
+                $methodGet = 'getTitle';
+                $methodSet = 'setTitle';
+                break;
+            default:
+                return false;
+        }
+
         $baseCriteria = new \Doctrine\Common\Collections\Criteria();
         $expr = $baseCriteria->expr();
         $baseCriteria
-            ->where($expr->neq('value', null))
-            ->andWhere($expr->neq('value', ''))
+            ->where($expr->neq($column, null))
+            ->andWhere($expr->neq($column, ''))
             ->orderBy(['id' => 'ASC'])
             ->setFirstResult(null)
             ->setMaxResults(self::SQL_LIMIT);
 
-        $sql = 'SELECT COUNT(id) FROM value WHERE value IS NOT NULL and value != "";';
+        $sql = "SELECT COUNT(id) FROM $table WHERE $column IS NOT NULL and $column != '';";
         $totalToProcess = $this->connection->query($sql)->fetchColumn();
         $this->logger->notice(
-            'Checking {total} resource values with a value.', // @translate
-            ['total' => $totalToProcess]
+            'Checking {total} records "{name}" with a "{value}".', // @translate
+            ['total' => $totalToProcess, 'name' => $table, 'value' => $column]
         );
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
@@ -87,14 +117,14 @@ class DbUtf8Encode extends AbstractCheck
         while (true) {
             $criteria = clone $baseCriteria;
             $criteria->setFirstResult($offset);
-            $values = $this->valueRepository->matching($criteria);
-            if (!$values->count() || $offset >= $values->count()) {
+            $entities = $this->repository->matching($criteria);
+            if (!$entities->count() || $offset >= $entities->count()) {
                 break;
             }
 
             if ($offset) {
                 $this->logger->info(
-                    '{processed}/{total} values processed.', // @translate
+                    '{processed}/{total} records processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );
 
@@ -106,49 +136,68 @@ class DbUtf8Encode extends AbstractCheck
                 }
             }
 
-            /** @var \Omeka\Entity\Value $value */
-            foreach ($values as $value) {
+            /** @var \Omeka\Entity\AbstractEntity $entity */
+            foreach ($entities as $entity) {
                 ++$totalProcessed;
 
-                $valueValue = $value->getValue();
+                $string = $entity->$methodGet();
                 // Same, but may be useful for a more complex check.
-                // $valueIso = mb_convert_encoding($valueValue, 'UTF-8', 'ISO-8859-15');
-                $valueIso = utf8_decode($valueValue);
-                if ($valueValue === $valueIso) {
+                // $iso = mb_convert_encoding($string, 'UTF-8', 'ISO-8859-15');
+                $iso = utf8_decode($string);
+                if ($string === $iso) {
                     // Don't log well formatted values because they are many.
                     ++$totalUtf8;
                     continue;
                 }
 
-                $valueValueEncoding = mb_detect_encoding($valueValue);
-                $valueIsoEncoding = mb_detect_encoding($valueIso);
-
-                // Of course, well formatted strings should remain.
-                // if the original value and the converted value are valid utf-8
-                // together, there is an issue!
-                $valueValueIsUtf8 = preg_match('!!u', $valueValue);
-                $valueIsoIsUtf8 = preg_match('!!u', $valueIso);
-                if (!($valueValueIsUtf8 && $valueIsoIsUtf8)
-                    || (strlen($valueIso) === mb_strlen($valueIso) && mb_strlen($valueIso) === mb_strlen($valueValue))
-                    || $valueValueEncoding === 'ASCII'
-                    || $valueIsoEncoding === 'ASCII'
-                ) {
+                // Quick check for ascii encoding.
+                $stringEncoding = mb_detect_encoding($string);
+                $isoEncoding = mb_detect_encoding($iso);
+                if (!$stringEncoding === 'ASCII' || $isoEncoding === 'ASCII') {
                     ++$totalUtf8;
                     continue;
                 }
 
-                $row = [
-                    'resource' => $value->getResource()->getId(),
-                    'value' => $value->getId(),
-                    'term' => $this->properties[$value->getProperty()->getId()],
-                    'content' => mb_substr(trim(str_replace(["\n", "\r", "\t"], ['  ', '  ', '  '], $value->getValue())), 0, 1000),
-                    'fixed' => $fix ? $yes : '',
-                ];
+                // Quick check with the length.
+                if (strlen($iso) === mb_strlen($iso) && strlen($iso) === mb_strlen($string)) {
+                    ++$totalUtf8;
+                    continue;
+                }
+
+                // If the original value and the converted value are valid utf-8
+                // together, there is an issue!
+                $stringIsUtf8 = preg_match('!!u', $string);
+                $isoIsUtf8 = preg_match('!!u', $iso);
+                if (!($stringIsUtf8 && $isoIsUtf8)) {
+                    ++$totalUtf8;
+                    continue;
+                }
+
+                switch ($recordData) {
+                    case 'value':
+                        $row = [
+                            'resource' => $entity->getResource()->getId(),
+                            'value' => $entity->getId(),
+                            'term' => $this->properties[$entity->getProperty()->getId()],
+                        ];
+                        break;
+                    case 'resource_title':
+                        $row = [
+                            'resource' => $entity->getId(),
+                            'value' => '',
+                            'term' => 'title',
+                        ];
+                        break;
+                    default:
+                        return false;
+                }
+                $row['content'] = mb_substr(trim(str_replace(["\n", "\r", "\t"], ['  ', '  ', '  '], $string)), 0, 1000);
+                $row['fixed'] = $fix ? $yes : '';
 
                 if ($fix) {
                     // The iso value will be a utf8 value in the database.
-                    $value->setValue($valueIso);
-                    $this->entityManager->persist($value);
+                    $entity->$methodSet($iso);
+                    $this->entityManager->persist($entity);
                     ++$totalSucceed;
                 }
 
@@ -158,8 +207,8 @@ class DbUtf8Encode extends AbstractCheck
             }
 
             $this->entityManager->flush();
-            $this->valueRepository->clear();
-            unset($values);
+            $this->repository->clear();
+            unset($entities);
 
             $offset += self::SQL_LIMIT;
         }
