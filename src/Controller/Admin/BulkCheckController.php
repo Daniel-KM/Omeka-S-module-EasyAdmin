@@ -85,6 +85,10 @@ class BulkCheckController extends AbstractActionController
             case 'item_no_value_fix':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\ItemNoValue::class, $defaultParams);
                 break;
+            case 'db_utf8encode_check':
+            case 'db_utf8encode_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\DbUtf8Encode::class, $defaultParams);
+                break;
             case 'db_job_check':
             case 'db_job_clean':
             case 'db_job_clean_all':

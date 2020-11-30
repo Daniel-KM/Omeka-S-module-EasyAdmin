@@ -14,6 +14,12 @@ abstract class AbstractCheck extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
+     * Max number of rows to output in spreadsheet.
+     * @var integer
+     */
+    const SPREADSHEET_ROW_LIMIT = 1000000;
+
+    /**
      * @var \Laminas\Log\Logger
      */
     protected $logger;
