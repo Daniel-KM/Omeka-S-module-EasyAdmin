@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class DirExcess extends AbstractCheck
@@ -17,14 +18,17 @@ class DirExcess extends AbstractCheck
         );
     }
 
-    protected function removeEmptyDirs()
+    protected function removeEmptyDirs(): bool
     {
         $result = $this->removeEmptyDirsForType('original');
         if (!$result) {
             return false;
         }
 
-        foreach (array_keys($this->config['thumbnails']['types']) as $type) {
+        $types = array_keys($this->config['thumbnails']['types']);
+        // Manage module Image Server.
+        $types[] = 'tile';
+        foreach ($types as $type) {
             $result = $this->removeEmptyDirsForType($type);
             if (!$result) {
                 return false;
@@ -34,9 +38,12 @@ class DirExcess extends AbstractCheck
         return true;
     }
 
-    protected function removeEmptyDirsForType($type)
+    protected function removeEmptyDirsForType($type): bool
     {
         $path = $this->basePath . '/' . $type;
+        if (!file_exists($path)) {
+            return true;
+        }
         $this->logger->notice(
             'Processing type "{type}".', // @translate
             ['type' => $type]
@@ -54,7 +61,7 @@ class DirExcess extends AbstractCheck
      * @param bool $root
      * @return bool
      */
-    protected function removeEmptySubFolders($path, $root = false)
+    protected function removeEmptySubFolders($path, $root = false): bool
     {
         $empty = true;
         foreach (glob($path . DIRECTORY_SEPARATOR . '{,.}[!.,!..]*', GLOB_MARK | GLOB_BRACE) as $file) {
