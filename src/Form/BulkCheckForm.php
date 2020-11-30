@@ -44,8 +44,8 @@ class BulkCheckForm extends Form
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
                         'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
-                        'db_session_check' => 'Check the size of the database table of sessions', // @translate
-                        'db_session_clean' => 'Remove old sessions (more than 100 days)', // @translate
+                        'db_session_check' => 'Check the size of the table of sessions in database', // @translate
+                        'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
                         'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
@@ -171,6 +171,26 @@ class BulkCheckForm extends Form
             ])
         ;
 
+        $this
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_session',
+                'options' => [
+                    'label' => 'Options to remove sessions', // @translate
+                ],
+            ]);
+        $this->get('db_session')
+            ->add([
+                'name' => 'days',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Older than this number of days', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'days',
+                ],
+            ]);
+
         // Fix the formatting issue of the label in Omeka.
         $this
             ->get('process')->setLabelAttributes(['style' => 'display: inline-block']);
@@ -196,6 +216,11 @@ class BulkCheckForm extends Form
             ])
             ->add([
                 'name' => 'media_types',
+                'required' => false,
+            ]);
+        $inputFilter->get('db_session')
+            ->add([
+                'name' => 'days',
                 'required' => false,
             ]);
     }
