@@ -201,6 +201,11 @@ class FileMissing extends AbstractCheckFile
             return true;
         }
 
+        $baseCriteria
+            ->orderBy(['id' => 'ASC'])
+            ->setFirstResult(null)
+            ->setMaxResults(self::SQL_LIMIT);
+
         // First, list files.
         $types = array_flip($types);
         foreach (array_keys($types) as $type) {
@@ -231,11 +236,13 @@ class FileMissing extends AbstractCheckFile
         while (true) {
             // Entity are used, because it's not possible to get the value
             // "has_original" or "has_thumbnails" via api.
-            /** @var \Omeka\Entity\Media[] $medias */
             $criteria = clone $baseCriteria;
-            $criteria->andWhere($expr->gt('id', $lastId));
-            $medias = $this->mediaRepository->matching($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
-            if (!count($medias)) {
+            $criteria
+                // Don't use offset, since last id is used.
+                // ->setFirstResult($offset)
+                ->andWhere($expr->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($criteria);
+            if (!$medias->count() || $offset >= $medias->count()) {
                 break;
             }
 
@@ -276,6 +283,7 @@ class FileMissing extends AbstractCheckFile
                 );
             }
 
+            /** @var \Omeka\Entity\Media $media */
             foreach ($medias as $media) {
                 $lastId = $media->getId();
                 $item = $media->getItem();

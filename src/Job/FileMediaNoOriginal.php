@@ -57,7 +57,10 @@ class FileMediaNoOriginal extends AbstractCheckFile
         $baseCriteria
             ->where($expr->eq('renderer', 'file'))
             ->andWhere($expr->eq('hasOriginal', 0))
-            ->andWhere($expr->eq('hasThumbnails', 0));
+            ->andWhere($expr->eq('hasThumbnails', 0))
+            ->orderBy(['id' => 'ASC'])
+            ->setFirstResult(null)
+            ->setMaxResults(self::SQL_LIMIT);
 
         // Since the fixed medias are no more available in the database, the
         // loop should take care of them, so a check is done on it.
@@ -68,11 +71,13 @@ class FileMediaNoOriginal extends AbstractCheckFile
         $totalProcessed = 0;
         $totalFixed = 0;
         while (true) {
-            /** @var \Omeka\Entity\Media[] $medias */
             $criteria = clone $baseCriteria;
-            $criteria->andWhere($expr->gt('id', $lastId));
-            $medias = $this->mediaRepository->matching($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
-            if (!count($medias)) {
+            $criteria
+                // Don't use offset, since last id is used.
+                // ->setFirstResult($offset)
+                ->andWhere($expr->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($criteria);
+            if (!$medias->count() || $offset >= $medias->count()) {
                 break;
             }
 
@@ -101,6 +106,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
                 );
             }
 
+            /** @var \Omeka\Entity\Media $media */
             foreach ($medias as $media) {
                 $lastId = $media->getId();
                 $row = [

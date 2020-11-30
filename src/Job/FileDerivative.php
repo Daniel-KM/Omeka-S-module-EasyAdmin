@@ -96,9 +96,10 @@ DQL;
 
         // TODO Manage creation of thumbnails for media without original (youtube…).
         // Check only media with an original file.
-        $criteria->andWhere($expr->eq('hasOriginal', 1));
-
-        $criteria->orderBy(['id' => 'ASC']);
+        $criteria
+            ->andWhere($expr->eq('hasOriginal', 1))
+            ->orderBy(['id' => 'ASC'])
+            ->setMaxResults(self::SQL_LIMIT);
 
         $collection = $this->mediaRepository->matching($criteria);
         $totalToProcess = $collection->count();
@@ -135,10 +136,9 @@ DQL;
             // Entity are used, because it's not possible to update the value
             // "has_thumbnails" via api.
             $criteria
-                ->setMaxResults(self::SQL_LIMIT)
                 ->setFirstResult($offset);
-                $medias = $this->mediaRepository->matching($criteria);
-            if (!count($medias)) {
+            $medias = $this->mediaRepository->matching($criteria);
+            if (!$medias->count() || $offset >= $medias->count()) {
                 break;
             }
 
