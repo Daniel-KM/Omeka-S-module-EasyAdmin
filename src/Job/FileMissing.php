@@ -24,6 +24,11 @@ class FileMissing extends AbstractCheckFile
      */
     protected $files;
 
+    /**
+     * @var array
+     */
+    protected $extensions = [];
+
     public function perform(): void
     {
         parent::perform();
@@ -32,6 +37,9 @@ class FileMissing extends AbstractCheckFile
         }
 
         $process = $this->getArg('process');
+
+        $this->extensions = $this->getArg('extensions', '');
+        $this->extensions = array_unique(array_filter(array_map('trim', explode(',', $this->extensions)), 'strlen'));
 
         if ($process === 'files_missing_fix') {
             $this->prepareSourceDirectory();
@@ -88,7 +96,7 @@ class FileMissing extends AbstractCheckFile
             return $this;
         }
 
-        $this->files = $this->listFilesInFolder($dir);
+        $this->files = $this->listFilesInFolder($dir, false, $this->extensions);
         if (!count($this->files)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
@@ -210,7 +218,9 @@ class FileMissing extends AbstractCheckFile
         $types = array_flip($types);
         foreach (array_keys($types) as $type) {
             $path = $this->basePath . '/' . $type;
-            $types[$type] = $this->listFilesInFolder($path);
+            $types[$type] = $isOriginal
+                ? $this->listFilesInFolder($path, false, $this->extensions)
+                : $this->listFilesInFolder($path);
         }
 
         $fixDb =$fix === 'files_missing_fix_db';

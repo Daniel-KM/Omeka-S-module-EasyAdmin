@@ -78,7 +78,18 @@ class BulkCheckForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'source_dir',
-                    'data-placeholder' => '/server/path/to/my/source/directory', // @translate
+                    'placeholder' => '/server/path/to/my/source/directory', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'extensions',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Limit to extensions', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'extensions',
+                    'placeholder' => 'pdf, jpeg', // @translate
                 ],
             ])
         ;
