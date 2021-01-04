@@ -12,6 +12,7 @@ class FileMissing extends AbstractCheckFile
         'exists' => 'Exists', // @translate
         'source' => 'Source', // @translate
         'fixed' => 'Fixed', // @translate
+        'message' => 'Message', // @translate
     ];
 
     /**
@@ -90,8 +91,8 @@ class FileMissing extends AbstractCheckFile
         if (realpath($dir) !== $dir || strlen($dir) <= 1) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
-                'Source directory "{path}" should be a real path.', // @translate
-                ['path' => $dir]
+                'Source directory "{path}" should be a real path ({realpath}).', // @translate
+                ['path' => $dir, 'realpath' => realpath($dir)]
             );
             return $this;
         }
@@ -320,6 +321,7 @@ class FileMissing extends AbstractCheckFile
                         'exists' => '',
                         'source' => '',
                         'fixed' => '',
+                        'message' => '',
                     ];
                     if (in_array($filename, $files)) {
                         $row['exists'] = $yes;
@@ -345,16 +347,29 @@ class FileMissing extends AbstractCheckFile
                             $hash = $media->getSha256();
                             if (isset($this->files[$hash])) {
                                 $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
-                                $result = copy(
-                                    $this->sourceDir . '/' . $this->files[$hash],
-                                    $this->basePath . '/original/' . $filename
-                                );
-                                if ($result) {
-                                    $row['fixed'] = $yes;
-                                    ++$totalSucceed;
-                                } else {
-                                    $row['fixed'] = $copyIssue;
-                                    ++$totalFailed;
+                                $src = $this->sourceDir . '/' . $this->files[$hash];
+                                $dest = $this->basePath . '/original/' . $filename;
+                                $hasCopyError = false;
+                                if (!file_exists(dirname($dest))) {
+                                    // Create folder for Archive Repertory.
+                                    $result = mkdir(dirname($dest), 0755, true);
+                                    if (!$result) {
+                                        $row['fixed'] = $copyIssue;
+                                        $row['message'] = error_get_last()['message'];
+                                        ++$totalFailed;
+                                        $hasCopyError = true;
+                                    }
+                                }
+                                if (!$hasCopyError) {
+                                    $result = copy($src,$dest);
+                                    if ($result) {
+                                        $row['fixed'] = $yes;
+                                        ++$totalSucceed;
+                                    } else {
+                                        $row['fixed'] = $copyIssue;
+                                        $row['message'] = error_get_last()['message'];
+                                        ++$totalFailed;
+                                    }
                                 }
                             } else {
                                 $row['source'] = $no;
