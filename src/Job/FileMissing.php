@@ -237,13 +237,25 @@ class FileMissing extends AbstractCheckFile
             // Entity are used, because it's not possible to get the value
             // "has_original" or "has_thumbnails" via api.
             $criteria = clone $baseCriteria;
-            $criteria
-                // Don't use offset, since last id is used.
-                // ->setFirstResult($offset)
-                ->andWhere($expr->gt('id', $lastId));
-            $medias = $this->mediaRepository->matching($criteria);
-            if (!$medias->count() || $offset >= $medias->count()) {
-                break;
+            if ($fixDb) {
+                $criteria
+                    // Don't use offset, since last id is used, because some ids
+                    // may have been removed.
+                    ->andWhere($expr->gt('id', $lastId));
+                $medias = $this->mediaRepository->matching($criteria);
+                // if (!$medias->count() || $offset >= $medias->count()) {
+                // if (!$medias->count() || $offset >= $totalToProcess) {
+                if (!$medias->count() || $offset >= $medias->count() || $totalProcessed >= $totalToProcess) {
+                    break;
+                }
+            } else {
+                $criteria
+                    ->setFirstResult($offset);
+                $medias = $this->mediaRepository->matching($criteria);
+                // if (!$medias->count()) {
+                if (!$medias->count() || $totalProcessed >= $totalToProcess) {
+                    break;
+                }
             }
 
             if ($this->shouldStop()) {
