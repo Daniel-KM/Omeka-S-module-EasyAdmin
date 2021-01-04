@@ -117,7 +117,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2019-2021 (see [Daniel-KM] on GitLab)
 
 
 [Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
