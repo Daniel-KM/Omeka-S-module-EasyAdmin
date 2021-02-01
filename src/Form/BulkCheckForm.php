@@ -43,6 +43,8 @@ class BulkCheckForm extends Form
                         'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
                         'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é", options below)', // @translate
                         'db_utf8_encode_fix' => 'Fix utf-8 encoding issues (options below)', // @translate
+                        'db_resource_title_check' => 'Check resource titles (for example after hard import)', // @translate
+                        'db_resource_title_fix' => 'Update resource titles', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate

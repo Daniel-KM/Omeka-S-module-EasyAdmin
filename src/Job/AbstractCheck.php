@@ -42,6 +42,11 @@ abstract class AbstractCheck extends AbstractJob
     /**
      * @var \Doctrine\ORM\EntityRepository
      */
+    protected $resourceRepository;
+
+        /**
+     * @var \Doctrine\ORM\EntityRepository
+     */
     protected $itemRepository;
 
     /**
@@ -97,6 +102,7 @@ abstract class AbstractCheck extends AbstractJob
         // These two connections are not the same.
         // $this->connection = $services->get('Omeka\Connection');
         $this->connection = $this->entityManager->getConnection();
+        $this->resourceRepository = $this->entityManager->getRepository(\Omeka\Entity\Resource::class);
         $this->itemRepository = $this->entityManager->getRepository(\Omeka\Entity\Item::class);
         $this->mediaRepository = $this->entityManager->getRepository(\Omeka\Entity\Media::class);
         $this->config = $services->get('Config');

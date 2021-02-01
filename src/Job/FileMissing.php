@@ -224,7 +224,7 @@ class FileMissing extends AbstractCheckFile
                 : $this->listFilesInFolder($path);
         }
 
-        $fixDb =$fix === 'files_missing_fix_db';
+        $fixDb = $fix === 'files_missing_fix_db';
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate

@@ -1,15 +1,9 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 class MediaPosition extends AbstractCheck
 {
-    /**
-     * Limit for the loop to avoid heavy sql requests.
-     *
-     * @var int
-     */
-    const SQL_LIMIT = 25;
-
     public function perform(): void
     {
         parent::perform();
