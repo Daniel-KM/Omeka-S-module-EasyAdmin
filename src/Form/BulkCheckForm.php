@@ -192,7 +192,7 @@ class BulkCheckForm extends Form
                 'type' => Fieldset::class,
                 'name' => 'db_utf8_encode',
                 'options' => [
-                    'label' => 'Options for utf-8 encoding', // @translate
+                    'label' => 'Options for utf-8 encoding (experimental: do a backup first)', // @translate
                 ],
             ]);
         $this->get('db_utf8_encode')

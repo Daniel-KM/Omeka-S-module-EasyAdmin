@@ -4,6 +4,8 @@ namespace BulkCheck\Job;
 
 class DbUtf8Encode extends AbstractCheck
 {
+    protected $totalUtf8 = 0;
+
     protected $columns = [
         'type' => 'Type', // @translate
         'resource' => 'Resource', // @translate
@@ -33,7 +35,7 @@ class DbUtf8Encode extends AbstractCheck
         $process = $this->getArg('process');
         $processFix = $process === 'db_utf8_encode_fix';
 
-        $typeResources = $this->getArg('type_resources', []);
+        $typeResources = $this->getArg('type_resources', []) ?: [];
         $availables = [
             'resource_title',
             'value',
@@ -158,7 +160,7 @@ class DbUtf8Encode extends AbstractCheck
         // Loop all media with original files.
         $offset = 0;
         $totalProcessed = 0;
-        $totalUtf8 = 0;
+        $this->totalUtf8 = 0;
         $totalSucceed = 0;
         $maxRows = self::SPREADSHEET_ROW_LIMIT;
         while (true) {
@@ -188,38 +190,19 @@ class DbUtf8Encode extends AbstractCheck
                 ++$totalProcessed;
 
                 $string = $entity->$methodGet();
-                if ($recordData === 'page_block') {
-                    $string = json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
-                }
-                // Same, but may be useful for a more complex check.
-                // $iso = mb_convert_encoding($string, 'UTF-8', 'ISO-8859-15');
-                $iso = utf8_decode($string);
-                if ($string === $iso) {
-                    // Don't log well formatted values because they are many.
-                    ++$totalUtf8;
+                if (!is_string($string) && !is_array($string)) {
                     continue;
                 }
 
-                // Quick check for ascii encoding.
-                $stringEncoding = mb_detect_encoding($string);
-                $isoEncoding = mb_detect_encoding($iso);
-                if (!$stringEncoding === 'ASCII' || $isoEncoding === 'ASCII') {
-                    ++$totalUtf8;
+                if ((is_string($string) && !strlen($string))
+                    || (is_array($string) && !count($string))
+                ) {
                     continue;
                 }
 
-                // Quick check with the length.
-                if (strlen($iso) === mb_strlen($iso) && strlen($iso) === mb_strlen($string)) {
-                    ++$totalUtf8;
-                    continue;
-                }
-
-                // If the original value and the converted value are valid utf-8
-                // together, there is an issue!
-                $stringIsUtf8 = preg_match('!!u', $string);
-                $isoIsUtf8 = preg_match('!!u', $iso);
-                if (!($stringIsUtf8 && $isoIsUtf8)) {
-                    ++$totalUtf8;
+                $isPageBlock = $recordData === 'page_block';
+                $iso = $this->convertToUnicode($string, $isPageBlock);
+                if (is_null($iso)) {
                     continue;
                 }
 
@@ -268,11 +251,11 @@ class DbUtf8Encode extends AbstractCheck
                     default:
                         return false;
                 }
-                $row['content'] = mb_substr(trim(str_replace(["\n", "\r", "\t"], ['  ', '  ', '  '], $string)), 0, 1000);
+                $row['content'] = mb_substr(trim(str_replace(["\n", "\r", "\t"], ['  ', '  ', '  '], is_string($string) ? $string : json_encode($string))), 0, 1000);
                 $row['fixed'] = $fix ? $yes : '';
 
                 if ($fix) {
-                    if ($recordData === 'page_block') {
+                    if ($isPageBlock) {
                         $iso = json_decode($iso, true);
                     }
                     // The iso value will be a utf8 value in the database.
@@ -298,13 +281,71 @@ class DbUtf8Encode extends AbstractCheck
             [
                 'processed' => $totalProcessed,
                 'total' => $totalToProcess,
-                'total_utf8' => $totalUtf8,
+                'total_utf8' => $this->totalUtf8,
                 'total_succeed' => $totalSucceed,
                 'type' => $type,
             ]
         );
 
         return true;
+    }
+
+    protected function convertToUnicode($string, $isPageBlock = false): ?string
+    {
+        if ($isPageBlock) {
+            $hasHtml = !empty($string['html']);
+            if ($hasHtml) {
+                // Don't convert main xml entities (quotes, > and <).
+                $string['html'] = str_replace(['&_gt_;', '&_lt_;'], ['&gt;', '&lt;'], html_entity_decode(
+                    str_replace(['&gt;', '&lt;'], ['&_gt_;', '&_lt_;'], $string['html']),
+                    ENT_NOQUOTES | ENT_HTML5,
+                    'ISO-8859-15'
+                ));
+            }
+            // JSON_INVALID_UTF8_IGNORE is only in php 7.2.
+            $stringTest = json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+            $string = $stringTest === false
+                ? json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS)
+                : $stringTest;
+            $iso = $this->convertToUnicode($string);
+            return is_null($iso)
+                ? json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS)
+                : (is_array($iso) ? json_encode($iso, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS) : $iso);
+        }
+
+        // Same, but may be useful for a more complex check.
+        // $iso = mb_convert_encoding($string, 'UTF-8', 'ISO-8859-15');
+        $iso = utf8_decode($string);
+        if ($string === $iso) {
+            // Don't log well formatted values because they are many.
+            ++$this->totalUtf8;
+            return null;
+        }
+
+        // Quick check for ascii encoding.
+        $stringEncoding = mb_detect_encoding($string);
+        $isoEncoding = mb_detect_encoding($iso);
+        if (!$stringEncoding === 'ASCII' || $isoEncoding === 'ASCII') {
+            ++$this->totalUtf8;
+            return null;
+        }
+
+        // Quick check with the length.
+        if (strlen($iso) === mb_strlen($iso) && strlen($iso) === mb_strlen($string)) {
+            ++$this->totalUtf8;
+            return null;
+        }
+
+        // If the original value and the converted value are valid utf-8
+        // together, there is an issue!
+        $stringIsUtf8 = preg_match('!!u', $string);
+        $isoIsUtf8 = preg_match('!!u', $iso);
+        if (!($stringIsUtf8 && $isoIsUtf8)) {
+            ++$this->totalUtf8;
+            return null;
+        }
+
+        return $iso;
     }
 
     /**
