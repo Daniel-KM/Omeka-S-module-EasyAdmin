@@ -60,7 +60,7 @@ WHERE item_set.id IN (:item_set_ids)
 DQL;
             $query = $this->entityManager->createQuery($dql);
             $query->setParameter('item_set_ids', $itemSets, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-            $itemIds = array_column($query->getArrayResult(), 'id');
+            $itemIds = array_map('intval', array_column($query->getArrayResult(), 'id'));
             $criteria->andWhere($expr->in('item', $itemIds));
         }
 
