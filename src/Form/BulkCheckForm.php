@@ -45,10 +45,9 @@ class BulkCheckForm extends Form
                         'db_utf8_encode_fix' => 'Fix utf-8 encoding issues (options below)', // @translate
                         'db_resource_title_check' => 'Check resource titles (for example after hard import)', // @translate
                         'db_resource_title_fix' => 'Update resource titles', // @translate
-                        'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
-                        'db_job_clean' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
-                        'db_job_clean_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
+                        'db_job_fix' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
+                        'db_job_fix_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
                         'db_session_check' => 'Check the size of the table of sessions in database', // @translate
                         'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
                         'db_log_check' => 'Check the size of the table of logs in database(module Log)', // @translate

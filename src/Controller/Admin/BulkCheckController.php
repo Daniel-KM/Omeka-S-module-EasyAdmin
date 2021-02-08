@@ -94,8 +94,8 @@ class BulkCheckController extends AbstractActionController
                 $job = $dispatcher->dispatch(\BulkCheck\Job\DbResourceTitle::class, $defaultParams);
                 break;
             case 'db_job_check':
-            case 'db_job_clean':
-            case 'db_job_clean_all':
+            case 'db_job_fix':
+            case 'db_job_fix_all':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\DbJob::class, $defaultParams);
                 break;
             case 'db_session_check':

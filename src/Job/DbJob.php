@@ -9,13 +9,13 @@ class DbJob extends AbstractCheck
 
         $process = $this->getArg('process');
         switch ($process) {
-            case 'db_job_clean_all':
+            case 'db_job_fix_all':
                 $this->checkDbJob(true, true);
                 break;
             case 'db_job_check':
-            case 'db_job_clean':
+            case 'db_job_fix':
             default:
-                $this->checkDbJob($process === 'db_job_clean');
+                $this->checkDbJob($process === 'db_job_fix');
                 break;
         }
 
