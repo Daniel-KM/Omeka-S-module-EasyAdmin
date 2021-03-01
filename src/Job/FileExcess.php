@@ -6,6 +6,7 @@ class FileExcess extends AbstractCheckFile
 {
     protected $columns = [
         'filename' => 'Filename', // @translate
+        'extension' => 'Extension', // @translate
         'type' => 'Type', // @translate
         'exists' => 'Exists', // @translate
         'item' => 'Item', // @translate
@@ -145,6 +146,7 @@ class FileExcess extends AbstractCheckFile
 
             $row = [
                 'filename' => $filename,
+                'extension' => pathinfo($filename, PATHINFO_EXTENSION),
                 'type' => $type,
                 'exists' => '',
                 'item' => '',

@@ -7,7 +7,8 @@ class FileHash extends AbstractCheckFile
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
-        'filename' => 'filename', // @translate
+        'filename' => 'Filename', // @translate
+        'extension' => 'Extension', // @translate,
         'exists' => 'Exists', // @translate
         'sha256' => 'Database hash', // @translate
         'real_sha256' => 'Real hash', // @translate

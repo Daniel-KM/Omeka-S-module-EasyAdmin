@@ -16,7 +16,8 @@ class FileDerivative extends AbstractCheck
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
-        'filename' => 'filename', // @translate
+        'filename' => 'Filename', // @translate
+        'extension' => 'Extension', // @translate,
         'exists' => 'Exists', // @translate
         'has_thumbnails' => 'Has thumbnails', // @translate
         'fixed' => 'Fixed', // @translate
@@ -156,6 +157,7 @@ DQL;
                     'item' => $media->getItem()->getId(),
                     'media' => $media->getId(),
                     'filename' => $media->getFilename(),
+                    'extension' => $media->getExtension() ?: '',
                     'exists' => '',
                     'has_thumbnails' => '',
                     'fixed' => '',

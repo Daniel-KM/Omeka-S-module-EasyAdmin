@@ -7,7 +7,8 @@ class FileMissing extends AbstractCheckFile
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
-        'filename' => 'filename', // @translate
+        'filename' => 'Filename', // @translate
+        'extension' => 'Extension', // @translate
         'type' => 'Type', // @translate
         'exists' => 'Exists', // @translate
         'source' => 'Source', // @translate
@@ -317,6 +318,7 @@ class FileMissing extends AbstractCheckFile
                         'item' => $itemId,
                         'media' => $media->getId(),
                         'filename' => $filename,
+                        'extension' => pathinfo($filename, PATHINFO_EXTENSION),
                         'type' => $type,
                         'exists' => '',
                         'source' => '',

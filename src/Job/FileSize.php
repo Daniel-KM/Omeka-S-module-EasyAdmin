@@ -7,7 +7,8 @@ class FileSize extends AbstractCheckFile
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
-        'filename' => 'filename', // @translate
+        'filename' => 'Filename', // @translate
+        'extension' => 'Extension', // @translate
         'exists' => 'Exists', // @translate
         'size' => 'Database size', // @translate
         'real_size' => 'Real size', // @translate

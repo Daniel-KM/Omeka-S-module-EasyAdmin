@@ -104,6 +104,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                     'item' => $media->getItem()->getId(),
                     'media' => $media->getId(),
                     'filename' => $filename,
+                    'extension' => pathinfo($filename, PATHINFO_EXTENSION),
                     'exists' => '',
                     $column => '',
                     "real_$column" => '',
