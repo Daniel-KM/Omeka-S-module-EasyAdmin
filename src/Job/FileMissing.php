@@ -9,6 +9,7 @@ class FileMissing extends AbstractCheckFile
         'media' => 'Media', // @translate
         'filename' => 'Filename', // @translate
         'extension' => 'Extension', // @translate
+        'hash' => 'Hash', // @translate
         'type' => 'Type', // @translate
         'exists' => 'Exists', // @translate
         'source' => 'Source', // @translate
@@ -319,6 +320,7 @@ class FileMissing extends AbstractCheckFile
                         'media' => $media->getId(),
                         'filename' => $filename,
                         'extension' => pathinfo($filename, PATHINFO_EXTENSION),
+                        'hash' => $media->getSha256(),
                         'type' => $type,
                         'exists' => '',
                         'source' => '',
