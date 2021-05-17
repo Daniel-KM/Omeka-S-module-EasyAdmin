@@ -211,10 +211,31 @@ DQL;
                 $tempFile->setTempPath($sourcePath);
                 $tempFile->setStorageId($media->getStorageId());
 
+                // Update other data: as long as the sha256 is good, the file is
+                // good so there is not problem to update base data.
+                $toFlush = false;
+
+                $current = $media->getExtension();
+                $new = $tempFile->getExtension();
+                $toFlush = $toFlush || mb_strtolower($current) !== mb_strtolower($new);
+                $media->setExtension($new);
+
+                $current = $media->getMediaType();
+                $new = $tempFile->getMediaType();
+                $toFlush = $toFlush || $current !== $new;
+                $media->setMediaType($new);
+
+                $current = $media->getSize();
+                $new = $tempFile->getSize();
+                $toFlush = $toFlush || $current !== $new;
+                $media->setSize($new);
+
                 $hasThumbnails = $media->hasThumbnails();
                 $result = $tempFile->storeThumbnails();
-                if ($hasThumbnails !== $result) {
-                    $media->setHasThumbnails($result);
+                $toFlush = $toFlush || $hasThumbnails !== $result;
+                $media->setHasThumbnails($result);
+
+                if ($toFlush) {
                     $this->entityManager->persist($media);
                     $this->entityManager->flush();
                 }
