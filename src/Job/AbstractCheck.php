@@ -181,7 +181,7 @@ abstract class AbstractCheck extends AbstractJob
     }
 
     /**
-     * Finalize the output file.
+     * Finalize the output file. The output file is removed in case of error.
      *
      * @return self
      */

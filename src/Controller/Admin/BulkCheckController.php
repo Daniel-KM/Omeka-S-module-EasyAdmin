@@ -77,6 +77,10 @@ class BulkCheckController extends AbstractActionController
             case 'files_hash_check':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $defaultParams);
                 break;
+            case 'files_dimension_check':
+            case 'files_dimension_fix':
+                $job = $dispatcher->dispatch(\BulkCheck\Job\FileDimension::class, $defaultParams);
+                break;
             case 'media_position_check':
             case 'media_position_fix':
                 $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $defaultParams);

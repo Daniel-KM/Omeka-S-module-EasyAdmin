@@ -183,12 +183,15 @@ class FileMissing extends AbstractCheckFile
      */
     protected function checkMissingFilesForTypes(array $types, $fix = false)
     {
-        $baseCriteria = new \Doctrine\Common\Collections\Criteria();
-        $expr = $baseCriteria->expr();
+        // Entity are used, because it's not possible to get the value
+        // "has_original" or "has_thumbnails" via api.
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $expr = $criteria->expr();
 
-        $isOriginal = in_array('original', $types);
-        if ($isOriginal) {
-            $baseCriteria->where($expr->eq('hasOriginal', 1));
+        $isOriginalMain = count($types) === 1
+            && reset($types) === 'original';
+        if ($isOriginalMain) {
+            $criteria->where($expr->eq('hasOriginal', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
             $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
             $this->logger->notice(
@@ -196,7 +199,7 @@ class FileMissing extends AbstractCheckFile
                 ['total' => $totalToProcess]
             );
         } else {
-            $baseCriteria->where($expr->eq('hasThumbnails', 1));
+            $criteria->where($expr->eq('hasThumbnails', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
             $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
             $this->logger->notice(
@@ -212,7 +215,7 @@ class FileMissing extends AbstractCheckFile
             return true;
         }
 
-        $baseCriteria
+        $criteria
             ->orderBy(['id' => 'ASC'])
             ->setFirstResult(null)
             ->setMaxResults(self::SQL_LIMIT);
@@ -221,12 +224,14 @@ class FileMissing extends AbstractCheckFile
         $types = array_flip($types);
         foreach (array_keys($types) as $type) {
             $path = $this->basePath . '/' . $type;
-            $types[$type] = $isOriginal
+            $types[$type] = $type === 'original'
                 ? $this->listFilesInFolder($path, false, $this->extensions)
                 : $this->listFilesInFolder($path);
         }
 
         $fixDb = $fix === 'files_missing_fix_db';
+
+        $baseCriteria = $criteria;
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
@@ -247,8 +252,6 @@ class FileMissing extends AbstractCheckFile
         $totalFailed = 0;
         $totalFixed = 0;
         while (true) {
-            // Entity are used, because it's not possible to get the value
-            // "has_original" or "has_thumbnails" via api.
             $criteria = clone $baseCriteria;
             if ($fixDb) {
                 $criteria
@@ -256,9 +259,7 @@ class FileMissing extends AbstractCheckFile
                     // may have been removed.
                     ->andWhere($expr->gt('id', $lastId));
                 $medias = $this->mediaRepository->matching($criteria);
-                // if (!$medias->count() || $offset >= $medias->count()) {
-                // if (!$medias->count() || $offset >= $totalToProcess) {
-                if (!$medias->count() || $offset >= $medias->count() || $totalProcessed >= $totalToProcess) {
+                if (!$medias->count() || $offset >= $totalToProcess || $totalProcessed >= $totalToProcess) {
                     break;
                 }
             } else {
@@ -291,7 +292,7 @@ class FileMissing extends AbstractCheckFile
                             'total' => $totalToProcess,
                             'total_succeed' => $totalSucceed,
                             'total_failed' => $totalFailed,
-                            'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
+                            'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
                         ]
                     );
                 }
@@ -314,7 +315,10 @@ class FileMissing extends AbstractCheckFile
                 $item = $media->getItem();
                 $itemId = $item->getId();
                 foreach ($types as $type => $files) {
-                    $filename = $isOriginal ? $media->getFilename() : ($media->getStorageId() . '.jpg');
+                    $isOriginal = $type === 'original';
+                    $filename = $isOriginal
+                        ? $media->getFilename()
+                        : ($media->getStorageId() . '.jpg');
                     $row = [
                         'item' => $itemId,
                         'media' => $media->getId(),
@@ -343,7 +347,7 @@ class FileMissing extends AbstractCheckFile
                                 $row['fixed'] = $itemNotRemoved;
                             }
                         } else {
-                            if ($type !== 'original') {
+                            if (!$isOriginal) {
                                 $row['fixed'] = $no;
                                 $this->writeRow($row);
                                 break;
@@ -422,7 +426,7 @@ class FileMissing extends AbstractCheckFile
                     'total' => $totalToProcess,
                     'total_succeed' => $totalSucceed,
                     'total_failed' => $totalFailed,
-                    'mode' => $isOriginal ? 'original' : sprintf('%d thumbnails', count($types)),
+                    'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
                 ]
             );
         }
