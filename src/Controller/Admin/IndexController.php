@@ -435,7 +435,7 @@ class IndexController extends AbstractActionController
             }
             $status = proc_close($proc);
         } else {
-            throw new \Exception(new Message(
+            throw new \Exception((string) new Message(
                 'Failed to execute command: %s', // @translate
                 $command
             ));
