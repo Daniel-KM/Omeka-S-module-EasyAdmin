@@ -24,7 +24,7 @@ class FileSize extends AbstractCheckFile
 
         $process = $this->getArg('process');
 
-        $this->checkFilesize($process === 'filesize_fix');
+        $this->checkFilesize($process === 'files_size_fix');
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate

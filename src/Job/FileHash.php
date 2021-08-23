@@ -24,7 +24,7 @@ class FileHash extends AbstractCheckFile
 
         $process = $this->getArg('process');
 
-        $this->checkFilehash($process === 'filehash_fix');
+        $this->checkFilehash($process === 'files_hash_check');
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate

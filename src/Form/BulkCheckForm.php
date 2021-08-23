@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Form;
 
 use Doctrine\DBAL\Connection;
@@ -33,10 +34,10 @@ class BulkCheckForm extends Form
                         'files_media_no_original' => 'Check media rendered as "file", but without original', // @translate
                         'files_media_no_original_fix' => 'Remove media rendered as "file", but without original (WARNING: export your media first)', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
-                        'filesize_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
-                        'filesize_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
-                        'filehash_check' => 'Check sha256 hashes of files', // @translate
-                        'filehash_fix' => 'Fix wrong sha256 of files', // @translate
+                        'files_size_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
+                        'files_size_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
+                        'files_hash_check' => 'Check sha256 hashes of files', // @translate
+                        'files_hash_fix' => 'Fix wrong sha256 of files', // @translate
                         'media_position_check' => 'Check positions of media (start from 1, without missing number)', // @translate
                         'media_position_fix' => 'Fix wrong positions of media', // @translate
                         'item_no_value' => 'Check items without value (media values are not checked)', // @translate
@@ -94,6 +95,7 @@ class BulkCheckForm extends Form
                 ],
             ])
         ;
+
         $this
             ->add([
                 'type' => Fieldset::class,
