@@ -73,7 +73,7 @@ Contact
 
 Current maintainers:
 
-* Daniel Berthereau (see [Daniel-KM] on GitHub)
+* Daniel Berthereau (see [Daniel-KM] on GitLab)
 
 
 Copyright
@@ -82,16 +82,16 @@ Copyright
 * Copyright Daniel Berthereau, 2017-2019
 
 
-[Easy Install]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall
+[Easy Install]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
 [Omeka Classic]: https://omeka.org/classic
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
 [themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-EasyInstall/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [GitLab]: https://gitlab.com/Daniel-KM
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

@@ -301,7 +301,7 @@ class Addons extends AbstractPlugin
         $htmlDom->loadHTML($html);
         $xpath = new DOMXPath($htmlDom);
 
-        // New format is the one of Github: /TagVersion/NameGivenByAuthor.zip.
+        // New format is the one of GitLab: /TagVersion/NameGivenByAuthor.zip.
         switch ($type) {
             case 'omekamodule':
                 $type = 'module';
