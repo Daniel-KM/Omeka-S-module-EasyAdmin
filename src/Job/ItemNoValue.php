@@ -144,7 +144,7 @@ SQL;
             $row['note'] = str_replace("\n", ' | ', trim($row['note']));
             $this->writeRow($row);
 
-            $this->mediaRepository->clear();
+            $this->entityManager->clear();
         }
 
         $this->api->batchDelete('items', array_column($items, 'i'));

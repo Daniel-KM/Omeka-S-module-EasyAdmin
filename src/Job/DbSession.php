@@ -50,7 +50,7 @@ FROM information_schema.TABLES
 WHERE table_schema = "$dbname"
     AND table_name = "$this->table";
 SQL;
-        $size = $this->connection->query($sqlSize)->fetchColumn();
+        $size = $this->connection->executeQuery($sqlSize)->fetchColumn();
 
         $sql = "SELECT COUNT(id) FROM $this->table WHERE modified < :timestamp;";
         $stmt = $this->connection->prepare($sql);
@@ -59,7 +59,7 @@ SQL;
         $old = $stmt->fetchColumn();
 
         $sql = "SELECT COUNT(id) FROM $this->table;";
-        $all = $this->connection->query($sql)->fetchColumn();
+        $all = $this->connection->executeQuery($sql)->fetchColumn();
         $this->logger->notice(
             'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {days} days.', // @translate
             ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $minimumDays]
@@ -71,7 +71,7 @@ SQL;
             $stmt->bindValue(':timestamp', $timestamp);
             $stmt->execute();
             $count = $stmt->rowCount();
-            $size = $this->connection->query($sqlSize)->fetchColumn();
+            $size = $this->connection->executeQuery($sqlSize)->fetchColumn();
             $this->logger->notice(
                 '{count} records older than {days} days were removed. The table "{table}" has a size of {size} MB.', // @translate
                 ['count' => $count, 'days' => $minimumDays, 'size' => $size, 'table' => $this->table]

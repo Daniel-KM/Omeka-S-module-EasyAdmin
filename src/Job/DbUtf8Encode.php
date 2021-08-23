@@ -148,7 +148,7 @@ class DbUtf8Encode extends AbstractCheck
             ->setMaxResults(self::SQL_LIMIT);
 
         $sql = "SELECT COUNT(id) FROM $table WHERE $column IS NOT NULL and $column != '';";
-        $totalToProcess = $this->connection->query($sql)->fetchColumn();
+        $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
         $this->logger->notice(
             'Checking {total} records "{name}" with a "{value}".', // @translate
             ['total' => $totalToProcess, 'name' => $table, 'value' => $column]
@@ -270,7 +270,7 @@ class DbUtf8Encode extends AbstractCheck
             }
 
             $this->entityManager->flush();
-            $this->repository->clear();
+            $this->entityManager->clear();
             unset($entities);
 
             $offset += self::SQL_LIMIT;

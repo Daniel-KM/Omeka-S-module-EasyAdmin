@@ -52,7 +52,7 @@ class DbResourceTitle extends AbstractCheck
     protected function checkDbResourceTitle(bool $fix): bool
     {
         $sql = 'SELECT COUNT(id) FROM resource;';
-        $totalResources = $this->connection->query($sql)->fetchColumn();
+        $totalResources = $this->connection->executeQuery($sql)->fetchColumn();
         if (empty($totalResources)) {
             $this->logger->notice(
                 'No resource to process.' // @translate
@@ -66,7 +66,7 @@ class DbResourceTitle extends AbstractCheck
         $sql = <<<'SQL'
 SELECT id, IFNULL(title_property_id, 1) AS "title_property_id" FROM resource_template ORDER BY id;';
 SQL;
-        $templateTitleTerms = $this->connection->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $templateTitleTerms = $this->connection->executeQuery($sql)->fetchAll(\PDO::FETCH_ASSOC);
         $templateTitleTerms = array_column($templateTitleTerms, 'title_property_id', 'id');
 
         // It's possible to do the process with some not so complex sql queries,

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace BulkCheck\Job;
 
 abstract class AbstractCheckFile extends AbstractCheck
@@ -22,9 +23,9 @@ abstract class AbstractCheckFile extends AbstractCheck
 
         // This total should be 0.
         $sql = "SELECT COUNT(id) FROM media WHERE has_original != 1 AND $column IS NOT NULL";
-        $totalNoOriginalSize = $this->connection->query($sql)->fetchColumn();
+        $totalNoOriginalSize = $this->connection->executeQuery($sql)->fetchColumn();
         $sql = 'SELECT COUNT(id) FROM media WHERE has_original != 1';
-        $totalNoOriginal = $this->connection->query($sql)->fetchColumn();
+        $totalNoOriginal = $this->connection->executeQuery($sql)->fetchColumn();
         if ($totalNoOriginalSize) {
             if ($fix) {
                 $sql = "UPDATE media SET $column = NULL WHERE has_original != 1 AND $column IS NOT NULL";
@@ -49,7 +50,7 @@ abstract class AbstractCheckFile extends AbstractCheck
         $criteria = [];
         $criteria['hasOriginal'] = 1;
         $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
-        $totalToProcess = $this->connection->query($sql)->fetchColumn();
+        $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
         $this->logger->notice(
             'Checking {total} media with original files.', // @translate
             ['total' => $totalToProcess]
@@ -207,7 +208,7 @@ abstract class AbstractCheckFile extends AbstractCheck
             }
 
             $this->entityManager->flush();
-            $this->mediaRepository->clear();
+            $this->entityManager->clear();
             unset($medias);
 
             $offset += self::SQL_LIMIT;

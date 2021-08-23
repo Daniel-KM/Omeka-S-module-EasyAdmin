@@ -159,7 +159,7 @@ class FileExcess extends AbstractCheckFile
                 $row['item'] = $media->getItem()->getId();
                 $row['media'] = $media->getId();
                 ++$totalSuccess;
-                $this->mediaRepository->clear();
+                $this->entityManager->clear();
                 $this->writeRow($row);
                 continue;
             }
@@ -207,7 +207,7 @@ class FileExcess extends AbstractCheckFile
             $this->writeRow($row);
 
             ++$totalExcess;
-            $this->mediaRepository->clear();
+            $this->entityManager->clear();
         }
 
         if ($move) {
