@@ -3,23 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-23 00:00+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2021-08-23 00:00+0000\n"
+"Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
+"Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
 
 #: view/easy-install/admin/index/index.phtml:11
 msgid "Easy Install"
-msgstr ""
+msgstr "Easy Install"
 
 #: view/easy-install/admin/index/index.phtml:13
 #, php-format
@@ -27,51 +27,53 @@ msgid ""
 "For more information on addons, see the pages %smodules%s and %sthemes%s or "
 "on %sOmeka.org%s."
 msgstr ""
+"Pour plus d‘informations sur les extensions, consultez les pages %smodules"
+"%s et %sthemes%s ou %sOmeka.org%s."
 
 #: view/easy-install/admin/index/index.phtml:19
 msgid "Select either a module or a theme."
-msgstr ""
+msgstr "Choisir un module ou un thème."
 
 #: view/easy-install/admin/index/index.phtml:20
 msgid "Addons with an asterisk are already downloaded."
-msgstr ""
+msgstr "Les extensions avec un astérisque sont déjà téléchargées."
 
 #: src/Form/UploadForm.php:22
 msgid "Modules Omeka.org"
-msgstr ""
+msgstr "Modules Omeka.org"
 
 #: src/Form/UploadForm.php:23
 msgid "Themes Omeka.org"
-msgstr ""
+msgstr "Thèmes Omeka.org"
 
 #: src/Form/UploadForm.php:24
 msgid "Modules web"
-msgstr ""
+msgstr "Modules web"
 
 #: src/Form/UploadForm.php:25
 msgid "Themes web"
-msgstr ""
+msgstr "Thèmes web"
 
 #: src/Form/UploadForm.php:54
 msgid "Select below…"
-msgstr ""
+msgstr "Choisir ci-dessous…"
 
 #: src/Controller/Admin/IndexController.php:23
 msgid "No addon to list: check your connection."
-msgstr ""
+msgstr "Aucune extension à lister : vérifiez votre connexion."
 
 #: src/Controller/Admin/IndexController.php:38
 msgid "There was an error on the form. Please try again."
-msgstr ""
+msgstr "Il y a une erreur sur le formulaire. Merci de réessayer."
 
 #: src/Controller/Admin/IndexController.php:51
 #, php-format
 msgid "The %s \"%s\" is already downloaded."
-msgstr ""
+msgstr "Le %s \"%s\" est déjà téléchargé."
 
 #: src/Controller/Admin/IndexController.php:63
 msgid "Nothing processed. Please try again."
-msgstr ""
+msgstr "Aucun traitement effectué. Merci de réessayer."
 
 #: src/Controller/Admin/IndexController.php:104
 #, php-format
@@ -79,17 +81,20 @@ msgid ""
 "The module \"%s\" requires the dependencies \"%s\" installed and enabled "
 "first."
 msgstr ""
+"Le module \"%s\" nécessite les dépendances \"%s\" installées et activées."
 
 #: src/Controller/Admin/IndexController.php:114
 #, php-format
 msgid "The %s directory is not writeable by the server."
-msgstr ""
+msgstr "Le dossier %s est protégé en écriture par le serveur."
 
 #: src/Controller/Admin/IndexController.php:121
 #, php-format
 msgid ""
 "Don’t forget to protect the %s directory from writing after installation."
 msgstr ""
+"N‘oubliez pas de protéger le dossier %s contre l‘écriture après "
+"installation."
 
 #: src/Controller/Admin/IndexController.php:131
 #, php-format
@@ -97,26 +102,28 @@ msgid ""
 "A zipfile exists with the same name in the %s directory and cannot be "
 "removed."
 msgstr ""
+"Un fichier zip existe avec le même nom dans le dossier %s et ne peut pas "
+"être supprimé."
 
 #: src/Controller/Admin/IndexController.php:140
 #, php-format
 msgid "The %s directory \"%s\" already exists."
-msgstr ""
+msgstr "Le dossier %s \"%s\" existe déjà."
 
 #: src/Controller/Admin/IndexController.php:151
 #, php-format
 msgid "Unable to fetch the %s \"%s\"."
-msgstr ""
+msgstr "Impossible de récupérer %s \"%s\"."
 
 #: src/Controller/Admin/IndexController.php:165
 #, php-format
 msgid "An error occurred during the unzipping of the %s \"%s\"."
-msgstr ""
+msgstr "Une erreur est survenue durant la décompression de %s \"%s\"."
 
 #: src/Controller/Admin/IndexController.php:187
 #, php-format
 msgid "The module \"%s\" requires the dependency \"Generic\" available first."
-msgstr ""
+msgstr "Le module \"%s\" nécessite la dépendance \"Generic\" disponible."
 
 #: src/Controller/Admin/IndexController.php:199
 #, php-format
@@ -124,23 +131,26 @@ msgid ""
 "If \"%s\" doesn’t appear in the list of %s, its directory may need to be "
 "renamed."
 msgstr ""
+"Si \"%s\" n‘apparaît pas dans la liste de %s, le dossier doit être renommé."
 
 #: src/Controller/Admin/IndexController.php:206
 #, php-format
 msgid "%s uploaded successfully"
-msgstr ""
+msgstr "%s téléchargé correctement"
 
 #: src/Controller/Admin/IndexController.php:211
 msgid ""
 "It is always recommended to read the original readme or help of the addon."
 msgstr ""
+"Il est toujours recommandées de lire le fichier lisez-moi (readme) original "
+"ou l‘aide de l‘extension."
 
 #: src/Controller/Admin/IndexController.php:439
 #, php-format
 msgid "Failed to execute command: %s"
-msgstr ""
+msgstr "Échec de la commande : %s"
 
 #: src/Mvc/Controller/Plugin/Addons.php:219
 #, php-format
 msgid "Unable to fetch the url %s."
-msgstr ""
+msgstr "Impossible de charger l‘url %s."
