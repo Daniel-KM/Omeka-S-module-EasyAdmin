@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace EasyInstall\Form;
 
 use EasyInstall\Mvc\Controller\Plugin\Addons;
@@ -14,7 +14,7 @@ class UploadForm extends Form
      */
     protected $addons = [];
 
-    public function init()
+    public function init(): void
     {
         $this->setAttribute('action', 'easy-install');
 
@@ -66,7 +66,7 @@ class UploadForm extends Form
     /**
      * @param Addons $addons
      */
-    public function setAddons(Addons $addons)
+    public function setAddons(Addons $addons): void
     {
         $this->addons = $addons;
     }

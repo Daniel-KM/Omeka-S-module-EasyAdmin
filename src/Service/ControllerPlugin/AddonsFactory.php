@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace EasyInstall\Service\ControllerPlugin;
 
 use EasyInstall\Mvc\Controller\Plugin\Addons;

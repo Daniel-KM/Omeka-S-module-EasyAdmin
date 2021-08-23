@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 namespace EasyInstall\Mvc\Controller\Plugin;
 
 use DOMDocument;
 use DOMXPath;
-use Omeka\Stdlib\Message;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Session\Container;
 use Laminas\Uri\Http as HttpUri;
+use Omeka\Stdlib\Message;
 
 /**
  * List addons for Omeka.
@@ -106,7 +106,7 @@ class Addons extends AbstractPlugin
     /**
      * Helper to save addons in the cache.
      */
-    protected function cacheAddons()
+    protected function cacheAddons(): void
     {
         $container = new Container('EasyInstall');
         $container->setExpirationSeconds($this->expirationSeconds);

@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 namespace EasyInstall\Controller\Admin;
 
 use Doctrine\Common\Inflector\Inflector;
 use EasyInstall\Form\UploadForm;
-use Omeka\Mvc\Controller\Plugin\Messenger;
-use Omeka\Stdlib\Message;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 class IndexController extends AbstractActionController
 {
@@ -70,7 +70,7 @@ class IndexController extends AbstractActionController
      *
      * @param array $addon
      */
-    protected function installAddon(array $addon)
+    protected function installAddon(array $addon): void
     {
         switch ($addon['type']) {
             case 'module':
@@ -401,7 +401,7 @@ class IndexController extends AbstractActionController
     {
         /** @var \Omeka\Api\Representation\ModuleRepresentation[] $modules */
         $modules = $this->api()->search('modules', ['id' => $module])->getContent();
-        return isset($modules[$module]) ? $modules[$module] : null;
+        return $modules[$module] ?? null;
     }
 
     /**
@@ -415,7 +415,7 @@ class IndexController extends AbstractActionController
      * @param array $errors
      * @throws \Exception
      */
-    protected function executeCommand($command, &$status, &$output, &$errors)
+    protected function executeCommand($command, &$status, &$output, &$errors): void
     {
         // Using proc_open() instead of exec() solves a problem where exec('convert')
         // fails with a "Permission Denied" error because the current working
