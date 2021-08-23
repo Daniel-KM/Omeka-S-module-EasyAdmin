@@ -89,7 +89,7 @@ SQL;
             }
 
             if ($offset) {
-                $this->logger->info(
+                $this->logger->notice(
                     '{processed}/{total} resources processed.', // @translate
                     ['processed' => $offset, 'total' => $totalToProcess]
                 );
@@ -144,19 +144,19 @@ SQL;
                     if ($fix) {
                         $resource->setTitle($realTitle);
                         $this->entityManager->persist($resource);
-                        $this->logger->notice(
+                        $this->logger->info(
                             'Fixed title for resource "{resource_type}" #{resource_id}.', // @translate
                             ['resource_id' => $resource->getId(), 'resource_type' => $resource->getResourceName(), 'resource_id' => $resource->getId()]
                         );
                         $row['fixed'] = $yes;
                     } else {
                         if ($realTitle === null) {
-                            $this->logger->notice(
+                            $this->logger->info(
                                 'Title for resource "{resource_type}" #{resource_id} should be empty.', // @translate
                                 ['resource_type' => $resource->getResourceName(), 'resource_id' => $resource->getId()]
                             );
                         } else {
-                            $this->logger->notice(
+                            $this->logger->info(
                                 'Title for resource "{resource_type}" #{resource_id} should be "{title}".', // @translate
                                 ['resource_type' => $resource->getResourceName(), 'resource_id' => $resource->getId(), 'title' => $shortRealTitle]
                             );
