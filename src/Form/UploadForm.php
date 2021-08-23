@@ -2,8 +2,8 @@
 namespace EasyInstall\Form;
 
 use EasyInstall\Mvc\Controller\Plugin\Addons;
-use Zend\Form\Element\Select;
-use Zend\Form\Form;
+use Laminas\Form\Element\Select;
+use Laminas\Form\Form;
 
 class UploadForm extends Form
 {

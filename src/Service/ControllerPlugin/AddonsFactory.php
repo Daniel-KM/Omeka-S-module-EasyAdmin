@@ -3,7 +3,7 @@ namespace EasyInstall\Service\ControllerPlugin;
 
 use EasyInstall\Mvc\Controller\Plugin\Addons;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AddonsFactory implements FactoryInterface
 {

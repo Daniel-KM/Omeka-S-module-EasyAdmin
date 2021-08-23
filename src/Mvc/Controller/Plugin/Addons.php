@@ -4,10 +4,10 @@ namespace EasyInstall\Mvc\Controller\Plugin;
 use DOMDocument;
 use DOMXPath;
 use Omeka\Stdlib\Message;
-use Zend\Http\Client as HttpClient;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\Session\Container;
-use Zend\Uri\Http as HttpUri;
+use Laminas\Http\Client as HttpClient;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Session\Container;
+use Laminas\Uri\Http as HttpUri;
 
 /**
  * List addons for Omeka.

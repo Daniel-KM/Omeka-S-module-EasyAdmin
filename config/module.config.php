@@ -27,7 +27,7 @@ return [
             'admin' => [
                 'child_routes' => [
                     'easy-install' => [
-                        'type' => \Zend\Router\Http\Literal::class,
+                        'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/easy-install',
                             'defaults' => [
