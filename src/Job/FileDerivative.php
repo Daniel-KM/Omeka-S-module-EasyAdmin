@@ -42,8 +42,13 @@ class FileDerivative extends AbstractCheck
 
         $types = array_keys($this->config['thumbnails']['types']);
 
+        // TODO Add a check job or merge with files check.
+        // $fix = true;
+
         // Prepare the list of medias.
 
+        // Entity are used, because it's not possible to update the value
+        // "has_thumbnails" via api.
         $criteria = Criteria::create();
         $expr = $criteria->expr();
 
@@ -134,8 +139,6 @@ DQL;
         $totalFailed = 0;
         $count = 0;
         while (++$count <= $totalToProcess) {
-            // Entity are used, because it's not possible to update the value
-            // "has_thumbnails" via api.
             $criteria
                 ->setFirstResult($offset);
             $medias = $this->mediaRepository->matching($criteria);
@@ -230,6 +233,10 @@ DQL;
                 $toFlush = $toFlush || $current !== $new;
                 $media->setSize($new);
 
+                $hasOriginal = $media->hasOriginal();
+                $toFlush = $toFlush || !$hasOriginal;
+                $media->setHasOriginal(true);
+
                 $hasThumbnails = $media->hasThumbnails();
                 $result = $tempFile->storeThumbnails();
                 $toFlush = $toFlush || $hasThumbnails !== $result;
@@ -237,7 +244,6 @@ DQL;
 
                 if ($toFlush) {
                     $this->entityManager->persist($media);
-                    $this->entityManager->flush();
                 }
 
                 if ($result) {
@@ -267,6 +273,7 @@ DQL;
 
             // Avoid memory issue.
             unset($medias);
+            $this->entityManager->flush();
             $this->entityManager->clear();
 
             $offset += self::SQL_LIMIT;
@@ -285,7 +292,7 @@ DQL;
      *
      * @param string $column
      * @param array|string $ids
-     * @return \Doctrine\Common\Collections\Expr\CompositeExpression|null
+     * @return \Doctrine\Common\Collections\Expr\CompositeExpression[]
      */
     protected function exprRange($column, $ids)
     {
@@ -298,18 +305,19 @@ DQL;
 
         $expr = Criteria::create()->expr();
         foreach ($ranges as $range) {
-            if (strpos($range, '-')) {
-                $from = strtok($range, '-');
-                $to = strtok('-');
+            if (strpos($range, '-') === false) {
+                $conditions[] = $expr->eq($column, $range);
+            } else {
+                [$from, $to] = explode('-', $range);
+                $from = strlen($from) ? (int) $from : null;
+                $to = strlen($to) ? (int) $to : null;
                 if ($from && $to) {
                     $conditions[] = $expr->andX($expr->gte($column, $from), $expr->lte($column, $to));
                 } elseif ($from) {
                     $conditions[] = $expr->gte($column, $from);
-                } else {
+                } elseif ($to) {
                     $conditions[] = $expr->lte($column, $to);
                 }
-            } else {
-                $conditions[] = $expr->eq($column, $range);
             }
         }
 
@@ -320,14 +328,11 @@ DQL;
      * Clean a list of ranges of ids.
      *
      * @param string|array $ids
-     * @return array
      */
-    protected function rangeToArray($ids)
+    protected function rangeToArray($ids): array
     {
-        $clean = function ($str) {
-            $str = preg_replace('/[^0-9-]/', ' ', $str);
-            $str = preg_replace('/\s*-+\s*/', '-', $str);
-            $str = preg_replace('/-+/', '-', $str);
+        $clean = function ($str): string {
+            $str = preg_replace('/[^0-9-]/', ' ', (string) $str);
             $str = preg_replace('/\s+/', ' ', $str);
             return trim($str);
         };
@@ -336,9 +341,9 @@ DQL;
             ? array_map($clean, $ids)
             : explode(' ', $clean($ids));
 
-        // Skip empty ranges and ranges with multiple "-".
+        // Skip empty ranges, fake ranges  and ranges with multiple "-".
         return array_values(array_filter($ids, function ($v) {
-            return !empty($v) && substr_count($v, '-') <= 1;
+            return !empty($v) && $v !== '-' && substr_count($v, '-') <= 1;
         }));
     }
 }
