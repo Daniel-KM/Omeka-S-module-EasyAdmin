@@ -40,8 +40,10 @@ class IndexController extends AbstractActionController
             return $view;
         }
 
+        $data = $form->getData();
+
         foreach ($addons->types() as $type) {
-            $url = $this->params()->fromPost($type);
+            $url = $data[$type] ?? null;
             if ($url) {
                 $addon = $addons->dataForUrl($url, $type);
                 if ($addons->dirExists($addon)) {

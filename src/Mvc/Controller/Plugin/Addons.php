@@ -26,11 +26,11 @@ class Addons extends AbstractPlugin
      */
     protected $data = [
         'omekamodule' => [
-            'source' => 'https://omeka.org/s/modules/',
+            'source' => 'https://omeka.org/add-ons/json/s_module.json',
             'destination' => '/modules',
         ],
         'omekatheme' => [
-            'source' => 'https://omeka.org/s/themes/',
+            'source' => 'https://omeka.org/add-ons/json/s_theme.json',
             'destination' => '/themes',
         ],
         'module' => [
@@ -274,7 +274,6 @@ class Addons extends AbstractPlugin
             $addon['dir'] = $addonName;
             $addon['version'] = $version;
             $addon['zip'] = $zip;
-            $addon['server'] = $server;
             $addon['dependencies'] = $dependencies;
 
             $list[$url] = $addon;
@@ -288,75 +287,36 @@ class Addons extends AbstractPlugin
      *
      * @todo Manage dependencies for addon from omeka.org.
      *
-     * @param string $html
+     * @param string $json
      * @param string $type
      * @return array
      */
-    protected function extractAddonListFromOmeka($html, $type)
+    protected function extractAddonListFromOmeka($json, $type)
     {
         $list = [];
 
-        libxml_use_internal_errors(true);
-        $htmlDom = new DOMDocument();
-        $htmlDom->loadHTML($html);
-        $xpath = new DOMXPath($htmlDom);
-
-        // New format is the one of GitLab: /TagVersion/NameGivenByAuthor.zip.
-        switch ($type) {
-            case 'omekamodule':
-                $type = 'module';
-                $query = '//div[@id="module-list"]/div[@class="module"]/div[@class="download"]/a[@class="button"]/@href';
-                break;
-            case 'omekatheme':
-                $type = 'theme';
-                $query = '//div[@id="theme-list"]/div[@class="theme"]/div[@class="download"]/a[@class="button"]/@href';
-                break;
-            default:
-                return [];
+        $addons = json_decode($json, true);
+        if (!$addons) {
+            return [];
         }
 
-        $rows = $xpath->query($query);
-        if ($rows->length <= 0) {
-            $htmlDom = new DOMDocument();
-            $htmlDom->loadHTML($html);
-            $xpath = new DOMXPath($htmlDom);
-            $rows = $xpath->query($query);
-            if ($rows->length <= 0) {
-                return [];
-            }
-        }
-
-        foreach ($rows as $row) {
-            $url = $row->nodeValue;
-            // $filename = basename(parse_url($url, PHP_URL_PATH));
-            $query = '//a[@href="' . $url . '"]/../../div/h4/a';
-            $nameRows = $xpath->query($query);
-            if (empty($nameRows)) {
+        foreach ($addons as $name => $data) {
+            if (!$data) {
                 continue;
             }
-            $name = $nameRows->item(0)->nodeValue;
 
-            $query = '//a[@href="' . $url . '"]/../span[@class="version"]';
-            $versionRows = $xpath->query($query);
-            $version = $versionRows->item(0)->nodeValue;
-            $version = trim(str_replace('Latest Version:', '', $version));
-
-            $query = '//a[@href="' . $url . '"]/../../div/h4/a/@href';
-            $addonRows = $xpath->query($query);
-            $addonName = $addonRows->item(0)->nodeValue;
-
-            $server = strtolower(parse_url($url, PHP_URL_HOST));
-            $zip = $url;
+            $version = $data['latest_version'];
+            $url = 'https://github.com/' . $data['owner'] . '/' . $data['repo'];
+            $zip = $data['versions'][$version]['download_url'] ?? $url . '/archive/master.zip';
 
             $addon = [];
-            $addon['type'] = $type;
+            $addon['type'] = str_replace('omeka', '', $type);
             $addon['server'] = 'omeka.org';
             $addon['name'] = $name;
-            $addon['basename'] = $addonName;
-            $addon['dir'] = $addonName;
-            $addon['version'] = $version;
+            $addon['basename'] = $data['dirname'];
+            $addon['dir'] = $data['dirname'];
+            $addon['version'] = $data['latest_version'];
             $addon['zip'] = $zip;
-            $addon['server'] = $server;
             $addon['dependencies'] = [];
 
             $list[$url] = $addon;
