@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace EasyInstall\Controller\Admin;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 use EasyInstall\Form\UploadForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
@@ -199,7 +199,7 @@ class IndexController extends AbstractActionController
         }
 
         $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
-            $addon['name'], Inflector::pluralize($type));
+            $addon['name'], InflectorFactory::create()->build()->pluralize($type));
         $this->messenger()->add(
             $result ? Messenger::NOTICE : Messenger::WARNING,
             $message
