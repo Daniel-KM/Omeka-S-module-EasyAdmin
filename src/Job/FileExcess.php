@@ -105,7 +105,7 @@ class FileExcess extends AbstractCheckFile
 
         $this->logger->notice(
             'Starting check of {total} files for type {type}.', // @translate
-            ['total' => $total]
+            ['total' => $total, 'type' => $type]
         );
 
         $i = 0;
