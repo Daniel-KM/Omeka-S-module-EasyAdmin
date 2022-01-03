@@ -172,9 +172,9 @@ SQL;
                 ++$totalProcessed;
             }
 
+            unset($resources);
             $this->entityManager->flush();
             $this->entityManager->clear();
-            unset($resources);
 
             $offset += self::SQL_LIMIT;
         }

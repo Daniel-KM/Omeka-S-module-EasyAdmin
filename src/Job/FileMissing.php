@@ -340,7 +340,7 @@ class FileMissing extends AbstractCheckFile
                             // TODO Fix items with more than one missing file.
                             if ($item->getMedia()->count() === 1) {
                                 $this->entityManager->remove($item);
-                                $this->entityManager->flush($item);
+                                $this->entityManager->flush();
                                 $row['fixed'] = $itemRemoved;
                                 ++$totalFixed;
                             } else {

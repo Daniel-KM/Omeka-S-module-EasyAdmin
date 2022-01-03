@@ -17,7 +17,7 @@ $this->htmlElement('body')->appendAttribute('class', 'bulk-check browse');
 <h2><?= $escape($translate('Checks')) ?></h2>
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">
-    <button><?= $translate('Submit') ?></button>
+    <button type="submit"><?= $translate('Submit') ?></button>
 </div>
 <?= $this->formCollection($form) ?>
 <?= $this->form()->closeTag() ?>
