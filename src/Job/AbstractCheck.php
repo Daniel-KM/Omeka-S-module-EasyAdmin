@@ -170,12 +170,35 @@ abstract class AbstractCheck extends AbstractJob
 
     /**
      * Fill a row (tsv) in the output file.
-     *
-     * @param array $row
-     * @return self
      */
-    protected function writeRow(array $row)
+    protected function writeRow(array $row): \BulkCheck\Job\AbstractCheck
     {
+        static $columnKeys;
+        static $total = 0;
+        static $skipNext = false;
+
+        ++$total;
+        if ($total > self::SPREADSHEET_ROW_LIMIT) {
+            if ($skipNext) {
+                return $this;
+            }
+            $skipNext = true;
+            $this->logger->err(
+                'Trying to output more than %d messages. Next messages are skipped.', // @translate
+                self::SPREADSHEET_ROW_LIMIT
+            );
+            return $this;
+        }
+
+        if (is_null($columnKeys)) {
+            $columnKeys = array_fill_keys(array_keys($this->columns), null);
+        }
+
+        // Order row according to the columns when associative array.
+        if (array_values($row) !== $row) {
+            $row = array_replace($columnKeys, array_intersect_key($row, $columnKeys));
+        }
+
         fputcsv($this->handle, $row, $this->options['delimiter'], $this->options['enclosure'], $this->options['escape']);
         return $this;
     }
