@@ -4,6 +4,10 @@ namespace BulkCheck\Job;
 
 use Omeka\Job\AbstractJob;
 
+/**
+ * Logging copied in BulkImport.
+ * @see \BulkImport\Processor\CheckTrait
+ */
 abstract class AbstractCheck extends AbstractJob
 {
     /**
@@ -238,7 +242,7 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function messageResultFile()
     {
-        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getArg('base_files', '/files');
+        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getArg('base_path') . '/files';
         $this->logger->notice(
             'Results are available in this spreadsheet: {url}.', // @translate
             ['url' => $baseUrl . '/bulk_check/' . mb_substr($this->filepath, mb_strlen($this->basePath . '/bulk_check/'))]
@@ -282,7 +286,7 @@ abstract class AbstractCheck extends AbstractJob
                     $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
                     $this->logger->err(
                         'Error when saving "{filename}" (temp file: "{tempfile}"): {exception}', // @translate
-                        ['filename' => $filename, 'tempfile' => $this->filepath, 'exception' => $e]
+                        ['filename' => $filename, 'tempfile' => $filePath, 'exception' => $e]
                     );
                     return $this;
                 }
@@ -291,7 +295,7 @@ abstract class AbstractCheck extends AbstractJob
                     $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
                     $this->logger->err(
                         'Error when saving "{filename}" (temp file: "{tempfile}"): {error}', // @translate
-                        ['filename' => $filename, 'tempfile' => $this->filepath, 'error' => error_get_last()['message']]
+                        ['filename' => $filename, 'tempfile' => $filePath, 'error' => error_get_last()['message']]
                     );
                     return $this;
                 }
