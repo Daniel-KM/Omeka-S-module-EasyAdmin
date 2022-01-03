@@ -78,7 +78,7 @@ WHERE table_schema = "$dbname"
     AND table_name = $table
 LIMIT 1;
 SQL;
-        return (bool) $this->connection->executeQuery($sql)->fetchColumn();
+        return (bool) $this->connection->executeQuery($sql)->fetchOne();
     }
 
     /**
@@ -101,17 +101,17 @@ FROM information_schema.TABLES
 WHERE table_schema = "$dbname"
     AND table_name = "$this->table";
 SQL;
-        $size = $this->connection->executeQuery($sqlSize)->fetchColumn();
+        $size = $this->connection->executeQuery($sqlSize)->fetchOne();
 
         $sql = "SELECT COUNT(id) FROM $this->table WHERE created < :date AND severity >= :severity;";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':date', $date);
         $stmt->bindValue(':severity', $maximumSeverity);
         $stmt->execute();
-        $old = $stmt->fetchColumn();
+        $old = $stmt->fetchOne();
 
         $sql = "SELECT COUNT(id) FROM $this->table;";
-        $all = $this->connection->executeQuery($sql)->fetchColumn();
+        $all = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {days} days and below or equal severity "{severity}".', // @translate
             ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $minimumDays, 'severity' => $this->severities[$maximumSeverity]]
@@ -124,7 +124,7 @@ SQL;
             $stmt->bindValue(':severity', $maximumSeverity);
             $stmt->execute();
             $count = $stmt->rowCount();
-            $size = $this->connection->executeQuery($sqlSize)->fetchColumn();
+            $size = $this->connection->executeQuery($sqlSize)->fetchOne();
             $this->logger->notice(
                 '{count} records older than {days} days with maximum severity "{severity}" were removed. The table "{table}" has a size of {size} MB.', // @translate
                 ['count' => $count, 'days' => $minimumDays, 'size' => $size, 'severity' => $this->severities[$maximumSeverity], 'table' => $this->table]

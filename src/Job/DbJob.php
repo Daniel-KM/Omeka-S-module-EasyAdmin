@@ -55,7 +55,7 @@ SQL;
 
         if ($fixAll) {
             $sql = 'SELECT COUNT(id) FROM job';
-            $countJobs = $this->connection->executeQuery($sql)->fetchColumn();
+            $countJobs = $this->connection->executeQuery($sql)->fetchOne();
 
             $sql = <<<SQL
 UPDATE job

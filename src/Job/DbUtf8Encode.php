@@ -148,7 +148,7 @@ class DbUtf8Encode extends AbstractCheck
             ->setMaxResults(self::SQL_LIMIT);
 
         $sql = "SELECT COUNT(id) FROM $table WHERE $column IS NOT NULL and $column != '';";
-        $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
+        $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'Checking {total} records "{name}" with a "{value}".', // @translate
             ['total' => $totalToProcess, 'name' => $table, 'value' => $column]
@@ -361,24 +361,20 @@ class DbUtf8Encode extends AbstractCheck
 
         $qb = $this->connection->createQueryBuilder();
         $qb
-            ->select([
-                'DISTINCT property.id AS id',
+            ->select(
+                'property.id AS id',
                 'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                 // Only the two first selects are needed, but some databases
                 // require "order by" or "group by" value to be in the select.
                 'vocabulary.id',
-                'property.id',
-            ])
+            )
             ->from('property', 'property')
             ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
             ->orderBy('vocabulary.id', 'asc')
             ->addOrderBy('property.id', 'asc')
             ->addGroupBy('property.id')
         ;
-        $stmt = $this->connection->executeQuery($qb);
-        // Fetch by key pair is not supported by doctrine 2.0.
-        $this->properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $this->properties = array_column($this->properties, 'term', 'id');
+        $this->properties = $this->connection->executeQuery($qb)->fetchAllKeyValue();
         return $this->properties;
     }
 }

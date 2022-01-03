@@ -193,7 +193,7 @@ class FileMissing extends AbstractCheckFile
         if ($isOriginalMain) {
             $criteria->where($expr->eq('hasOriginal', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
-            $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
+            $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
             $this->logger->notice(
                 'Checking {total} media with original files.', // @translate
                 ['total' => $totalToProcess]
@@ -201,7 +201,7 @@ class FileMissing extends AbstractCheckFile
         } else {
             $criteria->where($expr->eq('hasThumbnails', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
-            $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
+            $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
             $this->logger->notice(
                 'Checking {total} media with thumbnails.', // @translate
                 ['total' => $totalToProcess]

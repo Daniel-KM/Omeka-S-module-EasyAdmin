@@ -41,7 +41,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
     {
         // Some files (url) may have no original, but thumbnails.
         $sql = 'SELECT COUNT(`id`) FROM `media` WHERE `renderer` = "file" AND `has_original` != 1 AND `has_thumbnails` != 1';
-        $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
+        $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
 
         $this->logger->notice(
             'There are {count} media rendered as "file" without "has original" and "has thumbnails" set. Check if no creation or import is running before fixing it.', // @translate

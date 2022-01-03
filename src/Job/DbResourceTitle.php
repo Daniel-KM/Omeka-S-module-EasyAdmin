@@ -52,7 +52,7 @@ class DbResourceTitle extends AbstractCheck
     protected function checkDbResourceTitle(bool $fix): bool
     {
         $sql = 'SELECT COUNT(id) FROM resource;';
-        $totalResources = $this->connection->executeQuery($sql)->fetchColumn();
+        $totalResources = $this->connection->executeQuery($sql)->fetchOne();
         if (empty($totalResources)) {
             $this->logger->notice(
                 'No resource to process.' // @translate

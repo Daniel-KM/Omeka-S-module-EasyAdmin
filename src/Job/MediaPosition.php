@@ -21,7 +21,7 @@ class MediaPosition extends AbstractCheck
     protected function checkMediaPosition($fix = false)
     {
         $sql = 'SELECT COUNT(id) FROM media;';
-        $totalResources = $this->connection->executeQuery($sql)->fetchColumn();
+        $totalResources = $this->connection->executeQuery($sql)->fetchOne();
         if (empty($totalResources)) {
             $this->logger->notice(
                 'No media to process.' // @translate
@@ -30,7 +30,7 @@ class MediaPosition extends AbstractCheck
         }
 
         $sql = 'SELECT COUNT(id) FROM item;';
-        $totalToProcess = $this->connection->executeQuery($sql)->fetchColumn();
+        $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
         if (empty($totalResources)) {
             $this->logger->notice(
                 'No item to process.' // @translate
