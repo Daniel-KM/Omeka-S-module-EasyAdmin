@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-23 00:00+0000\n"
+"POT-Creation-Date: 2022-01-03 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,7 +43,7 @@ msgstr ""
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:707
+#: src/Generic/AbstractModule.php:725
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -392,11 +392,11 @@ msgstr ""
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/Admin/BulkCheckController.php:120
+#: src/Controller/Admin/BulkCheckController.php:117
 msgid "process"
 msgstr ""
 
-#: src/Controller/Admin/BulkCheckController.php:127
+#: src/Controller/Admin/BulkCheckController.php:124
 #, php-format
 msgid "Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s)."
 msgstr ""
@@ -717,10 +717,6 @@ msgid ""
 "has a size of {size} MB."
 msgstr ""
 
-#: src/Job/FileDimension.php:11
-msgid "Media type"
-msgstr ""
-
 #: src/Job/FileDimension.php:14
 msgid "Existing dimensions (w × h × d)"
 msgstr ""
@@ -743,24 +739,29 @@ msgid ""
 "thumbnails."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:118
+#: src/Job/AbstractCheck.php:122
 msgid "Starting \"{process}\"."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:145
+#: src/Job/AbstractCheck.php:149
 msgid "Unable to open output: {error}."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:220
+#: src/Job/AbstractCheck.php:191
+#, php-format
+msgid "Trying to output more than %d messages. Next messages are skipped."
+msgstr ""
+
+#: src/Job/AbstractCheck.php:247
 msgid "Results are available in this spreadsheet: {url}."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:261
+#: src/Job/AbstractCheck.php:288
 msgid ""
 "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {exception}"
 msgstr ""
 
-#: src/Job/AbstractCheck.php:270
+#: src/Job/AbstractCheck.php:297
 msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
 msgstr ""
 
