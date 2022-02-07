@@ -14,8 +14,6 @@
  * @todo Use the true Laminas console routing system.
  */
 
-namespace Omeka;
-
 require dirname(__DIR__, 4) . '/bootstrap.php';
 
 use Omeka\Stdlib\Message;
@@ -225,7 +223,22 @@ if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
 $job = new \Omeka\Entity\Job;
 $job->setOwner($user);
 $job->setClass($taskClass);
-$task = new $taskClass($job, $services);
+
+// Since there is no job id, the job should not require it.
+// For example, the `shouldStop()` should not be called.
+// Using a dynamic super-class bypasses this issue in most of the real life cases.
+// @todo Fix \Omeka\Job\AbstractJob::shouldStop().
+class_alias($taskClass, 'RealTask');
+class Task extends \RealTask
+{
+    public function shouldStop()
+    {
+        return $this->job->getId()
+            ? parent::shouldStop()
+            : false;
+    }
+}
+$task = new Task($job, $services);
 
 try {
     echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
