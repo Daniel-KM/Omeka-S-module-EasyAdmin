@@ -235,9 +235,11 @@ $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
 // Since it’s a job not prepared as a job, the logger should be prepared here.
 /** @var \Omeka\Module\Module $module */
 $module = $services->get('Omeka\ModuleManager')->getModule('Log');
+$referenceId = null;
 if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
+    $referenceId = 'task:' . str_replace('\\', '/', $taskName) . ':' . (new \DateTime())->format('Ymd-His');
     $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-    $referenceIdProcessor->setReferenceId('task:' . $taskName . ':' . (new \DateTime())->format('Ymd-His'));
+    $referenceIdProcessor->setReferenceId($referenceId);
     $logger->addProcessor($referenceIdProcessor);
     $userIdProcessor = new \Log\Processor\UserId($user);
     $logger->addProcessor($userIdProcessor);
@@ -278,10 +280,20 @@ if ($asJob) {
     $task = new Task($job, $services);
 }
 
-try {
+$jobId = $job->getId();
+if ($referenceId && $jobId) {
+    echo $translator->translate(new Message('Task "%s" is starting (job: #%d, reference: %s).', $taskName, $jobId, $referenceId)) . PHP_EOL; // @translate
+} elseif ($referenceId) {
+    echo $translator->translate(new Message('Task "%s" is starting (reference: %s).', $taskName, $referenceId)) . PHP_EOL; // @translate
+} elseif ($job->getId()) {
+    echo $translator->translate(new Message('Task "%s" is starting (job: #%d).', $taskName, $jobId)) . PHP_EOL; // @translate
+} else {
     echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
-    $logger->info('Task is starting.'); // @translate
+}
 
+$logger->info('Task is starting.'); // @translate
+
+try {
     // Run as standard job when a job is set.
     if ($asJob) {
         // See Omeka script "perform-job.php".
@@ -292,10 +304,11 @@ try {
     } else {
         $task->perform();
     }
-
-    $logger->info('Task ended.'); // @translate
-    echo $translator->translate(new Message('Task "%s" ended.', $taskName)) . PHP_EOL; // @translate
 } catch (\Exception $e) {
     echo $translator->translate(new Message('Task "%s" has an error: %s', $taskName, $e->getMessage())) . PHP_EOL; // @translate
     $logger->err($e);
+    exit();
 }
+
+$logger->info('Task ended.'); // @translate
+echo $translator->translate(new Message('Task "%s" ended.', $taskName)) . PHP_EOL; // @translate
