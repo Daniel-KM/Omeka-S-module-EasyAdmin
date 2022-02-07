@@ -45,6 +45,12 @@ Optional arguments:
 		each job. To find them, check the code, or run a job
 		manually then check the job page in admin interface.
 
+  -j --job
+		Create a standard job that will be checkable in admin
+		interface. In any case, all logs are available in logs with
+		a reference code. It allows to process some rare jobs that
+		are not taskable too.
+
   -h --help
 		This help.
 MSG;
@@ -55,6 +61,7 @@ $userId = null;
 $serverUrl = 'http://localhost';
 $basePath = '/';
 $jobArgs = [];
+$asJob = false;
 
 $application = \Omeka\Mvc\Application::init(require OMEKA_PATH . '/application/config/application.config.php');
 $services = $application->getServiceManager();
@@ -71,8 +78,8 @@ if (php_sapi_name() !== 'cli') {
     exit($translator->translate($message) . PHP_EOL);
 }
 
-$shortopts = 'ht:u:b:s:a:';
-$longopts = ['help', 'task:', 'user-id:', 'base-path:', 'server-url:', 'args:'];
+$shortopts = 'ht:u:b:s:a:j';
+$longopts = ['help', 'task:', 'user-id:', 'base-path:', 'server-url:', 'args:', 'job'];
 $options = getopt($shortopts, $longopts);
 
 if (!$options) {
@@ -107,6 +114,10 @@ foreach ($options as $key => $value) switch ($key) {
             echo $translator->translate($message) . PHP_EOL;
             exit();
         }
+        break;
+    case 'j':
+    case 'job':
+        $asJob = true;
         break;
     case 'h':
     case 'help':
@@ -241,27 +252,47 @@ $job = new \Omeka\Entity\Job;
 $job->setOwner($user);
 $job->setClass($taskClass);
 $job->setArgs($jobArgs);
+$job->setPid(getmypid());
 
-// Since there is no job id, the job should not require it.
-// For example, the `shouldStop()` should not be called.
-// Using a dynamic super-class bypasses this issue in most of the real life cases.
-// @todo Fix \Omeka\Job\AbstractJob::shouldStop().
-class_alias($taskClass, 'RealTask');
-class Task extends \RealTask
-{
-    public function shouldStop()
+if ($asJob) {
+    $entityManager->persist($job);
+    $entityManager->flush();
+    // Task is not needed: run the job directly below.
+    // $task = new $taskClass($job, $services);
+} else {
+    // Since there is no job id, the job should not require it.
+    // For example, the `shouldStop()` should not be called.
+    // Using a dynamic super-class bypasses this issue in most of the real life
+    // cases.
+    // @todo Fix \Omeka\Job\AbstractJob::shouldStop().
+    class_alias($taskClass, 'RealTask');
+    class Task extends \RealTask
     {
-        return $this->job->getId()
-            ? parent::shouldStop()
-            : false;
+        public function shouldStop()
+        {
+            return $this->job->getId()
+                ? parent::shouldStop()
+                : false;
+        }
     }
+    $task = new Task($job, $services);
 }
-$task = new Task($job, $services);
 
 try {
     echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
     $logger->info('Task is starting.'); // @translate
-    $task->perform();
+
+    // Run as standard job when a job is set.
+    if ($asJob) {
+        // See Omeka script "perform-job.php".
+        $strategy = $services->get('Omeka\Job\DispatchStrategy\Synchronous');
+        $services->get('Omeka\Job\Dispatcher')->send($job, $strategy);
+        $job->setPid(null);
+        $entityManager->flush();
+    } else {
+        $task->perform();
+    }
+
     $logger->info('Task ended.'); // @translate
     echo $translator->translate(new Message('Task "%s" ended.', $taskName)) . PHP_EOL; // @translate
 } catch (\Exception $e) {
