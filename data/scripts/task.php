@@ -12,7 +12,6 @@
  * The modules are not available inside this file (no Log\Stdlib\PsrMessage).
  *
  * @todo Use the true Laminas console routing system.
- * @todo Manage the server url for absolute links (currently via a setting).
  */
 
 namespace Omeka;
@@ -33,8 +32,12 @@ Required arguments:
 		rights.
 
 Recommended arguments:
+  -s --server-url [url]
+		The url of the server to build resource urls (default:
+		"http://localhost").
+
   -b --base-path [path]
-		The url path to complete the server url.
+		The url path to complete the server url (default: "/").
 
 Optional arguments:
   -h --help
@@ -44,7 +47,8 @@ MSG;
 
 $taskName = null;
 $userId = null;
-$basePath = null;
+$serverUrl = 'http://localhost';
+$basePath = '/';
 
 $application = \Omeka\Mvc\Application::init(require OMEKA_PATH . '/application/config/application.config.php');
 $services = $application->getServiceManager();
@@ -61,8 +65,8 @@ if (php_sapi_name() !== 'cli') {
     exit($translator->translate($message) . PHP_EOL);
 }
 
-$shortopts = 'ht:u:b:';
-$longopts = ['help', 'task:', 'user-id:', 'base-path:'];
+$shortopts = 'ht:u:b:s:';
+$longopts = ['help', 'task:', 'user-id:', 'base-path:', 'server-url:'];
 $options = getopt($shortopts, $longopts);
 
 if (!$options) {
@@ -78,6 +82,10 @@ foreach ($options as $key => $value) switch ($key) {
     case 'u':
     case 'user-id':
         $userId = $value;
+        break;
+    case 's':
+    case 'server-url':
+        $serverUrl = $value;
         break;
     case 'b':
     case 'base-path':
@@ -152,9 +160,32 @@ if (empty($user)) {
     exit($translator->translate($message) . PHP_EOL);
 }
 
-if (!empty($basePath)) {
-    $services->get('ViewHelperManager')->get('BasePath')->setBasePath($basePath);
+if (empty($serverUrl)) {
+    $serverUrl = 'http://localhost';
 }
+$serverUrlParts = parse_url($serverUrl);
+$scheme = $serverUrlParts['scheme'];
+$host = $serverUrlParts['host'];
+if (isset($serverUrlParts['port'])) {
+    $port = $serverUrlParts['port'];
+} elseif ($serverUrlParts['scheme'] === 'http') {
+    $port = 80;
+} elseif ($serverUrlParts['scheme'] === 'https') {
+    $port = 443;
+} else {
+    $port = null;
+}
+/** @var \Laminas\View\Helper\ServerUrl $serverUrlHelper */
+$serverUrlHelper = $services->get('ViewHelperManager')->get('ServerUrl');
+$serverUrlHelper
+    ->setScheme($scheme)
+    ->setHost($host)
+    ->setPort($port);
+
+$basePath = '/' . trim((string) $basePath, '/');
+$services->get('ViewHelperManager')->get('BasePath')
+    ->setBasePath($basePath);
+$services->get('Router')->setBaseUrl($basePath);
 
 $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
 
