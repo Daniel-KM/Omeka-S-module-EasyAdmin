@@ -25,7 +25,9 @@ Usage: php data/scripts/task.php [arguments]
 
 Required arguments:
   -t --task [Name]
-		Name of the job ("LoopItems").
+		Full class of a job ("EasyAdmin\Job\LoopItems"). May be its
+		basename ("LoopItems"). You should take care of case
+		sensitivity and escaping "\" or quoting name on cli.
 
   -u --user-id [#id]
 		The Omeka user id is required, else the job won’t have any
@@ -112,20 +114,35 @@ $omekaModulesPath = OMEKA_PATH . '/modules';
 $modulePaths = array_values(array_filter(array_diff(scandir($omekaModulesPath), ['.', '..']), function ($file) use ($omekaModulesPath) {
     return is_dir($omekaModulesPath . '/' . $file);
 }));
-foreach ($modulePaths as $modulePath) {
-    $filepath = $omekaModulesPath . '/' . $modulePath . '/src/Job/' . $taskName . '.php';
-    if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
-        include_once $filepath;
-        $taskClass = $modulePath . '\\Job\\' . $taskName;
-        if (class_exists($taskClass)) {
-            $job = new \Omeka\Entity\Job;
-            $task = new $taskClass($job, $services);
+// Short task name.
+if (strpos($taskName, '\\') === false) {
+    foreach ($modulePaths as $modulePath) {
+        $filepath = $omekaModulesPath . '/' . $modulePath . '/src/Job/' . $taskName . '.php';
+        if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+            include_once $filepath;
+            $taskClass = $modulePath . '\\Job\\' . $taskName;
+            if (!class_exists($taskClass)) {
+                $taskClass = null;
+            }
             break;
         }
     }
 }
+// Full class name.
+else {
+    $modulePath = strtok($taskName, '\\');
+    $baseTaskName = substr(strrchr($taskName, '\\'), 1);
+    $filepath = $omekaModulesPath . '/' . $modulePath . '/src/Job/' . $baseTaskName . '.php';
+    if (file_exists($filepath) && filesize($filepath) && is_readable($filepath)) {
+        include_once $filepath;
+        $taskClass = $taskName;
+        if (!class_exists($taskClass)) {
+            $taskClass = null;
+        }
+    }
+}
 
-if (empty($task)) {
+if (empty($taskClass)) {
     $message = new Message(
         'The task "%s" should be set and exist.', // @translate
         $taskName
@@ -205,8 +222,10 @@ if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
 // @link https://stackoverflow.com/questions/1900208/php-custom-error-handler-handling-parse-fatal-errors#7313887
 
 // Finalize the preparation of the job / task.
+$job = new \Omeka\Entity\Job;
 $job->setOwner($user);
 $job->setClass($taskClass);
+$task = new $taskClass($job, $services);
 
 try {
     echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
