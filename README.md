@@ -4,7 +4,7 @@ Easy Admin (module for Omeka S)
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
 admin interface:
 
-- launch regular simple tasks inside Omeka;
+- launch simple tasks, that can be any job of any module;
 - install modules;
 - update modules;
 - checks database and files.
@@ -27,19 +27,81 @@ See general end user documentation for [Installing a module].
 Usage
 -----
 
-### Cron tasks
+### Tasks and cron tasks
 
-A script allows to run jobs from the command line, even if they are not
-initialized. It’s useful to run cron tasks. See required and optional arguments:
+A script allows to run any job of any module from the command line, even if they
+are not initialized in the admin interface. It’s useful to run one time tasks or
+cron tasks, for example to harvest and update resources regularly with module
+[Bulk Import], or to clean up sessions (see included jobs), or to reindex
+resources in the search engine with module [Search SolR].
+
+Here is the command line to use:
 
 ```sh
 php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --help
 ```
 
-In your cron tab, you can add a task like that:
+In main cron tab or in the one of the user "www-data", you can add a task like
+that:
 
 ```sh
-/bin/su - www-data -C "php /var/www/omeka/modules/EasyAdmin/data/scripts/task.php" --task MyTask --user-id 1
+/bin/su - www-data -c "php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'EasyAdmin\Job\LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/'"
+```
+
+To use the command with the user "www-data" (or equivalent) may be required when
+the task creates files inside Omeka "/files/" directory. If the task only uses
+the database, it is usually not needed, but you need to take care of modules
+that can create derivative or temp files. And you may need to take care of
+escaping json arguments. Or use a sudo command:
+
+```sh
+sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --base-path 'OmekaS' --server-url 'https://example.org' --args '{"bulk_import_id": 1}'
+```
+
+Required arguments are:
+  - `-t` `--task` [Name] May be the full class of a job ("EasyAdmin\Job\LoopItems")
+    or its basename ("LoopItems"). You should take care of case sensitivity and
+    escaping "\" or quoting name on cli.
+  - `-u` `--user-id` [#id] The Omeka user id is required, else the job won’t
+    have any rights.
+
+Recommended arguments:
+  - `-s` `--server-url` [url] (default: "http://localhost")
+  - `-b` `--base-path` [path] (default: "/") The url path to complete the server
+    url.
+
+Optional arguments:
+  - `-a` `--args` [json] Arguments to pass to the task. Arguments are specific
+    to each job. To find them, check the code, or run a job manually then check
+    the job page in admin interface.
+  - `-j` `--job` Create a standard job that will be checkable in admin interface.
+    In any case, all logs are available in logs with a reference code. It allows
+    to process some rare jobs that are not taskable too.
+
+As an example, you can try the included job/task, for example "LoopItems" that
+loops all items to save them. This task allows to update all items, so all the
+modules that uses api events are triggered. This job can be use as a one-time
+task that help to process existing items when a new feature is added in a
+module:
+
+```sh
+php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{}'
+```
+
+Another example: run a bulk import job whose config is stored. Indeed, because
+the config of a bulk import may be complex, it is simpler to store it in the
+admin interface with its option "Store job as a task".
+
+```sh
+php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
+```
+
+Note that for jobs created manually in the admin interface, you can run them
+with the standard Omeka "perform-job.php". Of course, these job can be run only
+one time:
+
+```sh
+php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
 
@@ -99,6 +161,7 @@ Copyright
 [Easy Install]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[Search SolR]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Cron/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
