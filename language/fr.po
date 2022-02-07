@@ -1,0 +1,145 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-07 00:00+0000\n"
+"PO-Revision-Date: 2022-02-07 00:00+0000\n"
+"Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: src/Generic/AbstractModule.php:66
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr "Ce module requiert le module \"%s\"."
+
+#: src/Generic/AbstractModule.php:73
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr "Ce module requiert les modules \"%s\"."
+
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that cannot be installed."
+msgstr "Ce module a des ressources qui ne peuvent pas être installées."
+
+#: src/Generic/AbstractModule.php:87
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+"Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
+"de les supprimer manuellement."
+
+#: src/Generic/AbstractModule.php:328
+#, php-format
+msgid "The module removed tables \"%s\" from a previous broken install."
+msgstr ""
+"Le module a supprimé les tables \"%s\" depuis une installation échouée."
+
+#: src/Generic/AbstractModule.php:792
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+"Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
+"plus disponibles."
+
+#: data/scripts/task.php:17
+msgid "/bootstrap.php"
+msgstr "/bootstrap.php"
+
+#: data/scripts/task.php:74
+#, php-format
+msgid "The script \"%s\" must be run from the command line."
+msgstr "Le script « %s » doit être lancé depuis la ligne de commandes."
+
+#: data/scripts/task.php:112
+msgid "The job arguments are not a valid json object."
+msgstr "Les arguments de la tâche ne sont pas un objet json valide."
+
+#: data/scripts/task.php:131
+msgid "The task name must be set and exist."
+msgstr "Le nom de la tâche doit être indiqué et exister."
+
+#: data/scripts/task.php:173
+#, php-format
+msgid "The task \"%s\" should be set and exist."
+msgstr "La tâche « %s » doit être définie et exister."
+
+#: data/scripts/task.php:181
+msgid "The user id must be set and exist."
+msgstr "L’identifiant de l’utilisateur doit être indiqué et exister."
+
+#: data/scripts/task.php:192
+msgid "The database does not exist."
+msgstr "La base de données n’existe pas."
+
+#: data/scripts/task.php:198
+#, php-format
+msgid "The user #%d is set for the task \"%s\", but doesn’t exist."
+msgstr ""
+"L’utilisateur #%d est défini pour la tâche « %s », mais il n’existe pas."
+
+#: data/scripts/task.php:285
+#, php-format
+msgid "Task \"%s\" is starting (job: #%d, reference: %s)."
+msgstr "La tâche \"%s\" est lancée (tâche : #%d, référence : %s)."
+
+#: data/scripts/task.php:287
+#, php-format
+msgid "Task \"%s\" is starting (reference: %s)."
+msgstr "La tâche \"%s\" est lancée (référence : %s)."
+
+#: data/scripts/task.php:289
+#, php-format
+msgid "Task \"%s\" is starting (job: #%d)."
+msgstr "La tâche \"%s\" est lancée (tâche : #%d)."
+
+#: data/scripts/task.php:291
+#, php-format
+msgid "Task \"%s\" is starting."
+msgstr "La tâche \"%s\" est lancée."
+
+#: data/scripts/task.php:294
+msgid "Task is starting."
+msgstr "La tâche est lancée."
+
+#: data/scripts/task.php:308
+#, php-format
+msgid "Task \"%s\" has an error: %s"
+msgstr "La tâche \"%s\" a une erreur : %s"
+
+#: data/scripts/task.php:313
+msgid "Task ended."
+msgstr "Tâche terminée."
+
+#: data/scripts/task.php:314
+#, php-format
+msgid "Task \"%s\" ended."
+msgstr "Tâche \"%s\" terminée."
+
+#: src/Job/LoopItems.php:42
+msgid "No resource to process."
+msgstr "Aucune ressource à traiter."
+
+#: src/Job/LoopItems.php:48
+msgid "Processing {count} resources."
+msgstr "Traitement de {count} ressources."
+
+#: src/Job/LoopItems.php:69
+msgid "The job \"{name}\" was stopped."
+msgstr "La tâche \"{name}\" a été arrêtée."
+
+#: src/Job/LoopItems.php:92
+msgid "End of the job: {count}/{total} processed."
+msgstr "Fin de la tâche : {count}/{total} traités."
