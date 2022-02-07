@@ -14,12 +14,37 @@
  * @todo Use the true Laminas console routing system.
  * @todo Manage the server url for absolute links (currently via a setting).
  */
+
 namespace Omeka;
 
-use Omeka\Entity\User;
+require dirname(__DIR__, 4) . '/bootstrap.php';
+
 use Omeka\Stdlib\Message;
 
-require dirname(__DIR__, 4) . '/bootstrap.php';
+$help = <<<'MSG'
+Usage: php data/scripts/task.php [arguments]
+
+Required arguments:
+  -t --task [Name]
+		Name of the job ("LoopItems").
+
+  -u --user-id [#id]
+		The Omeka user id is required, else the job won’t have any
+		rights.
+
+Recommended arguments:
+  -b --base-path [path]
+		The url path to complete the server url.
+
+Optional arguments:
+  -h --help
+		This help.
+MSG;
+// @translate
+
+$taskName = null;
+$userId = null;
+$basePath = null;
 
 $application = \Omeka\Mvc\Application::init(require OMEKA_PATH . '/application/config/application.config.php');
 $services = $application->getServiceManager();
@@ -36,9 +61,14 @@ if (php_sapi_name() !== 'cli') {
     exit($translator->translate($message) . PHP_EOL);
 }
 
-$shortopts = 'h:t:u:b::';
-$longopts = ['help', 'task:', 'user-id:', 'base-path::'];
+$shortopts = 'ht:u:b:';
+$longopts = ['help', 'task:', 'user-id:', 'base-path:'];
 $options = getopt($shortopts, $longopts);
+
+if (!$options) {
+    echo $translator->translate($help) . PHP_EOL;
+    exit();
+}
 
 foreach ($options as $key => $value) switch ($key) {
     case 't':
@@ -55,10 +85,7 @@ foreach ($options as $key => $value) switch ($key) {
         break;
     case 'h':
     case 'help':
-        $message = new Message(
-        'Required options: -t --task / -u --user-id
-Optional option: -b --base-path' // @translate
-        );
+        $message = new Message($help);
         echo $translator->translate($message) . PHP_EOL;
         exit();
 }
@@ -67,7 +94,9 @@ if (empty($taskName)) {
     $message = new Message(
         'The task name must be set and exist.' // @translate
     );
-    exit($translator->translate($message) . PHP_EOL);
+    echo $translator->translate($message) . PHP_EOL . PHP_EOL;
+    echo $translator->translate($help) . PHP_EOL;
+    exit();
 }
 
 // TODO Use the plugin manager.
@@ -103,8 +132,16 @@ if (empty($userId)) {
     exit($translator->translate($message) . PHP_EOL);
 }
 
+/** @var \Doctrine\ORM\EntityManager $entityManager */
 $entityManager = $services->get('Omeka\EntityManager');
-$user = $entityManager->find(User::class, $userId);
+try {
+    $user = $entityManager->find(\Omeka\Entity\User::class, $userId);
+} catch (\Exception $e) {
+    $message = new Message(
+        'The database does not exist.', // @translate
+    );
+    exit($translator->translate($message) . PHP_EOL);
+}
 if (empty($user)) {
     $message = new Message(
         'The user #%d is set for the task "%s", but doesn’t exist.', // @translate
@@ -121,16 +158,12 @@ if (!empty($basePath)) {
 
 $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
 
-// Finalize the preparation of the job / task.
-$job->setOwner($user);
-$job->setClass($taskClass);
-
 // Since it’s a job not prepared as a job, the logger should be prepared here.
 /** @var \Omeka\Module\Module $module */
 $module = $services->get('Omeka\ModuleManager')->getModule('Log');
 if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
     $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-    $referenceIdProcessor->setReferenceId('task/' . $taskName . '/' . (new \DateTime())->format('Ymd-His'));
+    $referenceIdProcessor->setReferenceId('task:' . $taskName . ':' . (new \DateTime())->format('Ymd-His'));
     $logger->addProcessor($referenceIdProcessor);
     $userIdProcessor = new \Log\Processor\UserId($user);
     $logger->addProcessor($userIdProcessor);
@@ -140,10 +173,17 @@ if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
 // @see \Omeka\Job\DispatchStrategy::handleFatalError();
 // @link https://stackoverflow.com/questions/1900208/php-custom-error-handler-handling-parse-fatal-errors#7313887
 
+// Finalize the preparation of the job / task.
+$job->setOwner($user);
+$job->setClass($taskClass);
+
 try {
+    echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
     $logger->info('Task is starting.'); // @translate
     $task->perform();
     $logger->info('Task ended.'); // @translate
+    echo $translator->translate(new Message('Task "%s" ended.', $taskName)) . PHP_EOL; // @translate
 } catch (\Exception $e) {
+    echo $translator->translate(new Message('Task "%s" has an error: %s', $taskName, $e->getMessage())) . PHP_EOL; // @translate
     $logger->err($e);
 }
