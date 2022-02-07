@@ -40,6 +40,11 @@ Recommended arguments:
 		The url path to complete the server url (default: "/").
 
 Optional arguments:
+  -a --args [json]
+		Arguments to pass to the task. Arguments are specific to
+		each job. To find them, check the code, or run a job
+		manually then check the job page in admin interface.
+
   -h --help
 		This help.
 MSG;
@@ -49,6 +54,7 @@ $taskName = null;
 $userId = null;
 $serverUrl = 'http://localhost';
 $basePath = '/';
+$jobArgs = [];
 
 $application = \Omeka\Mvc\Application::init(require OMEKA_PATH . '/application/config/application.config.php');
 $services = $application->getServiceManager();
@@ -65,8 +71,8 @@ if (php_sapi_name() !== 'cli') {
     exit($translator->translate($message) . PHP_EOL);
 }
 
-$shortopts = 'ht:u:b:s:';
-$longopts = ['help', 'task:', 'user-id:', 'base-path:', 'server-url:'];
+$shortopts = 'ht:u:b:s:a:';
+$longopts = ['help', 'task:', 'user-id:', 'base-path:', 'server-url:', 'args:'];
 $options = getopt($shortopts, $longopts);
 
 if (!$options) {
@@ -90,6 +96,17 @@ foreach ($options as $key => $value) switch ($key) {
     case 'b':
     case 'base-path':
         $basePath = $value;
+        break;
+    case 'a':
+    case 'args':
+        $jobArgs = json_decode($value, true);
+        if (!is_array($jobArgs)) {
+            $message = new Message(
+                'The job arguments are not a valid json object.' // @translate
+            );
+            echo $translator->translate($message) . PHP_EOL;
+            exit();
+        }
         break;
     case 'h':
     case 'help':
@@ -223,6 +240,7 @@ if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
 $job = new \Omeka\Entity\Job;
 $job->setOwner($user);
 $job->setClass($taskClass);
+$job->setArgs($jobArgs);
 
 // Since there is no job id, the job should not require it.
 // For example, the `shouldStop()` should not be called.
