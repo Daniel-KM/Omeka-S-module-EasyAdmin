@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \BulkCheck\Form\BulkCheckForm $form
+ */
+
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+$form->prepare();
+
+$this->htmlElement('body')->appendAttribute('class', 'bulk-check browse');
+?>
+
+<?= $this->pageTitle($translate('Bulk check'), 1, $translate('Bulk check')) ?>
+
+<h2><?= $escape($translate('Checks')) ?></h2>
+<?= $this->form()->openTag($form) ?>
+<div id="page-actions">
+    <button type="submit"><?= $translate('Submit') ?></button>
+</div>
+<?= $this->formCollection($form) ?>
+<?= $this->form()->closeTag() ?>

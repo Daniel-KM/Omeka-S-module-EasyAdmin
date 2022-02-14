@@ -1,6 +1,10 @@
 Easy Admin (module for Omeka S)
 ===============================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
 admin interface:
 
@@ -13,15 +17,50 @@ Note: install/update modules is currently managed by module [Easy Install] and
 the checks is currently managed by module [Bulk Check]. They will be included
 soon.
 
+Checks and fixes that are doable:
+
+- list files in the file system (original and thumbnails), but not in the
+  database
+- remove useless files in the files directory (moved to files/check)
+- list files in the database, but not in the file system (for original and
+  thumbnails)
+- copy original files from a directory, for example after a disk crash or an
+  inadvertent deletion; files are copied via the hash, and they can be anywhere
+  in the directory or in subdirectories of the source path.
+- rebuild derivative files
+- remove empty directories in file system (original and thumbnails, mainly for
+  module [Archive Repertory])
+- check and update file size of media (required to fix Omeka installed before
+  Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
+- check and fix sha256 hashes of files
+- check and fix positions of media (start from 1, without missing number)
+- check and stop dead jobs (living in database, but non-existent in system)
+- check the size of the database table of sessions and remove them
+- check the size of the database table of logs and remove them
+- check and fix the encoding (iso-8859 to utf-8) of resource values and page
+  contents
+
 
 Installation
 ------------
+
+This module requires the module [Log] and the optional module [Generic].
+
+* From the zip
+
+Download the last release [EasyAdmin.zip] from the list of releases, and
+uncompress it in the `modules` directory.
+
+* From the source and for development
+
+If the module was installed from the source, rename the name of the folder of
+the module to `EasyAdmin`.
 
 Uncompress files and rename module folder `EasyAdmin`.
 
 Then install it like any other Omeka module and follow the config instructions.
 
-See general end user documentation for [Installing a module].
+See general end user documentation for [installing a module].
 
 
 Usage
@@ -105,6 +144,25 @@ php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-
 ```
 
 
+Checks
+------
+
+Go to the menu "Bulk Check", select your process, set your options if needed,
+and click the submit buttons. The results are available in logs currently.
+
+
+TODO
+----
+
+- [ ] Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in
+  a table (done for missing file; to do for all processors).
+- [ ] Check files with the wrong extension.
+- [ ] Add width/height/duration as data for image/audio/video to avoid to get them
+  each time (ready in modules [Iiif Server] and [Image Server]).
+- [ ] Remove old logs.
+- [ ] A main cleaning task.
+
+
 Warning
 -------
 
@@ -163,8 +221,21 @@ Copyright
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [Search SolR]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Cron/issues
+[Omeka S]: https://omeka.org/s
+[Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
+[omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
+[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
+[Derivative Images]: https://gitlab.com/Daniel-KM/Omeka-S-module-DerivativeImages
+[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
+[Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
+[BulkCheck.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/releases
+[installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
+[MIT]: https://github.com/sandywalker/webui-popover/blob/master/LICENSE.txt
+[GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
