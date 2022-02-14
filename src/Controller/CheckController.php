@@ -1,15 +1,16 @@
 <?php declare(strict_types=1);
-namespace BulkCheck\Controller\Admin;
+
+namespace EasyAdmin\Controller;
 
 use Omeka\Stdlib\Message;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
-class BulkCheckController extends AbstractActionController
+class CheckController extends AbstractActionController
 {
     public function indexAction()
     {
-        $form = $this->getForm(\BulkCheck\Form\BulkCheckForm::class);
+        $form = $this->getForm(\EasyAdmin\Form\CheckForm::class);
         $view = new ViewModel;
         $view
             ->setVariable('form', $form);
@@ -46,7 +47,7 @@ class BulkCheckController extends AbstractActionController
         switch ($params['process']) {
             case 'files_excess_check':
             case 'files_excess_move':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileExcess::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileExcess::class, $defaultParams);
                 break;
             case 'files_missing_check_full':
                 $params['files_missing']['include_derivatives'] = true;
@@ -54,58 +55,58 @@ class BulkCheckController extends AbstractActionController
             case 'files_missing_check':
             case 'files_missing_fix':
             case 'files_missing_fix_db':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMissing::class, $params['files_missing'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileMissing::class, $params['files_missing'] + $defaultParams);
                 break;
             case 'files_derivative':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileDerivative::class, $params['files_derivative'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDerivative::class, $params['files_derivative'] + $defaultParams);
                 break;
             case 'files_media_no_original':
             case 'files_media_no_original_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileMediaNoOriginal::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileMediaNoOriginal::class, $defaultParams);
                 break;
             case 'dirs_excess':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DirExcess::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DirExcess::class, $defaultParams);
                 break;
             case 'files_size_check':
             case 'files_size_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileSize::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileSize::class, $defaultParams);
                 break;
             case 'files_hash_check':
             case 'files_hash_check':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileHash::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileHash::class, $defaultParams);
                 break;
             case 'files_dimension_check':
             case 'files_dimension_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\FileDimension::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDimension::class, $defaultParams);
                 break;
             case 'media_position_check':
             case 'media_position_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\MediaPosition::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\MediaPosition::class, $defaultParams);
                 break;
             case 'item_no_value':
             case 'item_no_value_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\ItemNoValue::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\ItemNoValue::class, $defaultParams);
                 break;
             case 'db_utf8_encode_check':
             case 'db_utf8_encode_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbUtf8Encode::class, $params['db_utf8_encode'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbUtf8Encode::class, $params['db_utf8_encode'] + $defaultParams);
                 break;
             case 'db_resource_title_check':
             case 'db_resource_title_fix':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbResourceTitle::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceTitle::class, $defaultParams);
                 break;
             case 'db_job_check':
             case 'db_job_fix':
             case 'db_job_fix_all':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbJob::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbJob::class, $defaultParams);
                 break;
             case 'db_session_check':
             case 'db_session_clean':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbSession::class, $params['db_session'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $params['db_session'] + $defaultParams);
                 break;
             case 'db_log_check':
             case 'db_log_clean':
-                $job = $dispatcher->dispatch(\BulkCheck\Job\DbLog::class, $params['db_log'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbLog::class, $params['db_log'] + $defaultParams);
                 break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
@@ -140,7 +141,7 @@ class BulkCheckController extends AbstractActionController
         $this->messenger()->addSuccess($message);
 
         // Reset the form after a submission.
-        $form = $this->getForm(\BulkCheck\Form\BulkCheckForm::class);
+        $form = $this->getForm(\EasyAdmin\Form\CheckForm::class);
         return $view
             ->setVariable('form', $form);
     }

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace BulkCheck\Job;
+namespace EasyAdmin\Job;
 
 use Omeka\Job\AbstractJob;
 
@@ -97,7 +97,7 @@ abstract class AbstractCheck extends AbstractJob
 
         // The reference id is the job id for now.
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-        $referenceIdProcessor->setReferenceId('bulk/check/job_' . $this->job->getId());
+        $referenceIdProcessor->setReferenceId('easy-admin/check/job_' . $this->job->getId());
 
         $this->logger = $services->get('Omeka\Logger');
         $this->logger->addProcessor($referenceIdProcessor);
@@ -175,7 +175,7 @@ abstract class AbstractCheck extends AbstractJob
     /**
      * Fill a row (tsv) in the output file.
      */
-    protected function writeRow(array $row): \BulkCheck\Job\AbstractCheck
+    protected function writeRow(array $row): \EasyAdmin\Job\AbstractCheck
     {
         static $columnKeys;
         static $total = 0;
@@ -242,10 +242,10 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function messageResultFile()
     {
-        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getArg('base_path') . '/files';
+        $baseUrl = $this->config['file_store']['local']['base_uri'] ?: $this->getServiceLocator()->get('Router')->getBaseUrl() . '/files';
         $this->logger->notice(
             'Results are available in this spreadsheet: {url}.', // @translate
-            ['url' => $baseUrl . '/bulk_check/' . mb_substr($this->filepath, mb_strlen($this->basePath . '/bulk_check/'))]
+            ['url' => $baseUrl . '/check/' . mb_substr($this->filepath, mb_strlen($this->basePath . '/check/'))]
         );
         return $this;
     }
@@ -259,7 +259,7 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function prepareFilename()
     {
-        $destinationDir = $this->basePath . '/bulk_check';
+        $destinationDir = $this->basePath . '/check';
 
         $label = $this->getArg('process', '');
         $base = preg_replace('/[^A-Za-z0-9]/', '_', $label);
@@ -281,7 +281,7 @@ abstract class AbstractCheck extends AbstractJob
             $filePath = $destinationDir . '/' . $filename;
             if (!file_exists($filePath)) {
                 try {
-                    $result = touch($filePath);
+                    $result = @touch($filePath);
                 } catch (\Exception $e) {
                     $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
                     $this->logger->err(

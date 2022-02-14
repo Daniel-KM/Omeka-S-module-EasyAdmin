@@ -1,15 +1,16 @@
 <?php declare(strict_types=1);
-namespace BulkCheck\Service\Form;
 
-use BulkCheck\Form\BulkCheckForm;
+namespace EasyAdmin\Service\Form;
+
+use EasyAdmin\Form\CheckForm;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class BulkCheckFormFactory implements FactoryInterface
+class CheckFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $form = new BulkCheckForm(null, $options);
+        $form = new CheckForm(null, $options);
         return $form
             ->setConnection($services->get('Omeka\Connection'));
     }

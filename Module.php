@@ -11,8 +11,6 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
-use Omeka\Module\Exception\ModuleCannotInstallException;
-use Omeka\Stdlib\Message;
 
 /**
  * Easy Admin
@@ -28,23 +26,66 @@ class Module extends AbstractModule
 
     protected function preInstall(): void
     {
+        $this->installDir();
+    }
+
+    protected function installDir(): void
+    {
         $config = $this->getServiceLocator()->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-        if (!$this->checkDestinationDir($basePath . '/bulk_check')) {
-            $message = new Message(
+
+        // Automatic upgrade from module Bulk Check.
+        $result = null;
+        $bulkCheckPath = $basePath . '/bulk_check';
+        if (file_exists($bulkCheckPath) && is_dir($bulkCheckPath)) {
+            $result = rename($bulkCheckPath, $basePath . '/check');
+            if (!$result) {
+                $message = new \Omeka\Stdlib\Message(
+                    'Upgrading module BulkCheck: Unable to rename directory "files/bulk_check" into "files/check". Trying to create it.' // @translate
+                );
+                $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
+                $messenger->addWarning($message);
+            }
+        }
+
+        if (!$result && !$this->checkDestinationDir($basePath . '/check')) {
+            $message = new \Omeka\Stdlib\Message(
                 'The directory "%s" is not writeable.', // @translate
                 $basePath
             );
-            throw new ModuleCannotInstallException((string) $message);
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
+
+        $services = $this->getServiceLocator();
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule('BulkCheck');
+        if (!$module || in_array($module->getState(), [
+            \Omeka\Module\Manager::STATE_NOT_FOUND,
+            \Omeka\Module\Manager::STATE_NOT_INSTALLED,
+        ])) {
+            return;
+        }
+
+        // The module BulkCheck doesn't have any param, so it is uninstalled
+        // directly.
+        $sql = 'DELETE FROM `module` WHERE `id` = "BulkCheck";';
+        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $connection->executeStatement($sql);
+        $message = new \Omeka\Stdlib\Message(
+            'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
+            'Bulk Check', 'Easy Admin'
+        );
+        $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
+        $messenger->addWarning($message);
     }
 
     protected function preUninstall(): void
     {
-        if (!empty($_POST['remove-bulk-checks'])) {
+        if (!empty($_POST['remove-dir-check'])) {
             $config = $this->getServiceLocator()->get('Config');
             $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-            $this->rmDir($basePath . '/bulk_check');
+            $this->rmDir($basePath . '/check');
         }
     }
 
@@ -70,12 +111,12 @@ class Module extends AbstractModule
         $html .= '<p>';
         $html .= sprintf(
             $t->translate('All bulk checks will be removed (folder "{folder}").'), // @translate
-            $basePath . '/bulk_check'
+            $basePath . '/check'
         );
         $html .= '</p>';
 
-        $html .= '<label><input name="remove-bulk-checks" type="checkbox" form="confirmform">';
-        $html .= $t->translate('Remove bulk check directory'); // @translate
+        $html .= '<label><input name="remove-dir-check" type="checkbox" form="confirmform">';
+        $html .= $t->translate('Remove directory "files/check"'); // @translate
         $html .= '</label>';
 
         echo $html;

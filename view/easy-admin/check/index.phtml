@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \BulkCheck\Form\BulkCheckForm $form
+ * @var \EasyAdmin\Form\CheckForm $form
  */
 
 $translate = $this->plugin('translate');
@@ -9,10 +9,10 @@ $escape = $this->plugin('escapeHtml');
 
 $form->prepare();
 
-$this->htmlElement('body')->appendAttribute('class', 'bulk-check browse');
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-check browse');
 ?>
 
-<?= $this->pageTitle($translate('Bulk check'), 1, $translate('Bulk check')) ?>
+<?= $this->pageTitle($translate('Bulk check'), 1, $translate('Easy Admin')) ?>
 
 <h2><?= $escape($translate('Checks')) ?></h2>
 <?= $this->form()->openTag($form) ?>

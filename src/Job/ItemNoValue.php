@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace BulkCheck\Job;
+namespace EasyAdmin\Job;
 
 use Log\Stdlib\PsrMessage;
 
@@ -45,8 +45,8 @@ class ItemNoValue extends AbstractCheckFile
 SELECT item.id AS i, resource.created AS c, COUNT(media.id) AS m
 FROM item
 LEFT JOIN resource ON resource.id = item.id
-LEFT JOIN value ON value.resource_id = item.id 
-LEFT JOIN media ON media.item_id = item.id 
+LEFT JOIN value ON value.resource_id = item.id
+LEFT JOIN media ON media.item_id = item.id
 WHERE value.id IS NULL
 GROUP BY item.id
 ORDER BY item.id ASC;

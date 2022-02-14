@@ -7,28 +7,25 @@ return [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
         ],
-        'controller_map' => [
-            Controller\Admin\BulkCheckController::class => 'bulk/admin/check',
-        ],
     ],
     'form_elements' => [
         'factories' => [
-            Form\BulkCheckForm::class => Service\Form\BulkCheckFormFactory::class,
+            Form\CheckForm::class => Service\Form\CheckFormFactory::class,
         ],
     ],
     'controllers' => [
         'invokables' => [
-            'BulkCheck\Controller\Admin\BulkCheck' => Controller\Admin\BulkCheckController::class,
+            'EasyAdmin\Controller\Check' => Controller\CheckController::class,
         ],
     ],
     // TODO Merge bulk navigation and route with module BulkImport (require a main page?).
     'navigation' => [
         'AdminModule' => [
-            'bulk-check' => [
+            'easy-admin' => [
                 'label' => 'Bulk Check', // @translate
                 'route' => 'admin/bulk-check',
                 'controller' => 'bulk-check',
-                'resource' => 'BulkCheck\Controller\Admin\BulkCheck',
+                'resource' => 'EasyAdmin\Controller\Check',
                 'class' => 'o-icon-jobs',
             ],
         ],
@@ -42,9 +39,9 @@ return [
                         'options' => [
                             'route' => '/bulk-check',
                             'defaults' => [
-                                '__NAMESPACE__' => 'BulkCheck\Controller\Admin',
+                                '__NAMESPACE__' => 'EasyAdmin\Controller',
                                 '__ADMIN__' => true,
-                                'controller' => 'BulkCheck',
+                                'controller' => 'Check',
                                 'action' => 'index',
                             ],
                         ],

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace BulkCheck\Form;
+namespace EasyAdmin\Form;
 
 use Doctrine\DBAL\Connection;
 use Omeka\Form\Element\ItemSetSelect;
@@ -8,7 +8,7 @@ use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 
-class BulkCheckForm extends Form
+class CheckForm extends Form
 {
     /**
      * @var \Doctrine\DBAL\Connection

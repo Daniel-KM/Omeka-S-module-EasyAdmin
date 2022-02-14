@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace BulkCheck\Job;
+namespace EasyAdmin\Job;
 
 abstract class AbstractCheckFile extends AbstractCheck
 {
