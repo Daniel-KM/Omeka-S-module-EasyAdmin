@@ -220,7 +220,7 @@ DQL;
 
                 $current = $media->getExtension();
                 $new = $tempFile->getExtension();
-                $toFlush = $toFlush || mb_strtolower($current) !== mb_strtolower($new);
+                $toFlush = $toFlush || mb_strtolower((string) $current) !== mb_strtolower((string) $new);
                 $media->setExtension($new);
 
                 $current = $media->getMediaType();
