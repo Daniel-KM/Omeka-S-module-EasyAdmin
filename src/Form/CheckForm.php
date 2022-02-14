@@ -30,7 +30,7 @@ class CheckForm extends Form
                         'files_missing_check_full' => 'List files that are present in database, not in "/files/" (include derivatives)', // @translate
                         'files_missing_fix' => 'Copy missing original files from the source directory below (recover a disaster)', // @translate
                         'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
-                        'files_derivative' => 'Rebuild derivative images with options below', // @translate
+                        'files_derivative' => 'Rebuild derivative images (thumbnails) with options below', // @translate
                         'files_media_no_original' => 'Check media rendered as "file", but without original', // @translate
                         'files_media_no_original_fix' => 'Remove media rendered as "file", but without original (WARNING: export your media first)', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
@@ -103,7 +103,7 @@ class CheckForm extends Form
                 'type' => Fieldset::class,
                 'name' => 'files_derivative',
                 'options' => [
-                    'label' => 'Options for derivative files', // @translate
+                    'label' => 'Options to rebuild derivative files (thumbnails)', // @translate
                 ],
             ]);
         $this->get('files_derivative')
