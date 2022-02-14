@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
-namespace BulkCheck;
+
+namespace EasyAdmin;
 
 /**
  * @var Module $this
@@ -18,10 +19,7 @@ namespace BulkCheck;
 // $entityManager = $services->get('Omeka\EntityManager');
 // $plugins = $services->get('ControllerPluginManager');
 // $api = $plugins->get('api');
-// $space = strtolower(__NAMESPACE__);
 
-if (version_compare($oldVersion, '3.0.9', '<')) {
-    $config = $this->getServiceLocator()->get('Config');
-    $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-    $this->checkDestinationDir($basePath . '/bulk_check');
+if (version_compare($oldVersion, '3.3.2', '<')) {
+    $this->installDir();
 }
