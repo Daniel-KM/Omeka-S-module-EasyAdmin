@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 00:00+0000\n"
-"PO-Revision-Date: 2022-02-07 00:00+0000\n"
+"POT-Creation-Date: 2022-02-14 00:00+0000\n"
+"PO-Revision-Date: 2022-02-14 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -16,6 +16,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#: Module.php:107
+msgid "WARNING:"
+msgstr "ATTENTION :"
+
+#: Module.php:113
+msgid "All bulk checks will be removed (folder \"{folder}\")."
+msgstr ""
+"Tous les enregistrements issus des vérifications seront supprimés (dossier "
+"\"{folder}\")."
+
+#: Module.php:119
+msgid "Remove directory \"files/check\""
+msgstr "Supprimer le dossier \"files/check\""
 
 #: src/Generic/AbstractModule.php:66
 #, php-format
@@ -53,6 +67,54 @@ msgid ""
 msgstr ""
 "Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
 "plus disponibles."
+
+#: src/Job/FileDerivative.php:131 src/Job/FileDimension.php:104
+msgid "Not readable"
+msgstr "Non lisible"
+
+#: src/Job/FileDerivative.php:132
+msgid "Not writeable"
+msgstr "Non inscriptible"
+
+#: src/Job/FileDerivative.php:133
+msgid "Failed"
+msgstr "Échec"
+
+#: src/Job/FileDimension.php:103
+msgid "Missing file"
+msgstr "Fichier manquant"
+
+#: src/Job/FileDimension.php:105
+msgid "Empty file"
+msgstr "Fichier vide"
+
+#: src/Job/FileMissing.php:239
+msgid "No source"
+msgstr "Pas de source"
+
+#: src/Job/FileMissing.php:240
+msgid "Copy issue"
+msgstr "Problème de copie"
+
+#: src/Job/FileMissing.php:241
+msgid "Item removed"
+msgstr "Contenu supprimé"
+
+#: src/Job/FileMissing.php:242
+msgid "Item not removed: more than one media"
+msgstr "Contenu non supprimé : plus d’un média"
+
+#: view/easy-admin/check/index.phtml:15
+msgid "Bulk check"
+msgstr "Vérifications"
+
+#: view/easy-admin/check/index.phtml:15
+msgid "Easy Admin"
+msgstr "Simple Admin"
+
+#: view/easy-admin/check/index.phtml:17
+msgid "Checks"
+msgstr "Vérifications"
 
 #: data/scripts/task.php:17
 msgid "/bootstrap.php"
@@ -128,9 +190,872 @@ msgstr "Tâche terminée."
 msgid "Task \"%s\" ended."
 msgstr "Tâche \"%s\" terminée."
 
-#: src/Job/LoopItems.php:42
+#: Module.php:44
+msgid ""
+"Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
+"into \"files/check\". Trying to create it."
+msgstr ""
+"Mise à niveau du module BulkCheck : impossible de renommer le dossier "
+"\"files/bulk_check\" en \"files/check\". Essai de création."
+
+#: Module.php:53
+#, php-format
+msgid "The directory \"%s\" is not writeable."
+msgstr "Le dossier \"%s\" n’est pas inscriptible."
+
+#: Module.php:76
+#, php-format
+msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
+msgstr "Le module \"%s\" a été mis à niveau par le module \"%s\" et supprimé."
+
+#: Module.php:146
+msgid "The directory \"{path}\" is not writeable."
+msgstr "Le dossier \"{path}\" n’est pas inscriptible."
+
+#: Module.php:157
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr "Le dossier \"{path}\" n’est pas inscriptible : {error}"
+
+#: src/Form/CheckForm.php:25
+msgid "Processors"
+msgstr "Processeurs"
+
+#: src/Form/CheckForm.php:27
+msgid "List files that are present in \"/files/\", but not in database"
+msgstr ""
+"Lister les fichiers présents dans \"/files/\" mais pas dans la base de "
+"données"
+
+#: src/Form/CheckForm.php:28
+msgid ""
+"Move files that are present in \"/files/\", but not in database, into \"/"
+"files/check/\""
+msgstr ""
+"Déplacer les fichiers présents dans \"/files/\" mais pas dans la base de "
+"données, vers \"/files/check/\""
+
+#: src/Form/CheckForm.php:29
+msgid ""
+"List files that are present in database, not in \"/files/\" (original only)"
+msgstr ""
+"Lister les fichiers présents dans la base de données mais pas dans \"/files/"
+"\" (originaux seuls)"
+
+#: src/Form/CheckForm.php:30
+msgid ""
+"List files that are present in database, not in \"/files/\" (include "
+"derivatives)"
+msgstr ""
+"Lister les fichiers présents dans la base de données mais pas dans \"/files/"
+"\" (fichiers dérivés inclus)"
+
+#: src/Form/CheckForm.php:31
+msgid ""
+"Copy missing original files from the source directory below (recover a "
+"disaster)"
+msgstr ""
+"Copier les fichiers manquants à partir du dossier source ci-dessous "
+"(récupération après désastre)"
+
+#: src/Form/CheckForm.php:32
+msgid ""
+"Remove items with one file that is missing (WARNING: export your items first)"
+msgstr ""
+"Supprimer les contenus qui ont un seul fichier et qui manque (ATTENTION : "
+"exportez vos contenus d’abord)"
+
+#: src/Form/CheckForm.php:33
+msgid "Rebuild derivative images (thumbnails) with options below"
+msgstr ""
+"Reconstruire les fichiers dérivés (vignettes) avec les options ci-dessous"
+
+#: src/Form/CheckForm.php:34
+msgid "Check media rendered as \"file\", but without original"
+msgstr "Vérifier les médias rendus en tant que \"fichier\", mais sans original"
+
+#: src/Form/CheckForm.php:35
+msgid ""
+"Remove media rendered as \"file\", but without original (WARNING: export "
+"your media first)"
+msgstr ""
+"Supprimer les médias rendus en tant que \"fichier\", mais sans original "
+"(ATTENTION : exportez vos médias d’abord)"
+
+#: src/Form/CheckForm.php:36
+msgid "Remove empty directories in \"/files/\" (for module Archive Repertory)"
+msgstr ""
+"Supprimer les dossiers vides dans \"/files\" (pour le module Archive "
+"Repertory)"
+
+#: src/Form/CheckForm.php:37
+msgid ""
+"Check missing file sizes in database (not managed during upgrade to Omeka "
+"1.2.0)"
+msgstr ""
+"Vérifier les tailles de fichiers manquantes dans la base de données (non "
+"gérées lors de la mise à niveau vers Omeka 1.2.0)"
+
+#: src/Form/CheckForm.php:38
+msgid "Fix all file sizes in database (for example after hard import)"
+msgstr ""
+"Réparer toutes les tailles de fichier dans la base de données (par exemple "
+"après un import direct)"
+
+#: src/Form/CheckForm.php:39
+msgid "Check sha256 hashes of files"
+msgstr "Vérifier les sommes de contrôles sha256 des fichiers"
+
+#: src/Form/CheckForm.php:40
+msgid "Fix wrong sha256 of files"
+msgstr "Réparer les sommes de contrôle sha256 incorrectes des fichiers"
+
+#: src/Form/CheckForm.php:41
+msgid "Check files dimensions (modules IIIF Server / Image Server)"
+msgstr "Vérifier les dimensions (modules IIIF Server / Image Server)"
+
+#: src/Form/CheckForm.php:42
+msgid "Fix files dimensions (modules IIIF Server / Image Server)"
+msgstr "Corriger les dimensions (modules IIIF Server / Image Server)"
+
+#: src/Form/CheckForm.php:43
+msgid "Check positions of media (start from 1, without missing number)"
+msgstr ""
+"Vérifier les positions des médias (commencer à un, sans omettre de nombre)"
+
+#: src/Form/CheckForm.php:44
+msgid "Fix wrong positions of media"
+msgstr "Réparer les positions incorrectes des médias"
+
+#: src/Form/CheckForm.php:45
+msgid "Check items without value (media values are not checked)"
+msgstr ""
+"Vérifier les contenus sans valeurs (les valeurs des médias ne sont pas "
+"prises en compte)"
+
+#: src/Form/CheckForm.php:46
+msgid "Remove items without value (files are moved into \"/files/check/\")"
+msgstr ""
+"Supprimer les contenus sans métadonnées (les fichiers sont déplacés vers \"/"
+"files/check/\")"
+
+#: src/Form/CheckForm.php:47
+msgid ""
+"Check if all values are utf-8 encoded (Windows issues like \"Ã©\" for \"é\", "
+"options below)"
+msgstr ""
+"Vérifier si toutes les valeurs sont encodées en utf-8 (problèmes Windows "
+"tels que \"Ã©\" pour \"é\", options ci-dessous)"
+
+#: src/Form/CheckForm.php:48
+msgid "Fix utf-8 encoding issues (options below)"
+msgstr "Corriger les problèmes d’encodage utf-8 (options ci-dessous)"
+
+#: src/Form/CheckForm.php:49
+msgid "Check resource titles (for example after hard import)"
+msgstr ""
+"Vérifier les titres des ressources (par exemple après un import direct)"
+
+#: src/Form/CheckForm.php:50
+msgid "Update resource titles"
+msgstr "Mettre à jour le titre des ressources"
+
+#: src/Form/CheckForm.php:51
+msgid "Check dead jobs (living in database, but non-existent in system)"
+msgstr ""
+"Vérifier les tâches abandonnées (existe dans la base de données, mais pas "
+"dans le système)"
+
+#: src/Form/CheckForm.php:52
+msgid ""
+"Set status \"stopped\" for jobs that never started, and \"error\" for the "
+"jobs that never ended"
+msgstr ""
+"Indiquer le statut \"arrêté\" pour les tâches qui n’ont jamais commencé et "
+"\"erreur\" pour les tâches qui n’ont jamais terminé"
+
+#: src/Form/CheckForm.php:53
+msgid ""
+"Fix status as above for all jobs (when check cannot be done after a reboot)"
+msgstr ""
+"Réparer les statuts comme ci-dessus pour toutes les tâches (quand la "
+"vérification ne peut pas être réalisée après un redémarrage)"
+
+#: src/Form/CheckForm.php:54
+msgid "Check the size of the table of sessions in database"
+msgstr "Vérifier la taille de la table des sessions dans la base de données"
+
+#: src/Form/CheckForm.php:55
+msgid "Remove old sessions (specify age below)"
+msgstr "Supprimer les anciennes sessions (indiquer la date ci-dessous)"
+
+#: src/Form/CheckForm.php:56
+msgid "Check the size of the table of logs in database(module Log)"
+msgstr ""
+"Vérifier la taille de la table des journaux dans la base de données (module "
+"Log)"
+
+#: src/Form/CheckForm.php:57
+msgid "Remove old logs (options below)"
+msgstr "Supprimer les anciens journaux (options ci-dessous)"
+
+#: src/Form/CheckForm.php:58
+msgid "Index full-text search (core job)"
+msgstr "Indexer la recherche plein-texte (tâche Omeka)"
+
+#: src/Form/CheckForm.php:59
+msgid "Index thesaurus (module Thesaurus)"
+msgstr "Indexer les thésaurus (module Thésaurus)"
+
+#: src/Form/CheckForm.php:73
+msgid "Options for fix missing files"
+msgstr "Options pour réparer les fichiers manquants"
+
+#: src/Form/CheckForm.php:81
+msgid "Source for restoration"
+msgstr "Source pour la restauration"
+
+#: src/Form/CheckForm.php:85
+msgid "/server/path/to/my/source/directory"
+msgstr "/serveur/chemin/vers/mon/dossier/source"
+
+#: src/Form/CheckForm.php:92
+msgid "Limit to extensions"
+msgstr "Limiter aux extensions"
+
+#: src/Form/CheckForm.php:96
+msgid "pdf, jpeg"
+msgstr "pdf, jpeg"
+
+#: src/Form/CheckForm.php:106
+msgid "Options to rebuild derivative files (thumbnails)"
+msgstr "Options pour reconstruire les fichiers dérivés (vignettes)"
+
+#: src/Form/CheckForm.php:121
+msgid "Select one or more item sets…"
+msgstr "Choisir une ou plusieurs collections…"
+
+#: src/Form/CheckForm.php:128
+msgid "Ingesters to process"
+msgstr "Ingesteurs à traiter"
+
+#: src/Form/CheckForm.php:129 src/Form/CheckForm.php:336
+msgid "All ingesters"
+msgstr "Tous les ingesteurs"
+
+#: src/Form/CheckForm.php:144
+msgid "Renderers to process"
+msgstr "Gestionnaire de rendu à traiter"
+
+#: src/Form/CheckForm.php:145 src/Form/CheckForm.php:348
+msgid "All renderers"
+msgstr "Tous les gestionnaires de rendu"
+
+#: src/Form/CheckForm.php:160
+msgid "Media types to process"
+msgstr "Types de média à traiter"
+
+#: src/Form/CheckForm.php:161 src/Form/CheckForm.php:360
+msgid "All media types"
+msgstr "Tous les types de média"
+
+#: src/Form/CheckForm.php:176
+msgid "Media ids"
+msgstr "Id médias"
+
+#: src/Form/CheckForm.php:187
+msgid "Only originals without thumbnails"
+msgstr "Seulement les originaux sans vignettes"
+
+#: src/Form/CheckForm.php:200
+msgid "Options for utf-8 encoding (experimental: do a backup first)"
+msgstr ""
+"Options pour l’encodage utf-8 (expérimental : sauvegardez avant de lancer)"
+
+#: src/Form/CheckForm.php:208
+msgid "Types of resources to process"
+msgstr "Types de ressources à traiter"
+
+#: src/Form/CheckForm.php:211
+msgid "Resources titles"
+msgstr "Titre des ressources"
+
+#: src/Form/CheckForm.php:212
+msgid "Resources values"
+msgstr "Valeurs des ressources"
+
+#: src/Form/CheckForm.php:213
+msgid "Site title"
+msgstr "Titre du site"
+
+#: src/Form/CheckForm.php:214
+msgid "Site summary"
+msgstr "Sommaire des sites"
+
+#: src/Form/CheckForm.php:215
+msgid "Pages titles"
+msgstr "Titres des pages"
+
+#: src/Form/CheckForm.php:216
+msgid "Pages blocks"
+msgstr "Blocs des pages"
+
+#: src/Form/CheckForm.php:229
+msgid "Options to remove sessions"
+msgstr "Options pour supprimer les sessions"
+
+#: src/Form/CheckForm.php:237 src/Form/CheckForm.php:257
+msgid "Older than this number of days"
+msgstr "Plus anciens que ce nombre de jours"
+
+#: src/Form/CheckForm.php:249
+msgid "Options to remove logs (module Log)"
+msgstr "Options pour supprimer les journaux (module Log)"
+
+#: src/Form/CheckForm.php:267
+msgid "Maximum severity"
+msgstr "Gravité maximale"
+
+#: src/Form/CheckForm.php:269 src/Job/DbLog.php:16
+msgid "Emergency"
+msgstr "Urgence"
+
+#: src/Form/CheckForm.php:270 src/Job/DbLog.php:17
+msgid "Alert"
+msgstr "Alerte"
+
+#: src/Form/CheckForm.php:271 src/Job/DbLog.php:18
+msgid "Critical"
+msgstr "Critique"
+
+#: src/Form/CheckForm.php:274 src/Job/DbLog.php:21
+msgid "Notice"
+msgstr "Avis"
+
+#: src/Form/CheckForm.php:276 src/Job/DbLog.php:23
+msgid "Debug"
+msgstr "Débogage"
+
+#: src/Controller/CheckController.php:33
+msgid "No process submitted."
+msgstr "Aucun traitement soumis."
+
+#: src/Controller/CheckController.php:118
+msgid "process"
+msgstr "traitement"
+
+#: src/Controller/CheckController.php:125
+#, php-format
+msgid "Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s)."
+msgstr ""
+"Traitement des vérifications en arrière plan (tâche %1$s#%2$d%3$s, "
+"%4$sjournaux%3$s)."
+
+#: src/Job/DbUtf8Encode.php:12
+msgid "Value id"
+msgstr "Id \"value\""
+
+#: src/Job/DbUtf8Encode.php:14
+msgid "Content"
+msgstr "Contenu"
+
+#: src/Job/DbUtf8Encode.php:15 src/Job/FileMediaNoOriginal.php:12
+#: src/Job/FileExcess.php:14 src/Job/FileHash.php:15 src/Job/FileMissing.php:16
+#: src/Job/FileDimension.php:16 src/Job/DbResourceTitle.php:15
+#: src/Job/ItemNoValue.php:13 src/Job/FileSize.php:15
+#: src/Job/FileDerivative.php:23
+msgid "Fixed"
+msgstr "Corrigé"
+
+#: src/Job/DbUtf8Encode.php:53
+msgid "You should specify the types of records to check or fix."
+msgstr ""
+"Vous devez indiquer les types d’enregistrements à vérifier ou corriger."
+
+#: src/Job/DbUtf8Encode.php:66 src/Job/DbLog.php:65
+#: src/Job/FileMediaNoOriginal.php:27 src/Job/FileExcess.php:37
+#: src/Job/DirExcess.php:16 src/Job/FileHash.php:30
+#: src/Job/MediaPosition.php:16 src/Job/FileMissing.php:65
+#: src/Job/DbSession.php:30 src/Job/FileDimension.php:43
+#: src/Job/DbResourceTitle.php:36 src/Job/ItemNoValue.php:29
+#: src/Job/DbJob.php:24 src/Job/FileSize.php:30
+msgid "Process \"{process}\" completed."
+msgstr "Le traitement \"{process}\" est terminé."
+
+#: src/Job/DbUtf8Encode.php:74 src/Job/DbResourceTitle.php:44
+msgid "You should reindex the Omeka metadata."
+msgstr "Vous devez réindexer les métadonnées Omeka."
+
+#: src/Job/DbUtf8Encode.php:153
+msgid "Checking {total} records \"{name}\" with a \"{value}\"."
+msgstr ""
+"Vérification de {total} enregistrements \"{name}\" avec un \"{valeur}\"."
+
+#: src/Job/DbUtf8Encode.php:176
+msgid "{processed}/{total} records processed."
+msgstr "{processed}/{total} enregistrements traités."
+
+#: src/Job/DbUtf8Encode.php:182 src/Job/FileMediaNoOriginal.php:97
+#: src/Job/FileExcess.php:120 src/Job/MediaPosition.php:61
+#: src/Job/FileMissing.php:300 src/Job/FileDimension.php:140
+#: src/Job/DbResourceTitle.php:99 src/Job/AbstractCheckFile.php:94
+msgid "The job was stopped."
+msgstr "La tâche a été arrêtée."
+
+#: src/Job/DbUtf8Encode.php:280
+msgid ""
+"End of process: {processed}/{total} processed, {total_utf8} already utf-8, "
+"{total_succeed} converted ({type})."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_utf8} déjà utf-8, "
+"{total_succeed} convertis ({type})."
+
+#: src/Job/DbLog.php:33
+msgid "There is no table \"{table}\" to check."
+msgstr "Aucune table \"{table}\" à vérifier."
+
+#: src/Job/DbLog.php:46
+msgid ""
+"A minimum number of days and a maximal severity is needed to clean logs."
+msgstr ""
+"Un nombre minimum de jours et une gravité maximale sont nécessaire pour "
+"nettoyer les journaux."
+
+#: src/Job/DbLog.php:56
+msgid "The severity \"{severity}\" is not managed."
+msgstr "La gravité \"{severity}\" n’est pas gérée."
+
+#: src/Job/DbLog.php:116
+msgid ""
+"The table \"{table}\" has a size of {size} MB. {old}/{all} records are older "
+"than {days} days and below or equal severity \"{severity}\"."
+msgstr ""
+"La table \"{table}\" a une taille de {size} Mo. {old}/{all} enregistrements "
+"sont plus vieux que {days} jours et avec une gravité inférieure ou égal à "
+"\"{severity}\"."
+
+#: src/Job/DbLog.php:129
+msgid ""
+"{count} records older than {days} days with maximum severity \"{severity}\" "
+"were removed. The table \"{table}\" has a size of {size} MB."
+msgstr ""
+"{count} enregistrements plus anciens que {days} jours avec une gravité "
+"maximale \"{severity}\" ont été supprimés. La table \"{table}\" a une taille "
+"de {size} Mo."
+
+#: src/Job/FileMediaNoOriginal.php:10
+msgid "Renderer"
+msgstr "Rendu"
+
+#: src/Job/FileMediaNoOriginal.php:11
+msgid "Has original"
+msgstr "A un original"
+
+#: src/Job/FileMediaNoOriginal.php:47
+msgid ""
+"There are {count} media rendered as \"file\" without \"has original\" and "
+"\"has thumbnails\" set. Check if no creation or import is running before "
+"fixing it."
+msgstr ""
+"Un total de {count} media sont rendus en tant que \"fichier\" mais sans les "
+"métadonnées \"a un original\" et \"a des vignettes\". Vérifiez qu’aucune "
+"création ou import n’est en cours avant de corriger."
+
+#: src/Job/FileMediaNoOriginal.php:87
+msgid "Job stopped: {processed}/{total} processed, {total_fixed} fixed."
+msgstr "Tâche arrêtée : {processed}/{total} traités, {total_fixed} corrigés."
+
+#: src/Job/FileMediaNoOriginal.php:92
+msgid "Job stopped: {processed}/{total} processed."
+msgstr "Tâche arrêtée : {processed}/{total} traités."
+
+#: src/Job/FileMediaNoOriginal.php:104 src/Job/FileMissing.php:307
+#: src/Job/FileDimension.php:147 src/Job/AbstractCheckFile.php:88
+msgid "{processed}/{total} media processed."
+msgstr "{processed}/{total} média traités."
+
+#: src/Job/FileMediaNoOriginal.php:138
+msgid "End of process: {processed}/{total} processed, {total_fixed} fixed."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_fixed} corrigés."
+
+#: src/Job/FileMediaNoOriginal.php:143
+msgid "End of process: {processed}/{total} processed."
+msgstr "Fin du traitement : {processed}/{total} traités."
+
+#: src/Job/FileExcess.php:8 src/Job/FileHash.php:10 src/Job/FileMissing.php:10
+#: src/Job/FileDimension.php:10 src/Job/FileSize.php:10
+#: src/Job/FileDerivative.php:19
+msgid "Filename"
+msgstr "Nom de fichier"
+
+#: src/Job/FileExcess.php:9 src/Job/FileHash.php:11 src/Job/FileMissing.php:11
+#: src/Job/FileSize.php:11 src/Job/FileDerivative.php:20
+msgid "Extension"
+msgstr "Extension"
+
+#: src/Job/FileExcess.php:11 src/Job/FileHash.php:12 src/Job/FileMissing.php:14
+#: src/Job/FileDimension.php:13 src/Job/FileSize.php:12
+#: src/Job/FileDerivative.php:21
+msgid "Exists"
+msgstr "Existe"
+
+#: src/Job/FileExcess.php:28 src/Job/FileExcess.php:50
+#: src/Job/FileExcess.php:67 src/Job/FileExcess.php:178
+#: src/Job/ItemNoValue.php:115
+msgid "Unable to prepare directory \"{path}\". Check rights."
+msgstr "Impossible de préparer le dossier \"{path}\". Vérifiez les droits."
+
+#: src/Job/FileExcess.php:107
+msgid "Starting check of {total} files for type {type}."
+msgstr "Vérification de {total} fichiers pour le type {type}."
+
+#: src/Job/FileExcess.php:115
+msgid "{processed}/{total} files processed."
+msgstr "{processed}/{total} fichiers traités."
+
+#: src/Job/FileExcess.php:188
+msgid ""
+"File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
+"database and was moved."
+msgstr ""
+"Le fichier \"{filename}\" (\"{type}\", {processed}/{total}) n’existe pas "
+"dans la base de données et a été déplacé."
+
+#: src/Job/FileExcess.php:195
+msgid ""
+"File \"{filename}\" (type \"{type}\") doesn’t exist in database, and cannot "
+"be moved."
+msgstr ""
+"Le fichier \"{filename}\" (\"{type}\", n’existe pas dans la base de données "
+"et ne peut pas être déplacé."
+
+#: src/Job/FileExcess.php:202
+msgid ""
+"File \"{filename}\" (\"{type}\", {processed}/{total}) doesn’t exist in "
+"database."
+msgstr ""
+"Le fichier \"{filename}\" (\"{type}\", {processed}/{total}) n’existe pas "
+"dans la base de données."
+
+#: src/Job/FileExcess.php:215
+msgid ""
+"End check of {total} files for type {type}: {total_excess} files in excess "
+"moved."
+msgstr ""
+"Fin de la vérification de {total} fichiers pour le type {type}: "
+"{total_excess} fichiers en trop ont été déplacés."
+
+#: src/Job/FileExcess.php:220
+msgid ""
+"End check of {total} files for type {type}: {total_excess} files in excess."
+msgstr ""
+"Fin du traitement de {total} fichiers pour le type {type} : {total_excess} "
+"fichiers en trop."
+
+#: src/Job/DirExcess.php:48
+msgid "Processing type \"{type}\"."
+msgstr "Traitement du type \"{type}\"."
+
+#: src/Job/FileHash.php:13
+msgid "Database hash"
+msgstr "Somme de contrôle de la base de données"
+
+#: src/Job/FileHash.php:14
+msgid "Real hash"
+msgstr "Somme de contrôle réel"
+
+#: src/Job/MediaPosition.php:27 src/Job/FileMissing.php:213
+#: src/Job/AbstractCheckFile.php:61
+msgid "No media to process."
+msgstr "Aucun média à traiter."
+
+#: src/Job/MediaPosition.php:36
+msgid "No item to process."
+msgstr "Aucun contenu à traiter."
+
+#: src/Job/MediaPosition.php:55
+msgid "{processed}/{total} items processed."
+msgstr "{processed}/{total} contenus traités."
+
+#: src/Job/MediaPosition.php:101
+msgid "Fixed item #{item_id} wrong media positions."
+msgstr ""
+"Réparer les positions incorrectes des médias pour le contenu #{item_id}."
+
+#: src/Job/MediaPosition.php:109
+msgid "Item #{item_id} has wrong media positions."
+msgstr "Le contenu #{item_id} a des positions de média incorrectes."
+
+#: src/Job/MediaPosition.php:125 src/Job/FileDimension.php:261
+#: src/Job/AbstractCheckFile.php:218
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} avec "
+"succès, {total_failed} échecs."
+
+#: src/Job/MediaPosition.php:135
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} items has "
+"wrong positions."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} contenus "
+"ont des positions incorrectes."
+
+#: src/Job/FileMissing.php:12
+msgid "Hash"
+msgstr "Code de contrôle"
+
+#: src/Job/FileMissing.php:17 src/Job/FileDimension.php:17
+msgid "Message"
+msgstr "Message"
+
+#: src/Job/FileMissing.php:73
+msgid ""
+"The derivative files are not rebuilt automatically. Check them and recreate "
+"them via the other processes."
+msgstr ""
+"Les fichiers dérivés ne sont pas reconstruits automatiquement. Vérifiez-les "
+"et recréez-les avec les autres traitements."
+
+#: src/Job/FileMissing.php:87
+msgid "Source directory \"{path}\" is not set or not readable."
+msgstr "Le dossier source \"{path}\" n’est pas prêt ou non lisible."
+
+#: src/Job/FileMissing.php:96
+msgid "Source directory \"{path}\" should be a real path ({realpath})."
+msgstr "Le dossier source \"{path}\" doit être un chemin réel ({realpath})."
+
+#: src/Job/FileMissing.php:106
+msgid "Source directory \"{path}\" is empty."
+msgstr "Le dossier source \"{path}\" est vide."
+
+#: src/Job/FileMissing.php:118
+msgid "Preparing hashes of {total} files (this may take a long time)."
+msgstr ""
+"Préparation des sommes de contrôle de {total} fichiers (cela peut être long)."
+
+#: src/Job/FileMissing.php:129
+msgid "Source file \"{path}\" is not readable."
+msgstr "Le fichier source \"{path}\" n’est pas lisible."
+
+#: src/Job/FileMissing.php:138
+msgid "{count}/{total} hashes prepared."
+msgstr "{count}/{total} sommes de contrôle préparées."
+
+#: src/Job/FileMissing.php:148
+msgid "The source directory contains {total} readable files."
+msgstr "Le dossier source contient {total} fichiers lisibles."
+
+#: src/Job/FileMissing.php:153
+msgid "The source directory contains {total} duplicate files."
+msgstr "Le dossier source contient {total} fichiers en doublon."
+
+#: src/Job/FileMissing.php:198 src/Job/AbstractCheckFile.php:55
+msgid "Checking {total} media with original files."
+msgstr "Vérification de {total} médias avec des fichiers originaux."
+
+#: src/Job/FileMissing.php:206
+msgid "Checking {total} media with thumbnails."
+msgstr "Vérification de {total} médias avec les vignettes."
+
+#: src/Job/FileMissing.php:278 src/Job/FileDimension.php:130
+msgid ""
+"Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed, {total_fixed} fixed."
+msgstr ""
+"Tâche arrêtée : {processed}/{total} traités, {total_succeed} avec succès, "
+"{total_failed} échecs, {total_fixed} corrigés."
+
+#: src/Job/FileMissing.php:289
+msgid ""
+"Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed ({mode})."
+msgstr ""
+"Tâche arrêtée : {processed}/{total} traités, {total_succeed} avec succès, "
+"{total_failed} échecs ({mode})."
+
+#: src/Job/FileMissing.php:412 src/Job/FileDimension.php:250
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed, {total_fixed} fixed."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} avec "
+"succès, {total_failed} échecs, {total_fixed} corrigés."
+
+#: src/Job/FileMissing.php:423
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} succeed, "
+"{total_failed} failed ({mode})."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} avec "
+"succès, {total_failed} échecs ({mode})."
+
+#: src/Job/DbSession.php:22
+msgid "A minimum number of days is needed to clean sessions."
+msgstr "Un nombre minimum de jours est nécessaires pour nettoyer les sessions."
+
+#: src/Job/DbSession.php:64
+msgid ""
+"The table \"{table}\" has a size of {size} MB. {old}/{all} records are older "
+"than {days} days."
+msgstr ""
+"La table \"{table}\" a une taille de {size} Mo. {old}/{all} enregistrements "
+"sont plus vieux que {days} jours."
+
+#: src/Job/DbSession.php:76
+msgid ""
+"{count} records older than {days} days were removed. The table \"{table}\" "
+"has a size of {size} MB."
+msgstr ""
+"{count} enregistrements plus anciens que {days} jours ont été supprimés. La "
+"table \"{table}\" a une taille de {size} Mo."
+
+#: src/Job/FileDimension.php:14
+msgid "Existing dimensions (w × h × d)"
+msgstr "Dimensions existantes (l × h × d)"
+
+#: src/Job/FileDimension.php:15
+msgid "New dimensions (w × h × d)"
+msgstr "Nouvelles dimensions (l x h x d)"
+
+#: src/Job/FileDimension.php:30
+msgid "This process requires module \"{module}\"."
+msgstr "Ce traitement requiert les modules \"{module}\"."
+
+#: src/Job/FileDimension.php:82
+msgid "No image, audio or video to process."
+msgstr "Aucune image, audio ou vidéo à traiter."
+
+#: src/Job/FileDimension.php:88
+msgid ""
+"Checking dimensions of a {total} of image/audio/video media with original or "
+"thumbnails."
+msgstr ""
+"Vérification des dimensions de {total} médias image/audio/vidéo avec les "
+"fichiers originaux et vignettes."
+
+#: src/Job/AbstractCheck.php:122
+msgid "Starting \"{process}\"."
+msgstr "Lancement de \"{process}\"."
+
+#: src/Job/AbstractCheck.php:149
+msgid "Unable to open output: {error}."
+msgstr "Impossible d’ouvrir la sortie : {error}."
+
+#: src/Job/AbstractCheck.php:191
+#, php-format
+msgid "Trying to output more than %d messages. Next messages are skipped."
+msgstr ""
+"Impossible d’écrire plus de %d messages. Les messages suivants sont ignorés."
+
+#: src/Job/AbstractCheck.php:247
+msgid "Results are available in this spreadsheet: {url}."
+msgstr "Les résultats sont disponibles dans le tableau : {url}."
+
+#: src/Job/AbstractCheck.php:288
+msgid ""
+"Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {exception}"
+msgstr ""
+"Erreur d’enregistrement en sauvant \"{filename}\" (fichier temporaire : "
+"\"{tempfile}\") : {exception}"
+
+#: src/Job/AbstractCheck.php:297
+msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
+msgstr ""
+"Erreur lors de l’enregistrement de \"{filename}\" (fichier temporaire : "
+"\"{tempfile}\") : {error}"
+
+#: src/Job/DbResourceTitle.php:12
+msgid "Existing title"
+msgstr "Titre existant"
+
+#: src/Job/DbResourceTitle.php:13
+msgid "Real title"
+msgstr "Titre réel"
+
+#: src/Job/DbResourceTitle.php:14
+msgid "Different"
+msgstr "Différent"
+
+#: src/Job/DbResourceTitle.php:58 src/Job/LoopItems.php:42
 msgid "No resource to process."
 msgstr "Aucune ressource à traiter."
+
+#: src/Job/DbResourceTitle.php:93
+msgid "{processed}/{total} resources processed."
+msgstr "{processed}/{total} ressources traitées."
+
+#: src/Job/DbResourceTitle.php:148
+msgid "Fixed title for resource \"{resource_type}\" #{resource_id}."
+msgstr "Titre mis à jour pour la ressource \"{resource_type}\" #{resource_id}."
+
+#: src/Job/DbResourceTitle.php:155
+msgid "Title for resource \"{resource_type}\" #{resource_id} should be empty."
+msgstr ""
+"Le titre pour la ressource \"{resource_type}\" #{resource_id} doit être vide."
+
+#: src/Job/DbResourceTitle.php:160
+msgid ""
+"Title for resource \"{resource_type}\" #{resource_id} should be \"{title}\"."
+msgstr ""
+"Le titre pour la ressource \"{resource_type}\" #{resource_id} devrait être "
+"\"{title}\"."
+
+#: src/Job/DbResourceTitle.php:184
+msgid "End of process: {processed}/{total} processed, {total_succeed} updated."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} mis à jour."
+
+#: src/Job/DbResourceTitle.php:193
+msgid ""
+"End of process: {processed}/{total} processed, {total_succeed} different."
+msgstr ""
+"Fin du traitement : {processed}/{total} traités, {total_succeed} différents."
+
+#: src/Job/ItemNoValue.php:12
+msgid "Media count"
+msgstr "Nombre de médias"
+
+#: src/Job/ItemNoValue.php:57
+msgid "There are {count} items without value."
+msgstr "Il y a {count} contenus sans métadonnée."
+
+#: src/Job/ItemNoValue.php:101
+msgid "Media #{media_id}: Original file \"{filename}\" was missing."
+msgstr "Média #{media_id} : le fichier original \"{filename}\" n’existe pas."
+
+#: src/Job/ItemNoValue.php:125
+msgid "Media #{media_id}: Original file \"{filename}\" was moved."
+msgstr "Média #{media_id} : le fichier original \"{filename}\" a été déplacé."
+
+#: src/Job/ItemNoValue.php:132
+msgid "Media #{media_id}: Original file \"{filename}\" cannot be moved."
+msgstr ""
+"Média #{media_id} : le fichier original \"{filename}\" ne peut pas être "
+"déplacé."
+
+#: src/Job/DbJob.php:78
+msgid ""
+"Dead jobs were cleaned: {count_stopped} marked \"stopped\" and {count_error} "
+"marked \"error\" on a total of {count_jobs}."
+msgstr ""
+"Les tâches abandonnées ont été nettoyées : {count_stopped} ont été marquées "
+"\"arrétées\" et {count_error} ont été marquées \"erreurr\" sur un total de "
+"{count_jobs}."
+
+#: src/Job/DbJob.php:90
+msgid "There is no dead job."
+msgstr "Aucune tâche abandonnée."
+
+#: src/Job/DbJob.php:96
+msgid "The following {count} jobs are dead: {job_ids}."
+msgstr "Les tâches suivantes {count} sont abandonnées : {job_ids}."
+
+#: src/Job/DbJob.php:127
+msgid "A total of {count} dead jobs have been cleaned."
+msgstr "Un total de {count} tâches abandonnées ont été nettoyées."
 
 #: src/Job/LoopItems.php:48
 msgid "Processing {count} resources."
@@ -143,3 +1068,189 @@ msgstr "La tâche \"{name}\" a été arrêtée."
 #: src/Job/LoopItems.php:92
 msgid "End of the job: {count}/{total} processed."
 msgstr "Fin de la tâche : {count}/{total} traités."
+
+#: src/Job/FileSize.php:13
+msgid "Database size"
+msgstr "Taille de la base de données"
+
+#: src/Job/FileSize.php:14
+msgid "Real size"
+msgstr "Taille réelle"
+
+#: src/Job/AbstractCheckFile.php:18
+msgid "Column {type} does not exist or cannot be checked."
+msgstr "La colonne {type] n’existe pas et ne peut pas être vérifiée."
+
+#: src/Job/AbstractCheckFile.php:34
+msgid ""
+"{total_size}/{total_no} media have no original file, but a {type}, and were "
+"fixed."
+msgstr ""
+"{total_size}/{total_no} médias n’ont pas de fichiers originaux, mais un "
+"{type}, et peuvent être corrigés."
+
+#: src/Job/AbstractCheckFile.php:39
+msgid "{total_size}/{total_no} media have no original file, but a {type}."
+msgstr ""
+"{total_size}/{total_no} médias n’ont pas de fichier original, mais un {type}."
+
+#: src/Job/AbstractCheckFile.php:45
+msgid "{total_no} media have no original file, so no {type}."
+msgstr "{total_no} média n’ont pas de fichier original, et donc pas de {type}."
+
+#: src/Job/AbstractCheckFile.php:146
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" "
+"updated with {type} = {real_value}."
+msgstr ""
+"Média #{media_id} ({processed}/{total}) : le fichier original \"{filename}\" "
+"a été mis à jour avec {type} = {real_value}."
+
+#: src/Job/AbstractCheckFile.php:162
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has no "
+"{type}, but should be {real_value}."
+msgstr ""
+"Média #{media_id} ({processed}/{total}) : le fichier original \"{filename}\" "
+"n’a pas de {type}, mais devrait être {real_value}."
+
+#: src/Job/AbstractCheckFile.php:175
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" has a "
+"different {type}: {db_value} ≠ {real_value}."
+msgstr ""
+"Média #{media_id} ({processed}/{total}) : le fichier original \"{filename}\" "
+"a un {type} différent : {db_value} ≠ {real_value}."
+
+#: src/Job/AbstractCheckFile.php:193
+msgid ""
+"Media #{media_id} ({processed}/{total}): original file \"{filename}\" does "
+"not exist."
+msgstr ""
+"Média #{media_id} ({processed}/{total}) : le fichier original \"{filename}\" "
+"n’existe pas."
+
+#: src/Job/FileDerivative.php:22
+msgid "Has thumbnails"
+msgstr "A des vignettes"
+
+#: src/Job/FileDerivative.php:115
+msgid ""
+"No media to process for creation of derivative files (on a total of {total} "
+"medias). You may check your query."
+msgstr ""
+"Aucun média pour la création de fichiers dérivés (sur un total de {total} "
+"médias). Vous pourriez vérifier votre requête."
+
+#: src/Job/FileDerivative.php:122
+msgid ""
+"Processing creation of derivative files of {total_process} medias (on a "
+"total of {total} medias)."
+msgstr ""
+"Création des fichiers dérivés en cours pour {total_process} médias (sur un "
+"total de {total} médias)."
+
+#: src/Job/FileDerivative.php:153
+msgid ""
+"The job \"Derivative Images\" was stopped: {count]/{total} resources "
+"processed."
+msgstr ""
+"La tâche \"Images dérivées\" a été arrêtée : {count]/{total} ressources "
+"traitées."
+
+#: src/Job/FileDerivative.php:175
+msgid ""
+"Media #{media_id} ({index}/{total}): the original file \"{filename}\" does "
+"not exist."
+msgstr ""
+"Média #{media_id} ({index}/{total}) : le fichier original \"{filename}\" "
+"n’existe pas."
+
+#: src/Job/FileDerivative.php:185
+msgid ""
+"Media #{media_id} ({index}/{total}): the original file \"{filename}\" is not "
+"readable."
+msgstr ""
+"Média #{media_id} ({index}/{total}) : le fichier original \"{filename}\" "
+"n’est pas lisible."
+
+#: src/Job/FileDerivative.php:198
+msgid ""
+"Media #{media_id} ({index}/{total}): derivative file \"{filename}\" is not "
+"writeable (type \"{type}\")."
+msgstr ""
+"Média #{media_id} ({index}/{total}) : le fichier dérivé {filename}\" ne peut "
+"pas être enregistré (type \"{type}\")."
+
+#: src/Job/FileDerivative.php:209
+msgid "Media #{media_id} ({index}/{total}): creating derivative files."
+msgstr "Média #{media_id} ({index}/{total}) : création des fichiers dérivés."
+
+#: src/Job/FileDerivative.php:252
+msgid "Media #{media_id} ({index}/{total}): derivative files created."
+msgstr "Média #{media_id} ({index}/{total}) : fichiers dérivés créés."
+
+#: src/Job/FileDerivative.php:258
+msgid "Media #{media_id} ({index}/{total}): derivative files not created."
+msgstr ""
+"Média #{media_id} ({index}/{total}) : les fichiers dérivés ne peuvent pas "
+"être créés."
+
+#: src/Job/FileDerivative.php:283
+msgid ""
+"End of the creation of derivative files: {count}/{total} processed, "
+"{skipped} skipped, {succeed} succeed, {failed} failed."
+msgstr ""
+"Fin de la création des fichiers dérivés : {count}/{total} traités, {skipped} "
+"ignorés, {succeed} avec succès, {failed} échecs."
+
+#: config/module.config.php:25
+msgid "Bulk Check"
+msgstr "Vérifications"
+
+#~ msgid "Remove bulk check directory"
+#~ msgstr "Supprimer le dossier des vérifications"
+
+#~ msgid "Media type"
+#~ msgstr "Média-type"
+
+#~ msgid "filename"
+#~ msgstr "nom de fichier"
+
+#~ msgid "Available checkers"
+#~ msgstr "Traitements disponibles"
+
+#~ msgid ""
+#~ "Processing checks in background (job {link_open_job}#{job_id}"
+#~ "{link_close}, {link_open_log}logs{link_close})."
+#~ msgstr ""
+#~ "Traitement en arrière-plan (tâche {link_open_job}#{job_id}{link_close}, "
+#~ "{link_open_log}journaux{link_close})."
+
+#~ msgid ""
+#~ "Media #{media_id} ({processed}/{total}): original file copied from source "
+#~ "\"{filepath}\"."
+#~ msgstr ""
+#~ "Média #{media_id} ({processed}/{total}) : le fichier original a été copié "
+#~ "depuis la source \"{filepath}\"."
+
+#~ msgid ""
+#~ "Media #{media_id} ({processed}/{total}): unable to copy original file "
+#~ "\"{filepath}\"."
+#~ msgstr ""
+#~ "Média #{media_id} ({processed}/{total}) : impossible de copier le fichier "
+#~ "original \"{filepath}\"."
+
+#~ msgid ""
+#~ "Media #{media_id} ({processed}/{total}): file \"{filename}\" does not "
+#~ "does not have a source to copy."
+#~ msgstr ""
+#~ "Média #{media_id} ({processed}/{total}) : le fichier \"{filename}\" n’a "
+#~ "pas de source à copier."
+
+#~ msgid ""
+#~ "Media #{media_id} ({processed}/{total}): file \"{filename}\" does not "
+#~ "exist for type \"{type}\"."
+#~ msgstr ""
+#~ "Média #{media_id} ({processed}/{total}) : le fichier \"{filename}\" "
+#~ "n’existe pas pour le type \"{type}\"."
