@@ -11,11 +11,12 @@ admin interface:
 - launch simple tasks, that can be any job of any module;
 - install modules;
 - update modules;
+- maintenance state;
 - checks database and files.
 
 Note: install/update modules is currently managed by module [Easy Install] and
-the checks is currently managed by module [Bulk Check]. They will be included
-soon.
+the maintenance is currently managed by module [Maintenance]. They will be
+included soon.
 
 Checks and fixes that are doable:
 
@@ -213,25 +214,24 @@ Copyright
 
 * Copyright Daniel Berthereau, 2017-2022 (see [Daniel-KM] on GitLab)
 
+This module is a merge and improvement of previous modules [Easy Install], [Next],
+[Maintenance] and [Bulk Check].
+
 
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Omeka S]: https://omeka.org/s
 [Easy Install]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
+[Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
+[Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/
-[Search SolR]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Cron/issues
-[Omeka S]: https://omeka.org/s
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
-[Derivative Images]: https://gitlab.com/Daniel-KM/Omeka-S-module-DerivativeImages
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
-[BulkCheck.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/releases
-[installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
