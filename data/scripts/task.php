@@ -189,7 +189,7 @@ try {
     $user = $entityManager->find(\Omeka\Entity\User::class, $userId);
 } catch (\Exception $e) {
     $message = new Message(
-        'The database does not exist.', // @translate
+        'The database does not exist.' // @translate
     );
     exit($translator->translate($message) . PHP_EOL);
 }
