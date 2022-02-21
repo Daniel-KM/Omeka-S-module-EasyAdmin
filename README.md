@@ -137,8 +137,8 @@ php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Jo
 ```
 
 Note that for jobs created manually in the admin interface, you can run them
-with the standard Omeka "perform-job.php". Of course, these job can be run only
-one time:
+with the standard Omeka "perform-job.php". Of course, these job can be run one
+time only:
 
 ```sh
 php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-url 'https://example.org' --base-path '/'
