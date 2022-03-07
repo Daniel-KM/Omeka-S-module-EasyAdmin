@@ -111,6 +111,9 @@ class CheckController extends AbstractActionController
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
                 break;
+            case 'db_statistics_index':
+                $job = $dispatcher->dispatch(\Statistics\Job\AggregateHits::class);
+                break;
             case 'db_thesaurus_index':
                 $job = $dispatcher->dispatch(\Thesaurus\Job\Indexing::class);
                 break;

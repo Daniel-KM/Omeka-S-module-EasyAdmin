@@ -56,6 +56,7 @@ class CheckForm extends Form
                         'db_log_check' => 'Check the size of the table of logs in database(module Log)', // @translate
                         'db_log_clean' => 'Remove old logs (options below)', // @translate
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
+                        'db_statistics_index' => 'Index statistics (module Statistics, needed only after direct import)', // @translate
                         'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
                 ],

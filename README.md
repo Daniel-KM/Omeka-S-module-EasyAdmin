@@ -95,7 +95,7 @@ that can create derivative or temp files. And you may need to take care of
 escaping json arguments. Or use a sudo command:
 
 ```sh
-sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --base-path 'OmekaS' --server-url 'https://example.org' --args '{"bulk_import_id": 1}'
+sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/omeka-s' --args '{"bulk_import_id": 1}'
 ```
 
 Required arguments are:
@@ -134,6 +134,11 @@ admin interface with its option "Store job as a task".
 
 ```sh
 php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
+```
+
+Another example: reindex statistics after import of hits:
+```sh
+sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'Statistics\Job\AggregateHits' --user-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
 Note that for jobs created manually in the admin interface, you can run them
