@@ -52,7 +52,8 @@ GROUP BY item.id
 ORDER BY item.id ASC;
 SQL;
         // They are generally few.
-        $items = $this->connection->executeQuery($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $items = $this->connection->executeQuery($sql)->fetchAllAssociative();
+
         $this->logger->notice(
             'There are {count} items without value.', // @translate
             ['count' => count($items)]

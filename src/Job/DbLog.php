@@ -107,8 +107,7 @@ SQL;
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':date', $date);
         $stmt->bindValue(':severity', $maximumSeverity);
-        $stmt->execute();
-        $old = $stmt->fetchOne();
+        $old = $stmt->executeQuery()->fetchOne();
 
         $sql = "SELECT COUNT(id) FROM $this->table;";
         $all = $this->connection->executeQuery($sql)->fetchOne();
@@ -122,7 +121,7 @@ SQL;
             $stmt = $this->connection->prepare($sql);
             $stmt->bindValue(':date', $date);
             $stmt->bindValue(':severity', $maximumSeverity);
-            $stmt->execute();
+            $stmt->executeStatement();
             $count = $stmt->rowCount();
             $size = $this->connection->executeQuery($sqlSize)->fetchOne();
             $this->logger->notice(

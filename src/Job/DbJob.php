@@ -115,12 +115,12 @@ SQL;
 
             if ($stopped) {
                 $sql = 'UPDATE job SET status = "stopped" WHERE id IN (' . implode(',', $stopped) . ')';
-                $this->connection->exec($sql);
+                $this->connection->executeStatement($sql);
             }
 
             if ($errored) {
                 $sql = 'UPDATE job SET status = "error" WHERE id IN (' . implode(',', $errored) . ')';
-                $this->connection->exec($sql);
+                $this->connection->executeStatement($sql);
             }
 
             $this->logger->notice(

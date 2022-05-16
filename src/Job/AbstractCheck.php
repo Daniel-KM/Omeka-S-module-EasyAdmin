@@ -44,6 +44,16 @@ abstract class AbstractCheck extends AbstractJob
     protected $connection;
 
     /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $dbalConnection;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $ormConnection;
+
+    /**
      * @var \Doctrine\ORM\EntityRepository
      */
     protected $resourceRepository;
@@ -103,9 +113,10 @@ abstract class AbstractCheck extends AbstractJob
         $this->logger->addProcessor($referenceIdProcessor);
         $this->api = $services->get('ControllerPluginManager')->get('api');
         $this->entityManager = $services->get('Omeka\EntityManager');
-        // These two connections are not the same.
-        // $this->connection = $services->get('Omeka\Connection');
-        $this->connection = $this->entityManager->getConnection();
+        // These two connections are not the same in doctrine.
+        $this->dbalConnection = $services->get('Omeka\Connection');
+        $this->ormConnection = $this->entityManager->getConnection();
+        $this->connection = $this->dbalConnection;
         $this->resourceRepository = $this->entityManager->getRepository(\Omeka\Entity\Resource::class);
         $this->itemRepository = $this->entityManager->getRepository(\Omeka\Entity\Item::class);
         $this->mediaRepository = $this->entityManager->getRepository(\Omeka\Entity\Media::class);
