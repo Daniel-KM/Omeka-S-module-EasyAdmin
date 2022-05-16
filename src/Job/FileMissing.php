@@ -183,6 +183,9 @@ class FileMissing extends AbstractCheckFile
      */
     protected function checkMissingFilesForTypes(array $types, $fix = false)
     {
+        // In big recoveries, it is recommended to clear the caches.
+        $this->entityManager->clear();
+
         // Entity are used, because it's not possible to get the value
         // "has_original" or "has_thumbnails" via api.
         $criteria = new \Doctrine\Common\Collections\Criteria();
