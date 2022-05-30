@@ -23,6 +23,20 @@ Uncompress files in the directory `modules` and rename folder `EasyInstall`.
 
 See general end user documentation for [Installing a module](http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules).
 
+In some cases, your may need to add credentials in your config (omeka file "config/local.config.php"),
+depending on your linux distribution:
+```php
+    'http_client' => [
+        // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
+        'sslcapath' => '/usr/local/etc/ssl/certs',
+        'sslcafile' => '/usr/local/etc/ssl/certs/ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs',
+        // 'sslcafile' => '/etc/pki/tls/certs/ca-bundle.crt',
+    ],
+```
+
+You can find more information on the params in [Laminas help].
+
 
 Usage
 -----
@@ -86,6 +100,7 @@ Copyright
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
 [Omeka Classic]: https://omeka.org/classic
+[Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
 [themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall/-/issues
