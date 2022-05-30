@@ -448,12 +448,14 @@ class IndexController extends AbstractActionController
      * Remove a dir from filesystem.
      *
      * @param string $dirpath Absolute path.
-     * @return bool
      */
-    private function rmDir($dirPath)
+    private function rmDir(string $dirPath): bool
     {
         if (!file_exists($dirPath)) {
             return true;
+        }
+        if (strpos($dirPath, '/..') !== false || substr($dirPath, 0, 1) !== '/') {
+            return false;
         }
         $files = array_diff(scandir($dirPath), ['.', '..']);
         foreach ($files as $file) {
