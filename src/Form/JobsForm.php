@@ -3,6 +3,8 @@
 namespace EasyAdmin\Form;
 
 use Doctrine\DBAL\Connection;
+use Laminas\EventManager\EventManagerAwareTrait;
+use Laminas\EventManager\Event;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
@@ -10,6 +12,8 @@ use Omeka\Form\Element as OmekaElement;
 
 class JobsForm extends Form
 {
+    use EventManagerAwareTrait;
+
     /**
      * @var \Doctrine\DBAL\Connection
      */
@@ -286,6 +290,9 @@ class JobsForm extends Form
         $this
             ->get('process')->setLabelAttributes(['style' => 'display: inline-block']);
 
+        $event = new Event('form.add_elements', $this);
+        $this->getEventManager()->triggerEvent($event);
+
         $inputFilter = $this->getInputFilter();
         $inputFilter
             ->add([
@@ -324,6 +331,9 @@ class JobsForm extends Form
                 'name' => 'days',
                 'required' => false,
             ]);
+
+        $event = new Event('form.add_input_filters', $this, ['inputFilter' => $inputFilter]);
+        $this->getEventManager()->triggerEvent($event);
     }
 
     /**

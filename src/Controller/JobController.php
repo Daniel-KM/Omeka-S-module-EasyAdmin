@@ -4,6 +4,7 @@ namespace EasyAdmin\Controller;
 
 use Omeka\Stdlib\Message;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
 
 class JobController extends AbstractActionController
@@ -118,8 +119,21 @@ class JobController extends AbstractActionController
                 $job = $dispatcher->dispatch(\Thesaurus\Job\Indexing::class);
                 break;
             default:
-                $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
-                return $view;
+                $eventManager = $this->getEventManager();
+                $args = $eventManager->prepareArgs([
+                    'process' => $params['process'],
+                    'params' => $params,
+                    'job' => null,
+                    'args' => [],
+                ]);
+                $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
+                $jobClass = $args['job'];
+                 if (!$jobClass) {
+                    $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
+                    return $view;
+                }
+                $job = $dispatcher->dispatch($jobClass, $args['args']);
+                break;
         }
 
         $urlHelper = $this->url();
