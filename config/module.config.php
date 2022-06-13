@@ -37,12 +37,30 @@ return [
                     'easy-admin' => [
                         'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
-                            'route' => '/easy-admin/job',
+                            // TODO The default route may be modified later.
+                            'route' => '/easy-admin',
                             'defaults' => [
                                 '__NAMESPACE__' => 'EasyAdmin\Controller',
                                 '__ADMIN__' => true,
                                 'controller' => 'Job',
                                 'action' => 'index',
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'default' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/:controller[/:action]',
+                                    'constraints' => [
+                                        'controller' => 'job',
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        'controller' => 'Job',
+                                        'action' => 'index',
+                                    ],
+                                ],
                             ],
                         ],
                     ],

@@ -23,7 +23,7 @@ class LoopItems extends AbstractJob
     public function perform(): void
     {
         /**
-         * @var \Omeka\Mvc\Controller\Plugin\Logger $logger
+         * @var \Laminas\Log\Logger $logger
          * @var \Omeka\Api\Manager $api
          * @var \Doctrine\ORM\EntityManager $entityManager
          */
@@ -52,7 +52,7 @@ class LoopItems extends AbstractJob
         $offset = 0;
         $totalProcessed = 0;
         while (true) {
-            /** @var \Omeka\Api\Representation\AbstractRepresentation[] $resource */
+            /** @var \Omeka\Api\Representation\AbstractRepresentation[] $resources */
             $resources = $api
                 ->search($resourceType, [
                     'limit' => self::BULK_LIMIT,

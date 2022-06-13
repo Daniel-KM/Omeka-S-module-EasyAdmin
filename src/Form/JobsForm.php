@@ -336,56 +336,33 @@ class JobsForm extends Form
         $this->getEventManager()->triggerEvent($event);
     }
 
-    /**
-     * @return array
-     */
-    protected function listIngesters()
+    protected function listIngesters(): array
     {
         $sql = 'SELECT DISTINCT(ingester) FROM media ORDER BY ingester';
-        $stmt = $this->getConnection()->query($sql);
-        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All ingesters'] // @translate
             + array_combine($result, $result);
     }
 
-    /**
-     * @return array
-     */
-    protected function listRenderers()
+    protected function listRenderers(): array
     {
         $sql = 'SELECT DISTINCT(renderer) FROM media ORDER BY renderer';
-        $stmt = $this->getConnection()->query($sql);
-        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All renderers'] // @translate
             + array_combine($result, $result);
     }
 
-    /**
-     * @return array
-     */
-    protected function listMediaTypes()
+    protected function listMediaTypes(): array
     {
         $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type';
-        $stmt = $this->getConnection()->query($sql);
-        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All media types'] // @translate
             + array_combine($result, $result);
     }
 
-    /**
-     * @param Connection $connection
-     */
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): self
     {
         $this->connection = $connection;
         return $this;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    protected function getConnection()
-    {
-        return $this->connection;
     }
 }
