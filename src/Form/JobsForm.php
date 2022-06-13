@@ -3,12 +3,12 @@
 namespace EasyAdmin\Form;
 
 use Doctrine\DBAL\Connection;
-use Omeka\Form\Element\ItemSetSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
+use Omeka\Form\Element as OmekaElement;
 
-class CheckForm extends Form
+class JobsForm extends Form
 {
     /**
      * @var \Doctrine\DBAL\Connection
@@ -110,7 +110,7 @@ class CheckForm extends Form
         $this->get('files_derivative')
             ->add([
                 'name' => 'item_sets',
-                'type' => ItemSetSelect::class,
+                'type' => OmekaElement\ItemSetSelect::class,
                 'options' => [
                     'label' => 'Item sets', // @translate
                 ],

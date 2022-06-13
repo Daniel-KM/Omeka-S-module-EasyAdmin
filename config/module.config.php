@@ -10,22 +10,22 @@ return [
     ],
     'form_elements' => [
         'factories' => [
-            Form\CheckForm::class => Service\Form\CheckFormFactory::class,
+            Form\JobsForm::class => Service\Form\JobsFormFactory::class,
         ],
     ],
     'controllers' => [
         'invokables' => [
-            'EasyAdmin\Controller\Check' => Controller\CheckController::class,
+            'EasyAdmin\Controller\Job' => Controller\JobController::class,
         ],
     ],
     // TODO Merge bulk navigation and route with module BulkImport (require a main page?).
     'navigation' => [
         'AdminModule' => [
             'easy-admin' => [
-                'label' => 'Bulk Check', // @translate
-                'route' => 'admin/bulk-check',
-                'controller' => 'bulk-check',
-                'resource' => 'EasyAdmin\Controller\Check',
+                'label' => 'Job manager', // @translate
+                'route' => 'admin/easy-admin',
+                'controller' => 'job',
+                'resource' => 'EasyAdmin\Controller\Job',
                 'class' => 'o-icon-jobs',
             ],
         ],
@@ -34,14 +34,14 @@ return [
         'routes' => [
             'admin' => [
                 'child_routes' => [
-                    'bulk-check' => [
+                    'easy-admin' => [
                         'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
-                            'route' => '/bulk-check',
+                            'route' => '/easy-admin/job',
                             'defaults' => [
                                 '__NAMESPACE__' => 'EasyAdmin\Controller',
                                 '__ADMIN__' => true,
-                                'controller' => 'Check',
+                                'controller' => 'Job',
                                 'action' => 'index',
                             ],
                         ],

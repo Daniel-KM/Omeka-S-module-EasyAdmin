@@ -6,11 +6,11 @@ use Omeka\Stdlib\Message;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
-class CheckController extends AbstractActionController
+class JobController extends AbstractActionController
 {
     public function indexAction()
     {
-        $form = $this->getForm(\EasyAdmin\Form\CheckForm::class);
+        $form = $this->getForm(\EasyAdmin\Form\JobsForm::class);
         $view = new ViewModel;
         $view
             ->setVariable('form', $form);
@@ -144,7 +144,7 @@ class CheckController extends AbstractActionController
         $this->messenger()->addSuccess($message);
 
         // Reset the form after a submission.
-        $form = $this->getForm(\EasyAdmin\Form\CheckForm::class);
+        $form = $this->getForm(\EasyAdmin\Form\JobsForm::class);
         return $view
             ->setVariable('form', $form);
     }

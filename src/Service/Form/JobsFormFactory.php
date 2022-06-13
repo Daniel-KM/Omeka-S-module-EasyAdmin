@@ -2,15 +2,15 @@
 
 namespace EasyAdmin\Service\Form;
 
-use EasyAdmin\Form\CheckForm;
+use EasyAdmin\Form\JobsForm;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class CheckFormFactory implements FactoryInterface
+class JobsFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $form = new CheckForm(null, $options);
+        $form = new JobsForm(null, $options);
         return $form
             ->setConnection($services->get('Omeka\Connection'));
     }
