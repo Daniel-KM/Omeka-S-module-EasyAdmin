@@ -213,6 +213,7 @@ DQL;
                 $tempFile = $tempFileFactory->build();
                 $tempFile->setTempPath($sourcePath);
                 $tempFile->setStorageId($media->getStorageId());
+                $tempFile->setSourceName($media->getSource());
 
                 // Update other data: as long as the sha256 is good, the file is
                 // good so there is not problem to update base data.
