@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-14 00:00+0000\n"
+"POT-Creation-Date: 2022-09-26 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: src/Generic/AbstractModule.php:66
+#: src/Generic/AbstractModule.php:66 src/Generic/AbstractModule.php:740
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
@@ -54,7 +54,12 @@ msgstr ""
 msgid "The module removed tables \"%s\" from a previous broken install."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:792
+#: src/Generic/AbstractModule.php:735
+#, php-format
+msgid "This module requires the module \"%1$s\", version %2$s or above."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:832
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -81,31 +86,31 @@ msgstr ""
 msgid "Empty file"
 msgstr ""
 
-#: src/Job/FileMissing.php:239
+#: src/Job/FileMissing.php:242
 msgid "No source"
 msgstr ""
 
-#: src/Job/FileMissing.php:240
+#: src/Job/FileMissing.php:243
 msgid "Copy issue"
 msgstr ""
 
-#: src/Job/FileMissing.php:241
+#: src/Job/FileMissing.php:244
 msgid "Item removed"
 msgstr ""
 
-#: src/Job/FileMissing.php:242
+#: src/Job/FileMissing.php:245
 msgid "Item not removed: more than one media"
 msgstr ""
 
-#: view/easy-admin/check/index.phtml:15
+#: view/easy-admin/job/index.phtml:15
 msgid "Bulk check"
 msgstr ""
 
-#: view/easy-admin/check/index.phtml:15
+#: view/easy-admin/job/index.phtml:15
 msgid "Easy Admin"
 msgstr ""
 
-#: view/easy-admin/check/index.phtml:17
+#: view/easy-admin/job/index.phtml:17
 msgid "Checks"
 msgstr ""
 
@@ -206,296 +211,300 @@ msgstr ""
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
-#: src/Form/CheckForm.php:25
+#: src/Form/JobsForm.php:29
 msgid "Processors"
 msgstr ""
 
-#: src/Form/CheckForm.php:27
+#: src/Form/JobsForm.php:31
 msgid "List files that are present in \"/files/\", but not in database"
 msgstr ""
 
-#: src/Form/CheckForm.php:28
+#: src/Form/JobsForm.php:32
 msgid ""
 "Move files that are present in \"/files/\", but not in database, into \"/"
 "files/check/\""
 msgstr ""
 
-#: src/Form/CheckForm.php:29
+#: src/Form/JobsForm.php:33
 msgid ""
 "List files that are present in database, not in \"/files/\" (original only)"
 msgstr ""
 
-#: src/Form/CheckForm.php:30
+#: src/Form/JobsForm.php:34
 msgid ""
 "List files that are present in database, not in \"/files/\" (include "
 "derivatives)"
 msgstr ""
 
-#: src/Form/CheckForm.php:31
+#: src/Form/JobsForm.php:35
 msgid ""
 "Copy missing original files from the source directory below (recover a "
 "disaster)"
 msgstr ""
 
-#: src/Form/CheckForm.php:32
+#: src/Form/JobsForm.php:36
 msgid ""
 "Remove items with one file that is missing (WARNING: export your items first)"
 msgstr ""
 
-#: src/Form/CheckForm.php:33
+#: src/Form/JobsForm.php:37
 msgid "Rebuild derivative images (thumbnails) with options below"
 msgstr ""
 
-#: src/Form/CheckForm.php:34
+#: src/Form/JobsForm.php:38
 msgid "Check media rendered as \"file\", but without original"
 msgstr ""
 
-#: src/Form/CheckForm.php:35
+#: src/Form/JobsForm.php:39
 msgid ""
 "Remove media rendered as \"file\", but without original (WARNING: export "
 "your media first)"
 msgstr ""
 
-#: src/Form/CheckForm.php:36
+#: src/Form/JobsForm.php:40
 msgid "Remove empty directories in \"/files/\" (for module Archive Repertory)"
 msgstr ""
 
-#: src/Form/CheckForm.php:37
+#: src/Form/JobsForm.php:41
 msgid ""
 "Check missing file sizes in database (not managed during upgrade to Omeka "
 "1.2.0)"
 msgstr ""
 
-#: src/Form/CheckForm.php:38
+#: src/Form/JobsForm.php:42
 msgid "Fix all file sizes in database (for example after hard import)"
 msgstr ""
 
-#: src/Form/CheckForm.php:39
+#: src/Form/JobsForm.php:43
 msgid "Check sha256 hashes of files"
 msgstr ""
 
-#: src/Form/CheckForm.php:40
+#: src/Form/JobsForm.php:44
 msgid "Fix wrong sha256 of files"
 msgstr ""
 
-#: src/Form/CheckForm.php:41
+#: src/Form/JobsForm.php:45
 msgid "Check files dimensions (modules IIIF Server / Image Server)"
 msgstr ""
 
-#: src/Form/CheckForm.php:42
+#: src/Form/JobsForm.php:46
 msgid "Fix files dimensions (modules IIIF Server / Image Server)"
 msgstr ""
 
-#: src/Form/CheckForm.php:43
+#: src/Form/JobsForm.php:47
 msgid "Check positions of media (start from 1, without missing number)"
 msgstr ""
 
-#: src/Form/CheckForm.php:44
+#: src/Form/JobsForm.php:48
 msgid "Fix wrong positions of media"
 msgstr ""
 
-#: src/Form/CheckForm.php:45
+#: src/Form/JobsForm.php:49
 msgid "Check items without value (media values are not checked)"
 msgstr ""
 
-#: src/Form/CheckForm.php:46
+#: src/Form/JobsForm.php:50
 msgid "Remove items without value (files are moved into \"/files/check/\")"
 msgstr ""
 
-#: src/Form/CheckForm.php:47
+#: src/Form/JobsForm.php:51
 msgid ""
 "Check if all values are utf-8 encoded (Windows issues like \"Ã©\" for \"é\", "
 "options below)"
 msgstr ""
 
-#: src/Form/CheckForm.php:48
+#: src/Form/JobsForm.php:52
 msgid "Fix utf-8 encoding issues (options below)"
 msgstr ""
 
-#: src/Form/CheckForm.php:49
+#: src/Form/JobsForm.php:53
 msgid "Check resource titles (for example after hard import)"
 msgstr ""
 
-#: src/Form/CheckForm.php:50
+#: src/Form/JobsForm.php:54
 msgid "Update resource titles"
 msgstr ""
 
-#: src/Form/CheckForm.php:51
+#: src/Form/JobsForm.php:55
 msgid "Check dead jobs (living in database, but non-existent in system)"
 msgstr ""
 
-#: src/Form/CheckForm.php:52
+#: src/Form/JobsForm.php:56
 msgid ""
 "Set status \"stopped\" for jobs that never started, and \"error\" for the "
 "jobs that never ended"
 msgstr ""
 
-#: src/Form/CheckForm.php:53
+#: src/Form/JobsForm.php:57
 msgid ""
 "Fix status as above for all jobs (when check cannot be done after a reboot)"
 msgstr ""
 
-#: src/Form/CheckForm.php:54
+#: src/Form/JobsForm.php:58
 msgid "Check the size of the table of sessions in database"
 msgstr ""
 
-#: src/Form/CheckForm.php:55
+#: src/Form/JobsForm.php:59
 msgid "Remove old sessions (specify age below)"
 msgstr ""
 
-#: src/Form/CheckForm.php:56
+#: src/Form/JobsForm.php:60
 msgid "Check the size of the table of logs in database(module Log)"
 msgstr ""
 
-#: src/Form/CheckForm.php:57
+#: src/Form/JobsForm.php:61
 msgid "Remove old logs (options below)"
 msgstr ""
 
-#: src/Form/CheckForm.php:58
+#: src/Form/JobsForm.php:62
 msgid "Index full-text search (core job)"
 msgstr ""
 
-#: src/Form/CheckForm.php:59
+#: src/Form/JobsForm.php:63
+msgid "Index statistics (module Statistics, needed only after direct import)"
+msgstr ""
+
+#: src/Form/JobsForm.php:64
 msgid "Index thesaurus (module Thesaurus)"
 msgstr ""
 
-#: src/Form/CheckForm.php:73
+#: src/Form/JobsForm.php:78
 msgid "Options for fix missing files"
 msgstr ""
 
-#: src/Form/CheckForm.php:81
+#: src/Form/JobsForm.php:86
 msgid "Source for restoration"
 msgstr ""
 
-#: src/Form/CheckForm.php:85
+#: src/Form/JobsForm.php:90
 msgid "/server/path/to/my/source/directory"
 msgstr ""
 
-#: src/Form/CheckForm.php:92
+#: src/Form/JobsForm.php:97
 msgid "Limit to extensions"
 msgstr ""
 
-#: src/Form/CheckForm.php:96
+#: src/Form/JobsForm.php:101
 msgid "pdf, jpeg"
 msgstr ""
 
-#: src/Form/CheckForm.php:106
+#: src/Form/JobsForm.php:111
 msgid "Options to rebuild derivative files (thumbnails)"
 msgstr ""
 
-#: src/Form/CheckForm.php:121
+#: src/Form/JobsForm.php:126
 msgid "Select one or more item sets…"
 msgstr ""
 
-#: src/Form/CheckForm.php:128
+#: src/Form/JobsForm.php:133
 msgid "Ingesters to process"
 msgstr ""
 
-#: src/Form/CheckForm.php:129 src/Form/CheckForm.php:336
+#: src/Form/JobsForm.php:134 src/Form/JobsForm.php:343
 msgid "All ingesters"
 msgstr ""
 
-#: src/Form/CheckForm.php:144
+#: src/Form/JobsForm.php:149
 msgid "Renderers to process"
 msgstr ""
 
-#: src/Form/CheckForm.php:145 src/Form/CheckForm.php:348
+#: src/Form/JobsForm.php:150 src/Form/JobsForm.php:351
 msgid "All renderers"
 msgstr ""
 
-#: src/Form/CheckForm.php:160
+#: src/Form/JobsForm.php:165
 msgid "Media types to process"
 msgstr ""
 
-#: src/Form/CheckForm.php:161 src/Form/CheckForm.php:360
+#: src/Form/JobsForm.php:166 src/Form/JobsForm.php:359
 msgid "All media types"
 msgstr ""
 
-#: src/Form/CheckForm.php:176
+#: src/Form/JobsForm.php:181
 msgid "Media ids"
 msgstr ""
 
-#: src/Form/CheckForm.php:187
+#: src/Form/JobsForm.php:192
 msgid "Only originals without thumbnails"
 msgstr ""
 
-#: src/Form/CheckForm.php:200
+#: src/Form/JobsForm.php:205
 msgid "Options for utf-8 encoding (experimental: do a backup first)"
 msgstr ""
 
-#: src/Form/CheckForm.php:208
+#: src/Form/JobsForm.php:213
 msgid "Types of resources to process"
 msgstr ""
 
-#: src/Form/CheckForm.php:211
+#: src/Form/JobsForm.php:216
 msgid "Resources titles"
 msgstr ""
 
-#: src/Form/CheckForm.php:212
+#: src/Form/JobsForm.php:217
 msgid "Resources values"
 msgstr ""
 
-#: src/Form/CheckForm.php:213
+#: src/Form/JobsForm.php:218
 msgid "Site title"
 msgstr ""
 
-#: src/Form/CheckForm.php:214
+#: src/Form/JobsForm.php:219
 msgid "Site summary"
 msgstr ""
 
-#: src/Form/CheckForm.php:215
+#: src/Form/JobsForm.php:220
 msgid "Pages titles"
 msgstr ""
 
-#: src/Form/CheckForm.php:216
+#: src/Form/JobsForm.php:221
 msgid "Pages blocks"
 msgstr ""
 
-#: src/Form/CheckForm.php:229
+#: src/Form/JobsForm.php:234
 msgid "Options to remove sessions"
 msgstr ""
 
-#: src/Form/CheckForm.php:237 src/Form/CheckForm.php:257
+#: src/Form/JobsForm.php:242 src/Form/JobsForm.php:262
 msgid "Older than this number of days"
 msgstr ""
 
-#: src/Form/CheckForm.php:249
+#: src/Form/JobsForm.php:254
 msgid "Options to remove logs (module Log)"
 msgstr ""
 
-#: src/Form/CheckForm.php:267
+#: src/Form/JobsForm.php:272
 msgid "Maximum severity"
 msgstr ""
 
-#: src/Form/CheckForm.php:269 src/Job/DbLog.php:16
+#: src/Form/JobsForm.php:274 src/Job/DbLog.php:16
 msgid "Emergency"
 msgstr ""
 
-#: src/Form/CheckForm.php:270 src/Job/DbLog.php:17
+#: src/Form/JobsForm.php:275 src/Job/DbLog.php:17
 msgid "Alert"
 msgstr ""
 
-#: src/Form/CheckForm.php:271 src/Job/DbLog.php:18
+#: src/Form/JobsForm.php:276 src/Job/DbLog.php:18
 msgid "Critical"
 msgstr ""
 
-#: src/Form/CheckForm.php:274 src/Job/DbLog.php:21
+#: src/Form/JobsForm.php:279 src/Job/DbLog.php:21
 msgid "Notice"
 msgstr ""
 
-#: src/Form/CheckForm.php:276 src/Job/DbLog.php:23
+#: src/Form/JobsForm.php:281 src/Job/DbLog.php:23
 msgid "Debug"
 msgstr ""
 
-#: src/Controller/CheckController.php:33
+#: src/Controller/JobController.php:34
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/CheckController.php:118
+#: src/Controller/JobController.php:132
 msgid "process"
 msgstr ""
 
-#: src/Controller/CheckController.php:125
+#: src/Controller/JobController.php:142
 #, php-format
 msgid "Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s)."
 msgstr ""
@@ -544,7 +553,7 @@ msgstr ""
 
 #: src/Job/DbUtf8Encode.php:182 src/Job/FileMediaNoOriginal.php:97
 #: src/Job/FileExcess.php:120 src/Job/MediaPosition.php:61
-#: src/Job/FileMissing.php:300 src/Job/FileDimension.php:140
+#: src/Job/FileMissing.php:303 src/Job/FileDimension.php:140
 #: src/Job/DbResourceTitle.php:99 src/Job/AbstractCheckFile.php:94
 msgid "The job was stopped."
 msgstr ""
@@ -568,20 +577,16 @@ msgstr ""
 msgid "The severity \"{severity}\" is not managed."
 msgstr ""
 
-#: src/Job/DbLog.php:116
+#: src/Job/DbLog.php:115
 msgid ""
 "The table \"{table}\" has a size of {size} MB. {old}/{all} records are older "
 "than {days} days and below or equal severity \"{severity}\"."
 msgstr ""
 
-#: src/Job/DbLog.php:129
+#: src/Job/DbLog.php:128
 msgid ""
 "{count} records older than {days} days with maximum severity \"{severity}\" "
 "were removed. The table \"{table}\" has a size of {size} MB."
-msgstr ""
-
-#: src/Job/FileMediaNoOriginal.php:10
-msgid "Renderer"
 msgstr ""
 
 #: src/Job/FileMediaNoOriginal.php:11
@@ -603,7 +608,7 @@ msgstr ""
 msgid "Job stopped: {processed}/{total} processed."
 msgstr ""
 
-#: src/Job/FileMediaNoOriginal.php:104 src/Job/FileMissing.php:307
+#: src/Job/FileMediaNoOriginal.php:104 src/Job/FileMissing.php:310
 #: src/Job/FileDimension.php:147 src/Job/AbstractCheckFile.php:88
 msgid "{processed}/{total} media processed."
 msgstr ""
@@ -635,7 +640,7 @@ msgstr ""
 
 #: src/Job/FileExcess.php:28 src/Job/FileExcess.php:50
 #: src/Job/FileExcess.php:67 src/Job/FileExcess.php:178
-#: src/Job/ItemNoValue.php:115
+#: src/Job/ItemNoValue.php:116
 msgid "Unable to prepare directory \"{path}\". Check rights."
 msgstr ""
 
@@ -688,7 +693,7 @@ msgstr ""
 msgid "Real hash"
 msgstr ""
 
-#: src/Job/MediaPosition.php:27 src/Job/FileMissing.php:213
+#: src/Job/MediaPosition.php:27 src/Job/FileMissing.php:216
 #: src/Job/AbstractCheckFile.php:61
 msgid "No media to process."
 msgstr ""
@@ -768,33 +773,33 @@ msgstr ""
 msgid "The source directory contains {total} duplicate files."
 msgstr ""
 
-#: src/Job/FileMissing.php:198 src/Job/AbstractCheckFile.php:55
+#: src/Job/FileMissing.php:201 src/Job/AbstractCheckFile.php:55
 msgid "Checking {total} media with original files."
 msgstr ""
 
-#: src/Job/FileMissing.php:206
+#: src/Job/FileMissing.php:209
 msgid "Checking {total} media with thumbnails."
 msgstr ""
 
-#: src/Job/FileMissing.php:278 src/Job/FileDimension.php:130
+#: src/Job/FileMissing.php:281 src/Job/FileDimension.php:130
 msgid ""
 "Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed, {total_fixed} fixed."
 msgstr ""
 
-#: src/Job/FileMissing.php:289
+#: src/Job/FileMissing.php:292
 msgid ""
 "Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
 msgstr ""
 
-#: src/Job/FileMissing.php:412 src/Job/FileDimension.php:250
+#: src/Job/FileMissing.php:415 src/Job/FileDimension.php:250
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed, {total_fixed} fixed."
 msgstr ""
 
-#: src/Job/FileMissing.php:423
+#: src/Job/FileMissing.php:426
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
@@ -804,13 +809,13 @@ msgstr ""
 msgid "A minimum number of days is needed to clean sessions."
 msgstr ""
 
-#: src/Job/DbSession.php:64
+#: src/Job/DbSession.php:63
 msgid ""
 "The table \"{table}\" has a size of {size} MB. {old}/{all} records are older "
 "than {days} days."
 msgstr ""
 
-#: src/Job/DbSession.php:76
+#: src/Job/DbSession.php:75
 msgid ""
 "{count} records older than {days} days were removed. The table \"{table}\" "
 "has a size of {size} MB."
@@ -838,29 +843,29 @@ msgid ""
 "thumbnails."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:122
+#: src/Job/AbstractCheck.php:133
 msgid "Starting \"{process}\"."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:149
+#: src/Job/AbstractCheck.php:160
 msgid "Unable to open output: {error}."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:191
+#: src/Job/AbstractCheck.php:202
 #, php-format
 msgid "Trying to output more than %d messages. Next messages are skipped."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:247
+#: src/Job/AbstractCheck.php:258
 msgid "Results are available in this spreadsheet: {url}."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:288
+#: src/Job/AbstractCheck.php:299
 msgid ""
 "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {exception}"
 msgstr ""
 
-#: src/Job/AbstractCheck.php:297
+#: src/Job/AbstractCheck.php:308
 msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
 msgstr ""
 
@@ -910,19 +915,19 @@ msgstr ""
 msgid "Media count"
 msgstr ""
 
-#: src/Job/ItemNoValue.php:57
+#: src/Job/ItemNoValue.php:58
 msgid "There are {count} items without value."
 msgstr ""
 
-#: src/Job/ItemNoValue.php:101
+#: src/Job/ItemNoValue.php:102
 msgid "Media #{media_id}: Original file \"{filename}\" was missing."
 msgstr ""
 
-#: src/Job/ItemNoValue.php:125
+#: src/Job/ItemNoValue.php:126
 msgid "Media #{media_id}: Original file \"{filename}\" was moved."
 msgstr ""
 
-#: src/Job/ItemNoValue.php:132
+#: src/Job/ItemNoValue.php:133
 msgid "Media #{media_id}: Original file \"{filename}\" cannot be moved."
 msgstr ""
 
@@ -1050,20 +1055,20 @@ msgstr ""
 msgid "Media #{media_id} ({index}/{total}): creating derivative files."
 msgstr ""
 
-#: src/Job/FileDerivative.php:252
+#: src/Job/FileDerivative.php:253
 msgid "Media #{media_id} ({index}/{total}): derivative files created."
 msgstr ""
 
-#: src/Job/FileDerivative.php:258
+#: src/Job/FileDerivative.php:259
 msgid "Media #{media_id} ({index}/{total}): derivative files not created."
 msgstr ""
 
-#: src/Job/FileDerivative.php:283
+#: src/Job/FileDerivative.php:284
 msgid ""
 "End of the creation of derivative files: {count}/{total} processed, "
 "{skipped} skipped, {succeed} succeed, {failed} failed."
 msgstr ""
 
 #: config/module.config.php:25
-msgid "Bulk Check"
+msgid "Job manager"
 msgstr ""
