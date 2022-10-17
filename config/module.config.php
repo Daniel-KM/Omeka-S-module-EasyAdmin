@@ -8,7 +8,20 @@ return [
             dirname(__DIR__) . '/view',
         ],
     ],
+    'view_helpers' => [
+        'invokables' => [
+            'formNote' => Form\View\Helper\FormNote::class,
+        ],
+        'delegators' => [
+            'Laminas\Form\View\Helper\FormElement' => [
+               Service\Delegator\FormElementDelegatorFactory::class,
+            ],
+        ],
+    ],
     'form_elements' => [
+        'invokables' => [
+            Form\Element\Note::class => Form\Element\Note::class,
+        ],
         'factories' => [
             Form\JobsForm::class => Service\Form\JobsFormFactory::class,
         ],
