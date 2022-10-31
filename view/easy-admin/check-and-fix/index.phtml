@@ -11,7 +11,7 @@ $translate = $plugins->get('translate');
 
 $form->prepare();
 
-$this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-check browse');
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin check-and-fix browse');
 
 $this->headScript()
     ->appendFile($assetUrl('js/easy-admin.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
