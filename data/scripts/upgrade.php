@@ -13,12 +13,14 @@ use Omeka\Stdlib\Message;
  *
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Doctrine\ORM\EntityManager $entityManager
+ * @var \Omeka\View\Helper\Url $url
  * @var \Omeka\Api\Manager $api
  * @var \Omeka\Settings\Settings $settings
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $services = $serviceLocator;
 $plugins = $services->get('ControllerPluginManager');
+$url = $services->get('ViewHelperManager')->get('url');
 // $api = $plugins->get('api');
 // $config = require dirname(dirname(__DIR__)) . '/config/module.config.php';
 $settings = $services->get('Omeka\Settings');
@@ -41,7 +43,12 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
         unset($container->addons);
         $message = new Message('The module replaces the module Easy Install. The upgrade is automatic.'); // @translate
     } else {
-        $message = new Message('It’s now possible to install modules and themes.'); // @translate
+        $message = new Message('It’s now possible to install %1$smodules and themes%2$s.', // @translate
+            // Route easy-admin is not available during upgrade.
+            sprintf('<a href="%s">', $url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons'])),
+            '</a>'
+        );
+        $message->setEscapeHtml(false);
     }
     $messenger->addSuccess($message);
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-26 00:00+0000\n"
+"POT-Creation-Date: 2022-10-31 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,49 +17,51 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:107
+#: Module.php:134
 msgid "WARNING:"
 msgstr ""
 
-#: Module.php:113
-msgid "All bulk checks will be removed (folder \"{folder}\")."
+#: Module.php:140
+msgid ""
+"All stored files from checks and fixes, if any, will be removed from folder "
+"\"{folder}\"."
 msgstr ""
 
-#: Module.php:119
+#: Module.php:146
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: src/Generic/AbstractModule.php:66 src/Generic/AbstractModule.php:740
+#: src/Generic/AbstractModule.php:80 src/Generic/AbstractModule.php:774
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:73
+#: src/Generic/AbstractModule.php:87
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:80
+#: src/Generic/AbstractModule.php:94
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:87
+#: src/Generic/AbstractModule.php:101
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:328
+#: src/Generic/AbstractModule.php:362
 #, php-format
 msgid "The module removed tables \"%s\" from a previous broken install."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:735
+#: src/Generic/AbstractModule.php:769
 #, php-format
 msgid "This module requires the module \"%1$s\", version %2$s or above."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:832
+#: src/Generic/AbstractModule.php:866
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -102,16 +104,32 @@ msgstr ""
 msgid "Item not removed: more than one media"
 msgstr ""
 
-#: view/easy-admin/job/index.phtml:15
-msgid "Bulk check"
-msgstr ""
-
-#: view/easy-admin/job/index.phtml:15
+#: view/easy-admin/addons/index.phtml:11
+#: view/easy-admin/check-and-fix/index.phtml:21
 msgid "Easy Admin"
 msgstr ""
 
-#: view/easy-admin/job/index.phtml:17
-msgid "Checks"
+#: view/easy-admin/addons/index.phtml:13
+#, php-format
+msgid ""
+"For more information on addons, see the pages %smodules%s and %sthemes%s or "
+"on %sOmeka.org%s."
+msgstr ""
+
+#: view/easy-admin/addons/index.phtml:19
+msgid "Select either a module or a theme."
+msgstr ""
+
+#: view/easy-admin/addons/index.phtml:20
+msgid "Addons with an asterisk are already downloaded."
+msgstr ""
+
+#: view/easy-admin/check-and-fix/index.phtml:21
+msgid "Check and fix"
+msgstr ""
+
+#: view/easy-admin/check-and-fix/index.phtml:23
+msgid "Checks and fixes"
 msgstr ""
 
 #: data/scripts/task.php:17
@@ -187,326 +205,476 @@ msgstr ""
 msgid "Task \"%s\" ended."
 msgstr ""
 
-#: Module.php:44
+#: data/scripts/upgrade.php:44
+msgid "The module replaces the module Easy Install. The upgrade is automatic."
+msgstr ""
+
+#: data/scripts/upgrade.php:46
+#, php-format
+msgid "It’s now possible to install %1$smodules and themes%2$s."
+msgstr ""
+
+#: Module.php:71
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
 msgstr ""
 
-#: Module.php:53
+#: Module.php:80
 #, php-format
 msgid "The directory \"%s\" is not writeable."
 msgstr ""
 
-#: Module.php:76
+#: Module.php:103
 #, php-format
 msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
 msgstr ""
 
-#: Module.php:146
+#: Module.php:173
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: Module.php:157
+#: Module.php:184
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
-#: src/Form/JobsForm.php:29
-msgid "Processors"
+#: src/Form/Element/Note.php:114
+#, php-format
+msgid ""
+"Argument \"wrap\" of method %1$s must be a null or alphanumeric string, "
+"received unstringable object \"%2$s\"."
 msgstr ""
 
-#: src/Form/JobsForm.php:31
+#: src/Form/Element/Note.php:121 src/Form/Element/Note.php:133
+#, php-format
+msgid ""
+"Argument \"wrap\" of method %1$s must be a null or alphanumeric string, "
+"received \"%2$s\"."
+msgstr ""
+
+#: src/Form/AddonsForm.php:21
+msgid "Modules Omeka.org"
+msgstr ""
+
+#: src/Form/AddonsForm.php:22
+msgid "Themes Omeka.org"
+msgstr ""
+
+#: src/Form/AddonsForm.php:23
+msgid "Modules web"
+msgstr ""
+
+#: src/Form/AddonsForm.php:24
+msgid "Themes web"
+msgstr ""
+
+#: src/Form/AddonsForm.php:53
+msgid "Select below…"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:114
+msgid "Files"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:128 src/Form/CheckAndFixForm.php:306
+#: src/Form/CheckAndFixForm.php:353 src/Form/CheckAndFixForm.php:428
+#: src/Form/CheckAndFixForm.php:538
+msgid "Tasks"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:132
 msgid "List files that are present in \"/files/\", but not in database"
 msgstr ""
 
-#: src/Form/JobsForm.php:32
+#: src/Form/CheckAndFixForm.php:133
 msgid ""
 "Move files that are present in \"/files/\", but not in database, into \"/"
 "files/check/\""
 msgstr ""
 
-#: src/Form/JobsForm.php:33
+#: src/Form/CheckAndFixForm.php:134
 msgid ""
 "List files that are present in database, not in \"/files/\" (original only)"
 msgstr ""
 
-#: src/Form/JobsForm.php:34
+#: src/Form/CheckAndFixForm.php:135
 msgid ""
 "List files that are present in database, not in \"/files/\" (include "
 "derivatives)"
 msgstr ""
 
-#: src/Form/JobsForm.php:35
+#: src/Form/CheckAndFixForm.php:136
 msgid ""
 "Copy missing original files from the source directory below (recover a "
 "disaster)"
 msgstr ""
 
-#: src/Form/JobsForm.php:36
+#: src/Form/CheckAndFixForm.php:137
 msgid ""
 "Remove items with one file that is missing (WARNING: export your items first)"
 msgstr ""
 
-#: src/Form/JobsForm.php:37
-msgid "Rebuild derivative images (thumbnails) with options below"
+#: src/Form/CheckAndFixForm.php:138
+msgid ""
+"Remove empty directories in \"/files/\" (mainly for module Archive Repertory)"
 msgstr ""
 
-#: src/Form/JobsForm.php:38
+#: src/Form/CheckAndFixForm.php:139
+msgid "Rebuild derivative images (thumbnails)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:154
+msgid "Options for fix missing files"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:165
+msgid "Source for restoration"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:169
+msgid "/server/path/to/my/source/directory"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:176
+msgid "Limit to extensions"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:180
+msgid "pdf, jpeg"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:190
+msgid "Options to rebuild derivative files (thumbnails)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:208
+msgid "Select one or more item sets…"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:215
+msgid "Ingesters to process"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:216 src/Form/CheckAndFixForm.php:561
+msgid "All ingesters"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:231
+msgid "Renderers to process"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:232 src/Form/CheckAndFixForm.php:569
+msgid "All renderers"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:247
+msgid "Media types to process"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:248 src/Form/CheckAndFixForm.php:577
+msgid "All media types"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:263
+msgid "Media ids"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:274
+msgid "Only originals without thumbnails"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:292
+msgid "Files and database"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:310
 msgid "Check media rendered as \"file\", but without original"
 msgstr ""
 
-#: src/Form/JobsForm.php:39
+#: src/Form/CheckAndFixForm.php:311
 msgid ""
 "Remove media rendered as \"file\", but without original (WARNING: export "
 "your media first)"
 msgstr ""
 
-#: src/Form/JobsForm.php:40
-msgid "Remove empty directories in \"/files/\" (for module Archive Repertory)"
-msgstr ""
-
-#: src/Form/JobsForm.php:41
+#: src/Form/CheckAndFixForm.php:312
 msgid ""
 "Check missing file sizes in database (not managed during upgrade to Omeka "
 "1.2.0)"
 msgstr ""
 
-#: src/Form/JobsForm.php:42
+#: src/Form/CheckAndFixForm.php:313
 msgid "Fix all file sizes in database (for example after hard import)"
 msgstr ""
 
-#: src/Form/JobsForm.php:43
+#: src/Form/CheckAndFixForm.php:314
 msgid "Check sha256 hashes of files"
 msgstr ""
 
-#: src/Form/JobsForm.php:44
+#: src/Form/CheckAndFixForm.php:315
 msgid "Fix wrong sha256 of files"
 msgstr ""
 
-#: src/Form/JobsForm.php:45
+#: src/Form/CheckAndFixForm.php:316
 msgid "Check files dimensions (modules IIIF Server / Image Server)"
 msgstr ""
 
-#: src/Form/JobsForm.php:46
+#: src/Form/CheckAndFixForm.php:317
 msgid "Fix files dimensions (modules IIIF Server / Image Server)"
 msgstr ""
 
-#: src/Form/JobsForm.php:47
+#: src/Form/CheckAndFixForm.php:318
 msgid "Check positions of media (start from 1, without missing number)"
 msgstr ""
 
-#: src/Form/JobsForm.php:48
+#: src/Form/CheckAndFixForm.php:319
 msgid "Fix wrong positions of media"
 msgstr ""
 
-#: src/Form/JobsForm.php:49
+#: src/Form/CheckAndFixForm.php:339
+msgid "Resources and values"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:357
 msgid "Check items without value (media values are not checked)"
 msgstr ""
 
-#: src/Form/JobsForm.php:50
+#: src/Form/CheckAndFixForm.php:358
 msgid "Remove items without value (files are moved into \"/files/check/\")"
 msgstr ""
 
-#: src/Form/JobsForm.php:51
+#: src/Form/CheckAndFixForm.php:359
 msgid ""
-"Check if all values are utf-8 encoded (Windows issues like \"Ã©\" for \"é\", "
-"options below)"
+"Check if all values are utf-8 encoded (Windows issues like \"Ã©\" for \"é\")"
 msgstr ""
 
-#: src/Form/JobsForm.php:52
-msgid "Fix utf-8 encoding issues (options below)"
+#: src/Form/CheckAndFixForm.php:360
+msgid "Fix utf-8 encoding issues"
 msgstr ""
 
-#: src/Form/JobsForm.php:53
-msgid "Check resource titles (for example after hard import)"
+#: src/Form/CheckAndFixForm.php:361
+msgid "Check resource titles, for example after hard import"
 msgstr ""
 
-#: src/Form/JobsForm.php:54
+#: src/Form/CheckAndFixForm.php:362
 msgid "Update resource titles"
 msgstr ""
 
-#: src/Form/JobsForm.php:55
+#: src/Form/CheckAndFixForm.php:377
+msgid "Options for utf-8 encoding (experimental: do a backup first)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:388
+msgid "Types of resources to process"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:391
+msgid "Resources titles"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:392
+msgid "Resources values"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:393
+msgid "Site title"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:394
+msgid "Site summary"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:395
+msgid "Pages titles"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:396
+msgid "Pages blocks"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:414
+msgid "Database"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:432
 msgid "Check dead jobs (living in database, but non-existent in system)"
 msgstr ""
 
-#: src/Form/JobsForm.php:56
+#: src/Form/CheckAndFixForm.php:433
 msgid ""
 "Set status \"stopped\" for jobs that never started, and \"error\" for the "
 "jobs that never ended"
 msgstr ""
 
-#: src/Form/JobsForm.php:57
+#: src/Form/CheckAndFixForm.php:434
 msgid ""
 "Fix status as above for all jobs (when check cannot be done after a reboot)"
 msgstr ""
 
-#: src/Form/JobsForm.php:58
+#: src/Form/CheckAndFixForm.php:435
 msgid "Check the size of the table of sessions in database"
 msgstr ""
 
-#: src/Form/JobsForm.php:59
+#: src/Form/CheckAndFixForm.php:436
 msgid "Remove old sessions (specify age below)"
 msgstr ""
 
-#: src/Form/JobsForm.php:60
-msgid "Check the size of the table of logs in database(module Log)"
+#: src/Form/CheckAndFixForm.php:437
+msgid "Check the size of the table of logs in database (module Log)"
 msgstr ""
 
-#: src/Form/JobsForm.php:61
-msgid "Remove old logs (options below)"
+#: src/Form/CheckAndFixForm.php:438
+msgid "Remove old logs"
 msgstr ""
 
-#: src/Form/JobsForm.php:62
-msgid "Index full-text search (core job)"
-msgstr ""
-
-#: src/Form/JobsForm.php:63
-msgid "Index statistics (module Statistics, needed only after direct import)"
-msgstr ""
-
-#: src/Form/JobsForm.php:64
-msgid "Index thesaurus (module Thesaurus)"
-msgstr ""
-
-#: src/Form/JobsForm.php:78
-msgid "Options for fix missing files"
-msgstr ""
-
-#: src/Form/JobsForm.php:86
-msgid "Source for restoration"
-msgstr ""
-
-#: src/Form/JobsForm.php:90
-msgid "/server/path/to/my/source/directory"
-msgstr ""
-
-#: src/Form/JobsForm.php:97
-msgid "Limit to extensions"
-msgstr ""
-
-#: src/Form/JobsForm.php:101
-msgid "pdf, jpeg"
-msgstr ""
-
-#: src/Form/JobsForm.php:111
-msgid "Options to rebuild derivative files (thumbnails)"
-msgstr ""
-
-#: src/Form/JobsForm.php:126
-msgid "Select one or more item sets…"
-msgstr ""
-
-#: src/Form/JobsForm.php:133
-msgid "Ingesters to process"
-msgstr ""
-
-#: src/Form/JobsForm.php:134 src/Form/JobsForm.php:343
-msgid "All ingesters"
-msgstr ""
-
-#: src/Form/JobsForm.php:149
-msgid "Renderers to process"
-msgstr ""
-
-#: src/Form/JobsForm.php:150 src/Form/JobsForm.php:351
-msgid "All renderers"
-msgstr ""
-
-#: src/Form/JobsForm.php:165
-msgid "Media types to process"
-msgstr ""
-
-#: src/Form/JobsForm.php:166 src/Form/JobsForm.php:359
-msgid "All media types"
-msgstr ""
-
-#: src/Form/JobsForm.php:181
-msgid "Media ids"
-msgstr ""
-
-#: src/Form/JobsForm.php:192
-msgid "Only originals without thumbnails"
-msgstr ""
-
-#: src/Form/JobsForm.php:205
-msgid "Options for utf-8 encoding (experimental: do a backup first)"
-msgstr ""
-
-#: src/Form/JobsForm.php:213
-msgid "Types of resources to process"
-msgstr ""
-
-#: src/Form/JobsForm.php:216
-msgid "Resources titles"
-msgstr ""
-
-#: src/Form/JobsForm.php:217
-msgid "Resources values"
-msgstr ""
-
-#: src/Form/JobsForm.php:218
-msgid "Site title"
-msgstr ""
-
-#: src/Form/JobsForm.php:219
-msgid "Site summary"
-msgstr ""
-
-#: src/Form/JobsForm.php:220
-msgid "Pages titles"
-msgstr ""
-
-#: src/Form/JobsForm.php:221
-msgid "Pages blocks"
-msgstr ""
-
-#: src/Form/JobsForm.php:234
+#: src/Form/CheckAndFixForm.php:453
 msgid "Options to remove sessions"
 msgstr ""
 
-#: src/Form/JobsForm.php:242 src/Form/JobsForm.php:262
+#: src/Form/CheckAndFixForm.php:464 src/Form/CheckAndFixForm.php:487
 msgid "Older than this number of days"
 msgstr ""
 
-#: src/Form/JobsForm.php:254
+#: src/Form/CheckAndFixForm.php:476
 msgid "Options to remove logs (module Log)"
 msgstr ""
 
-#: src/Form/JobsForm.php:272
+#: src/Form/CheckAndFixForm.php:497
 msgid "Maximum severity"
 msgstr ""
 
-#: src/Form/JobsForm.php:274 src/Job/DbLog.php:16
+#: src/Form/CheckAndFixForm.php:499 src/Job/DbLog.php:16
 msgid "Emergency"
 msgstr ""
 
-#: src/Form/JobsForm.php:275 src/Job/DbLog.php:17
+#: src/Form/CheckAndFixForm.php:500 src/Job/DbLog.php:17
 msgid "Alert"
 msgstr ""
 
-#: src/Form/JobsForm.php:276 src/Job/DbLog.php:18
+#: src/Form/CheckAndFixForm.php:501 src/Job/DbLog.php:18
 msgid "Critical"
 msgstr ""
 
-#: src/Form/JobsForm.php:279 src/Job/DbLog.php:21
+#: src/Form/CheckAndFixForm.php:504 src/Job/DbLog.php:21
 msgid "Notice"
 msgstr ""
 
-#: src/Form/JobsForm.php:281 src/Job/DbLog.php:23
+#: src/Form/CheckAndFixForm.php:506 src/Job/DbLog.php:23
 msgid "Debug"
 msgstr ""
 
-#: src/Controller/JobController.php:34
+#: src/Form/CheckAndFixForm.php:524
+msgid "Module tasks and indexations"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:542
+msgid "Index full-text search (core job)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:543
+msgid "Index statistics (module Statistics, needed only after direct import)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:544
+msgid "Index thesaurus (module Thesaurus)"
+msgstr ""
+
+#: src/Controller/CheckAndFixController.php:47
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/JobController.php:132
-msgid "process"
+#: src/Controller/CheckAndFixController.php:143
+#, php-format
+msgid "Unknown process \"%s\""
 msgstr ""
 
-#: src/Controller/JobController.php:142
+#: src/Controller/CheckAndFixController.php:155
 #, php-format
 msgid "Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s)."
+msgstr ""
+
+#: src/Controller/AddonsController.php:25
+msgid "No addon to list: check your connection."
+msgstr ""
+
+#: src/Controller/AddonsController.php:40
+msgid "There was an error on the form. Please try again."
+msgstr ""
+
+#: src/Controller/AddonsController.php:55
+#, php-format
+msgid "The %s \"%s\" is already downloaded."
+msgstr ""
+
+#: src/Controller/AddonsController.php:67
+msgid "Nothing processed. Please try again."
+msgstr ""
+
+#: src/Controller/AddonsController.php:108
+#, php-format
+msgid ""
+"The module \"%s\" requires the dependencies \"%s\" installed and enabled "
+"first."
+msgstr ""
+
+#: src/Controller/AddonsController.php:118
+#, php-format
+msgid "The %s directory is not writeable by the server."
+msgstr ""
+
+#: src/Controller/AddonsController.php:125
+#, php-format
+msgid ""
+"Don’t forget to protect the %s directory from writing after installation."
+msgstr ""
+
+#: src/Controller/AddonsController.php:135
+#, php-format
+msgid ""
+"A zipfile exists with the same name in the %s directory and cannot be "
+"removed."
+msgstr ""
+
+#: src/Controller/AddonsController.php:144
+#, php-format
+msgid "The %s directory \"%s\" already exists."
+msgstr ""
+
+#: src/Controller/AddonsController.php:155
+#, php-format
+msgid "Unable to fetch the %s \"%s\"."
+msgstr ""
+
+#: src/Controller/AddonsController.php:169
+#, php-format
+msgid "An error occurred during the unzipping of the %s \"%s\"."
+msgstr ""
+
+#: src/Controller/AddonsController.php:191
+#, php-format
+msgid "The module \"%s\" requires the dependency \"Generic\" available first."
+msgstr ""
+
+#: src/Controller/AddonsController.php:203
+#, php-format
+msgid ""
+"If \"%s\" doesn’t appear in the list of %s, its directory may need to be "
+"renamed."
+msgstr ""
+
+#: src/Controller/AddonsController.php:210
+#, php-format
+msgid "%s uploaded successfully"
+msgstr ""
+
+#: src/Controller/AddonsController.php:215
+msgid ""
+"It is always recommended to read the original readme or help of the addon."
+msgstr ""
+
+#: src/Controller/AddonsController.php:443
+#, php-format
+msgid "Failed to execute command: %s"
 msgstr ""
 
 #: src/Job/DbUtf8Encode.php:12
@@ -1069,6 +1237,11 @@ msgid ""
 "{skipped} skipped, {succeed} succeed, {failed} failed."
 msgstr ""
 
-#: config/module.config.php:25
-msgid "Job manager"
+#: src/Mvc/Controller/Plugin/Addons.php:210
+#, php-format
+msgid "Unable to fetch the url %s."
+msgstr ""
+
+#: config/module.config.php:58
+msgid "Install addons"
 msgstr ""
