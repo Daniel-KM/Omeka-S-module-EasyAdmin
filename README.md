@@ -8,14 +8,11 @@ Easy Admin (module for Omeka S)
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
 admin interface:
 
-- launch simple tasks, that can be any job of any module;
 - install modules;
-- update modules;
-- maintenance state;
-- checks database and files.
-
-Note: the maintenance is currently managed by module [Maintenance]. It will be
-included soon.
+- update modules (in a future version);
+- maintenance state (in a future version);
+- checks database and files;
+- launch simple tasks, that can be any job of any module.
 
 Checks and fixes that are doable:
 
@@ -39,6 +36,8 @@ Checks and fixes that are doable:
 - check the size of the database table of logs and remove them
 - check and fix the encoding (iso-8859 to utf-8) of resource values and page
   contents
+
+And many more.
 
 
 Installation
@@ -79,6 +78,18 @@ You can find more information on the params in [Laminas help].
 
 Usage
 -----
+
+### Checks and fixes
+
+Go to the menu "Bulk Check", select your process, set your options if needed,
+and click the submit buttons. The results are available in logs currently.
+
+
+### Install and update modules and themes
+
+Simply select either the desired module or the desired theme and click "upload".
+
+See more details on [modules] and [themes].
 
 ### Tasks and cron tasks
 
@@ -161,21 +172,6 @@ time only:
 ```sh
 php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-url 'https://example.org' --base-path '/'
 ```
-
-
-Checks and fixes
-----------------
-
-Go to the menu "Bulk Check", select your process, set your options if needed,
-and click the submit buttons. The results are available in logs currently.
-
-
-Install and update modules and themes
--------------------------------------
-
-Simply select either the desired module or the desired theme and click "upload".
-
-See more details on [modules] and [themes].
 
 
 TODO
