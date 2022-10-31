@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
+
 namespace EasyInstall\Mvc\Controller\Plugin;
 
-use DOMDocument;
-use DOMXPath;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Session\Container;
@@ -75,7 +74,7 @@ class Addons extends AbstractPlugin
     /**
      * Return the addon list.
      *
-     * @return string
+     * @return array
      */
     public function __invoke()
     {
@@ -93,25 +92,17 @@ class Addons extends AbstractPlugin
             }
         }
 
-        $addons = [];
+        $this->addons = [];
         foreach ($this->types() as $addonType) {
-            $addons[$addonType] = $this->listAddonsForType($addonType);
+            $this->addons[$addonType] = $this->listAddonsForType($addonType);
         }
 
-        $this->addons = $addons;
-        $this->cacheAddons();
-        return $this->addons;
-    }
-
-    /**
-     * Helper to save addons in the cache.
-     */
-    protected function cacheAddons(): void
-    {
-        $container = new Container('EasyInstall');
-        $container->setExpirationSeconds($this->expirationSeconds);
-        $container->setExpirationHops($this->expirationHops);
         $container->addons = $this->addons;
+        $container
+            ->setExpirationSeconds($this->expirationSeconds)
+            ->setExpirationHops($this->expirationHops);
+
+        return $this->addons;
     }
 
     /**

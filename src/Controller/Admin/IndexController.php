@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace EasyInstall\Controller\Admin;
 
 use Doctrine\Inflector\InflectorFactory;
@@ -14,6 +15,7 @@ class IndexController extends AbstractActionController
     {
         $view = new ViewModel;
 
+        /** @var \EasyInstall\Form\UploadForm $form */
         $form = $this->getForm(UploadForm::class);
         $view->form = $form;
 
