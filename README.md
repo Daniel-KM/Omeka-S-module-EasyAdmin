@@ -14,8 +14,7 @@ admin interface:
 - maintenance state;
 - checks database and files.
 
-Note: install/update modules is currently managed by module [Easy Install] and
-the maintenance is currently managed by module [Maintenance]. They will be
+Note: the maintenance is currently managed by module [Maintenance]. It will be
 included soon.
 
 Checks and fixes that are doable:
@@ -62,6 +61,20 @@ Uncompress files and rename module folder `EasyAdmin`.
 Then install it like any other Omeka module and follow the config instructions.
 
 See general end user documentation for [installing a module].
+
+In some cases, your may need to add credentials in your config (omeka file "config/local.config.php"),
+depending on your linux distribution:
+```php
+    'http_client' => [
+        // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
+        'sslcapath' => '/usr/local/etc/ssl/certs',
+        'sslcafile' => '/usr/local/etc/ssl/certs/ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs',
+        // 'sslcafile' => '/etc/pki/tls/certs/ca-bundle.crt',
+    ],
+```
+
+You can find more information on the params in [Laminas help].
 
 
 Usage
@@ -150,11 +163,19 @@ php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-
 ```
 
 
-Checks
-------
+Checks and fixes
+----------------
 
 Go to the menu "Bulk Check", select your process, set your options if needed,
 and click the submit buttons. The results are available in logs currently.
+
+
+Install and update modules and themes
+-------------------------------------
+
+Simply select either the desired module or the desired theme and click "upload".
+
+See more details on [modules] and [themes].
 
 
 TODO
@@ -221,6 +242,7 @@ Copyright
 
 This module is a merge and improvement of previous modules [Easy Install], [Next],
 [Maintenance] and [Bulk Check].
+The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 
 
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
@@ -230,6 +252,7 @@ This module is a merge and improvement of previous modules [Easy Install], [Next
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
 [Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
@@ -237,10 +260,13 @@ This module is a merge and improvement of previous modules [Easy Install], [Next
 [Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
+[modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
+[themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
-[MIT]: https://github.com/sandywalker/webui-popover/blob/master/LICENSE.txt
+[Escher]: https://github.com/AcuGIS/Escher
+[Omeka Classic]: https://omeka.org/classic
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

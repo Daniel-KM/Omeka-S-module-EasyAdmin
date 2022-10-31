@@ -24,11 +24,18 @@ return [
         ],
         'factories' => [
             Form\JobsForm::class => Service\Form\JobsFormFactory::class,
+            Form\UploadForm::class => Service\Form\UploadFormFactory::class,
         ],
     ],
     'controllers' => [
         'invokables' => [
+            'EasyInstall\Controller\Admin\Index' => Controller\Admin\IndexController::class,
             'EasyAdmin\Controller\Job' => Controller\JobController::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'factories' => [
+            'easyInstallAddons' => Service\ControllerPlugin\AddonsFactory::class,
         ],
     ],
     'navigation' => [
@@ -39,6 +46,12 @@ return [
                 'controller' => 'job',
                 'resource' => 'EasyAdmin\Controller\Job',
                 'class' => 'o-icon-jobs',
+            ],
+            [
+                'label' => 'Easy Install',
+                'route' => 'admin/easy-install',
+                'resource' => 'Omeka\Controller\Admin\Module',
+                'privilege' => 'browse',
             ],
         ],
     ],
@@ -73,6 +86,17 @@ return [
                                         'action' => 'index',
                                     ],
                                 ],
+                            ],
+                        ],
+                    ],
+                    'easy-install' => [
+                        'type' => \Laminas\Router\Http\Literal::class,
+                        'options' => [
+                            'route' => '/easy-install',
+                            'defaults' => [
+                                '__NAMESPACE__' => 'EasyInstall\Controller\Admin',
+                                'controller' => 'Index',
+                                'action' => 'index',
                             ],
                         ],
                     ],
