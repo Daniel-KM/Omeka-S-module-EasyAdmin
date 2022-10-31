@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright 2017-2021 Daniel Berthereau
+ * Copyright 2017-2022 Daniel Berthereau
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/or
@@ -30,11 +30,25 @@
 namespace EasyInstall;
 
 use Omeka\Module\AbstractModule;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
 {
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
+    }
+
+     public function install(ServiceLocatorInterface $services): void
+     {
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $message = new Message(
+            'This module is deprecated and has been superceded by %Easy Admin%s. The upgrade from it is automatic.', // @translate
+            '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin" target="_blank">',
+            '</a>'
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addWarning($message);
     }
 }

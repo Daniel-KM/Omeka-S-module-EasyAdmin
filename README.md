@@ -1,6 +1,9 @@
 Easy Install (module for Omeka S)
 =================================
 
+> ***IMPORTANT***: This module is deprecated and has been replaced by the module
+> [Easy Admin] and won’t be updated any more. The upgrade from it is automatic.
+
 > __New versions of this module and support for Omeka S version 3.0 and above
 > are available on [GitLab], which seems to respect users and privacy better
 > than the previous repository.__
@@ -93,9 +96,10 @@ Current maintainers:
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2019
+* Copyright Daniel Berthereau, 2017-2022
 
 
+[Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Easy Install]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Semantic]: https://www.omeka.org/s
