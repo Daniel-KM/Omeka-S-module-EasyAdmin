@@ -4,17 +4,24 @@
  * @var \EasyAdmin\Form\JobsForm $form
  */
 
-$translate = $this->plugin('translate');
-$escape = $this->plugin('escapeHtml');
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
 
 $form->prepare();
 
 $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-check browse');
+
+$this->headScript()
+    ->appendFile($assetUrl('js/easy-admin.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
+;
 ?>
 
 <?= $this->pageTitle($translate('Check and fixes'), 1, $translate('Easy Admin')) ?>
 
 <h2><?= $escape($translate('Checks and fixes')) ?></h2>
+
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">
     <button type="submit"><?= $translate('Submit') ?></button>

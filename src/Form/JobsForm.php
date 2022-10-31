@@ -22,11 +22,112 @@ class JobsForm extends Form
     public function init(): void
     {
         $this
+            ->appendFieldsetFilesCheckFix()
+            ->appendFieldsetFilesDatabase()
+            ->appendFieldsetResourceValues()
+            ->appendFieldsetDatabase()
+            ->appendFieldsetTasks()
+        ;
+
+        $event = new Event('form.add_elements', $this);
+        $this->getEventManager()->triggerEvent($event);
+
+        $inputFilter = $this->getInputFilter();
+
+        $inputFilter->get('files_checkfix')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('files_checkfix')
+            ->get('files_derivative')
+            ->add([
+                'name' => 'item_sets',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'ingesters',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'renderers',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'media_types',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('files_database')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('resource_values')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('resource_values')
+            ->get('db_utf8_encode')
+            ->add([
+                'name' => 'type_resources',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('database')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('database')
+            ->get('db_session')
+            ->add([
+                'name' => 'days',
+                'required' => false,
+            ]);
+        $inputFilter->get('database')
+            ->get('db_log')
+            ->add([
+                'name' => 'days',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('module_tasks')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+
+        $event = new Event('form.add_input_filters', $this, ['inputFilter' => $inputFilter]);
+        $this->getEventManager()->triggerEvent($event);
+    }
+
+    protected function appendFieldsetFilesCheckFix(): self
+    {
+        $this
+            ->add([
+                'name' => 'files_checkfix',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Files', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_checkfix',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('files_checkfix');
+        $fieldset
             ->add([
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => 'Processors', // @translate
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
                         'files_excess_check' => 'List files that are present in "/files/", but not in database', // @translate
                         'files_excess_move' => 'Move files that are present in "/files/", but not in database, into "/files/check/"', // @translate
@@ -34,10 +135,180 @@ class JobsForm extends Form
                         'files_missing_check_full' => 'List files that are present in database, not in "/files/" (include derivatives)', // @translate
                         'files_missing_fix' => 'Copy missing original files from the source directory below (recover a disaster)', // @translate
                         'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
-                        'files_derivative' => 'Rebuild derivative images (thumbnails) with options below', // @translate
+                        'dirs_excess' => 'Remove empty directories in "/files/" (mainly for module Archive Repertory)', // @translate
+                        'files_derivative' => 'Rebuild derivative images (thumbnails)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'files_checkfix-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
+            ]);
+
+            $fieldset
+                ->add([
+                    'type' => Fieldset::class,
+                    'name' => 'files_missing',
+                    'options' => [
+                        'label' => 'Options for fix missing files', // @translate
+                    ],
+                    'attributes' => [
+                        'class' => 'files_missing_fix',
+                    ],
+                ]);
+            $fieldset->get('files_missing')
+                ->add([
+                    'name' => 'source_dir',
+                    'type' => Element\Text::class,
+                    'options' => [
+                        'label' => 'Source for restoration', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'files_missing-source_dir',
+                        'placeholder' => '/server/path/to/my/source/directory', // @translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'extensions',
+                    'type' => Element\Text::class,
+                    'options' => [
+                        'label' => 'Limit to extensions', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'files_missing-extensions',
+                        'placeholder' => 'pdf, jpeg', // @translate
+                    ],
+                ])
+            ;
+
+            $fieldset
+                ->add([
+                    'type' => Fieldset::class,
+                    'name' => 'files_derivative',
+                    'options' => [
+                        'label' => 'Options to rebuild derivative files (thumbnails)', // @translate
+                    ],
+                    'attributes' => [
+                        'class' => 'files_derivative',
+                    ],
+                ]);
+            $fieldset->get('files_derivative')
+                ->add([
+                    'name' => 'item_sets',
+                    'type' => OmekaElement\ItemSetSelect::class,
+                    'options' => [
+                        'label' => 'Item sets', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'files_derivative-item_sets',
+                        'class' => 'chosen-select',
+                        'multiple' => true,
+                        'required' => false,
+                        'data-placeholder' => 'Select one or more item sets…', // @translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'ingesters',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'label' => 'Ingesters to process', // @translate
+                        'empty_option' => 'All ingesters', // @translate
+                        'value_options' => $this->listIngesters(),
+                    ],
+                    'attributes' => [
+                        'id' => 'files_derivative-ingesters',
+                        'class' => 'chosen-select',
+                        'multiple' => true,
+                        'placeholder' => 'Select ingesters to process', // @ translate
+                        'data-placeholder' => 'Select ingesters to process', // @ translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'renderers',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'label' => 'Renderers to process', // @translate
+                        'empty_option' => 'All renderers', // @translate
+                        'value_options' => $this->listRenderers(),
+                    ],
+                    'attributes' => [
+                        'id' => 'files_derivative-renderers',
+                        'class' => 'chosen-select',
+                        'multiple' => true,
+                        'placeholder' => 'Select renderers to process', // @ translate
+                        'data-placeholder' => 'Select renderers to process', // @ translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'media_types',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'label' => 'Media types to process', // @translate
+                        'empty_option' => 'All media types', // @translate
+                        'value_options' => $this->listMediaTypes(),
+                    ],
+                    'attributes' => [
+                        'id' => 'files_derivative-media_types',
+                        'class' => 'chosen-select',
+                        'multiple' => true,
+                        'placeholder' => 'Select media types to process', // @ translate
+                        'data-placeholder' => 'Select media types to process', // @ translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'files_derivative-media_ids',
+                    'type' => Element\Text::class,
+                    'options' => [
+                        'label' => 'Media ids', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'media_ids',
+                        'placeholder' => '2-6 8 38-52 80-', // @ translate
+                    ],
+                ])
+                ->add([
+                    'name' => 'original_without_thumbnails',
+                    'type' => Element\Checkbox::class,
+                    'options' => [
+                        'label' => 'Only originals without thumbnails', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'files_derivative-original_without_thumbnails',
+                    ],
+                ])
+            ;
+
+        return $this;
+    }
+
+    protected function appendFieldsetFilesDatabase(): self
+    {
+        $this
+            ->add([
+                'name' => 'files_database',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Files and database', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_database',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('files_database');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
                         'files_media_no_original' => 'Check media rendered as "file", but without original', // @translate
                         'files_media_no_original_fix' => 'Remove media rendered as "file", but without original (WARNING: export your media first)', // @translate
-                        'dirs_excess' => 'Remove empty directories in "/files/" (for module Archive Repertory)', // @translate
                         'files_size_check' => 'Check missing file sizes in database (not managed during upgrade to Omeka 1.2.0)', // @translate
                         'files_size_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                         'files_hash_check' => 'Check sha256 hashes of files', // @translate
@@ -46,166 +317,70 @@ class JobsForm extends Form
                         'files_dimension_fix' => 'Fix files dimensions (modules IIIF Server / Image Server)', // @translate
                         'media_position_check' => 'Check positions of media (start from 1, without missing number)', // @translate
                         'media_position_fix' => 'Fix wrong positions of media', // @translate
-                        'item_no_value' => 'Check items without value (media values are not checked)', // @translate
-                        'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
-                        'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é", options below)', // @translate
-                        'db_utf8_encode_fix' => 'Fix utf-8 encoding issues (options below)', // @translate
-                        'db_resource_title_check' => 'Check resource titles (for example after hard import)', // @translate
-                        'db_resource_title_fix' => 'Update resource titles', // @translate
-                        'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
-                        'db_job_fix' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
-                        'db_job_fix_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
-                        'db_session_check' => 'Check the size of the table of sessions in database', // @translate
-                        'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
-                        'db_log_check' => 'Check the size of the table of logs in database(module Log)', // @translate
-                        'db_log_clean' => 'Remove old logs (options below)', // @translate
-                        'db_fulltext_index' => 'Index full-text search (core job)', // @translate
-                        'db_statistics_index' => 'Index statistics (module Statistics, needed only after direct import)', // @translate
-                        'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'process',
-                    'required' => true,
-                ],
-            ]);
-
-        $this
-            ->add([
-                'type' => Fieldset::class,
-                'name' => 'files_missing',
-                'options' => [
-                    'label' => 'Options for fix missing files', // @translate
-                ],
-            ]);
-        $this->get('files_missing')
-            ->add([
-                'name' => 'source_dir',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Source for restoration', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'source_dir',
-                    'placeholder' => '/server/path/to/my/source/directory', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'extensions',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Limit to extensions', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'extensions',
-                    'placeholder' => 'pdf, jpeg', // @translate
-                ],
-            ])
-        ;
-
-        $this
-            ->add([
-                'type' => Fieldset::class,
-                'name' => 'files_derivative',
-                'options' => [
-                    'label' => 'Options to rebuild derivative files (thumbnails)', // @translate
-                ],
-            ]);
-        $this->get('files_derivative')
-            ->add([
-                'name' => 'item_sets',
-                'type' => OmekaElement\ItemSetSelect::class,
-                'options' => [
-                    'label' => 'Item sets', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'item_sets',
-                    'class' => 'chosen-select',
-                    'multiple' => true,
+                    'id' => 'files_database-process',
                     'required' => false,
-                    'data-placeholder' => 'Select one or more item sets…', // @translate
+                    'class' => 'fieldset-process'
                 ],
-            ])
-            ->add([
-                'name' => 'ingesters',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Ingesters to process', // @translate
-                    'empty_option' => 'All ingesters', // @translate
-                    'value_options' => $this->listIngesters(),
-                ],
-                'attributes' => [
-                    'id' => 'ingesters',
-                    'class' => 'chosen-select',
-                    'multiple' => true,
-                    'placeholder' => 'Select ingesters to process', // @ translate
-                    'data-placeholder' => 'Select ingesters to process', // @ translate
-                ],
-            ])
-            ->add([
-                'name' => 'renderers',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Renderers to process', // @translate
-                    'empty_option' => 'All renderers', // @translate
-                    'value_options' => $this->listRenderers(),
-                ],
-                'attributes' => [
-                    'id' => 'renderers',
-                    'class' => 'chosen-select',
-                    'multiple' => true,
-                    'placeholder' => 'Select renderers to process', // @ translate
-                    'data-placeholder' => 'Select renderers to process', // @ translate
-                ],
-            ])
-            ->add([
-                'name' => 'media_types',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Media types to process', // @translate
-                    'empty_option' => 'All media types', // @translate
-                    'value_options' => $this->listMediaTypes(),
-                ],
-                'attributes' => [
-                    'id' => 'media_types',
-                    'class' => 'chosen-select',
-                    'multiple' => true,
-                    'placeholder' => 'Select media types to process', // @ translate
-                    'data-placeholder' => 'Select media types to process', // @ translate
-                ],
-            ])
-            ->add([
-                'name' => 'media_ids',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Media ids', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'media_ids',
-                    'placeholder' => '2-6 8 38-52 80-', // @ translate
-                ],
-            ])
-            ->add([
-                'name' => 'original_without_thumbnails',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Only originals without thumbnails', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'original_without_thumbnails',
-                ],
-            ])
-        ;
+            ]);
 
+        return $this;
+    }
+
+    protected function appendFieldsetResourceValues(): self
+    {
         $this
+            ->add([
+                'name' => 'resource_values',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Resources and values', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_values',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('resource_values');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'item_no_value' => 'Check items without value (media values are not checked)', // @translate
+                        'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
+                        'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
+                        'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
+                        'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate
+                        'db_resource_title_fix' => 'Update resource titles', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'resource_values-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
+            ]);
+
+        $fieldset
             ->add([
                 'type' => Fieldset::class,
                 'name' => 'db_utf8_encode',
                 'options' => [
                     'label' => 'Options for utf-8 encoding (experimental: do a backup first)', // @translate
                 ],
+                'attributes' => [
+                    'class' => 'db_utf8_encode_check db_utf8_encode_fix',
+                ],
             ]);
-        $this->get('db_utf8_encode')
+        $fieldset->get('db_utf8_encode')
             ->add([
                 'name' => 'type_resources',
                 'type' => Element\MultiCheckbox::class,
@@ -222,19 +397,66 @@ class JobsForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'type_resources',
+                    'id' => 'db_utf8_encode-type_resources',
                 ],
             ]);
 
+        return $this;
+    }
+
+    protected function appendFieldsetDatabase(): self
+    {
         $this
+            ->add([
+                'name' => 'database',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Database', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'database',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('database');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
+                        'db_job_fix' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
+                        'db_job_fix_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
+                        'db_session_check' => 'Check the size of the table of sessions in database', // @translate
+                        'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
+                        'db_log_check' => 'Check the size of the table of logs in database (module Log)', // @translate
+                        'db_log_clean' => 'Remove old logs', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'database-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
+            ]);
+
+        $fieldset
             ->add([
                 'type' => Fieldset::class,
                 'name' => 'db_session',
                 'options' => [
                     'label' => 'Options to remove sessions', // @translate
                 ],
+                'attributes' => [
+                    'class' => 'db_session_check db_session_clean',
+                ],
             ]);
-        $this->get('db_session')
+        $fieldset->get('db_session')
             ->add([
                 'name' => 'days',
                 'type' => Element\Number::class,
@@ -242,19 +464,22 @@ class JobsForm extends Form
                     'label' => 'Older than this number of days', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'days',
+                    'id' => 'db_session-days',
                 ],
             ]);
 
-        $this
+        $fieldset
             ->add([
                 'type' => Fieldset::class,
                 'name' => 'db_log',
                 'options' => [
                     'label' => 'Options to remove logs (module Log)', // @translate
                 ],
+                'attributes' => [
+                    'class' => 'db_log_check db_log_clean',
+                ],
             ]);
-        $this->get('db_log')
+        $fieldset->get('db_log')
             ->add([
                 'name' => 'days',
                 'type' => Element\Number::class,
@@ -262,7 +487,7 @@ class JobsForm extends Form
                     'label' => 'Older than this number of days', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'days',
+                    'id' => 'db_log-days',
                 ],
             ])
             ->add([
@@ -282,58 +507,51 @@ class JobsForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'severity',
+                    'id' => 'db_log-severity',
                 ],
             ]);
 
-        // Fix the formatting issue of the label in Omeka.
+        return $this;
+    }
+
+    protected function appendFieldsetTasks(): self
+    {
         $this
-            ->get('process')->setLabelAttributes(['style' => 'display: inline-block']);
+            ->add([
+                'name' => 'module_tasks',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Module tasks and indexations', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'module_tasks',
+                    'class' => 'field-container',
+                ],
+            ]);
 
-        $event = new Event('form.add_elements', $this);
-        $this->getEventManager()->triggerEvent($event);
-
-        $inputFilter = $this->getInputFilter();
-        $inputFilter
+        $fieldset = $this->get('module_tasks');
+        $fieldset
             ->add([
                 'name' => 'process',
-                'required' => true,
-            ]);
-        $inputFilter->get('files_derivative')
-            ->add([
-                'name' => 'item_sets',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'ingesters',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'renderers',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'media_types',
-                'required' => false,
-            ]);
-        $inputFilter->get('db_utf8_encode')
-            ->add([
-                'name' => 'type_resources',
-                'required' => false,
-            ]);
-        $inputFilter->get('db_session')
-            ->add([
-                'name' => 'days',
-                'required' => false,
-            ]);
-        $inputFilter->get('db_log')
-            ->add([
-                'name' => 'days',
-                'required' => false,
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'db_fulltext_index' => 'Index full-text search (core job)', // @translate
+                        'db_statistics_index' => 'Index statistics (module Statistics, needed only after direct import)', // @translate
+                        'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'module_tasks-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
             ]);
 
-        $event = new Event('form.add_input_filters', $this, ['inputFilter' => $inputFilter]);
-        $this->getEventManager()->triggerEvent($event);
+        return $this;
     }
 
     protected function listIngesters(): array

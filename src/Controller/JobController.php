@@ -11,10 +11,11 @@ class JobController extends AbstractActionController
 {
     public function indexAction()
     {
+        /** @var \EasyAdmin\Form\JobsForm $form */
         $form = $this->getForm(\EasyAdmin\Form\JobsForm::class);
-        $view = new ViewModel;
-        $view
-            ->setVariable('form', $form);
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
 
         $request = $this->getRequest();
         if (!$request->isPost()) {
@@ -30,36 +31,45 @@ class JobController extends AbstractActionController
             return $view;
         }
 
-        if (empty($params['process'])) {
+        $params = $form->getData();
+        unset($params['csrf']);
+
+        // Only first process is managed.
+        $process = null;
+        foreach ($params as $value) {
+            if (is_array($value) && !empty($value['process'])) {
+                $process = $value['process'];
+                break;
+            }
+        }
+
+        if (empty($process)) {
             $this->messenger()->addWarning('No process submitted.'); // @translate
             return $view;
         }
-
-        $params = $form->getData();
-        unset($params['csrf']);
 
         /** @var \Omeka\Mvc\Controller\Plugin\JobDispatcher $dispatcher */
         $dispatcher = $this->jobDispatcher();
 
         $defaultParams = [
-            'process' => $params['process'],
+            'process' => $process,
         ];
 
-        switch ($params['process']) {
+        switch ($process) {
             case 'files_excess_check':
             case 'files_excess_move':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\FileExcess::class, $defaultParams);
                 break;
             case 'files_missing_check_full':
-                $params['files_missing']['include_derivatives'] = true;
+                $params['files_checkfix']['files_missing']['include_derivatives'] = true;
                 // no break
             case 'files_missing_check':
             case 'files_missing_fix':
             case 'files_missing_fix_db':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileMissing::class, $params['files_missing'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileMissing::class, $defaultParams + $params['files_checkfix']['files_missing']);
                 break;
             case 'files_derivative':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDerivative::class, $params['files_derivative'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDerivative::class, $defaultParams + $params['files_checkfix']['files_derivative']);
                 break;
             case 'files_media_no_original':
             case 'files_media_no_original_fix':
@@ -90,7 +100,7 @@ class JobController extends AbstractActionController
                 break;
             case 'db_utf8_encode_check':
             case 'db_utf8_encode_fix':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbUtf8Encode::class, $params['db_utf8_encode'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbUtf8Encode::class, $defaultParams + $params['resource_values']['db_utf8_encode']);
                 break;
             case 'db_resource_title_check':
             case 'db_resource_title_fix':
@@ -103,11 +113,11 @@ class JobController extends AbstractActionController
                 break;
             case 'db_session_check':
             case 'db_session_clean':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $params['db_session'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $defaultParams + $params['database']['db_session']);
                 break;
             case 'db_log_check':
             case 'db_log_clean':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbLog::class, $params['db_log'] + $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbLog::class, $defaultParams + $params['database']['db_log']);
                 break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
@@ -121,7 +131,7 @@ class JobController extends AbstractActionController
             default:
                 $eventManager = $this->getEventManager();
                 $args = $eventManager->prepareArgs([
-                    'process' => $params['process'],
+                    'process' => $process,
                     'params' => $params,
                     'job' => null,
                     'args' => [],
@@ -129,7 +139,10 @@ class JobController extends AbstractActionController
                 $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
                 $jobClass = $args['job'];
                  if (!$jobClass) {
-                    $this->messenger()->addError('Unknown process {process}', ['process' => $params['process']]); // @translate
+                    $this->messenger()->addError(new Message(
+                        'Unknown process "%s"', // @translate
+                        $process
+                    ));
                     return $view;
                 }
                 $job = $dispatcher->dispatch($jobClass, $args['args']);
