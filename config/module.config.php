@@ -64,6 +64,7 @@ return [
             ],
         ],
     ],
+    // TODO Remove these routes and use main admin/default.
     'router' => [
         'routes' => [
             'admin' => [
