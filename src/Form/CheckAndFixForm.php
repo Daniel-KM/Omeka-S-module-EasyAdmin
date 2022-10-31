@@ -10,7 +10,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element as OmekaElement;
 
-class JobsForm extends Form
+class CheckAndFixForm extends Form
 {
     use EventManagerAwareTrait;
 

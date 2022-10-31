@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace EasyInstall\Mvc\Controller\Plugin;
+namespace EasyAdmin\Mvc\Controller\Plugin;
 
 use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -84,7 +84,7 @@ class Addons extends AbstractPlugin
         }
 
         // Check the cache.
-        $container = new Container('EasyInstall');
+        $container = new Container('EasyAdmin');
         if (isset($container->addons)) {
             $this->addons = $container->addons;
             if (!$this->isEmpty()) {

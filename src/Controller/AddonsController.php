@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace EasyInstall\Controller\Admin;
+namespace EasyAdmin\Controller;
 
 use Doctrine\Inflector\InflectorFactory;
-use EasyInstall\Form\UploadForm;
+use EasyAdmin\Form\AddonsForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
-class IndexController extends AbstractActionController
+class AddonsController extends AbstractActionController
 {
     public function indexAction()
     {
         $view = new ViewModel;
 
-        /** @var \EasyInstall\Form\UploadForm $form */
-        $form = $this->getForm(UploadForm::class);
+        /** @var \EasyAdmin\Form\AddonsForm $form */
+        $form = $this->getForm(AddonsForm::class);
         $view->form = $form;
 
         $addons = $form->getAddons();

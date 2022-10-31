@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace EasyInstallTest\Controller;
+namespace EasyAdminTest\Controller;
 
 use OmekaTestHelper\Controller\OmekaControllerTestCase;
 
-abstract class EasyInstallControllerTestCase extends OmekaControllerTestCase
+abstract class EasyAdminControllerTestCase extends OmekaControllerTestCase
 {
     public function setUp(): void
     {

@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
-namespace EasyInstall\Service\Form;
 
-use EasyInstall\Form\UploadForm;
+namespace EasyAdmin\Service\Form;
+
+use EasyAdmin\Form\AddonsForm;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class UploadFormFactory implements FactoryInterface
+class AddonsFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $form = new UploadForm(null, $options);
+        $form = new AddonsForm(null, $options);
         $addons = $services->get('ControllerPluginManager')
-            ->get('easyInstallAddons');
+            ->get('easyAdminAddons');
         $form->setAddons($addons);
         return $form;
     }

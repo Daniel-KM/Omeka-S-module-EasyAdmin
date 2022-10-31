@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace EasyInstallTest\Controller;
+namespace EasyAdminTest\Controller;
 
-class IndexControllerTest extends EasyInstallControllerTestCase
+class IndexControllerTest extends EasyAdminControllerTestCase
 {
     public function testIndexActionCanBeAccessed(): void
     {
-        $this->dispatch('/admin/easy-install');
+        $this->dispatch('/admin/easy-admin/addons');
         $this->assertResponseStatusCode(200);
     }
 
     public function testIndexActionCannotBeAccessedInPublic(): void
     {
-        $this->dispatch('/easy-install');
+        $this->dispatch('/easy-admin/addons');
         $this->assertResponseStatusCode(404);
     }
 }

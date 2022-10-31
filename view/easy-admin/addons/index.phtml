@@ -1,14 +1,14 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \EasyInstall\Form\UploadForm $form
+ * @var \EasyAdmin\Form\AddonsForm $form
  */
 
 $translate = $this->plugin('translate');
 $form->prepare();
 ?>
 
-<?php echo $this->pageTitle($translate('Easy Install')); ?>
+<?php echo $this->pageTitle($translate('Easy Admin')); ?>
 <p class="explanation">
     <?php echo sprintf($translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html">', '</a>',

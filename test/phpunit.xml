@@ -7,8 +7,8 @@
     bootstrap="./bootstrap.php"
     >
     <testsuites>
-        <testsuite name="EasyInstallTest">
-            <directory>./EasyInstallTest</directory>
+        <testsuite name="EasyAdminTest">
+            <directory>./EasyAdminTest</directory>
         </testsuite>
     </testsuites>
 </phpunit>

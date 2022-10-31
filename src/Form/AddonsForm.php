@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
-namespace EasyInstall\Form;
 
-use EasyInstall\Mvc\Controller\Plugin\Addons;
+namespace EasyAdmin\Form;
+
+use EasyAdmin\Mvc\Controller\Plugin\Addons;
 use Laminas\Form\Element\Select;
 use Laminas\Form\Form;
 
-class UploadForm extends Form
+class AddonsForm extends Form
 {
     /**
      * List of addons.
@@ -16,8 +17,6 @@ class UploadForm extends Form
 
     public function init(): void
     {
-        $this->setAttribute('action', 'easy-install');
-
         $addonLabels = [
             'omekamodule' => 'Modules Omeka.org', // @translate
             'omekatheme' => 'Themes Omeka.org', // @translate

@@ -7,12 +7,12 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
 
-class JobController extends AbstractActionController
+class CheckAndFixController extends AbstractActionController
 {
     public function indexAction()
     {
-        /** @var \EasyAdmin\Form\JobsForm $form */
-        $form = $this->getForm(\EasyAdmin\Form\JobsForm::class);
+        /** @var \EasyAdmin\Form\CheckAndFixForm $form */
+        $form = $this->getForm(\EasyAdmin\Form\CheckAndFixForm::class);
         $view = new ViewModel([
             'form' => $form,
         ]);
@@ -171,7 +171,7 @@ class JobController extends AbstractActionController
         $this->messenger()->addSuccess($message);
 
         // Reset the form after a submission.
-        $form = $this->getForm(\EasyAdmin\Form\JobsForm::class);
+        $form = $this->getForm(\EasyAdmin\Form\CheckAndFixForm::class);
         return $view
             ->setVariable('form', $form);
     }

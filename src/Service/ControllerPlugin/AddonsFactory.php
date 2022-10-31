@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace EasyInstall\Service\ControllerPlugin;
+namespace EasyAdmin\Service\ControllerPlugin;
 
-use EasyInstall\Mvc\Controller\Plugin\Addons;
+use EasyAdmin\Mvc\Controller\Plugin\Addons;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
