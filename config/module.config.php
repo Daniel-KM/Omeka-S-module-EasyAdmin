@@ -31,11 +31,10 @@ return [
             'EasyAdmin\Controller\Job' => Controller\JobController::class,
         ],
     ],
-    // TODO Merge bulk navigation and route with module BulkImport (require a main page?).
     'navigation' => [
         'AdminModule' => [
             'easy-admin' => [
-                'label' => 'Job manager', // @translate
+                'label' => 'Checks and fixes', // @translate
                 'route' => 'admin/easy-admin',
                 'controller' => 'job',
                 'resource' => 'EasyAdmin\Controller\Job',
