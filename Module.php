@@ -175,6 +175,24 @@ class Module extends AbstractModule
             'view.edit.before',
             [$this, 'contentLockingOnEdit']
         );
+
+        // The check for content locking can be done via `api.hydrate.pre` or
+        // `api.update.pre`, that is bypassable in code.
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.update.pre',
+            [$this, 'contentLockingOnSave']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'view.edit.pre',
+            [$this, 'contentLockingOnSave']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'view.edit.pre',
+            [$this, 'contentLockingOnSave']
+        );
     }
 
     public function contentLockingOnEdit(Event $event): void
@@ -243,6 +261,52 @@ class Module extends AbstractModule
             ]
         );
         $messenger->addWarning($message);
+    }
+
+    public function contentLockingOnSave(Event $event): void
+    {
+        /**
+         * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
+         * @var \Omeka\Entity\User $user
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         * @var \EasyAdmin\Entity\ContentLock $contentLock
+         * @var \Omeka\Api\Request $request
+         */
+        $request = $event->getParam('request');
+
+        $entityId = $request->getId();
+        $entityName = $request->getResource();
+        if (!$entityId || !$entityName) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $entityManager = $services->get('Omeka\EntityManager');
+
+        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+            ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+        if (!$contentLock) {
+            return;
+        }
+
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $contentLockUser = $contentLock->getUser();
+        if ($user->getId() === $contentLockUser->getId()) {
+            // The content lock won't be removed in case of a validation
+            // exception.
+            $entityManager->remove($contentLock);
+            return;
+        }
+
+        $i18n = $services->get('ViewHelperManager')->get('i18n');
+        $message = new \Log\Stdlib\PsrMessage(
+            'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
+            [
+                'user_name' => $contentLockUser->getName(),
+                'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+            ]
+        );
+        throw new \Omeka\Api\Exception\ValidationException((string) $message);
     }
 
     /**
