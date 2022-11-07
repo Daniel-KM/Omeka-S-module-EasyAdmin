@@ -184,13 +184,29 @@ class Module extends AbstractModule
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'view.edit.pre',
+            'api.update.pre',
             [$this, 'contentLockingOnSave']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
-            'view.edit.pre',
+            'api.update.pre',
             [$this, 'contentLockingOnSave']
+        );
+
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.delete.pre',
+            [$this, 'contentLockingOnDelete']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.delete.pre',
+            [$this, 'contentLockingOnDelete']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.delete.pre',
+            [$this, 'contentLockingOnDelete']
         );
 
         $sharedEventManager->attach(
@@ -388,6 +404,38 @@ class Module extends AbstractModule
 
         // Throw exception for frontend and backend.
         throw new \Omeka\Api\Exception\ValidationException((string) $message);
+    }
+
+    /**
+     * Remove content lock on resouce deletion.
+     *
+     * The primary key is not a join column, so old deleted record can remain.
+     */
+    public function contentLockingOnDelete(Event $event): void
+    {
+        /**
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         * @var \EasyAdmin\Entity\ContentLock $contentLock
+         * @var \Omeka\Api\Request $request
+         */
+        $request = $event->getParam('request');
+
+        $entityId = $request->getId();
+        $entityName = $request->getResource();
+        if (!$entityId || !$entityName) {
+            return;
+        }
+
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+
+        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+            ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+        if (!$contentLock) {
+            return;
+        }
+
+        $entityManager->remove($contentLock);
+        // Will be flushed auomatically in post.
     }
 
     /**
