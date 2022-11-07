@@ -21,6 +21,7 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\Note::class => Form\Element\Note::class,
+            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [
             Form\AddonsForm::class => Service\Form\AddonsFormFactory::class,
@@ -112,7 +113,9 @@ return [
             ],
         ],
     ],
-    // Keep empty config for automatic management.
     'easyadmin' => [
+        'settings' => [
+            'easyadmin_content_lock' => true,
+        ],
     ],
 ];

@@ -193,6 +193,12 @@ class Module extends AbstractModule
             'view.edit.pre',
             [$this, 'contentLockingOnSave']
         );
+
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_elements',
+            [$this, 'handleMainSettings']
+        );
     }
 
     public function contentLockingOnEdit(Event $event): void
@@ -209,6 +215,12 @@ class Module extends AbstractModule
         $view = $event->getTarget();
         $resource = $view->resource;
         if (!$resource) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        if (!$settings->get('easyadmin_content_lock')) {
             return;
         }
 
@@ -229,7 +241,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $services = $this->getServiceLocator();
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
@@ -272,6 +283,12 @@ class Module extends AbstractModule
          * @var \EasyAdmin\Entity\ContentLock $contentLock
          * @var \Omeka\Api\Request $request
          */
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        if (!$settings->get('easyadmin_content_lock')) {
+            return;
+        }
+
         $request = $event->getParam('request');
 
         $entityId = $request->getId();
@@ -280,7 +297,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $services = $this->getServiceLocator();
         $entityManager = $services->get('Omeka\EntityManager');
 
         $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
