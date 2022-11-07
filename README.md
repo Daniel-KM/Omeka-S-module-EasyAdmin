@@ -8,6 +8,7 @@ Easy Admin (module for Omeka S)
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
 admin interface:
 
+- content lock to avoid concurrent edition;
 - install modules;
 - update modules (in a future version);
 - maintenance state (in a future version);
@@ -90,6 +91,12 @@ and click the submit buttons. The results are available in logs currently.
 Simply select either the desired module or the desired theme and click "upload".
 
 See more details on [modules] and [themes].
+
+### Content lock
+
+This feature is inspired by Drupal [Content Lock] mechanism and allows to block
+concurrent editing: when a user is editing a resource, other users cannot edit
+it until submission.
 
 ### Tasks and cron tasks
 
@@ -248,12 +255,14 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
 [Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[EasyAdmin.zip]: https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
+[Content Lock]: https://www.drupal.org/project/content_lock
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
