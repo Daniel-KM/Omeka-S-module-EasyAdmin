@@ -260,6 +260,12 @@ class Module extends AbstractModule
 
         $contentLockUser = $contentLock->getUser();
         if ($user->getId() === $contentLockUser->getId()) {
+            // Refresh the content lock: this is a new edition or a
+            // submitted one. So the previous lock should be removed and a
+            // a new one created, but it's simpler to override first one.
+            $contentLock->setCreated(new \DateTIme('now'));
+            $entityManager->persist($contentLock);
+            $entityManager->flush();
             return;
         }
 
