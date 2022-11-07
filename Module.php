@@ -269,7 +269,20 @@ class Module extends AbstractModule
             return;
         }
 
+        $controllerNames = [
+            'items' => 'item',
+            'item_sets' => 'item-set',
+            'media' => 'media',
+        ];
+
+        // TODO Add rights to bypass.
+
+        /** @var \Laminas\Http\PhpEnvironment\Request $request */
+        $request = $services->get('Application')->getMvcEvent()->getRequest();
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
+
+        $isPost = $request->isPost();
+
         $message = new \Log\Stdlib\PsrMessage(
             'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
             [
@@ -277,7 +290,14 @@ class Module extends AbstractModule
                 'date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short'),
             ]
         );
-        $messenger->addWarning($message);
+        $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
+
+        $message = new \Log\Stdlib\PsrMessage(
+            'You can bypass this lock by checking this box: {checkbox}', // @translate
+            ['checkbox' => '<input type="checkbox" name="bypass_content_lock" value="1" id="bypass_content_lock" form="edit-' . $controllerNames[$entityName] . '"/>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
     }
 
     public function contentLockingOnSave(Event $event): void
@@ -321,6 +341,36 @@ class Module extends AbstractModule
         }
 
         $i18n = $services->get('ViewHelperManager')->get('i18n');
+
+        // When a lock is bypassed, keep it for the original user.
+        if ($request->getValue('bypass_content_lock')) {
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $message = new \Log\Stdlib\PsrMessage(
+                'The lock in place since {date} has been bypassed, but the user {user_name} can override it on save.', // @translate
+                [
+                    'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+                    'user_name' => $contentLockUser->getName(),
+                ]
+            );
+            $messenger->addWarning($message);
+            return;
+        }
+
+        // Keep the message for backend api process.
+        $message = new \Log\Stdlib\PsrMessage(
+            'User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited by the user {user_name} (#{user_id}) since {date}.', // @translate
+            [
+                'user' => $user->getName(),
+                'userid' => $user->getId(),
+                'resource_name' => $entityName,
+                'resource_id' => $entityId,
+                'user_name' => $contentLockUser->getName(),
+                'user_id' => $contentLockUser->getId(),
+                'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+            ]
+        );
+        $services->get('Omeka\Logger')->err($message);
+
         $message = new \Log\Stdlib\PsrMessage(
             'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
             [
@@ -328,6 +378,8 @@ class Module extends AbstractModule
                 'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
             ]
         );
+
+        // Throw exception for frontend and backend.
         throw new \Omeka\Api\Exception\ValidationException((string) $message);
     }
 
