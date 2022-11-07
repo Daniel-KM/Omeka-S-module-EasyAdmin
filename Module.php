@@ -193,6 +193,26 @@ class Module extends AbstractModule
             [$this, 'contentLockingOnSave']
         );
 
+        // There is no good event for deletion. So either js on layout, either
+        // view.details and js, eiher override confirm form and/or delete confirm
+        // to add elements or add a trigger in delete-confirm-details.
+        // Here, view details + inline js to avoid to load a js in many views.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.details',
+            [$this, 'contentLockingOnDeleteConfirm']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.details',
+            [$this, 'contentLockingOnDeleteConfirm']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.details',
+            [$this, 'contentLockingOnDeleteConfirm']
+        );
+
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.delete.pre',
@@ -315,12 +335,144 @@ class Module extends AbstractModule
         );
         $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
 
-        $message = new \Log\Stdlib\PsrMessage(
-            'You can bypass this lock by checking this box: {checkbox}', // @translate
-            ['checkbox' => '<input type="checkbox" name="bypass_content_lock" value="1" id="bypass_content_lock" form="edit-' . $controllerNames[$entityName] . '"/>']
-        );
+        $html = <<<'HTML'
+<label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="edit-{entity_name}"/>{message_bypass}</label>
+<div class="easy-admin confirm-delete">
+    <label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>
+    <script>
+        $(document).ready(function() {
+            $('.easy-admin.confirm-delete').prependTo('#delete.sidebar #confirmform');
+            const buttonPageAction = $('#page-actions button[type=submit]');
+            const buttonSidebar = $('#delete.sidebar #confirmform input[name=submit]');
+            buttonPageAction.prop('disabled', true);
+            buttonSidebar.prop('disabled', true);
+            $('.bypass-content-lock').on('change', function () {
+                const button = $(this).parent().parent().hasClass('confirm-delete') ? buttonSidebar : buttonPageAction;
+                button.prop('disabled', !$(this).is(':checked'));
+            });
+        });
+    </script>
+</div>
+HTML;
+        $message = $view->translate('Bypass the lock'); // @translate
+        $message = new \Log\Stdlib\PsrMessage($html, ['entity_name' => $controllerNames[$entityName], 'message_bypass' => $message]);
         $message->setEscapeHtml(false);
         $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
+    }
+
+    public function contentLockingOnDeleteConfirm(Event $event): void
+    {
+        /**
+         * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
+         * @var \Omeka\Api\Representation\AbstractEntityRepresentation $resource
+         * @var \Omeka\Mvc\Status $status
+         * @var \Omeka\Entity\User $user
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         * @var \EasyAdmin\Entity\ContentLock $contentLock
+         * @var \Laminas\View\Renderer\PhpRenderer $view
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         */
+
+        // In the view show-details, the action is not known.
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        $routeMatch = $status->getRouteMatch();
+        if (!$status->isAdminRequest()
+            || $routeMatch->getMatchedRouteName() !== 'admin/id'
+            || $routeMatch->getParam('action') !== 'delete-confirm'
+        ) {
+            return;
+        }
+
+        $view = $event->getTarget();
+        $resource = $view->resource;
+        if (!$resource) {
+            return;
+        }
+
+        $settings = $services->get('Omeka\Settings');
+        if (!$settings->get('easyadmin_content_lock')) {
+            return;
+        }
+
+        // This mapping is needed because the api name is not available in the
+        // representation.
+        $resourceNames = [
+            \Omeka\Api\Representation\ItemRepresentation::class => 'items',
+            \Omeka\Api\Representation\ItemSetRepresentation::class => 'item_sets',
+            \Omeka\Api\Representation\MediaRepresentation::class => 'media',
+            'o:Item' => 'items',
+            'o:ItemSet' => 'item_sets',
+            'o:Media' => 'media',
+        ];
+
+        $entityId = $resource->id();
+        $entityName = $resourceNames[get_class($resource)] ?? $resourceNames[$resource->getJsonLdType()] ?? null;
+        if (!$entityId || !$entityName) {
+            return;
+        }
+
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $entityManager = $services->get('Omeka\EntityManager');
+
+        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+            ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+
+        // Don't create or refresh a content lock on confirm delete.
+        if (!$contentLock) {
+            return;
+        }
+
+        // TODO Add rights to bypass.
+
+        $contentLockUser = $contentLock->getUser();
+        $isCurrentUser = $user->getId() === $contentLockUser->getId();
+
+        $html = <<<'HTML'
+<div class="easy-admin confirm-delete">
+    <p class="error">
+        <strong>%1$s</strong>
+        %2$s
+    </p>
+    %3$s
+    <script>
+        $(document).ready(function() {
+            $('.easy-admin.confirm-delete').prependTo('#sidebar .sidebar-content #confirmform');
+            if (!$('.easy-admin.confirm-delete .bypass-content-lock').length) {
+                return;
+            }
+            const buttonSidebar = $('.sidebar #sidebar-confirm input[name=submit]');
+            buttonSidebar.prop('disabled', true);
+            $('.bypass-content-lock').on('change', function () {
+                buttonSidebar.prop('disabled', !$(this).is(':checked'));
+            });
+        });
+    </script>
+</div>
+HTML;
+
+        $translator = $services->get('MvcTranslator');
+
+        $messageWarn = new \Log\Stdlib\PsrMessage('Warning:'); // @translate
+        if ($isCurrentUser) {
+            $message = new \Log\Stdlib\PsrMessage(
+                'You edit this resource somewhere since {date}.', // @translate
+                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
+            );
+            $messageInput = new \Log\Stdlib\PsrMessage('');
+        } else {
+            $message = new \Log\Stdlib\PsrMessage(
+                'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
+                [
+                    'user_name' => $contentLockUser->getName(),
+                    'date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short'),
+                ]
+            );
+            $messageInput = new \Log\Stdlib\PsrMessage('Bypass the lock'); // @translate
+            $messageInput = new \Log\Stdlib\PsrMessage('<label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>', ['message_bypass' => $messageInput->setTranslator($translator)]);
+        }
+
+        echo sprintf($html, $messageWarn->setTranslator($translator), $message->setTranslator($translator), $messageInput->setTranslator($translator));
     }
 
     public function contentLockingOnSave(Event $event): void
@@ -418,6 +570,11 @@ class Module extends AbstractModule
          * @var \EasyAdmin\Entity\ContentLock $contentLock
          * @var \Omeka\Api\Request $request
          */
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        // Remove the content lock on delete even when the feature is disabled.
+        $isContentLockEnabled = $settings->get('easyadmin_content_lock');
+
         $request = $event->getParam('request');
 
         $entityId = $request->getId();
@@ -426,7 +583,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $entityManager = $services->get('Omeka\EntityManager');
 
         $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
@@ -434,8 +591,78 @@ class Module extends AbstractModule
             return;
         }
 
-        $entityManager->remove($contentLock);
-        // Will be flushed auomatically in post.
+        if (!$isContentLockEnabled) {
+            // The content lock won't be removed in case of a validation
+            // exception.
+            $entityManager->remove($contentLock);
+            return;
+        }
+
+        $i18n = $services->get('ViewHelperManager')->get('i18n');
+
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $contentLockUser = $contentLock->getUser();
+
+        if ($user->getId() === $contentLockUser->getId()) {
+            // The content lock won't be removed in case of a validation
+            // exception.
+            $entityManager->remove($contentLock);
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $message = new \Log\Stdlib\PsrMessage(
+                'You removed the resource you are editing somewhere since {date}.', // @translate
+                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
+            );
+            $messenger->addWarning($message);
+            return;
+        }
+
+        // When lock is bypassed on delete, don't keep it for the user editing.
+
+        // TODO Find a better way to check bypass content lock.
+        if ($request->getValue('bypass_content_lock')
+            || $request->getOption('bypass_content_lock')
+            || !empty($_POST['bypass_content_lock'])
+        ) {
+            // Will be flushed auomatically in post.
+            $entityManager->remove($contentLock);
+            $messenger = $services->get('ControllerPluginManager')->get('messenger');
+            $message = new \Log\Stdlib\PsrMessage(
+                'You removed a resource currently locked in edition by {user_name} since {date}.', // @translate
+                [
+                    'user_name' => $contentLockUser->getName(),
+                    'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+                ]
+            );
+            $messenger->addWarning($message);
+            return;
+        }
+
+        // Keep the message for backend api process.
+        $message = new \Log\Stdlib\PsrMessage(
+            'User {user} (#{userid}) tried to delete {resource_name} #{resource_id} edited by the user {user_name} (#{user_id}) since {date}.', // @translate
+            [
+                'user' => $user->getName(),
+                'userid' => $user->getId(),
+                'resource_name' => $entityName,
+                'resource_id' => $entityId,
+                'user_name' => $contentLockUser->getName(),
+                'user_id' => $contentLockUser->getId(),
+                'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+            ]
+        );
+        $services->get('Omeka\Logger')->err($message);
+
+        $message = new \Log\Stdlib\PsrMessage(
+            'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
+            [
+                'user_name' => $contentLockUser->getName(),
+                'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
+            ]
+        );
+
+        // Throw exception for frontend and backend.
+        // TODO Redirect to browse or show view instead of displaying the error.
+        throw new \Omeka\Api\Exception\ValidationException((string) $message);
     }
 
     /**
