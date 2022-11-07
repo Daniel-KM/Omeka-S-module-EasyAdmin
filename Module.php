@@ -175,7 +175,6 @@ class Module extends AbstractModule
             'view.edit.before',
             [$this, 'contentLockingOnEdit']
         );
-
         // The check for content locking can be done via `api.hydrate.pre` or
         // `api.update.pre`, that is bypassable in code.
         $sharedEventManager->attach(
@@ -258,14 +257,23 @@ class Module extends AbstractModule
             return;
         }
 
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+
         $contentLockUser = $contentLock->getUser();
-        if ($user->getId() === $contentLockUser->getId()) {
+        $isCurrentUser = $user->getId() === $contentLockUser->getId();
+
+        if ($isCurrentUser) {
             // Refresh the content lock: this is a new edition or a
             // submitted one. So the previous lock should be removed and a
             // a new one created, but it's simpler to override first one.
             $contentLock->setCreated(new \DateTIme('now'));
             $entityManager->persist($contentLock);
             $entityManager->flush();
+            $message = new \Log\Stdlib\PsrMessage(
+                'You edit already this resource somewhere since {date}.', // @translate
+                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
+            );
+            $messenger->addWarning($message);
             return;
         }
 
@@ -279,7 +287,6 @@ class Module extends AbstractModule
 
         /** @var \Laminas\Http\PhpEnvironment\Request $request */
         $request = $services->get('Application')->getMvcEvent()->getRequest();
-        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         $isPost = $request->isPost();
 
