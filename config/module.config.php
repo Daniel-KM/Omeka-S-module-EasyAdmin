@@ -38,32 +38,6 @@ return [
             'easyAdminAddons' => Service\ControllerPlugin\AddonsFactory::class,
         ],
     ],
-    'navigation' => [
-        'AdminModule' => [
-            'easy-admin' => [
-                'label' => 'Easy Admin', // @translate
-                'route' => 'admin/easy-admin/default',
-                'controller' => 'check-and-fix',
-                'resource' => 'Omeka\Controller\Admin\Module',
-                'privilege' => 'browse',
-                'class' => 'o-icon- fa-tools',
-                'pages' => [
-                    [
-                        'label' => 'Checks and fixes', // @translate
-                        'route' => 'admin/easy-admin/default',
-                        'controller' => 'check-and-fix',
-                        'class' => 'o-icon- fa-wrench',
-                    ],
-                    [
-                        'label' => 'Install addons', // @translate
-                        'route' => 'admin/easy-admin/default',
-                        'controller' => 'addons',
-                        'class' => 'o-icon- fa-puzzle-piece',
-                    ],
-                ],
-            ],
-        ],
-    ],
     // TODO Remove these routes and use main admin/default.
     'router' => [
         'routes' => [
@@ -97,6 +71,32 @@ return [
                                 ],
                             ],
                         ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'navigation' => [
+        'AdminModule' => [
+            'easy-admin' => [
+                'label' => 'Easy Admin', // @translate
+                'route' => 'admin/easy-admin/default',
+                'controller' => 'check-and-fix',
+                'resource' => 'Omeka\Controller\Admin\Module',
+                'privilege' => 'browse',
+                'class' => 'o-icon- fa-tools',
+                'pages' => [
+                    [
+                        'label' => 'Checks and fixes', // @translate
+                        'route' => 'admin/easy-admin/default',
+                        'controller' => 'check-and-fix',
+                        'class' => 'o-icon- fa-wrench',
+                    ],
+                    [
+                        'label' => 'Install addons', // @translate
+                        'route' => 'admin/easy-admin/default',
+                        'controller' => 'addons',
+                        'class' => 'o-icon- fa-puzzle-piece',
                     ],
                 ],
             ],
