@@ -157,6 +157,92 @@ class Module extends AbstractModule
             'view.details',
             [$this, 'warnUninstall']
         );
+
+        // Content lockiing in admin board.
+        // It is useless in public board, because there is the moderation.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.edit.before',
+            [$this, 'contentLockingOnEdit']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.edit.before',
+            [$this, 'contentLockingOnEdit']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.edit.before',
+            [$this, 'contentLockingOnEdit']
+        );
+    }
+
+    public function contentLockingOnEdit(Event $event): void
+    {
+        /**
+         * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
+         * @var \Omeka\Api\Representation\AbstractEntityRepresentation $resource
+         * @var \Omeka\Entity\User $user
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         * @var \EasyAdmin\Entity\ContentLock $contentLock
+         * @var \Laminas\View\Renderer\PhpRenderer $view
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         */
+        $view = $event->getTarget();
+        $resource = $view->resource;
+        if (!$resource) {
+            return;
+        }
+
+        // This mapping is needed because the api name is not available in the
+        // representation.
+        $resourceNames = [
+            \Omeka\Api\Representation\ItemRepresentation::class => 'items',
+            \Omeka\Api\Representation\ItemSetRepresentation::class => 'item_sets',
+            \Omeka\Api\Representation\MediaRepresentation::class => 'media',
+            'o:Item' => 'items',
+            'o:ItemSet' => 'item_sets',
+            'o:Media' => 'media',
+        ];
+
+        $entityId = $resource->id();
+        $entityName = $resourceNames[get_class($resource)] ?? $resourceNames[$resource->getJsonLdType()] ?? null;
+        if (!$entityId || !$entityName) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $entityManager = $services->get('Omeka\EntityManager');
+
+        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+            ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+
+        if (!$contentLock) {
+            $contentLock = new \EasyAdmin\Entity\ContentLock($entityId, $entityName);
+            $contentLock
+                ->setUser($user)
+                ->setCreated(new \DateTIme('now'));
+            // Flush is needed because the event does not run it.
+            $entityManager->persist($contentLock);
+            $entityManager->flush();
+            return;
+        }
+
+        $contentLockUser = $contentLock->getUser();
+        if ($user->getId() === $contentLockUser->getId()) {
+            return;
+        }
+
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $message = new \Log\Stdlib\PsrMessage(
+            'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
+            [
+                'user_name' => $contentLockUser->getName(),
+                'date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short'),
+            ]
+        );
+        $messenger->addWarning($message);
     }
 
     /**
