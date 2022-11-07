@@ -82,6 +82,16 @@ class CheckAndFixForm extends Form
                 'required' => false,
             ]);
         $inputFilter->get('database')
+            ->get('db_content_lock')
+            ->add([
+                'name' => 'hours',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'user_id',
+                'required' => false,
+            ]);
+        $inputFilter->get('database')
             ->get('db_session')
             ->add([
                 'name' => 'days',
@@ -429,6 +439,8 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
+                        'db_content_lock_check' => 'Check existing content locks', // @translate
+                        'db_content_lock_clean' => 'Remove existing content locks', // @translate
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_fix' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
                         'db_job_fix_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
@@ -444,6 +456,44 @@ class CheckAndFixForm extends Form
                     'class' => 'fieldset-process'
                 ],
             ]);
+
+            $fieldset
+                ->add([
+                    'type' => Fieldset::class,
+                    'name' => 'db_content_lock',
+                    'options' => [
+                        'label' => 'Options to remove content locks', // @translate
+                    ],
+                    'attributes' => [
+                        'class' => 'db_content_lock_check db_content_lock_clean',
+                    ],
+                ]);
+            $fieldset->get('db_content_lock')
+                ->add([
+                    'name' => 'hours',
+                    'type' => Element\Number::class,
+                    'options' => [
+                        'label' => 'Older than this number of hours', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'db_content_lock-hours',
+                    ],
+                ])
+                ->add([
+                    'name' => 'user_id',
+                    'type' => OmekaElement\UserSelect::class,
+                    'options' => [
+                        'label' => 'Belonging to these users', // @translate
+                        'empty_option' => '',
+                    ],
+                    'attributes' => [
+                        'id' => 'db_content_lock-user_id',
+                        'multiple' => true,
+                        'required' => false,
+                        'class' => 'chosen-select',
+                        'data-placeholder' => 'Select users…', // @translate
+                    ],
+                ]);
 
         $fieldset
             ->add([

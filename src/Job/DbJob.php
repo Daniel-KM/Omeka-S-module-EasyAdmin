@@ -31,7 +31,6 @@ class DbJob extends AbstractCheck
      *
      * @param bool $fix
      * @param bool $fixAll
-     * @return bool
      */
     protected function checkDbJob($fix = false, $fixAll = false)
     {

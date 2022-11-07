@@ -37,7 +37,6 @@ class DbSession extends AbstractCheck
      *
      * @param bool $fix
      * @param int $minimumDays
-     * @return bool
      */
     protected function checkDbSession(bool $fix = false, int $minimumDays = 0): void
     {

@@ -87,7 +87,6 @@ SQL;
      * @param bool $fix
      * @param int $minimumDays
      * @param int $maximumSeverity
-     * @return bool
      */
     protected function checkDbLog(bool $fix = false, int $minimumDays = 0, int $maximumSeverity = 0): void
     {
@@ -103,14 +102,15 @@ WHERE table_schema = "$dbname"
 SQL;
         $size = $this->connection->executeQuery($sqlSize)->fetchOne();
 
+        $sql = "SELECT COUNT(id) FROM $this->table;";
+        $all = $this->connection->executeQuery($sql)->fetchOne();
+
         $sql = "SELECT COUNT(id) FROM $this->table WHERE created < :date AND severity >= :severity;";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(':date', $date);
         $stmt->bindValue(':severity', $maximumSeverity);
         $old = $stmt->executeQuery()->fetchOne();
 
-        $sql = "SELECT COUNT(id) FROM $this->table;";
-        $all = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {days} days and below or equal severity "{severity}".', // @translate
             ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $minimumDays, 'severity' => $this->severities[$maximumSeverity]]
