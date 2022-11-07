@@ -52,3 +52,26 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
     }
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.3.6', '<')) {
+    $sqlFile = $this->modulePath() . '/data/install/schema.sql';
+    if (!$this->checkNewTablesFromFile($sqlFile)) {
+        $translator = $services->get('MvcTranslator');
+        $message = new Message(
+            $translator->translate('This module cannot install its tables, because they exist already. Try to remove them first.') // @translate
+        );
+        throw new ModuleCannotInstallException((string) $message);
+    }
+    $this->execSqlFromFile($sqlFile);
+
+    $settings->set('easyadmin_content_lock', true);
+
+    $message = new Message('A anti-concurrent editing feature has been added: when a user opens a resource for edition, others users cannot edit it until submission.'); // @translate
+    $messenger->addSuccess($message);
+    $message = new Message('This option can be enabled/disabled in %1$smain settings%2$s.', // @translate
+        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+        '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+}
