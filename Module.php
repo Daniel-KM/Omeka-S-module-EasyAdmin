@@ -610,7 +610,7 @@ HTML;
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $message = new \Log\Stdlib\PsrMessage(
                 'You removed the resource you are editing somewhere since {date}.', // @translate
-                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
+                ['date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short')]
             );
             $messenger->addWarning($message);
             return;
