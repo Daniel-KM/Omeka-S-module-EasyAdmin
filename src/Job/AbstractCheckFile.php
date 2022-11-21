@@ -13,7 +13,7 @@ abstract class AbstractCheckFile extends AbstractCheck
      */
     protected function checkFileData($column, $fix = false)
     {
-        if (!in_array($column, ['size', 'sha256'])) {
+        if (!in_array($column, ['size', 'sha256', 'media_type'])) {
             $this->logger->err(
                 'Column {type} does not exist or cannot be checked.', // @translate
                 ['type' => $column]
@@ -66,6 +66,8 @@ abstract class AbstractCheckFile extends AbstractCheck
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
+
+        $specifyMediaType = $this->getServiceLocator()->get('ControllerPluginManager')->get('specifyMediaType');
 
         // Loop all media with original files.
         $originalPath = $this->basePath . '/original';
@@ -123,6 +125,10 @@ abstract class AbstractCheckFile extends AbstractCheck
                             $dbValue = $media->getSha256();
                             $realValue = hash_file('sha256', $filepath);
                             break;
+                        case 'media_type':
+                            $dbValue = $media->getMediaType();
+                            $realValue = $specifyMediaType($filepath);
+                            break;
                     }
 
                     $isDifferent = $dbValue != $realValue;
@@ -139,20 +145,24 @@ abstract class AbstractCheckFile extends AbstractCheck
                                 case 'sha256':
                                     $media->setSha256($realValue);
                                     break;
+                                case 'media_type':
+                                    $media->setMediaType($realValue);
+                                    break;
                             }
                             $this->entityManager->persist($media);
+                            $this->logger->notice(
+                                'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value} (was {old_value}).', // @translate
+                                [
+                                    'media_id' => $media->getId(),
+                                    'processed' => $offset + $key + 1,
+                                    'total' => $totalToProcess,
+                                    'filename' => $filename,
+                                    'type' => $column,
+                                    'real_value' => $realValue,
+                                    'old_value' => $dbValue,
+                                ]
+                            );
                         }
-                        $this->logger->notice(
-                            'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value}.', // @translate
-                            [
-                                'media_id' => $media->getId(),
-                                'processed' => $offset + $key + 1,
-                                'total' => $totalToProcess,
-                                'filename' => $filename,
-                                'type' => $column,
-                                'real_value' => $realValue,
-                            ]
-                        );
                         ++$totalSucceed;
                         $row['fixed'] = $yes;
                     } else {
