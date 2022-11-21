@@ -276,24 +276,13 @@ class Module extends AbstractModule
             return;
         }
 
-        // TODO Remove all contents locks on *any* save, so avoid checks!
+        $this->removeExpiredContentLocks();
 
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
         $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
-
-        $duration = (int) $settings->get('easyadmin_content_lock_duration');
-
-        if ($contentLock
-            && $duration
-            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
-        ) {
-            $entityManager->remove($contentLock);
-            $entityManager->flush($contentLock);
-            $contentLock = null;
-        }
 
         if (!$contentLock) {
             $contentLock = new \EasyAdmin\Entity\ContentLock($entityId, $entityName);
@@ -425,6 +414,8 @@ HTML;
             return;
         }
 
+        $this->removeExpiredContentLocks();
+
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
@@ -433,17 +424,6 @@ HTML;
 
         // Don't create or refresh a content lock on confirm delete.
         if (!$contentLock) {
-            return;
-        }
-
-        $duration = (int) $settings->get('easyadmin_content_lock_duration');
-
-        if ($contentLock
-            && $duration
-            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
-        ) {
-            $entityManager->remove($contentLock);
-            $entityManager->flush($contentLock);
             return;
         }
 
@@ -522,23 +502,14 @@ HTML;
             return;
         }
 
+        $this->removeExpiredContentLocks();
+
         $entityManager = $services->get('Omeka\EntityManager');
 
         $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
         if (!$contentLock) {
             return;
-        }
-
-        $duration = (int) $settings->get('easyadmin_content_lock_duration');
-
-        if ($contentLock
-            && $duration
-            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
-        ) {
-            $entityManager->remove($contentLock);
-            $entityManager->flush($contentLock);
-            $contentLock = null;
         }
 
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
@@ -698,6 +669,25 @@ HTML;
         // Throw exception for frontend and backend.
         // TODO Redirect to browse or show view instead of displaying the error.
         throw new \Omeka\Api\Exception\ValidationException((string) $message);
+    }
+
+    protected function removeExpiredContentLocks(): void
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $duration = (int) $settings->get('easyadmin_content_lock_duration');
+        if (!$duration) {
+            return;
+        }
+
+        // Use connection, because entity manager won't remove values and will
+        // cause complex flush process/sync.
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $services->get('Omeka\Connection');
+        $connection->executeStatement(
+            'DELETE FROM content_lock WHERE created < DATE_SUB(NOW(), INTERVAL :duration SECOND)',
+            ['duration' => $duration]
+        );
     }
 
     /**
