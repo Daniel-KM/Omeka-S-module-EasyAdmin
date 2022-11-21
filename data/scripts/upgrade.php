@@ -75,3 +75,25 @@ if (version_compare($oldVersion, '3.3.6', '<')) {
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.3.7', '<')) {
+    $settings->set('easyadmin_content_lock_duration', 86400);
+
+    $message = new Message('The content locks are removed after 24h by default.'); // @translate
+    $messenger->addSuccess($message);
+    $message = new Message('This option can be enabled/disabled in %1$smain settings%2$s.', // @translate
+        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+        '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+
+    $message = new Message('A task has been added to manage precise xml media types, for example "application/alto+xml" instead of "text/xml".'); // @translate
+    $messenger->addSuccess($message);
+    $message = new Message('This task can be run via the main %1$smenu%2$s.', // @translate
+        sprintf('<a href="%s">', $url('admin', [], true) . '/easy-admin/check-and-fix#files_database'),
+        '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+}
