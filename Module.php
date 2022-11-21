@@ -276,11 +276,24 @@ class Module extends AbstractModule
             return;
         }
 
+        // TODO Remove all contents locks on *any* save, so avoid checks!
+
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
         $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+
+        $duration = (int) $settings->get('easyadmin_content_lock_duration');
+
+        if ($contentLock
+            && $duration
+            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
+        ) {
+            $entityManager->remove($contentLock);
+            $entityManager->flush($contentLock);
+            $contentLock = null;
+        }
 
         if (!$contentLock) {
             $contentLock = new \EasyAdmin\Entity\ContentLock($entityId, $entityName);
@@ -289,7 +302,7 @@ class Module extends AbstractModule
                 ->setCreated(new \DateTIme('now'));
             // Flush is needed because the event does not run it.
             $entityManager->persist($contentLock);
-            $entityManager->flush();
+            $entityManager->flush($contentLock);
             return;
         }
 
@@ -304,7 +317,7 @@ class Module extends AbstractModule
             // a new one created, but it's simpler to override first one.
             $contentLock->setCreated(new \DateTIme('now'));
             $entityManager->persist($contentLock);
-            $entityManager->flush();
+            $entityManager->flush($contentLock);
             $message = new \Log\Stdlib\PsrMessage(
                 'You edit already this resource somewhere since {date}.', // @translate
                 ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
@@ -423,6 +436,17 @@ HTML;
             return;
         }
 
+        $duration = (int) $settings->get('easyadmin_content_lock_duration');
+
+        if ($contentLock
+            && $duration
+            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
+        ) {
+            $entityManager->remove($contentLock);
+            $entityManager->flush($contentLock);
+            return;
+        }
+
         // TODO Add rights to bypass.
 
         $contentLockUser = $contentLock->getUser();
@@ -504,6 +528,17 @@ HTML;
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
         if (!$contentLock) {
             return;
+        }
+
+        $duration = (int) $settings->get('easyadmin_content_lock_duration');
+
+        if ($contentLock
+            && $duration
+            && ((new \DateTime('now'))->getTimestamp() - $contentLock->getCreated()->getTimestamp()) > $duration
+        ) {
+            $entityManager->remove($contentLock);
+            $entityManager->flush($contentLock);
+            $contentLock = null;
         }
 
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();

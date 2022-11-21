@@ -22,6 +22,16 @@ class SettingsFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'easyadmin_content_lock',
                 ],
+            ])
+            ->add([
+                'name' => 'easyadmin_content_lock_duration',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Number of seconds before automatic removing of the lock', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_content_lock_duration',
+                ],
             ]);
     }
 }
