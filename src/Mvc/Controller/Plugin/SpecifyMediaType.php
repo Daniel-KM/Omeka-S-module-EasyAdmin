@@ -70,7 +70,11 @@ class SpecifyMediaType extends AbstractPlugin
     protected function simpleMediaType(): ?string
     {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
-        return $finfo->file($this->filepath) ?: null;
+        $mediaType = $finfo->file($this->filepath) ?: null;
+        if (array_key_exists($mediaType, \Omeka\File\TempFile::MEDIA_TYPE_ALIASES)) {
+            $mediaType = \Omeka\File\TempFile::MEDIA_TYPE_ALIASES[$mediaType];
+        }
+        return $mediaType;
     }
 
     /**

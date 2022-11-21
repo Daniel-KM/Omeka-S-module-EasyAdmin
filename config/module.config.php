@@ -3,6 +3,11 @@
 namespace EasyAdmin;
 
 return [
+    'service_manager' => [
+        'factories' => [
+            'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
