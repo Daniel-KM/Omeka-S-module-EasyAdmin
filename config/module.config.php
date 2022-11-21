@@ -37,6 +37,7 @@ return [
     'controller_plugins' => [
         'factories' => [
             'easyAdminAddons' => Service\ControllerPlugin\AddonsFactory::class,
+            'specifyMediaType' => Service\ControllerPlugin\SpecifyMediaTypeFactory::class,
         ],
     ],
     // TODO Remove these routes and use main admin/default.
