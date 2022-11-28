@@ -41,7 +41,10 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
         $connection->executeStatement($sql);
         $container = new \Laminas\Session\Container('EasyInstall');
         unset($container->addons);
-        $message = new Message('The module replaces the module Easy Install. The upgrade is automatic.'); // @translate
+        $message = new Message(
+            'The module replaces the module %s. The upgrade is automatic.', // @translate
+            'Easy Install'
+        );
     } else {
         $message = new Message('It’s now possible to install %1$smodules and themes%2$s.', // @translate
             // Route easy-admin is not available during upgrade.
@@ -97,3 +100,30 @@ if (version_compare($oldVersion, '3.3.7', '<')) {
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.3.8', '<')) {
+    $maintenanceStatus = $settings->get('maintenance_status', false) ? 'no' : 'public';
+    $maintenanceText = $settings->get('maintenance_text') ?: $services->get('MvcTranslator')->translate('This site is down for maintenance. Please contact the site administrator for more information.'); // @translate
+    $settings->set('easyadmin_maintenance_status', $maintenanceStatus);
+    $settings->set('easyadmin_maintenance_text', $maintenanceText); // @translate
+
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Maintenance');
+    if ($module) {
+        $sql = 'DELETE FROM `module` WHERE `id` = "Maintenance";';
+        $connection->executeStatement($sql);
+        $message = new Message(
+            'The module replaces the module %s. The upgrade is automatic.', // @translate
+            'Maintenance'
+        );
+    } else {
+        $message = new Message('It’s now possible to set the site in maintenance mode for public or users.', // @translate
+            sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+            '</a>'
+        );
+        $message->setEscapeHtml(false);
+    }
+    $messenger->addSuccess($message);
+}
+
