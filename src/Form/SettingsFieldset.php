@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Form;
 
+use EasyAdmin\Form\Element as EasyAdminElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element\CkeditorInline;
@@ -37,13 +38,20 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
-                'name' => 'easyadmin_maintenance_status',
-                'type' => Element\Checkbox::class,
+                'name' => 'easyadmin_maintenance_mode',
+                'type' => EasyAdminElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Set the public front-end under maintenance', // @translate
+                    'label' => 'Set Omeka under maintenance', // @translate
+                    'value_options' => [
+                        '' => 'No', // @translate
+                        'public' => 'Public front-end', // @translate
+                        'admin' => 'Admin (except global admins)', // @translate
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'easyadmin_maintenance_status',
+                    'id' => 'easyadmin_maintenance_mode',
+                    'required' => false,
+                    'value' => '',
                 ],
             ])
             ->add([

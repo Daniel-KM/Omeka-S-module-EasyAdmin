@@ -5,6 +5,7 @@ namespace EasyAdmin\Mvc;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Mvc\MvcEvent;
+use Omeka\Permissions\Acl;
 
 class MvcListeners extends AbstractListenerAggregate
 {
@@ -23,7 +24,6 @@ class MvcListeners extends AbstractListenerAggregate
      */
     public function redirectToMaintenance(MvcEvent $event)
     {
-        $response = $event->getResponse();
         $routeMatch = $event->getRouteMatch();
         $matchedRouteName = $routeMatch->getMatchedRouteName();
 
@@ -34,13 +34,20 @@ class MvcListeners extends AbstractListenerAggregate
         $services = $event->getApplication()->getServiceManager();
         $settings = $services->get('Omeka\Settings');
 
-        $isMaintenance = (bool) $settings->get('easyadmin_maintenance_status');
-        if (!$isMaintenance) {
+        $maintenanceMode = $settings->get('easyadmin_maintenance_mode');
+        if (!$maintenanceMode) {
             return;
         }
 
-        if ($routeMatch->getParam('__ADMIN__')) {
-            return;
+        if ($maintenanceMode === 'public') {
+            if ($routeMatch->getParam('__ADMIN__')) {
+                return;
+            }
+        } else {
+            $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+            if ($user && $user->getRole() === Acl::ROLE_GLOBAL_ADMIN) {
+                return;
+            }
         }
 
         $url = $event->getRouter()->assemble([], ['name' => 'maintenance']);
