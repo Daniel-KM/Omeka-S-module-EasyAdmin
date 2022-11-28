@@ -11,7 +11,7 @@ admin interface:
 - content lock to avoid concurrent edition;
 - install modules;
 - update modules (in a future version);
-- maintenance state (in a future version);
+- maintenance state for public and admin even when no migration;
 - checks database and files;
 - launch simple tasks, that can be any job of any module.
 
