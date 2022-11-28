@@ -4,10 +4,16 @@ namespace EasyAdmin;
 
 return [
     'service_manager' => [
+        'invokables' => [
+            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
+        ],
         'factories' => [
             'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
             'Omeka\File\Validator' => Service\File\ValidatorFactory::class,
         ],
+    ],
+    'listeners' => [
+        Mvc\MvcListeners::class,
     ],
     'view_manager' => [
         'template_path_stack' => [
