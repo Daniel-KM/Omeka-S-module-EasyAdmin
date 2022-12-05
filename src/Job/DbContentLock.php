@@ -24,7 +24,7 @@ class DbContentLock extends AbstractCheck
             return;
         }
 
-        $userIds = array_unique(array_map('intval', $this->getArg('user_id', [])));
+        $userIds = array_unique(array_map('intval', $this->getArg('user_id') ?: []));
 
         $this->checkDbContentLock($processFix, (int) $minimumHours, $userIds);
 
