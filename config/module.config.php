@@ -24,6 +24,9 @@ return [
         'invokables' => [
             'formNote' => Form\View\Helper\FormNote::class,
         ],
+        'factories' => [
+            'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
+        ],
         'delegators' => [
             'Laminas\Form\View\Helper\FormElement' => [
                Service\Delegator\FormElementDelegatorFactory::class,
