@@ -302,17 +302,17 @@ class Module extends AbstractModule
         $isCurrentUser = $user->getId() === $contentLockUser->getId();
 
         if ($isCurrentUser) {
+            $message = new \Log\Stdlib\PsrMessage(
+                'You edit already this resource somewhere since {date}.', // @translate
+                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
+            );
+            $messenger->addWarning($message);
             // Refresh the content lock: this is a new edition or a
             // submitted one. So the previous lock should be removed and a
             // a new one created, but it's simpler to override first one.
             $contentLock->setCreated(new \DateTIme('now'));
             $entityManager->persist($contentLock);
             $entityManager->flush($contentLock);
-            $message = new \Log\Stdlib\PsrMessage(
-                'You edit already this resource somewhere since {date}.', // @translate
-                ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
-            );
-            $messenger->addWarning($message);
             return;
         }
 
@@ -611,15 +611,15 @@ HTML;
         $contentLockUser = $contentLock->getUser();
 
         if ($user->getId() === $contentLockUser->getId()) {
-            // The content lock won't be removed in case of a validation
-            // exception.
-            $entityManager->remove($contentLock);
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $message = new \Log\Stdlib\PsrMessage(
                 'You removed the resource you are editing somewhere since {date}.', // @translate
                 ['date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short')]
             );
             $messenger->addWarning($message);
+            // The content lock won't be removed in case of a validation
+            // exception.
+            $entityManager->remove($contentLock);
             return;
         }
 
@@ -630,8 +630,6 @@ HTML;
             || $request->getOption('bypass_content_lock')
             || !empty($_POST['bypass_content_lock'])
         ) {
-            // Will be flushed auomatically in post.
-            $entityManager->remove($contentLock);
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $message = new \Log\Stdlib\PsrMessage(
                 'You removed a resource currently locked in edition by {user_name} since {date}.', // @translate
@@ -641,6 +639,8 @@ HTML;
                 ]
             );
             $messenger->addWarning($message);
+            // Will be flushed auomatically in post.
+            $entityManager->remove($contentLock);
             return;
         }
 
