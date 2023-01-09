@@ -152,11 +152,21 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        // Display a warn before uninstalling.
+        // Manage buttons in admin resources.
         $sharedEventManager->attach(
-            'Omeka\Controller\Admin\Module',
-            'view.details',
-            [$this, 'warnUninstall']
+            'Omeka\Controller\Admin\Item',
+            'view.layout',
+            [$this, 'handleViewLayoutResource']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\ItemSet',
+            'view.layout',
+            [$this, 'handleViewLayoutResource']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Media',
+            'view.layout',
+            [$this, 'handleViewLayoutResource']
         );
 
         // Content lockiing in admin board.
@@ -235,6 +245,89 @@ class Module extends AbstractModule
             'form.add_elements',
             [$this, 'handleMainSettings']
         );
+
+        // Display a warn before uninstalling.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Module',
+            'view.details',
+            [$this, 'warnUninstall']
+        );
+    }
+
+    public function handleViewLayoutResource(Event $event): void
+    {
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
+        $view = $event->getTarget();
+        $params = $view->params()->fromRoute();
+        $action = $params['action'] ?? 'browse';
+        if ($action !== 'show') {
+            return;
+        }
+
+        $controller = $params['__CONTROLLER__'] ?? $params['controller'] ?? '';
+        $controllers = [
+            'item' => 'items',
+            'item-set' => 'item_sets',
+            'media' => 'media',
+            'Omeka\Controller\Admin\Item' => 'items',
+            'Omeka\Controller\Admin\ItemSet' => 'item_sets',
+            'Omeka\Controller\Admin\Media' => 'media',
+        ];
+        if (!isset($controllers[$controller])) {
+            return;
+        }
+
+        // The resource is not available in the main view.
+        $id = isset($params['id']) ? (int) $params['id'] : 0;
+        if (!$id) {
+            return;
+        }
+
+        $plugins = $view->getHelperPluginManager();
+
+        $setting = $plugins->get('setting');
+        $interface = $setting('easyadmin_interface') ?: [];
+        if (!in_array('resource_public_view', $interface)) {
+            return;
+        }
+
+        $vars = $view->vars();
+        if ($vars->offsetExists('resource')) {
+            $resource = $vars->offsetGet('resource');
+        } else {
+            $api = $plugins->get('api');
+            try {
+                $resource = $api->read($controllers[$controller], ['id' => $id], ['initialize' => false, 'finalize' => false])->getContent();
+            } catch (\Exception $e) {
+                return;
+            }
+        }
+
+        $defaultSite = $plugins->get('defaultSite');
+        $defaultSiteSlug = $defaultSite('slug');
+        if (!$defaultSiteSlug) {
+            return;
+        }
+
+        $url = $view->publicResourceUrl($resource);
+        if (!$url) {
+            return;
+        }
+
+        $linkPublicView = $view->hyperlink(
+            $view->translate('Public view'), // @translate
+            $url,
+            ['class' => 'button', 'target' => '_blank']
+        );
+
+        $html = preg_replace(
+            '~<div id="page-actions">(.*?)</div>~s',
+            '<div id="page-actions">' . $linkPublicView . ' $1 ' . '</div>',
+            $vars->offsetGet('content'),
+            1
+        );
+
+        $vars->offsetSet('content', $html);
     }
 
     public function contentLockingOnEdit(Event $event): void

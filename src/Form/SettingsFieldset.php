@@ -23,6 +23,22 @@ class SettingsFieldset extends Fieldset
             ->setOption('element_groups', $this->elementGroups)
 
             ->add([
+                'name' => 'easyadmin_interface',
+                'type' => EasyAdminElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'element_group' => 'resources',
+                    'label' => 'Elements to display in resources admin pages', // @translate
+                    'value_options' => [
+                        'resource_public_view' => 'Button Public view', // @translate
+                    ],
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_interface',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_content_lock',
                 'type' => Element\Checkbox::class,
                 'options' => [
