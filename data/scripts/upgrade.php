@@ -100,6 +100,21 @@ if (version_compare($oldVersion, '3.3.7', '<')) {
 }
 
 if (version_compare($oldVersion, '3.3.8', '<')) {
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('BulkCheck');
+    if ($module) {
+        $sql = 'DELETE FROM `module` WHERE `id` = "BulkCheck";';
+        $connection->executeStatement($sql);
+        $container = new \Laminas\Session\Container('BulkCheck');
+        unset($container->addons);
+        $message = new Message(
+            'The module replaces the module %s. The upgrade is automatic.', // @translate
+            'Bulk Check'
+        );
+        $messenger->addSuccess($message);
+    }
+
     $maintenanceStatus = $settings->get('maintenance_status', false) ? 'no' : 'public';
     $maintenanceText = $settings->get('maintenance_text') ?: $services->get('MvcTranslator')->translate('This site is down for maintenance. Please contact the site administrator for more information.'); // @translate
     $settings->set('easyadmin_maintenance_status', $maintenanceStatus);
@@ -125,3 +140,12 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
     $messenger->addSuccess($message);
 }
 
+if (version_compare($oldVersion, '3.4.8', '<')) {
+    $settings->set('easyadmin_interface', ['resource_public_view']);
+    $message = new Message('An option allows to display a link from the resource admin page to the public page.', // @translate
+        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+        '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+}
