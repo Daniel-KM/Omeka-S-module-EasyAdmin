@@ -10,10 +10,10 @@ class AddonsFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $form = new AddonsForm(null, $options);
-        $addons = $services->get('ControllerPluginManager')
-            ->get('easyAdminAddons');
-        $form->setAddons($addons);
-        return $form;
+        $plugins = $services->get('ControllerPluginManager');
+
+        $form = new AddonsForm();
+        return $form
+            ->setAddons($plugins->get('easyAdminAddons'));
     }
 }

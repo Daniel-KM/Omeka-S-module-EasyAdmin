@@ -64,10 +64,11 @@ class DbResourceTitle extends AbstractCheck
 
         // For quick process, get all the title terms of all templates one time.
         $sql = <<<'SQL'
-SELECT id, IFNULL(title_property_id, 1) AS "title_property_id" FROM resource_template ORDER BY id;';
+SELECT id, IFNULL(title_property_id, 1) AS "title_property_id"
+FROM resource_template
+ORDER BY id;
 SQL;
-        $templateTitleTerms = $this->connection->executeQuery($sql)->fetchAll(\PDO::FETCH_ASSOC);
-        $templateTitleTerms = array_column($templateTitleTerms, 'title_property_id', 'id');
+        $templateTitleTerms = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         // It's possible to do the process with some not so complex sql queries,
         // but it's done manually for now. May be complicate with the title of

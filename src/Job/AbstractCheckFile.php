@@ -29,7 +29,7 @@ abstract class AbstractCheckFile extends AbstractCheck
         if ($totalNoOriginalSize) {
             if ($fix) {
                 $sql = "UPDATE media SET $column = NULL WHERE has_original != 1 AND $column IS NOT NULL";
-                $this->connection->exec($sql);
+                $this->connection->executeStatement($sql);
                 $this->logger->notice(
                     '{total_size}/{total_no} media have no original file, but a {type}, and were fixed.', // @translate
                     ['total_size' => $totalNoOriginalSize, 'total_no' => $totalNoOriginal, 'type' => $column]

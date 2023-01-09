@@ -9,11 +9,9 @@ use Laminas\Form\Form;
 class AddonsForm extends Form
 {
     /**
-     * List of addons.
-     *
-     * @var array
+     * @var \EasyAdmin\Mvc\Controller\Plugin\Addons
      */
-    protected $addons = [];
+    protected $addons;
 
     public function init(): void
     {
@@ -62,18 +60,13 @@ class AddonsForm extends Form
         }
     }
 
-    /**
-     * @param Addons $addons
-     */
-    public function setAddons(Addons $addons): void
+    public function setAddons(Addons $addons): self
     {
         $this->addons = $addons;
+        return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getAddons()
+    public function getAddons(): Addons
     {
         return $this->addons;
     }

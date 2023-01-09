@@ -43,7 +43,7 @@ ORDER BY id ASC;
 SQL;
 
         // Fetch all: jobs are few, except if admin never checks result of jobs.
-        $result = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->fetchAllAssociative();
 
         // Unselect processes with an existing pid.
         foreach ($result as $id => $row) {

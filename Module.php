@@ -42,14 +42,16 @@ use Laminas\EventManager\SharedEventManagerInterface;
 /**
  * Easy Admin
  *
- * @copyright Daniel Berthereau, 2017-2022
+ * @copyright Daniel Berthereau, 2017-2023
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
 
-    protected $dependency = 'Log';
+    protected $dependencies = [
+        'Log',
+    ];
 
     protected function preInstall(): void
     {
@@ -58,8 +60,10 @@ class Module extends AbstractModule
 
     protected function installDir(): void
     {
-        $config = $this->getServiceLocator()->get('Config');
+        $services = $this->getServiceLocator();
+        $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         // Automatic upgrade from module Bulk Check.
         $result = null;
@@ -70,7 +74,6 @@ class Module extends AbstractModule
                 $message = new \Omeka\Stdlib\Message(
                     'Upgrading module BulkCheck: Unable to rename directory "files/bulk_check" into "files/check". Trying to create it.' // @translate
                 );
-                $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
                 $messenger->addWarning($message);
             }
         }
@@ -83,7 +86,6 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
-        $services = $this->getServiceLocator();
         /** @var \Omeka\Module\Manager $moduleManager */
         $moduleManager = $services->get('Omeka\ModuleManager');
         $module = $moduleManager->getModule('BulkCheck');
@@ -97,13 +99,12 @@ class Module extends AbstractModule
         // The module BulkCheck doesn't have any param, so it is uninstalled
         // directly.
         $sql = 'DELETE FROM `module` WHERE `id` = "BulkCheck";';
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $connection = $services->get('Omeka\Connection');
         $connection->executeStatement($sql);
         $message = new \Omeka\Stdlib\Message(
             'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
             'Bulk Check', 'Easy Admin'
         );
-        $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
         $messenger->addWarning($message);
     }
 
@@ -699,7 +700,7 @@ HTML;
     protected function checkDestinationDir($dirPath)
     {
         if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writable($dirPath)) {
+            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
                 $this->getServiceLocator()->get('Omeka\Logger')->err(
                     'The directory "{path}" is not writeable.', // @translate
                     ['path' => $dirPath]

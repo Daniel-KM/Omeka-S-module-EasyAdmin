@@ -5,7 +5,7 @@ namespace EasyAdmin\Form;
 use EasyAdmin\Form\Element as EasyAdminElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
-use Omeka\Form\Element\CkeditorInline;
+use Omeka\Form\Element as OmekaElement;
 
 class SettingsFieldset extends Fieldset
 {
@@ -56,7 +56,7 @@ class SettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'easyadmin_maintenance_text',
-                'type' => CkeditorInline::class,
+                'type' => OmekaElement\CkeditorInline::class,
                 'options' => [
                     'label' => 'Text to display for maintenance', // @translate
                 ],
