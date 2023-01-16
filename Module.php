@@ -659,7 +659,7 @@ HTML;
     }
 
     /**
-     * Remove content lock on resouce deletion.
+     * Remove content lock on resource deletion.
      *
      * The primary key is not a join column, so old deleted record can remain.
      */
