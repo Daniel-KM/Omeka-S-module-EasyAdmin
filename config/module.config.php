@@ -49,6 +49,7 @@ return [
         'invokables' => [
             'EasyAdmin\Controller\Addons' => Controller\AddonsController::class,
             'EasyAdmin\Controller\CheckAndFix' => Controller\CheckAndFixController::class,
+            'Omeka\Controller\Maintenance' => Controller\MaintenanceController::class,
         ],
     ],
     'controller_plugins' => [
