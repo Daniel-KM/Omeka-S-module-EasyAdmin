@@ -26,8 +26,12 @@ class MvcListeners extends AbstractListenerAggregate
     {
         $routeMatch = $event->getRouteMatch();
         $matchedRouteName = $routeMatch->getMatchedRouteName();
-
-        if (in_array($matchedRouteName, ['maintenance', 'migrate', 'install'])) {
+        if (in_array($matchedRouteName, [
+            'maintenance',
+            'migrate',
+            'install',
+            'login',
+        ])) {
             return;
         }
 
