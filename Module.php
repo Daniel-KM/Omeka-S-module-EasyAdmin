@@ -291,6 +291,7 @@ class Module extends AbstractModule
             return;
         }
 
+        /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
         $vars = $view->vars();
         if ($vars->offsetExists('resource')) {
             $resource = $vars->offsetGet('resource');
@@ -309,7 +310,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $url = $view->publicResourceUrl($resource);
+        $url = $resource->siteUrl($defaultSiteSlug);
         if (!$url) {
             return;
         }
