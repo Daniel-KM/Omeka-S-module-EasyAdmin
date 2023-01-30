@@ -149,3 +149,33 @@ if (version_compare($oldVersion, '3.4.8', '<')) {
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.9.2', '<')) {
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $modules = [
+        'BulkCheck',
+        'Maintenance',
+    ];
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    foreach ($modules as $moduleName) {
+        $module = $moduleManager->getModule('BulkCheck');
+        if (!$module || in_array($module->getState(), [
+            \Omeka\Module\Manager::STATE_NOT_FOUND,
+            \Omeka\Module\Manager::STATE_NOT_INSTALLED,
+        ])) {
+            continue;
+        }
+        $module = $moduleName;
+        $sql = 'DELETE FROM `module` WHERE `id` = "' . $module . '";';
+        $connection->executeStatement($sql);
+        $sql = 'DELETE FROM `setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
+        $connection->executeStatement($sql);
+        $sql = 'DELETE FROM `site_setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
+        $connection->executeStatement($sql);
+        $message = new \Omeka\Stdlib\Message(
+            'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
+            $module, 'Easy Admin'
+        );
+        $messenger->addWarning($message);
+    }
+}
