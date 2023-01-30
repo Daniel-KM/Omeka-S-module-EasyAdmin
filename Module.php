@@ -87,25 +87,33 @@ class Module extends AbstractModule
         }
 
         /** @var \Omeka\Module\Manager $moduleManager */
-        $moduleManager = $services->get('Omeka\ModuleManager');
-        $module = $moduleManager->getModule('BulkCheck');
-        if (!$module || in_array($module->getState(), [
-            \Omeka\Module\Manager::STATE_NOT_FOUND,
-            \Omeka\Module\Manager::STATE_NOT_INSTALLED,
-        ])) {
-            return;
-        }
-
-        // The module BulkCheck doesn't have any param, so it is uninstalled
-        // directly.
-        $sql = 'DELETE FROM `module` WHERE `id` = "BulkCheck";';
+        $modules = [
+            'BulkCheck',
+            'Maintenance',
+        ];
         $connection = $services->get('Omeka\Connection');
-        $connection->executeStatement($sql);
-        $message = new \Omeka\Stdlib\Message(
-            'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
-            'Bulk Check', 'Easy Admin'
-        );
-        $messenger->addWarning($message);
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        foreach ($modules as $moduleName) {
+            $module = $moduleManager->getModule('BulkCheck');
+            if (!$module || in_array($module->getState(), [
+                \Omeka\Module\Manager::STATE_NOT_FOUND,
+                \Omeka\Module\Manager::STATE_NOT_INSTALLED,
+            ])) {
+                continue;
+            }
+            $module = $moduleName;
+            $sql = 'DELETE FROM `module` WHERE `id` = "' . $module . '";';
+            $connection->executeStatement($sql);
+            $sql = 'DELETE FROM `setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
+            $connection->executeStatement($sql);
+            $sql = 'DELETE FROM `site_setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
+            $connection->executeStatement($sql);
+            $message = new \Omeka\Stdlib\Message(
+                'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
+                $module, 'Easy Admin'
+            );
+            $messenger->addWarning($message);
+        }
     }
 
     protected function preUninstall(): void
