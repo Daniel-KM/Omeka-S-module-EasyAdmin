@@ -29,7 +29,7 @@ class SettingsFieldset extends Fieldset
                     'element_group' => 'resources',
                     'label' => 'Elements to display in resources admin pages', // @translate
                     'value_options' => [
-                        'resource_public_view' => 'Button Public view', // @translate
+                        'resource_public_view' => 'Button "Public view"', // @translate
                     ],
                     'use_hidden_element' => true,
                 ],
