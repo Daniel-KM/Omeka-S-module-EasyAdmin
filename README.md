@@ -62,8 +62,22 @@ Then install it like any other Omeka module and follow the config instructions.
 
 See general end user documentation for [installing a module].
 
-In some cases, your may need to add credentials in your config (omeka file "config/local.config.php"),
-depending on your linux distribution:
+In some cases, in particular when the server is behind a proxy, a firewall or a
+specific infrastructure, your may need to add credentials in your config (omeka
+file "config/local.config.php"), depending on your linux distribution:
+
+```php
+    'http_client' => [
+        // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
+        'sslcapath' => '/usr/local/etc/ssl/certs/',
+        'sslcafile' => 'ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs/',
+        // 'sslcafile' => 'ca-bundle.crt',
+    ],
+```
+
+In some cases, the path should be absolute:
+
 ```php
     'http_client' => [
         // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
