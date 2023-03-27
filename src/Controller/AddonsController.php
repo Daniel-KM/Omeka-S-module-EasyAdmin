@@ -186,10 +186,12 @@ class AddonsController extends AbstractActionController
                 $modulePhp = file_get_contents($moduleFile);
                 if (strpos($modulePhp, 'use Generic\AbstractModule;')) {
                     $module = $this->getModule('Generic');
-                    if (empty($module)) {
+                    if (empty($module)
+                        || version_compare($module->getIni('version') ?? '', '3.4.43', '<')
+                    ) {
                         $this->messenger()->addError(new Message(
-                            'The module "%s" requires the dependency "Generic" available first.', // @translate
-                            $addon['name']
+                            'The module "%1$s" requires the dependency "Generic" version "%2$s" available first.', // @translate
+                            $addon['name'], '3.4.43'
                         ));
                         // Remove the folder to avoid a fatal error (Generic is a
                         // required abstract class).
