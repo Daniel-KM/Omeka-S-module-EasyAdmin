@@ -131,7 +131,7 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
             'Maintenance'
         );
     } else {
-        $message = new Message('It’s now possible to set the site in maintenance mode for public or users.', // @translate
+        $message = new Message('It’s now possible to set the site in %1$smaintenance mode%2$s for public or users.', // @translate
             sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
             '</a>'
         );
@@ -142,7 +142,7 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
 
 if (version_compare($oldVersion, '3.4.8', '<')) {
     $settings->set('easyadmin_interface', ['resource_public_view']);
-    $message = new Message('An option allows to display a link from the resource admin page to the public page.', // @translate
+    $message = new Message('An %1$soption%2$s allows to display a link from the resource admin page to the public page.', // @translate
         sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
         '</a>'
     );

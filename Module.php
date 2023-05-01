@@ -35,9 +35,12 @@ if (!class_exists(\Generic\AbstractModule::class)) {
         : __DIR__ . '/src/Generic/AbstractModule.php';
 }
 
+use DateTime;
+use EasyAdmin\Entity\ContentLock;
 use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Log\Stdlib\PsrMessage;
 
 /**
  * Easy Admin
@@ -384,14 +387,14 @@ class Module extends AbstractModule
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
-        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+        $contentLock = $entityManager->getRepository(ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
 
         if (!$contentLock) {
-            $contentLock = new \EasyAdmin\Entity\ContentLock($entityId, $entityName);
+            $contentLock = new ContentLock($entityId, $entityName);
             $contentLock
                 ->setUser($user)
-                ->setCreated(new \DateTIme('now'));
+                ->setCreated(new DateTIme('now'));
             // Flush is needed because the event does not run it.
             $entityManager->persist($contentLock);
             $entityManager->flush($contentLock);
@@ -404,7 +407,7 @@ class Module extends AbstractModule
         $isCurrentUser = $user->getId() === $contentLockUser->getId();
 
         if ($isCurrentUser) {
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'You edit already this resource somewhere since {date}.', // @translate
                 ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
             );
@@ -412,7 +415,7 @@ class Module extends AbstractModule
             // Refresh the content lock: this is a new edition or a
             // submitted one. So the previous lock should be removed and a
             // a new one created, but it's simpler to override first one.
-            $contentLock->setCreated(new \DateTIme('now'));
+            $contentLock->setCreated(new DateTIme('now'));
             $entityManager->persist($contentLock);
             $entityManager->flush($contentLock);
             return;
@@ -431,7 +434,7 @@ class Module extends AbstractModule
 
         $isPost = $request->isPost();
 
-        $message = new \Log\Stdlib\PsrMessage(
+        $message = new PsrMessage(
             'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
             [
                 'user_name' => $contentLockUser->getName(),
@@ -460,7 +463,7 @@ class Module extends AbstractModule
 </div>
 HTML;
         $message = $view->translate('Bypass the lock'); // @translate
-        $message = new \Log\Stdlib\PsrMessage($html, ['entity_name' => $controllerNames[$entityName], 'message_bypass' => $message]);
+        $message = new PsrMessage($html, ['entity_name' => $controllerNames[$entityName], 'message_bypass' => $message]);
         $message->setEscapeHtml(false);
         $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
     }
@@ -522,7 +525,7 @@ HTML;
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         $entityManager = $services->get('Omeka\EntityManager');
 
-        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+        $contentLock = $entityManager->getRepository(ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
 
         // Don't create or refresh a content lock on confirm delete.
@@ -560,23 +563,23 @@ HTML;
 
         $translator = $services->get('MvcTranslator');
 
-        $messageWarn = new \Log\Stdlib\PsrMessage('Warning:'); // @translate
+        $messageWarn = new PsrMessage('Warning:'); // @translate
         if ($isCurrentUser) {
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'You edit this resource somewhere since {date}.', // @translate
                 ['date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short')]
             );
-            $messageInput = new \Log\Stdlib\PsrMessage('');
+            $messageInput = new PsrMessage('');
         } else {
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
                 [
                     'user_name' => $contentLockUser->getName(),
                     'date' => $view->i18n()->dateFormat($contentLock->getCreated(), 'long', 'short'),
                 ]
             );
-            $messageInput = new \Log\Stdlib\PsrMessage('Bypass the lock'); // @translate
-            $messageInput = new \Log\Stdlib\PsrMessage('<label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>', ['message_bypass' => $messageInput->setTranslator($translator)]);
+            $messageInput = new PsrMessage('Bypass the lock'); // @translate
+            $messageInput = new PsrMessage('<label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>', ['message_bypass' => $messageInput->setTranslator($translator)]);
         }
 
         echo sprintf($html, $messageWarn->setTranslator($translator), $message->setTranslator($translator), $messageInput->setTranslator($translator));
@@ -609,7 +612,7 @@ HTML;
 
         $entityManager = $services->get('Omeka\EntityManager');
 
-        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+        $contentLock = $entityManager->getRepository(ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
         if (!$contentLock) {
             return;
@@ -629,7 +632,7 @@ HTML;
         // When a lock is bypassed, keep it for the original user.
         if ($request->getValue('bypass_content_lock')) {
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'The lock in place since {date} has been bypassed, but the user {user_name} can override it on save.', // @translate
                 [
                     'date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short'),
@@ -641,7 +644,7 @@ HTML;
         }
 
         // Keep the message for backend api process.
-        $message = new \Log\Stdlib\PsrMessage(
+        $message = new PsrMessage(
             'User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited by the user {user_name} (#{user_id}) since {date}.', // @translate
             [
                 'user' => $user->getName(),
@@ -655,7 +658,7 @@ HTML;
         );
         $services->get('Omeka\Logger')->err($message);
 
-        $message = new \Log\Stdlib\PsrMessage(
+        $message = new PsrMessage(
             'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
             [
                 'user_name' => $contentLockUser->getName(),
@@ -694,7 +697,7 @@ HTML;
 
         $entityManager = $services->get('Omeka\EntityManager');
 
-        $contentLock = $entityManager->getRepository(\EasyAdmin\Entity\ContentLock::class)
+        $contentLock = $entityManager->getRepository(ContentLock::class)
             ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
         if (!$contentLock) {
             return;
@@ -714,7 +717,7 @@ HTML;
 
         if ($user->getId() === $contentLockUser->getId()) {
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'You removed the resource you are editing somewhere since {date}.', // @translate
                 ['date' => $i18n->dateFormat($contentLock->getCreated(), 'long', 'short')]
             );
@@ -733,7 +736,7 @@ HTML;
             || !empty($_POST['bypass_content_lock'])
         ) {
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $message = new \Log\Stdlib\PsrMessage(
+            $message = new PsrMessage(
                 'You removed a resource currently locked in edition by {user_name} since {date}.', // @translate
                 [
                     'user_name' => $contentLockUser->getName(),
@@ -747,7 +750,7 @@ HTML;
         }
 
         // Keep the message for backend api process.
-        $message = new \Log\Stdlib\PsrMessage(
+        $message = new PsrMessage(
             'User {user} (#{userid}) tried to delete {resource_name} #{resource_id} edited by the user {user_name} (#{user_id}) since {date}.', // @translate
             [
                 'user' => $user->getName(),
@@ -761,7 +764,7 @@ HTML;
         );
         $services->get('Omeka\Logger')->err($message);
 
-        $message = new \Log\Stdlib\PsrMessage(
+        $message = new PsrMessage(
             'This content is being edited by the user {user_name} and is therefore locked to prevent other users changes. This lock is in place since {date}.', // @translate
             [
                 'user_name' => $contentLockUser->getName(),
