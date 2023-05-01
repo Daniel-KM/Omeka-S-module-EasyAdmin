@@ -395,10 +395,25 @@ class Module extends AbstractModule
             $contentLock
                 ->setUser($user)
                 ->setCreated(new DateTIme('now'));
-            // Flush is needed because the event does not run it.
             $entityManager->persist($contentLock);
-            $entityManager->flush($contentLock);
-            return;
+            try {
+                // Flush is needed because the event does not run it.
+                $entityManager->flush($contentLock);
+                return;
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                // Sometime a duplicate entry occurs even if checked just above.
+                try {
+                    $entityManager->remove($contentLock);
+                    $contentLock = $entityManager->getRepository(ContentLock::class)
+                        ->findOneBy(['entityId' => $entityId, 'entityName' => $entityName]);
+                } catch (\Exception $e) {
+                    return;
+                }
+            } catch (\Exception $e) {
+                // No content lock when there is an issue.
+                $entityManager->remove($contentLock);
+                return;
+            }
         }
 
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
