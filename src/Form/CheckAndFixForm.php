@@ -267,13 +267,13 @@ class CheckAndFixForm extends Form
                     ],
                 ])
                 ->add([
-                    'name' => 'files_derivative-media_ids',
+                    'name' => 'media_ids',
                     'type' => Element\Text::class,
                     'options' => [
                         'label' => 'Media ids', // @translate
                     ],
                     'attributes' => [
-                        'id' => 'media_ids',
+                        'id' => 'files_derivative-media_ids',
                         'placeholder' => '2-6 8 38-52 80-', // @ translate
                     ],
                 ])
