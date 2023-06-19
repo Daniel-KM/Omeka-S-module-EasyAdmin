@@ -6,6 +6,7 @@ use Doctrine\Inflector\InflectorFactory;
 use EasyAdmin\Form\AddonsForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Omeka\Api\Representation\ModuleRepresentation;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
@@ -185,9 +186,10 @@ class AddonsController extends AbstractActionController
             if (file_exists($moduleFile) && filesize($moduleFile)) {
                 $modulePhp = file_get_contents($moduleFile);
                 if (strpos($modulePhp, 'use Generic\AbstractModule;')) {
+                    /** @var \Omeka\Api\Representation\ModuleRepresentation @module */
                     $module = $this->getModule('Generic');
                     if (empty($module)
-                        || version_compare($module->getIni('version') ?? '', '3.4.43', '<')
+                        || version_compare($module->getJsonLd()['o:ini']['version'] ?? '', '3.4.43', '<')
                     ) {
                         $this->messenger()->addError(new Message(
                             'The module "%1$s" requires the dependency "Generic" version "%2$s" available first.', // @translate
@@ -399,11 +401,8 @@ class AddonsController extends AbstractActionController
      * Get a module by its name.
      *
      * @todo Modules cannot be api read or fetch one by one by the api (core issue).
-     *
-     * @param string $module
-     * @return \Omeka\Api\Representation\ModuleRepresentation|null
      */
-    protected function getModule($module)
+    protected function getModule(string $module): ?ModuleRepresentation
     {
         /** @var \Omeka\Api\Representation\ModuleRepresentation[] $modules */
         $modules = $this->api()->search('modules', ['id' => $module])->getContent();
