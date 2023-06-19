@@ -121,6 +121,7 @@ class CheckAndFixController extends AbstractActionController
                 break;
             case 'db_session_check':
             case 'db_session_clean':
+            case 'db_session_recreate':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $defaultParams + $params['database']['db_session']);
                 break;
             case 'db_log_check':

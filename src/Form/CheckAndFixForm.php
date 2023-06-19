@@ -448,6 +448,7 @@ class CheckAndFixForm extends Form
                         'db_job_fix_all' => 'Fix status as above for all jobs (when check cannot be done after a reboot)', // @translate
                         'db_session_check' => 'Check the size of the table of sessions in database', // @translate
                         'db_session_clean' => 'Remove old sessions (specify age below)', // @translate
+                        'db_session_recreate' => 'Remove all sessions (when table is too big)', // @translate
                         'db_log_check' => 'Check the size of the table of logs in database (module Log)', // @translate
                         'db_log_clean' => 'Remove old logs', // @translate
                     ],

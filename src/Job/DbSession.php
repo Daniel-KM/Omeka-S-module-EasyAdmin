@@ -15,6 +15,7 @@ class DbSession extends AbstractCheck
 
         $process = $this->getArg('process');
         $processFix = $process === 'db_session_clean';
+        $processRecreate = $process === 'db_session_recreate';
 
         $minimumDays = (string) $this->getArg('days');
         if ($processFix && !is_numeric($minimumDays)) {
@@ -24,7 +25,7 @@ class DbSession extends AbstractCheck
             return;
         }
 
-        $this->checkDbSession($processFix, (int) $minimumDays);
+        $this->checkDbSession($processFix, (int) $minimumDays, $processRecreate);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -38,7 +39,7 @@ class DbSession extends AbstractCheck
      * @param bool $fix
      * @param int $minimumDays
      */
-    protected function checkDbSession(bool $fix = false, int $minimumDays = 0): void
+    protected function checkDbSession(bool $fix = false, int $minimumDays = 0, bool $recreate = false): void
     {
         $timestamp = time() - 86400 * $minimumDays;
 
@@ -50,6 +51,18 @@ WHERE table_schema = "$dbname"
     AND table_name = "$this->table";
 SQL;
         $size = $this->connection->executeQuery($sqlSize)->fetchOne();
+
+        if ($recreate) {
+            $sql = <<<SQL
+SET foreign_key_checks = 0;
+CREATE TABLE `session_new` LIKE `session`;
+RENAME TABLE `session` TO `session_old`, `session_new` TO `session`;
+DROP TABLE `session_old`;
+SET foreign_key_checks = 1;
+SQL;
+            $this->connection->executeStatement($sql);
+            return;
+        }
 
         $sql = "SELECT COUNT(id) FROM $this->table WHERE modified < :timestamp;";
         $stmt = $this->connection->prepare($sql);
