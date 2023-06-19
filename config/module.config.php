@@ -137,7 +137,7 @@ return [
             'easyadmin_interface' => [
                 'resource_public_view',
             ],
-            'easyadmin_content_lock' => true,
+            'easyadmin_content_lock' => false,
             // 86400 seconds = 24 hours.
             'easyadmin_content_lock_duration' => 86400,
             'easyadmin_maintenance_mode' => '',
