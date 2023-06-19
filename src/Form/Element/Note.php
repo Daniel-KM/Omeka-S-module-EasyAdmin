@@ -21,6 +21,8 @@ use Laminas\Form\Exception\InvalidArgumentException;
  * @link https://github.com/zendframework/zf1/blob/master/library/Zend/View/Helper/FormNote.php
  *
  * @todo Ignore the element in the form data output (use input filter "remove" or modify the form?).
+ *
+ * @deprecated Use Omeka S v4 Form group.
  */
 class Note extends Element
 {

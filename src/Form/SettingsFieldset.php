@@ -28,8 +28,10 @@ class SettingsFieldset extends Fieldset
                 'options' => [
                     'element_group' => 'resources',
                     'label' => 'Elements to display in resources admin pages', // @translate
+                    'info' => 'For button "Previous/Next", an issue exists on some versions of mysql database. Mariadb is working fine.', // @translate
                     'value_options' => [
                         'resource_public_view' => 'Button "Public view"', // @translate
+                        'resource_previous_next' => 'Buttons "Previous/Next"', // @translate
                     ],
                     'use_hidden_element' => true,
                 ],

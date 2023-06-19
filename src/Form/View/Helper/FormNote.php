@@ -5,6 +5,9 @@ namespace EasyAdmin\Form\View\Helper;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\View\Helper\AbstractHelper;
 
+/**
+ * @deprecated Use Omeka S v4 Form group.
+ */
 class FormNote extends AbstractHelper
 {
     /**

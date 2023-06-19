@@ -22,10 +22,15 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            /** Deprecated: use form group. */
             'formNote' => Form\View\Helper\FormNote::class,
+            'lastBrowsePage' => View\Helper\LastBrowsePage::class,
         ],
         'factories' => [
             'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
+            'browsePreviousNext' => Service\ViewHelper\BrowsePreviousNextFactory::class,
+            'nextResource' => Service\ViewHelper\NextResourceFactory::class,
+            'previousResource' => Service\ViewHelper\PreviousResourceFactory::class,
         ],
         'delegators' => [
             'Laminas\Form\View\Helper\FormElement' => [
@@ -136,7 +141,9 @@ return [
         'settings' => [
             'easyadmin_interface' => [
                 'resource_public_view',
+                // 'resource_previous_next',
             ],
+            // Disable
             'easyadmin_content_lock' => false,
             // 86400 seconds = 24 hours.
             'easyadmin_content_lock_duration' => 86400,

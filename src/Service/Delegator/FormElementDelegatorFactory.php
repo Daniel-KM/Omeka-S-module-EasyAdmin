@@ -5,6 +5,9 @@ namespace EasyAdmin\Service\Delegator;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
+/**
+ * @deprecated Use Omeka S v4 Form group.
+ */
 class FormElementDelegatorFactory implements DelegatorFactoryInterface
 {
     public function __invoke(ContainerInterface $container, $name,

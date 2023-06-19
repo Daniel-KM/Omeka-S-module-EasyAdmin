@@ -40,6 +40,7 @@ use EasyAdmin\Entity\ContentLock;
 use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Session\Container;
 use Log\Stdlib\PsrMessage;
 
 /**
@@ -176,7 +177,20 @@ class Module extends AbstractModule
             [$this, 'handleViewLayoutResource']
         );
 
-        // Content lockiing in admin board.
+        // Manage previous/next resource. Require module EasyAdmin.
+        // TODO Manage item sets and media for search?
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Item',
+            'view.browse.before',
+            [$this, 'handleViewBrowse']
+        );
+        $sharedEventManager->attach(
+            \AdvancedSearch\Controller\SearchController::class,
+            'view.layout',
+            [$this, 'handleViewBrowse']
+        );
+
+        // Content locking in admin board.
         // It is useless in public board, because there is the moderation.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
@@ -336,6 +350,28 @@ class Module extends AbstractModule
         );
 
         $vars->offsetSet('content', $html);
+    }
+
+    public function handleViewBrowse(Event $event): void
+    {
+        $session = new Container('EasyAdmin');
+        if (!isset($session->lastBrowsePage)) {
+            $session->lastBrowsePage = [];
+            $session->lastQuery = [];
+        }
+        $params = $event->getTarget()->params();
+        // $ui = $params->fromRoute('__ADMIN__') ? 'admin' : 'public';
+        $ui = 'admin';
+        // Why not use $this->getServiceLocator()->get('Request')->getServer()->get('REQUEST_URI')?
+        $session->lastBrowsePage[$ui] = $_SERVER['REQUEST_URI'];
+        // Remove any csrf key.
+        $query = $params->fromQuery();
+        foreach (array_keys($query) as $key) {
+            if (substr($key, -4) === 'csrf') {
+                unset($query[$key]);
+            }
+        }
+        $session->lastQuery[$ui] = $query;
     }
 
     public function contentLockingOnEdit(Event $event): void

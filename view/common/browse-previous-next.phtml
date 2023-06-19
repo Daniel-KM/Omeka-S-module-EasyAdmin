@@ -1,0 +1,29 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $previous
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $next
+ * @var string $lastBrowse
+ * @var array $options
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+
+if ($previous):
+    echo $hyperlink('<', $previous->url('show'), ['class' => 'button', 'rel' => 'prev', 'title' => $translate('Previous resource')]);
+else:
+    echo $hyperlink('<', '#', ['class' => 'button', 'rel' => 'prev', 'title' => $translate('No previous resource'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+endif;
+
+if (!empty($options['upper'])):
+    echo $hyperlink('^', $lastBrowse, ['class' => 'button', 'title' => $translate('Back to last browse page')]);
+endif;
+
+if ($next):
+    echo $hyperlink('>', $next->url('show'), ['class' => 'button', 'rel' => 'next', 'title' => $translate('Next resource')]);
+else:
+    echo $hyperlink('>', '#', ['class' => 'button', 'rel' => 'next', 'title' => $translate('No next resource'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+endif;
