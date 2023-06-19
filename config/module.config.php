@@ -28,8 +28,8 @@ return [
         ],
         'factories' => [
             'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
-            'browsePreviousNext' => Service\ViewHelper\BrowsePreviousNextFactory::class,
             'nextResource' => Service\ViewHelper\NextResourceFactory::class,
+            'previousNext' => Service\ViewHelper\PreviousNextFactory::class,
             'previousResource' => Service\ViewHelper\PreviousResourceFactory::class,
         ],
         'delegators' => [

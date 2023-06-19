@@ -4,8 +4,9 @@
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $previous
  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $next
- * @var string $lastBrowse
- * @var array $options
+ * @var bool $back
+ * @var string $lastBrowseUrl
+ * @var array $options Passed options.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -18,8 +19,12 @@ else:
     echo $hyperlink('<', '#', ['class' => 'button', 'rel' => 'prev', 'title' => $translate('No previous resource'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
 endif;
 
-if (!empty($options['upper'])):
-    echo $hyperlink('^', $lastBrowse, ['class' => 'button', 'title' => $translate('Back to last browse page')]);
+if (!empty($back)):
+    if ($lastBrowseUrl):
+        echo $hyperlink('^', $lastBrowseUrl, ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search')]);
+    else:
+        echo $hyperlink('^', '#', ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+    endif;
 endif;
 
 if ($next):

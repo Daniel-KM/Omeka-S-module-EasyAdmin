@@ -308,7 +308,9 @@ class Module extends AbstractModule
 
         $setting = $plugins->get('setting');
         $interface = $setting('easyadmin_interface') ?: [];
-        if (!in_array('resource_public_view', $interface)) {
+        $publicView = in_array('resource_public_view', $interface);
+        $previousNext = in_array('resource_previous_next', $interface);
+        if (!$publicView && !$previousNext) {
             return;
         }
 
@@ -317,6 +319,7 @@ class Module extends AbstractModule
         if ($vars->offsetExists('resource')) {
             $resource = $vars->offsetGet('resource');
         } else {
+            // Normally, the current resource should be present in vars.
             $api = $plugins->get('api');
             try {
                 $resource = $api->read($controllers[$controller], ['id' => $id], ['initialize' => false, 'finalize' => false])->getContent();
@@ -325,29 +328,40 @@ class Module extends AbstractModule
             }
         }
 
-        $defaultSite = $plugins->get('defaultSite');
-        $defaultSiteSlug = $defaultSite('slug');
-        if (!$defaultSiteSlug) {
-            return;
+        $html = $vars->offsetGet('content');
+
+        if ($publicView) {
+            $defaultSite = $plugins->get('defaultSite');
+            $defaultSiteSlug = $defaultSite('slug');
+            if ($defaultSiteSlug) {
+                $url = $resource->siteUrl($defaultSiteSlug);
+                if ($url) {
+                    $linkPublicView = $view->hyperlink(
+                        $view->translate('Public view'), // @translate
+                        $url,
+                        ['class' => 'button', 'target' => '_blank']
+                    );
+                    $html = preg_replace(
+                        '~<div id="page-actions">(.*?)</div>~s',
+                        '<div id="page-actions">' . $linkPublicView . ' $1 ' . '</div>',
+                        $html,
+                        1
+                    );
+                }
+            }
         }
 
-        $url = $resource->siteUrl($defaultSiteSlug);
-        if (!$url) {
-            return;
+        if ($previousNext) {
+            $linkBrowseView = $view->previousNext($resource, ['back' => true]);
+            if ($linkBrowseView) {
+                $html = preg_replace(
+                    '~<div id="page-actions">(.*?)</div>~s',
+                    '<div id="page-actions">$1 ' . $linkBrowseView . '</div>',
+                    $html,
+                    1
+                );
+            }
         }
-
-        $linkPublicView = $view->hyperlink(
-            $view->translate('Public view'), // @translate
-            $url,
-            ['class' => 'button', 'target' => '_blank']
-        );
-
-        $html = preg_replace(
-            '~<div id="page-actions">(.*?)</div>~s',
-            '<div id="page-actions">' . $linkPublicView . ' $1 ' . '</div>',
-            $vars->offsetGet('content'),
-            1
-        );
 
         $vars->offsetSet('content', $html);
     }
@@ -360,7 +374,7 @@ class Module extends AbstractModule
             $session->lastQuery = [];
         }
         $params = $event->getTarget()->params();
-        // $ui = $params->fromRoute('__ADMIN__') ? 'admin' : 'public';
+        // $ui = $params->fromRoute('__SITE__') ? 'public' : 'admin';
         $ui = 'admin';
         // Why not use $this->getServiceLocator()->get('Request')->getServer()->get('REQUEST_URI')?
         $session->lastBrowsePage[$ui] = $_SERVER['REQUEST_URI'];

@@ -2,109 +2,217 @@
 
 namespace EasyAdmin\View\Helper;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
-use Omeka\Api\Adapter\Manager as AdapterManager;
+use Laminas\EventManager\Event;
+use Laminas\Session\Container;
+use Omeka\Api\Adapter\Manager as ApiAdapterManager;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
+use Omeka\Api\Representation\MediaRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Api\Request;
 
+/**
+ * @todo Simplify, factorize and clarify process.
+ */
 trait PreviousNextResourceTrait
 {
     /**
-     * @var AdapterManager
+     * @var ApiAdapterManager
      */
-    protected $adapterManager;
+    protected $apiAdapterManager;
+
+    /**
+     * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
+     */
+    protected $resourceAdapter;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources
+     */
+    protected $searchResources;
 
     /**
      * @var SiteRepresentation
      */
     protected $site;
 
-    /**
-     * @var AbstractResourceEntityAdapter
-     */
-    protected $adapter;
-
-    public function __construct(AdapterManager $adapterManager, SiteRepresentation $site = null)
-    {
-        $this->adapterManager = $adapterManager;
+    public function __construct(
+        ApiAdapterManager $apiAdapterManager,
+        Connection $connection,
+        EntityManager $entityManager,
+        ?SearchResources $searchResources,
+        ?SiteRepresentation $site
+    ) {
+        $this->apiAdapterManager = $apiAdapterManager;
+        $this->connection = $connection;
+        $this->entityManager = $entityManager;
+        $this->searchResources = $searchResources;
         $this->site = $site;
     }
 
-    /**
-     * Get the public resource immediately before or following the current one.
-     *
-     * @param AbstractResourceEntityRepresentation $resource
-     * @param string $lowerOrGreaterThan "<" or ">".
-     * @return AbstractResourceEntityRepresentation|null
-     */
-    protected function previousOrNextResource(AbstractResourceEntityRepresentation $resource, $lowerOrGreaterThan)
+    protected function getQuery(string $resourceName, ?string $sourceQuery, ?array $query): array
     {
+        $view = $this->getView();
+
+        if ($sourceQuery === 'session') {
+            $ui = $this->site ? 'public' : 'admin';
+            $session = new Container('EasyAdmin');
+            return empty($session->lastBrowsePage[$ui])
+                ? $session->lastBrowsePage[$ui]
+                : [];
+        } elseif ($sourceQuery === 'setting') {
+            switch ($resourceName) {
+                case 'items':
+                    return $this->site
+                        ? $view->siteSetting('next_prevnext_items_query')
+                        : $view->setting('next_prevnext_items_query');
+                    break;
+                case 'item_sets':
+                    return $this->site
+                        ? $view->siteSetting('next_prevnext_item_sets_query')
+                        : $view->setting('next_prevnext_item_sets_query');
+                case 'media':
+                default:
+                    return [];
+            }
+        } else {
+            return $query ?? [];
+        }
+    }
+
+    protected function getPreviousAndNextResourceIds(AbstractResourceEntityRepresentation $resource, array $query): array
+    {
+        // Because it seems complex to get prev/next with doctrine in particular
+        // when row_number() is not available, all ids are returned, that is
+        // quick anyway.
+        // See previous queries in module Next (version 3.4.46) or in previous
+        // version of this module.
+        // TODO Check if visibility is automatically managed. Or use standard automatic filter to check visibility.
+
         $resourceName = $resource->resourceName();
-        $this->adapter = $this->adapterManager->get($resourceName);
 
-        $resourceTypes = [
-            'items' => \Omeka\Entity\Item::class,
-            'item_sets' => \Omeka\Entity\ItemSet::class,
-            'media' => \Omeka\Entity\Media::class,
-        ];
-        $resourceType = $resourceTypes[$resourceName];
+        // First step, get the original query, unchanged, without limit.
+        // Ideally, use qb from the adapter directly and return scalar.
+        $qb = $this->prepareSearch($resourceName, $query)
+            ->setMaxResults(null)
+            ->setFirstResult(null);
 
-        // Visibility is automatically managed.
-
-        $entityManager = $this->adapter->getEntityManager();
-        $qb = $entityManager->createQueryBuilder()
-            ->select('omeka_root.id')
-            ->from($resourceType, 'omeka_root');
-
-        $hasQuery = false;
-
-        if ($this->site) {
+        if ($this->site && !$query) {
             switch ($resourceName) {
                 case 'items':
                     $this->filterItemsBySite($qb);
-                    $hasQuery = $this->filterAndSortResources($qb, 'next_prevnext_items_query');
                     break;
                 case 'item_sets':
                     $this->filterItemSetsBySite($qb);
-                    $hasQuery = $this->filterAndSortResources($qb, 'next_prevnext_item_sets_query');
                     break;
                 case 'media':
+                case 'annotations':
                 default:
                     break;
             }
         }
 
-        $qb->groupBy('omeka_root.id');
+        // Get only ids.
+        // Ideally output only three ids; or two ids with order reversed for previous.
+        $qb->select('omeka_root.id');
+        $ids = $qb->getQuery()->getSingleColumnResult();
 
-        // Because it seems complex to get prev/next with doctrine in particular
-        // when row_number() is not available, all ids are returned, that is
-        // quick anyway.
-        // TODO Find the previous or next row via doctrine with a query.
-        // TODO Make the result static for prev/next.
-        if ($hasQuery) {
-            $qb
-                ->addOrderBy('omeka_root.id', 'ASC');
-            $result = array_map('intval', array_column($qb->getQuery()->getScalarResult(), 'id'));
-            $index = array_search($resource->id(), $result);
-            if ($index === false) {
-                return null;
-            }
-            $lowerOrGreaterThan === '<' ? --$index : ++$index;
-            return isset($result[$index])
-                ? $this->getView()->api()->read($resourceName, $result[$index])->getContent()
-                : null;
+        $resourceId = $resource->id();
+        $index = array_search($resourceId, $ids);
+        if ($index === false) {
+            return [null, null];
         }
 
-        $qb
-            ->andWhere('omeka_root.id ' . $lowerOrGreaterThan . ' :resource_id')
-            ->setParameter(':resource_id', $resource->id())
-            ->addOrderBy('omeka_root.id', $lowerOrGreaterThan === '<' ? 'DESC' : 'ASC')
-            ->setMaxResults(1);
-        $result = $qb->getQuery()->getResult();
-        return empty($result[0]['id'])
-            ? null
-            : $this->getView()->api()->read($resourceName, $result[0]['id'])->getContent();
+        $previousIndex = $index - 1;
+        $previousResourceId = empty($ids[$previousIndex]) ? null : (int) $ids[$previousIndex];
+
+        $nextIndex = $index + 1;
+        $nextResourceId = empty($ids[$nextIndex]) ? null : (int) $ids[$nextIndex];
+
+        return [
+            $previousResourceId,
+            $nextResourceId,
+        ];
+    }
+
+    /**
+     * Copy of \Omeka\Api\Adapter\AbstractEntityAdapter::search() to get a prepared query builder.
+     *
+     * @todo Trigger all api manager events (api.execute.pre, etc.).
+     * @see \Omeka\Api\Adapter\AbstractEntityAdapter::search()
+     */
+    protected function prepareSearch($resourceName, array $query): QueryBuilder
+    {
+        /** @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter $adapter */
+        $this->resourceAdapter = $this->apiAdapterManager->get($resourceName);
+
+        $request = new Request('search', $resourceName);
+
+        // Use specific module Advanced Search adapter if available.
+        $override = [];
+        if ($this->searchResources) {
+            $this->searchResources->setAdapter($this->resourceAdapter);
+            $query = $this->searchResources->cleanQuery($query);
+            $query = $this->searchResources->startOverrideQuery($query, $override);
+            // The process is done during event "api.search.query".
+            if (!empty($override)) {
+                $request->setOption('override', $override);
+            }
+        }
+
+        $request->setContent($query);
+
+        // Set default query parameters
+        $defaultQuery = [
+            'page' => null,
+            'per_page' => null,
+            'limit' => null,
+            'offset' => null,
+            'sort_by' => null,
+            'sort_order' => null,
+        ];
+        $query += $defaultQuery;
+        $query['sort_order'] = $query['sort_order'] && strtoupper((string) $query['sort_order']) === 'DESC' ? 'DESC' : 'ASC';
+
+        // Begin building the search query.
+        $entityClass = $this->resourceAdapter->getEntityClass();
+
+        // $adapter->index = 0;
+        $qb = $this->resourceAdapter->getEntityManager()
+            ->createQueryBuilder()
+            ->select('omeka_root')
+            ->from($entityClass, 'omeka_root');
+        $this->resourceAdapter->buildBaseQuery($qb, $query);
+        $this->resourceAdapter->buildQuery($qb, $query);
+        $qb->groupBy('omeka_root.id');
+
+        // Trigger the search.query event.
+        $event = new Event('api.search.query', $this->resourceAdapter, [
+            'queryBuilder' => $qb,
+            'request' => $request,
+        ]);
+        $this->resourceAdapter->getEventManager()->triggerEvent($event);
+
+        // Finish building the search query. In addition to any sorting the
+        // adapters add, always sort by entity ID.
+        $this->resourceAdapter->sortQuery($qb, $query);
+        $this->resourceAdapter->limitQuery($qb, $query);
+        $qb->addOrderBy('omeka_root.id', $query['sort_order']);
+
+        return $qb;
     }
 
     /**
@@ -115,7 +223,7 @@ trait PreviousNextResourceTrait
      */
     protected function filterAndSortResources(QueryBuilder $qb, string $settingName): bool
     {
-        if (!$this->adapter) {
+        if (!$this->resourceAdapter) {
             return false;
         }
 
@@ -126,15 +234,16 @@ trait PreviousNextResourceTrait
             return false;
         }
 
+        // TODO Store query as array.
         $originalQuery = ltrim((string) $query, "? \t\n\r\0\x0B");
         parse_str($originalQuery, $query);
         if (!$query) {
             return false;
         }
 
-        $this->adapter->buildBaseQuery($qb, $query);
-        $this->adapter->buildQuery($qb, $query);
-        $this->adapter->sortQuery($qb, $query);
+        $this->resourceAdapter->buildBaseQuery($qb, $query);
+        $this->resourceAdapter->buildQuery($qb, $query);
+        $this->resourceAdapter->sortQuery($qb, $query);
         return true;
     }
 
@@ -145,15 +254,15 @@ trait PreviousNextResourceTrait
      */
     protected function filterItemsBySite(QueryBuilder $qb): void
     {
-        if (!$this->adapter || !$this->site) {
+        if (!$this->resourceAdapter || !$this->site) {
             return;
         }
 
-        $siteAlias = $this->adapter->createAlias();
+        $siteAlias = $this->resourceAdapter->createAlias();
         $qb->innerJoin(
             'omeka_root.sites', $siteAlias, 'WITH', $qb->expr()->eq(
                 "$siteAlias.id",
-                $this->adapter->createNamedParameter($qb, $this->site->id())
+                $this->resourceAdapter->createNamedParameter($qb, $this->site->id())
             )
         );
     }
@@ -165,19 +274,83 @@ trait PreviousNextResourceTrait
      */
     protected function filterItemSetsBySite(QueryBuilder $qb): void
     {
-        if (!$this->adapter || !$this->site) {
+        if (!$this->resourceAdapter || !$this->site) {
             return;
         }
 
-        $siteItemSetsAlias = $this->adapter->createAlias();
+        $siteItemSetsAlias = $this->resourceAdapter->createAlias();
         $qb->innerJoin(
             'omeka_root.siteItemSets',
             $siteItemSetsAlias
         );
         $qb->andWhere($qb->expr()->eq(
             "$siteItemSetsAlias.site",
-            $this->adapter->createNamedParameter($qb, $this->site->id()))
+            $this->resourceAdapter->createNamedParameter($qb, $this->site->id()))
         );
         $qb->addOrderBy("$siteItemSetsAlias.position", 'ASC');
+    }
+
+    protected function previousMedia(MediaRepresentation $media): ?MediaRepresentation
+    {
+        /*
+        $conn = $this->connection;
+        $qb = $conn->createQueryBuilder()
+            ->select('media.id')
+            ->from('media', 'media')
+            ->innerJoin('resource', 'resource')
+            // TODO Manage the visibility.
+            ->where('resource.is_public = 1')
+            ->andWhere('media.position < :media_position')
+            // TODO Get the media position.
+            ->setParameter(':media_position', $media->position())
+            ->andWhere('media.item_id = :item_id')
+            ->setParameter(':item_id', $media->item()->id())
+            ->orderBy('resource.id', 'ASC')
+            ->setMaxResults(1);
+        */
+
+        // TODO Use a better way to get the previous media. Use positions?
+        $previous = null;
+        $mediaId = $media->id();
+        foreach ($media->item()->media() as $media) {
+            if ($media->id() === $mediaId) {
+                return $previous;
+            }
+            $previous = $media;
+        }
+        return null;
+    }
+
+    protected function nextMedia(MediaRepresentation $media): ?MediaRepresentation
+    {
+        /*
+        $conn = $this->connection;
+        $qb = $conn->createQueryBuilder()
+            ->select('media.id')
+            ->from('media', 'media')
+            ->innerJoin('resource', 'resource')
+            // TODO Manage the visibility.
+            ->where('resource.is_public = 1')
+            ->andWhere('media.position > :media_position')
+            // TODO Get the media position.
+            ->setParameter(':media_position', $media->position())
+            ->andWhere('media.item_id = :item_id')
+            ->setParameter(':item_id', $media->item()->id())
+            ->orderBy('resource.id', 'ASC')
+            ->setMaxResults(1);
+        */
+
+        // TODO Use a better way to get the next media. Use positions?
+        $next = false;
+        $mediaId = $media->id();
+        foreach ($media->item()->media() as $media) {
+            if ($next) {
+                return $media;
+            }
+            if ($media->id() === $mediaId) {
+                $next = true;
+            }
+        }
+        return null;
     }
 }

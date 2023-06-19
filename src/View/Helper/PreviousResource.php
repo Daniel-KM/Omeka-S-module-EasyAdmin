@@ -4,7 +4,6 @@ namespace EasyAdmin\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Api\Representation\MediaRepresentation;
 
 class PreviousResource extends AbstractHelper
 {
@@ -13,45 +12,24 @@ class PreviousResource extends AbstractHelper
     /**
      * Get the public resource immediately before the current one.
      *
-     * @param AbstractResourceEntityRepresentation $resource
-     * @return AbstractResourceEntityRepresentation|null
+     * @param string $sourceQuery "session", "setting" else passed query.
      */
-    public function __invoke(AbstractResourceEntityRepresentation $resource): ?AbstractResourceEntityRepresentation
+    public function __invoke(AbstractResourceEntityRepresentation $resource, ?string $sourceQuery = null, array $query = []): ?AbstractResourceEntityRepresentation
     {
         $resourceName = $resource->resourceName();
+
+        // TODO Manage query for media.
+        // TODO Manage different queries by resource type.
         if ($resourceName === 'media') {
             return $this->previousMedia($resource);
         }
-        return $this->previousOrNextResource($resource, '<');
-    }
 
-    protected function previousMedia(MediaRepresentation $media)
-    {
-        /*
-        $conn = $this->connection;
-        $qb = $conn->createQueryBuilder()
-            ->select('media.id')
-            ->from('media', 'media')
-            ->innerJoin('resource', 'resource')
-            // TODO Manage the visibility.
-            ->where('resource.is_public = 1')
-            ->andWhere('media.position < :media_position')
-            // TODO Get the media position.
-            ->setParameter(':media_position', $media->position())
-            ->andWhere('media.item_id = :item_id')
-            ->setParameter(':item_id', $media->item()->id())
-            ->orderBy('resource.id', 'ASC')
-            ->setMaxResults(1);
-        */
+        $view = $this->getView();
+        $query = $this->getQuery($resourceName, $sourceQuery, $query);
 
-        // TODO Use a better way to get the previous media.
-        $previous = null;
-        $mediaId = $media->id();
-        foreach ($media->item()->media() as $media) {
-            if ($media->id() === $mediaId) {
-                return $previous;
-            }
-            $previous = $media;
-        }
+        $previous = $this->getPreviousAndNextResourceIds($resource, $query)[0];
+        return $previous
+            ? $view->api()->read($resourceName, ['id' => $previous])->getContent()
+            : null;
     }
 }

@@ -2,20 +2,22 @@
 
 namespace EasyAdmin\Service\ViewHelper;
 
-use EasyAdmin\View\Helper\BrowsePreviousNext;
+use EasyAdmin\View\Helper\PreviousNext;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class BrowsePreviousNextFactory implements FactoryInterface
+class PreviousNextFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         $plugins = $services->get('ControllerPluginManager');
-        return new BrowsePreviousNext(
+        $currentSite = $services->get('ViewHelperManager')->get('currentSite');
+        return new PreviousNext(
             $services->get('Omeka\ApiAdapterManager'),
             $services->get('Omeka\Connection'),
             $services->get('Omeka\EntityManager'),
-            $plugins->has('searchResources') ? $plugins->get('searchResources') : null
+            $plugins->has('searchResources') ? $plugins->get('searchResources') : null,
+            $currentSite()
         );
     }
 }
