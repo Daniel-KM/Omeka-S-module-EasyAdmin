@@ -97,25 +97,20 @@ class Module extends AbstractModule
         $connection = $services->get('Omeka\Connection');
         $moduleManager = $services->get('Omeka\ModuleManager');
         foreach ($modules as $moduleName) {
-            $module = $moduleManager->getModule('BulkCheck');
-            if (!$module || in_array($module->getState(), [
-                \Omeka\Module\Manager::STATE_NOT_FOUND,
-                \Omeka\Module\Manager::STATE_NOT_INSTALLED,
-            ])) {
-                continue;
+            $module = $moduleManager->getModule($moduleName);
+            $sql = 'DELETE FROM `module` WHERE `id` = "' . $moduleName . '";';
+            $connection->executeStatement($sql);
+            $sql = 'DELETE FROM `setting` WHERE `id` LIKE "' . strtolower($moduleName) . '\\_%";';
+            $connection->executeStatement($sql);
+            $sql = 'DELETE FROM `site_setting` WHERE `id` LIKE "' . strtolower($moduleName) . '\\_%";';
+            $connection->executeStatement($sql);
+            if ($module) {
+                $message = new \Omeka\Stdlib\Message(
+                    'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
+                    $moduleName, 'Easy Admin'
+                );
+                $messenger->addWarning($message);
             }
-            $module = $moduleName;
-            $sql = 'DELETE FROM `module` WHERE `id` = "' . $module . '";';
-            $connection->executeStatement($sql);
-            $sql = 'DELETE FROM `setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
-            $connection->executeStatement($sql);
-            $sql = 'DELETE FROM `site_setting` WHERE `id` LIKE "' . strtolower($module) . '_%";';
-            $connection->executeStatement($sql);
-            $message = new \Omeka\Stdlib\Message(
-                'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
-                $module, 'Easy Admin'
-            );
-            $messenger->addWarning($message);
         }
     }
 
