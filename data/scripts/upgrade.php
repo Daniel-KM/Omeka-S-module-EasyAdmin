@@ -174,3 +174,13 @@ if (version_compare($oldVersion, '3.4.9.2', '<')) {
         }
     }
 }
+
+if (version_compare($oldVersion, '3.4.11', '<')) {
+    $settings->set('easyadmin_interface', ['resource_public_view']);
+    $message = new Message('An %1$soption%2$s allows to display links to previous and next resources.', // @translate
+        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+        '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+}
