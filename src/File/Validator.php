@@ -4,7 +4,7 @@ namespace EasyAdmin\File;
 
 use Omeka\File\TempFile;
 use Omeka\Stdlib\ErrorStore;
-use Omeka\Stdlib\Message;
+use Log\Stdlib\PsrMessage;
 
 /**
  * File validator service
@@ -25,9 +25,9 @@ class Validator extends \Omeka\File\Validator
             ) {
                 $isValid = false;
                 if ($errorStore) {
-                    $message = new Message(
-                        'Error validating "%1$s". Cannot store files with the media type "%2$s".', // @translate
-                        $tempFile->getSourceName(), $mediaType
+                    $message = new PsrMessage(
+                        'Error validating "{filename}". Cannot store files with the media type "{mediatype}".', // @translate
+                        ['filename' => $tempFile->getSourceName(), 'mediatype' => $mediaType]
                     );
                     $errorStore->addError('file', $message);
                 }
@@ -38,9 +38,9 @@ class Validator extends \Omeka\File\Validator
             if ($extension && !in_array($extension, $this->extensions)) {
                 $isValid = false;
                 if ($errorStore) {
-                    $message = new Message(
-                        'Error validating "%1$s". Cannot store files with the resolved extension "%2$s".', // @translate
-                        $tempFile->getSourceName(), $extension
+                    $message = new PsrMessage(
+                        'Error validating "{filename}". Cannot store files with the resolved extension "{extension}".', // @translate
+                        ['filename' => $tempFile->getSourceName(), 'extension' => $extension]
                     );
                     $errorStore->addError('file', $message);
                 }

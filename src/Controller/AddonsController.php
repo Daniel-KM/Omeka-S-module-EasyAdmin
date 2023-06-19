@@ -6,9 +6,9 @@ use Doctrine\Inflector\InflectorFactory;
 use EasyAdmin\Form\AddonsForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Log\Stdlib\PsrMessage;
 use Omeka\Api\Representation\ModuleRepresentation;
 use Omeka\Mvc\Controller\Plugin\Messenger;
-use Omeka\Stdlib\Message;
 
 class AddonsController extends AbstractActionController
 {
@@ -52,10 +52,9 @@ class AddonsController extends AbstractActionController
                 if ($addons->dirExists($addon)) {
                     // Hack to get a clean message.
                     $type = str_replace('omeka', '', $type);
-                    $this->messenger()->addError(new Message(
-                        'The %s "%s" is already downloaded.', // @translate
-                        $type,
-                        $addon['name']
+                    $this->messenger()->addError(new PsrMessage(
+                        'The {type} "{name}" is already downloaded.', // @translate
+                        ['type' => $type, 'name' => $addon['name']]
                     ));
                     return $this->redirect()->toRoute(null, ['action' => 'index'], true);
                 }
@@ -105,26 +104,25 @@ class AddonsController extends AbstractActionController
             }
         }
         if ($missingDependencies) {
-            $this->messenger()->addError(new Message(
-                'The module "%s" requires the dependencies "%s" installed and enabled first.', // @translate
-                $addon['name'],
-                implode('", "', $missingDependencies)
+            $this->messenger()->addError(new PsrMessage(
+                'The module "{module}" requires the dependencies "{names}" installed and enabled first.', // @translate
+                ['module' => $addon['name'], 'names' => implode('", "', $missingDependencies)]
             ));
             return;
         }
 
         $isWriteableDestination = is_writeable($destination);
         if (!$isWriteableDestination) {
-            $this->messenger()->addError(new Message(
-                'The %s directory is not writeable by the server.', // @translate
-                $type
+            $this->messenger()->addError(new PsrMessage(
+                'The {type} directory is not writeable by the server.', // @translate
+                ['type' => $type]
             ));
             return;
         }
         // Add a message for security hole.
-        $this->messenger()->addWarning(new Message(
-            'Don’t forget to protect the %s directory from writing after installation.', // @translate
-            $type
+        $this->messenger()->addWarning(new PsrMessage(
+            'Don’t forget to protect the {type} directory from writing after installation.', // @translate
+            ['type' => $type]
         ));
 
         // Local zip file path.
@@ -132,19 +130,18 @@ class AddonsController extends AbstractActionController
         if (file_exists($zipFile)) {
             $result = @unlink($zipFile);
             if (!$result) {
-                $this->messenger()->addError(new Message(
-                    'A zipfile exists with the same name in the %s directory and cannot be removed.', // @translate
-                    $type
+                $this->messenger()->addError(new PsrMessage(
+                    'A zipfile exists with the same name in the {type} directory and cannot be removed.', // @translate
+                    ['type' => $type]
                 ));
                 return;
             }
         }
 
         if (file_exists($destination . DIRECTORY_SEPARATOR . $addon['dir'])) {
-            $this->messenger()->addError(new Message(
-                'The %s directory "%s" already exists.', // @translate
-                $type,
-                $addon['dir']
+            $this->messenger()->addError(new PsrMessage(
+                'The {type} directory "{name}" already exists.', // @translate
+                ['type' => $type, 'name' => $addon['dir']]
             ));
             return;
         }
@@ -152,10 +149,9 @@ class AddonsController extends AbstractActionController
         // Get the zip file from server.
         $result = $this->downloadFile($addon['zip'], $zipFile);
         if (!$result) {
-            $this->messenger()->addError(new Message(
-                'Unable to fetch the %s "%s".', // @translate
-                $type,
-                $addon['name']
+            $this->messenger()->addError(new PsrMessage(
+                'Unable to fetch the {type} "[name}".', // @translate
+                ['type' => $type, 'name' => $addon['name']]
             ));
             return;
         }
@@ -166,10 +162,9 @@ class AddonsController extends AbstractActionController
         unlink($zipFile);
 
         if (!$result) {
-            $this->messenger()->addError(new Message(
-                'An error occurred during the unzipping of the %s "%s".', // @translate
-                $type,
-                $addon['name']
+            $this->messenger()->addError(new PsrMessage(
+                'An error occurred during the unzipping of the {type} "{name}".', // @translate
+                ['type' => $type, 'name' => $addon['name']]
             ));
             return;
         }
@@ -191,9 +186,9 @@ class AddonsController extends AbstractActionController
                     if (empty($module)
                         || version_compare($module->getJsonLd()['o:ini']['version'] ?? '', '3.4.43', '<')
                     ) {
-                        $this->messenger()->addError(new Message(
-                            'The module "%1$s" requires the dependency "Generic" version "%2$s" available first.', // @translate
-                            $addon['name'], '3.4.43'
+                        $this->messenger()->addError(new PsrMessage(
+                            'The module "{name}" requires the dependency "Generic" version "{version}" available first.', // @translate
+                            ['name' => $addon['name'], 'version' => '3.4.43']
                         ));
                         // Remove the folder to avoid a fatal error (Generic is a
                         // required abstract class).
@@ -204,18 +199,18 @@ class AddonsController extends AbstractActionController
             }
         }
 
-        $message = new Message('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
+        $message = new PsrMessage('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
             $addon['name'], InflectorFactory::create()->build()->pluralize($type));
         $this->messenger()->add(
             $result ? Messenger::NOTICE : Messenger::WARNING,
             $message
         );
-        $this->messenger()->addSuccess(new Message(
-            '%s uploaded successfully', // @translate
-            ucfirst($type)
+        $this->messenger()->addSuccess(new PsrMessage(
+            '{type} uploaded successfully', // @translate
+            ['type' => ucfirst($type)]
         ));
 
-        $this->messenger()->addNotice(new Message(
+        $this->messenger()->addNotice(new PsrMessage(
             'It is always recommended to read the original readme or help of the addon.' // @translate
         ));
     }
@@ -440,9 +435,9 @@ class AddonsController extends AbstractActionController
             }
             $status = proc_close($proc);
         } else {
-            throw new \Exception((string) new Message(
-                'Failed to execute command: %s', // @translate
-                $command
+            throw new \Exception((string) new PsrMessage(
+                'Failed to execute command: {command}', // @translate
+                ['command' => $command]
             ));
         }
     }

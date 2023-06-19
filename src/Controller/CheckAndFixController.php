@@ -2,10 +2,10 @@
 
 namespace EasyAdmin\Controller;
 
-use Omeka\Stdlib\Message;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
+use Log\Stdlib\PsrMessage;
 
 class CheckAndFixController extends AbstractActionController
 {
@@ -147,9 +147,9 @@ class CheckAndFixController extends AbstractActionController
                 $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
                 $jobClass = $args['job'];
                  if (!$jobClass) {
-                    $this->messenger()->addError(new Message(
-                        'Unknown process "%s"', // @translate
-                        $process
+                    $this->messenger()->addError(new PsrMessage(
+                        'Unknown process "{process}"', // @translate
+                        ['process' => $process]
                     ));
                     return $view;
                 }
@@ -158,22 +158,20 @@ class CheckAndFixController extends AbstractActionController
         }
 
         $urlHelper = $this->url();
-        // TODO Don't use PsrMessage for now to fix issues with Doctrine and inexisting file to remove.
-        $message = new Message(
-            'Processing checks in background (job %1$s#%2$d%3$s, %4$slogs%3$s).', // @translate
-            sprintf(
-                '<a href="%s">',
-                htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-            ),
-            $job->getId(),
-            '</a>',
-            sprintf(
-                '<a href="%s">',
-                // Check if module Log is enabled (avoid issue when disabled).
-                htmlspecialchars(class_exists(\Log\Stdlib\PsrMessage::class)
-                    ? $urlHelper->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
-                    : $urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log'])
-            ))
+        $message = new PsrMessage(
+            'Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}logs{ae}).', // @translate
+            [
+                'link_job' => sprintf(
+                    '<a href="%s">',
+                    htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                ),
+                'job_id' => $job->getId(),
+                'ae' => '</a>',
+                'link_log' => sprintf(
+                    '<a href="%s">',
+                    htmlspecialchars($urlHelper->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
+                )
+            ]
         );
         $message->setEscapeHtml(false);
         $this->messenger()->addSuccess($message);

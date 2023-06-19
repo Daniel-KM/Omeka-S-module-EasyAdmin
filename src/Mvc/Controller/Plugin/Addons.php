@@ -6,7 +6,7 @@ use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Session\Container;
 use Laminas\Uri\Http as HttpUri;
-use Omeka\Stdlib\Message;
+use Log\Stdlib\PsrMessage;
 
 /**
  * List addons for Omeka.
@@ -206,9 +206,10 @@ class Addons extends AbstractPlugin
         $response = $response->isOk() ? $response->getBody() : null;
 
         if (empty($response)) {
-            $this->getController()->messenger()->addError(
-                new Message('Unable to fetch the url %s.', $url) // @translate
-            );
+            $this->getController()->messenger()->addError(new PsrMessage(
+                'Unable to fetch the url {url}.', // @translate
+                ['url' => $url]
+            ));
         }
 
         return $response;
