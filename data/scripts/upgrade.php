@@ -184,3 +184,10 @@ if (version_compare($oldVersion, '3.4.11', '<')) {
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.12', '<')) {
+    // Reset the session for browse page, managed differently.
+    $session = new \Laminas\Session\Container('EasyAdmin');
+    $session->lastBrowsePage = [];
+    $session->lastQuery = [];
+}
