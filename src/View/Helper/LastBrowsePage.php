@@ -21,10 +21,20 @@ class LastBrowsePage extends AbstractHelper
         $isAdmin = $view->status()->isAdminRequest();
         $ui = $isAdmin ? 'admin' : 'public';
         $session = new Container('EasyAdmin');
-        if (empty($session->lastBrowsePage[$ui])) {
+        if (empty($session->lastBrowsePage[$ui]['items'])) {
             return $default
                 ?: $view->url($isAdmin ? 'admin/default' : 'site/resource', ['action' => ''], [], true);
         }
-        return $session->lastBrowsePage[$ui];
+        $query = $session->lastBrowsePage[$ui]['items'];
+        // Remove any csrf key, useless for a search page.
+        // TODO Check if it is still needed to remove the csrf from the stored browse page.
+        /* // Require parsing.
+        foreach (array_keys($query) as $key) {
+            if (substr($key, -4) === 'csrf') {
+                unset($query[$key]);
+            }
+        }
+        */
+        return $query;
     }
 }

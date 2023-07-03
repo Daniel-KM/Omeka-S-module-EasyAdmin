@@ -12,9 +12,11 @@ class NextResource extends AbstractHelper
     /**
      * Get the public resource immediately following the current one.
      *
-     * @param string $sourceQuery "session", "setting" else passed query.
+     * @param string $sourceQuery "session" (default when no query), "setting"
+     *   else passed query.
+     * @param array|string $query
      */
-    public function __invoke(AbstractResourceEntityRepresentation $resource, ?string $sourceQuery = null, array $query = []): ?AbstractResourceEntityRepresentation
+    public function __invoke(AbstractResourceEntityRepresentation $resource, ?string $sourceQuery = null, $query = null): ?AbstractResourceEntityRepresentation
     {
         $resourceName = $resource->resourceName();
 
@@ -22,6 +24,10 @@ class NextResource extends AbstractHelper
         // TODO Manage different queries by resource type.
         if ($resourceName === 'media') {
             return $this->nextMedia($resource);
+        }
+
+        if (empty($sourceQuery)) {
+            $sourceQuery = empty($query) ? 'session' : null;
         }
 
         $view = $this->getView();

@@ -63,27 +63,28 @@ trait PreviousNextResourceTrait
         $this->site = $site;
     }
 
-    protected function getQuery(string $resourceName, ?string $sourceQuery, ?array $query): array
+    /**
+     * Get the query as string or array from the session or settings or passed.
+     */
+    protected function getQuery(string $resourceName, ?string $sourceQuery, ?array $query)
     {
         $view = $this->getView();
 
         if ($sourceQuery === 'session') {
             $ui = $this->site ? 'public' : 'admin';
             $session = new Container('EasyAdmin');
-            return empty($session->lastBrowsePage[$ui])
-                ? $session->lastBrowsePage[$ui]
-                : [];
+            return $session->lastQuery[$ui][$resourceName] ?? [];
         } elseif ($sourceQuery === 'setting') {
             switch ($resourceName) {
                 case 'items':
                     return $this->site
-                        ? $view->siteSetting('next_prevnext_items_query')
-                        : $view->setting('next_prevnext_items_query');
+                        ? $view->siteSetting('blockplus_prevnext_items_query', [])
+                        : $view->setting('easyadmin_prevnext_items_query', []);
                     break;
                 case 'item_sets':
                     return $this->site
-                        ? $view->siteSetting('next_prevnext_item_sets_query')
-                        : $view->setting('next_prevnext_item_sets_query');
+                        ? $view->siteSetting('blockplus_prevnext_item_sets_query', [])
+                        : $view->setting('easyadmin_prevnext_item_sets_query', []);
                 case 'media':
                 default:
                     return [];
@@ -93,7 +94,7 @@ trait PreviousNextResourceTrait
         }
     }
 
-    protected function getPreviousAndNextResourceIds(AbstractResourceEntityRepresentation $resource, array $query): array
+    protected function getPreviousAndNextResourceIds(AbstractResourceEntityRepresentation $resource, $query): array
     {
         // Because it seems complex to get prev/next with doctrine in particular
         // when row_number() is not available, all ids are returned, that is
@@ -103,6 +104,14 @@ trait PreviousNextResourceTrait
         // TODO Check if visibility is automatically managed. Or use standard automatic filter to check visibility.
 
         $resourceName = $resource->resourceName();
+
+        if (empty($query)) {
+            $query = [];
+        } elseif (is_string($query)) {
+            $q = $query;
+            $query = [];
+            parse_str($q, $query);
+        }
 
         // First step, get the original query, unchanged, without limit.
         // Ideally, use qb from the adapter directly and return scalar.
@@ -209,7 +218,6 @@ trait PreviousNextResourceTrait
         // Finish building the search query. In addition to any sorting the
         // adapters add, always sort by entity ID.
         $this->resourceAdapter->sortQuery($qb, $query);
-        $this->resourceAdapter->limitQuery($qb, $query);
         $qb->addOrderBy('omeka_root.id', $query['sort_order']);
 
         return $qb;

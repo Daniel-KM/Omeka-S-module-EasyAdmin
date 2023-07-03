@@ -22,8 +22,9 @@ class PreviousNext extends AbstractHelper
      * @param array $options
      * - template (string): set specific template (default: common/previous-next)
      * - back (bool): add back link
-     * - source_query (string): "session", "setting" else passed query.
-     * - query (array): use a specific query
+     * - source_query (string): "session" (default when no query), "setting" else
+     *   passed query.
+     * - query (array|string): use a specific query
      * - as_array (bool): return data as an array
      * @return string|array Html code or resources.
      */
@@ -35,7 +36,8 @@ class PreviousNext extends AbstractHelper
 
         $options['template'] = empty($options['template']) ? self::PARTIAL_NAME : $options['template'];
         $options['back'] = !empty($options['back']);
-        $options['source_query'] = $options['source_query'] ?? null;
+        $options['source_query'] = $options['source_query']
+            ?? (empty($options['query']) ? 'session' : null);
         $options['query'] = $options['query'] ?? null;
         $asArray = !empty($options['as_array']);
         unset($options['as_array']);

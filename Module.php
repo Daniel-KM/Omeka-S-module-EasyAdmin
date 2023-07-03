@@ -352,7 +352,11 @@ class Module extends AbstractModule
         }
 
         if ($previousNext) {
-            $linkBrowseView = $view->previousNext($resource, ['back' => true]);
+            /** @see \EasyAdmin\View\Helper\PreviousNext */
+            $linkBrowseView = $view->previousNext($resource, [
+                'source_query' => 'session',
+                'back' => true,
+            ]);
             if ($linkBrowseView) {
                 $html = preg_replace(
                     '~<div id="page-actions">(.*?)</div>~s',
@@ -366,6 +370,11 @@ class Module extends AbstractModule
         $vars->offsetSet('content', $html);
     }
 
+    /**
+     * Copy in:
+     * @see \BlockPlus\Module::handleViewBrowse()
+     * @see \EasyAdmin\Module::handleViewBrowse()
+     */
     public function handleViewBrowse(Event $event): void
     {
         $session = new Container('EasyAdmin');
@@ -377,15 +386,10 @@ class Module extends AbstractModule
         // $ui = $params->fromRoute('__SITE__') ? 'public' : 'admin';
         $ui = 'admin';
         // Why not use $this->getServiceLocator()->get('Request')->getServer()->get('REQUEST_URI')?
-        $session->lastBrowsePage[$ui] = $_SERVER['REQUEST_URI'];
-        // Remove any csrf key.
-        $query = $params->fromQuery();
-        foreach (array_keys($query) as $key) {
-            if (substr($key, -4) === 'csrf') {
-                unset($query[$key]);
-            }
-        }
-        $session->lastQuery[$ui] = $query;
+        $session->lastBrowsePage[$ui]['items'] = $_SERVER['REQUEST_URI'];
+        // Store the processed query too for quicker process later and because
+        // the controller may modify it (default sort order).
+        $session->lastQuery[$ui]['items'] = $params->fromQuery();
     }
 
     public function contentLockingOnEdit(Event $event): void
