@@ -94,6 +94,7 @@ class Module extends AbstractModule
         /** @var \Omeka\Module\Manager $moduleManager */
         $modules = [
             'BulkCheck',
+            'EasyInstall',
             'Maintenance',
         ];
         $connection = $services->get('Omeka\Connection');
