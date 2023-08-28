@@ -138,7 +138,7 @@ resources in the search engine with module [Search SolR].
 Here is the command line to use:
 
 ```sh
-php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --help
+php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --help
 ```
 
 In main cron tab or in the one of the user "www-data", you can add a task like
@@ -152,10 +152,12 @@ To use the command with the user "www-data" (or equivalent) may be required when
 the task creates files inside Omeka "/files/" directory. If the task only uses
 the database, it is usually not needed, but you need to take care of modules
 that can create derivative or temp files. And you may need to take care of
-escaping json arguments. Or use a sudo command:
+escaping json arguments.
+
+A sudo command may be used:
 
 ```sh
-sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/omeka-s' --args '{"bulk_import_id": 1}'
+sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/omeka-s' --args '{"bulk_import_id": 1}'
 ```
 
 Required arguments are:
@@ -174,9 +176,10 @@ Optional arguments:
   - `-a` `--args` [json] Arguments to pass to the task. Arguments are specific
     to each job. To find them, check the code, or run a job manually then check
     the job page in admin interface.
-  - `-j` `--job` Create a standard job that will be checkable in admin interface.
-    In any case, all logs are available in logs with a reference code. It allows
-    to process some rare jobs that are not taskable too.
+  - `-k` `--as-task`
+    Process a a simple task and do not create a job. May be used for tasks that
+    do not need to be checked as a job. This is the inverse of the deprecated
+    argument `--job`.
 
 As an example, you can try the included job/task, for example "LoopItems" that
 loops all items to save them. This task allows to update all items, so all the
@@ -185,7 +188,7 @@ task that help to process existing items when a new feature is added in a
 module:
 
 ```sh
-php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{}'
+php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{}'
 ```
 
 Another example: run a bulk import job whose config is stored. Indeed, because
@@ -193,12 +196,12 @@ the config of a bulk import may be complex, it is simpler to store it in the
 admin interface with its option "Store job as a task".
 
 ```sh
-php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
+php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
 ```
 
 Another example: reindex statistics after import of hits:
 ```sh
-sudo -u www-data php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'Statistics\Job\AggregateHits' --user-id 1 --server-url 'https://example.org' --base-path '/'
+sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'Statistics\Job\AggregateHits' --user-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
 Note that for jobs created manually in the admin interface, you can run them
@@ -206,7 +209,7 @@ with the standard Omeka "perform-job.php". Of course, these job can be run one
 time only:
 
 ```sh
-php /path/to/omeka/application/data/scripts/perform-job.php --job-id 1 --server-url 'https://example.org' --base-path '/'
+php '/path/to/omeka/application/data/scripts/perform-job.php' --job-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
 
