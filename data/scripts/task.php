@@ -58,8 +58,8 @@ MSG;
 
 $taskName = null;
 $userId = null;
-$serverUrl = 'http://localhost';
-$basePath = '/';
+$serverUrl = null;
+$basePath = null;
 $jobArgs = [];
 $asJob = false;
 
@@ -87,6 +87,8 @@ if (!$options) {
     exit();
 }
 
+$errors = [];
+
 foreach ($options as $key => $value) switch ($key) {
     case 't':
     case 'task':
@@ -111,8 +113,7 @@ foreach ($options as $key => $value) switch ($key) {
             $message = new Message(
                 'The job arguments are not a valid json object.' // @translate
             );
-            echo $translator->translate($message) . PHP_EOL;
-            exit();
+            $errors[] = $translator->translate($message);
         }
         break;
     case 'j':
@@ -124,6 +125,8 @@ foreach ($options as $key => $value) switch ($key) {
         $message = new Message($help);
         echo $translator->translate($message) . PHP_EOL;
         exit();
+    default:
+        break;
 }
 
 if (empty($taskName)) {
@@ -173,39 +176,71 @@ if (empty($taskClass)) {
         'The task "%s" should be set and exist.', // @translate
         $taskName
     );
-    exit($translator->translate($message) . PHP_EOL);
+    $errors[] = $translator->translate($message);
 }
 
 if (empty($userId)) {
     $message = new Message(
         'The user id must be set and exist.' // @translate
     );
-    exit($translator->translate($message) . PHP_EOL);
+    $errors[] = $translator->translate($message);
 }
 
 /** @var \Doctrine\ORM\EntityManager $entityManager */
 $entityManager = $services->get('Omeka\EntityManager');
+$hasDatabaseError = false;
 try {
     $user = $entityManager->find(\Omeka\Entity\User::class, $userId);
 } catch (\Exception $e) {
-    $message = new Message(
-        'The database does not exist.' // @translate
-    );
-    exit($translator->translate($message) . PHP_EOL);
+    $message = $e->getMessage();
+    if (mb_strpos($message, 'could not find driver') !== false) {
+        $message = new Message(
+            'Database is not available. Check if php-mysql is installed with the php version available on cli.' // @translate
+        );
+    } else {
+        $message = new Message(
+            'The database does not exist.' // @translate
+        );
+    }
+    $hasDatabaseError = true;
+    $errors[] = $translator->translate($message);
 }
-if (empty($user)) {
+
+if ($userId && empty($user) && !$hasDatabaseError) {
     $message = new Message(
         'The user #%d is set for the task "%s", but doesn’t exist.', // @translate
         $userId,
         $taskName
     );
     $logger->err($message);
-    exit($translator->translate($message) . PHP_EOL);
+    $errors[] = $translator->translate($message);
 }
+
+if (count($errors)) {
+    exit(implode(PHP_EOL, $errors) . PHP_EOL);
+}
+
+// Clean vars.
+unset($errors, $hasDatabaseError, $help, $longopts, $message, $modulePaths, $options, $omekaModulesPath, $shortopts);
 
 if (empty($serverUrl)) {
     $serverUrl = 'http://localhost';
+    $message = new Message(
+        'No server url passed, so use: --server-url "http://localhost"' // @translate
+    );
+    $logger->notice($message); // @translate
+    echo $message . PHP_EOL;
 }
+
+if (empty($basePath)) {
+    $basePath = '/';
+    $message = new Message(
+        'No base path passed, so use: --base-path "/"' // @translate
+    );
+    $logger->notice($message); // @translate
+    echo $message . PHP_EOL;
+}
+
 $serverUrlParts = parse_url($serverUrl);
 $scheme = $serverUrlParts['scheme'];
 $host = $serverUrlParts['host'];
@@ -226,8 +261,7 @@ $serverUrlHelper
     ->setPort($port);
 
 $basePath = '/' . trim((string) $basePath, '/');
-$services->get('ViewHelperManager')->get('BasePath')
-    ->setBasePath($basePath);
+$services->get('ViewHelperManager')->get('BasePath')->setBasePath($basePath);
 $services->get('Router')->setBaseUrl($basePath);
 
 $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
@@ -282,15 +316,16 @@ if ($asJob) {
 
 $jobId = $job->getId();
 if ($referenceId && $jobId) {
-    echo $translator->translate(new Message('Task "%s" is starting (job: #%d, reference: %s).', $taskName, $jobId, $referenceId)) . PHP_EOL; // @translate
+    $message = new Message('Task "%1$s" is starting (job: #%2$d, reference: %3$s).', $taskName, $jobId, $referenceId); // @translate
 } elseif ($referenceId) {
-    echo $translator->translate(new Message('Task "%s" is starting (reference: %s).', $taskName, $referenceId)) . PHP_EOL; // @translate
+    $message = new Message('Task "%1$s" is starting (reference: %2$s).', $taskName, $referenceId); // @translate
 } elseif ($job->getId()) {
-    echo $translator->translate(new Message('Task "%s" is starting (job: #%d).', $taskName, $jobId)) . PHP_EOL; // @translate
+    $message = new Message('Task "%1$s" is starting (job: #%2$d).', $taskName, $jobId); // @translate
 } else {
-    echo $translator->translate(new Message('Task "%s" is starting.', $taskName)) . PHP_EOL; // @translate
+    $message = new Message('Task "%1$s" is starting.', $taskName); // @translate
 }
 
+echo $translator->translate($message) . PHP_EOL;
 $logger->info('Task is starting.'); // @translate
 
 try {
@@ -305,10 +340,10 @@ try {
         $task->perform();
     }
 } catch (\Exception $e) {
-    echo $translator->translate(new Message('Task "%s" has an error: %s', $taskName, $e->getMessage())) . PHP_EOL; // @translate
+    echo $translator->translate(new Message('Task "%1$s" has an error: %2$s', $taskName, $e->getMessage())) . PHP_EOL; // @translate
     $logger->err($e);
     exit();
 }
 
 $logger->info('Task ended.'); // @translate
-echo $translator->translate(new Message('Task "%s" ended.', $taskName)) . PHP_EOL; // @translate
+echo $translator->translate(new Message('Task "%1$s" ended.', $taskName)) . PHP_EOL; // @translate
