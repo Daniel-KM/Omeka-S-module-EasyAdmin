@@ -158,19 +158,19 @@ class CheckAndFixController extends AbstractActionController
                 break;
         }
 
-        $urlHelper = $this->url();
+        $urlPlugin = $this->url();
         $message = new PsrMessage(
             'Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}logs{ae}).', // @translate
             [
                 'link_job' => sprintf(
                     '<a href="%s">',
-                    htmlspecialchars($urlHelper->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                    htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
                 ),
                 'job_id' => $job->getId(),
                 'ae' => '</a>',
                 'link_log' => sprintf(
                     '<a href="%s">',
-                    htmlspecialchars($urlHelper->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
+                    htmlspecialchars($urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
                 )
             ]
         );
