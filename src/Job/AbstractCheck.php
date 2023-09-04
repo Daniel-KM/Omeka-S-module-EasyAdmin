@@ -318,4 +318,21 @@ abstract class AbstractCheck extends AbstractJob
         $this->filepath = $filePath;
         return $this;
     }
+
+    /**
+     * Check if a module is active.
+     *
+     * @param string $module
+     * @return bool
+     */
+    protected function isModuleActive(string $module): bool
+    {
+        $services = $this->getServiceLocator();
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule($module);
+        return $module
+            && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+    }
+
 }

@@ -113,6 +113,9 @@ class CheckAndFixController extends AbstractActionController
             case 'db_item_primary_media_check':
             case 'db_item_primary_media_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbItemPrimaryMedia::class, $defaultParams);
+            case 'db_value_annotation_template_check':
+            case 'db_value_annotation_template_fix':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbValueAnnotationTemplate::class, $defaultParams);
                 break;
             case 'db_content_lock_check':
             case 'db_content_lock_clean':

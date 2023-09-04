@@ -374,6 +374,8 @@ class CheckAndFixForm extends Form
                         'db_resource_title_fix' => 'Update resource titles', // @translate
                         'db_item_primary_media_check' => 'Check if the primary medias are set', // @translate
                         'db_item_primary_media_fix' => 'Set the primary medias to all items', // @translate
+                        'db_value_annotation_template_check' => 'Check templates for value annotations (module Advanced Resource Template)', // @translate
+                        'db_value_annotation_template_fix' => 'Fix templates for value annotations (module Advanced Resource Template)', // @translate
                     ],
                 ],
                 'attributes' => [
