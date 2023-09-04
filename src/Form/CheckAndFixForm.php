@@ -366,6 +366,8 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
+                        'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
+                        'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
                         'item_no_value' => 'Check items without value (media values are not checked)', // @translate
                         'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
                         'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
