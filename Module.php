@@ -810,7 +810,7 @@ HTML;
                 ]
             );
             $messenger->addWarning($message);
-            // Will be flushed auomatically in post.
+            // Will be flushed automatically in post.
             $entityManager->remove($contentLock);
             return;
         }
