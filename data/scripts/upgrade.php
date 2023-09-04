@@ -196,5 +196,5 @@ if (version_compare($oldVersion, '3.4.13', '<')) {
     $message = new Message(
         'The script for tasks was updated and option `--job` is now passed by default. Check your cron tasks if you use it.' // @translate
     );
-    $messenger->addSuccess($message);
+    $messenger->addWarning($message);
 }
