@@ -161,21 +161,23 @@ sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --
 ```
 
 Required arguments are:
-  - `-t` `--task` [Name] May be the full class of a job ("EasyAdmin\Job\LoopItems")
-    or its basename ("LoopItems"). You should take care of case sensitivity and
-    escaping "\" or quoting name on cli.
-  - `-u` `--user-id` [#id] The Omeka user id is required, else the job won’t
-    have any rights.
+  - `-t` `--task` [Name]
+    May be the full class of a job ("EasyAdmin\Job\LoopItems") or its basename
+    ("LoopItems"). You should take care of case sensitivity and escaping "\" or
+    quoting name on cli.
+  - `-u` `--user-id` [#id]
+    The Omeka user id is required, else the job won’t have any rights.
 
 Recommended arguments:
   - `-s` `--server-url` [url] (default: "http://localhost")
-  - `-b` `--base-path` [path] (default: "/") The url path to complete the server
-    url.
+  - `-b` `--base-path` [path] (default: "/")
+    The url path to complete the server url.
 
 Optional arguments:
-  - `-a` `--args` [json] Arguments to pass to the task. Arguments are specific
-    to each job. To find them, check the code, or run a job manually then check
-    the job page in admin interface.
+  - `-a` `--args` [json]
+    Arguments to pass to the task. Arguments are specific to each job. To find
+    them, check the code, or run a job manually then check the job page in admin
+    interface.
   - `-k` `--as-task`
     Process a a simple task and do not create a job. May be used for tasks that
     do not need to be checked as a job. This is the inverse of the deprecated
