@@ -199,8 +199,10 @@ class AddonsController extends AbstractActionController
             }
         }
 
-        $message = new PsrMessage('If "%s" doesn’t appear in the list of %s, its directory may need to be renamed.', // @translate
-            $addon['name'], InflectorFactory::create()->build()->pluralize($type));
+        $message = new PsrMessage(
+            'If "{name}" doesn’t appear in the list of {type}, its directory may need to be renamed.', // @translate
+            ['name' => $addon['name'], 'type' => InflectorFactory::create()->build()->pluralize($type)]
+        );
         $this->messenger()->add(
             $result ? Messenger::NOTICE : Messenger::WARNING,
             $message
