@@ -66,7 +66,7 @@ class DbResourceTitle extends AbstractCheck
         $sql = <<<'SQL'
 SELECT id, IFNULL(title_property_id, 1) AS "title_property_id"
 FROM resource_template
-ORDER BY id;
+ORDER BY id ASC;
 SQL;
         $templateTitleTerms = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 

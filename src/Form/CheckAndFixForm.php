@@ -609,7 +609,7 @@ class CheckAndFixForm extends Form
 
     protected function listIngesters(): array
     {
-        $sql = 'SELECT DISTINCT(ingester) FROM media ORDER BY ingester';
+        $sql = 'SELECT DISTINCT(ingester) FROM media ORDER BY ingester ASC';
         $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All ingesters'] // @translate
             + array_combine($result, $result);
@@ -617,7 +617,7 @@ class CheckAndFixForm extends Form
 
     protected function listRenderers(): array
     {
-        $sql = 'SELECT DISTINCT(renderer) FROM media ORDER BY renderer';
+        $sql = 'SELECT DISTINCT(renderer) FROM media ORDER BY renderer ASC';
         $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All renderers'] // @translate
             + array_combine($result, $result);
@@ -625,7 +625,7 @@ class CheckAndFixForm extends Form
 
     protected function listMediaTypes(): array
     {
-        $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type';
+        $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type ASC';
         $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
         return ['' => 'All media types'] // @translate
             + array_combine($result, $result);
