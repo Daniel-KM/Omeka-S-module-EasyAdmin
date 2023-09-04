@@ -372,6 +372,8 @@ class CheckAndFixForm extends Form
                         'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
                         'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate
                         'db_resource_title_fix' => 'Update resource titles', // @translate
+                        'db_item_primary_media_check' => 'Check if the primary medias are set', // @translate
+                        'db_item_primary_media_fix' => 'Set the primary medias to all items', // @translate
                     ],
                 ],
                 'attributes' => [
