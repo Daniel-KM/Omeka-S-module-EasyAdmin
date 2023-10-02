@@ -22,8 +22,13 @@ class LastBrowsePage extends AbstractHelper
         $ui = $isAdmin ? 'admin' : 'public';
         $session = new Container('EasyAdmin');
         if (empty($session->lastBrowsePage[$ui]['items'])) {
-            return $default
-                ?: $view->url($isAdmin ? 'admin/default' : 'site/resource', ['action' => ''], [], true);
+            if ($default) {
+                return $default;
+            }
+            $plugins = $view->getHelperPluginManager();
+            return $plugins->has('searchingUrl')
+                ? $plugins->get('searchingUrl')(false, $session->lastQuery[$ui]['items'] ?? [])
+                : $view->url($isAdmin ? 'admin/default' : 'site/resource', ['action' => ''], [], true);
         }
         $query = $session->lastBrowsePage[$ui]['items'];
         // Remove any csrf key, useless for a search page.
