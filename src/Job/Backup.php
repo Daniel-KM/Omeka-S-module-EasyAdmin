@@ -30,6 +30,11 @@ class Backup extends AbstractCheck
         'zip',
     ];
 
+    /**
+     * @var string
+     */
+    protected $destination;
+
     public function perform(): void
     {
         $services = $this->getServiceLocator();
@@ -71,9 +76,31 @@ class Backup extends AbstractCheck
         $compression = $this->getArg('compression');
         $compression = $compression === null ? -1 : (int) $compression;
 
-        $this->backup($include, [
+        $filepath = $this->backup($include, [
             'compression' => $compression,
         ]);
+
+        if (!$filepath) {
+            return;
+        }
+
+        $backupDir = $this->basePath . '/backup';
+        if (mb_strpos($filepath, $backupDir . '/') === 0) {
+            // The path between store and filename is the prefix.
+            $dir = pathinfo($filepath, PATHINFO_DIRNAME);
+            $filename = pathinfo($filepath, PATHINFO_FILENAME);
+            $extension = pathinfo($filepath, PATHINFO_EXTENSION);
+            $storagePath = sprintf('%s/%s.%s', mb_substr($dir, mb_strlen($this->basePath) + 1), $filename, $extension);
+            $store = $services->get('Omeka\File\Store');
+            $fileUrl = $store->getUri($storagePath);
+            $this->logger->notice(
+                'The backup is available at {link} (size: {size} bytes).', // @translate
+                [
+                    'link' => sprintf('<a href="%1$s" download="%2$s">%2$s</a>', $fileUrl, basename($filename)),
+                    'size' => number_format((int) filesize($filepath), 0, ',', ' '),
+                ]
+            );
+        }
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -83,8 +110,7 @@ class Backup extends AbstractCheck
 
     protected function backup(array $include, array $options): ?string
     {
-        $basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-        $destinationDir = $basePath . '/backup';
+        $destinationDir = $this->basePath . '/backup';
         if (!$this->checkDestinationDir($destinationDir)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return null;
