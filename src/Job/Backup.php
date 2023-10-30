@@ -67,8 +67,12 @@ class Backup extends AbstractCheck
         }
 
         $process = $this->getArg('process');
+        $compression = $this->getArg('compression');
+        $compression = $compression === null ? -1 : (int) $compression;
 
-        $this->backup($include);
+        $this->backup($include, [
+            'compression' => $compression,
+        ]);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -76,7 +80,7 @@ class Backup extends AbstractCheck
         );
     }
 
-    protected function backup(array $include): ?string
+    protected function backup(array $include, array $options): ?string
     {
         $basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         $destinationDir = $basePath . '/backup';
@@ -102,7 +106,7 @@ class Backup extends AbstractCheck
 
         $exclude = $this->includeToExclude($include);
 
-        $result = $this->zip(OMEKA_PATH, $filePath, $exclude);
+        $result = $this->zip(OMEKA_PATH, $filePath, $exclude, $options['compression']);
         if (!$result) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(

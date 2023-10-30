@@ -664,7 +664,21 @@ class CheckAndFixForm extends Form
                         'hidden',
                     ],
                 ],
-            ]);
+            ])
+            ->add([
+                'name' => 'compression',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Compression level (-1: auto, 0: none/quick, 9: max/slow)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'backup_omeka-compression',
+                    'min' => '-1',
+                    'max' => '9',
+                    'value' => '-1',
+                ],
+            ])
+        ;
 
         return $this;
     }

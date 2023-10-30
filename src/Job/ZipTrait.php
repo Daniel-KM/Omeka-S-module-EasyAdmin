@@ -45,10 +45,21 @@ trait ZipTrait
      * @param string $source Full source dir path.
      * @param string $destination Full destination file name.
      * @param array $exclude Relative paths of folders and files from source.
+     * @param int $compression From 0 to 9; -1 means auto.
      * @return int Number of compressed files (-1 if undetermined, 0 if issue).
      */
-    protected function zip(string $source, string $destination, array $exclude = []):  bool
-    {
+    protected function zip(
+        string $source,
+        string $destination,
+        array $exclude = [],
+        int $compression = -1
+    ): int {
+        if ($compression > 9) {
+            $compression = 9;
+        } elseif ($compression < 0) {
+            $compression = -1;
+        }
+
         $isCli = $this->zipGenerator !== 'ZipArchive';
         $expand = $isCli ? '*' : '';
 
@@ -78,6 +89,26 @@ trait ZipTrait
             $skipHidden = in_array('.*', $exclude);
             $sourceLength = mb_strlen($source);
 
+            // TODO Find a better way to set the compression level for ZipArchive.
+            // In fact, "default" is "deflate".
+            /*
+            $compressions = [
+                -1 => ZipArchive::CM_DEFAULT,
+                0 => ZipArchive::CM_STORE,
+                1 => ZipArchive::CM_REDUCE_1,
+                2 => ZipArchive::CM_REDUCE_2,
+                3 => ZipArchive::CM_REDUCE_3,
+                4 => ZipArchive::CM_REDUCE_4,
+                5 => ZipArchive::CM_IMPLODE,
+                6 => ZipArchive::CM_DEFLATE,
+                7 => ZipArchive::CM_DEFLATE64,
+                8 => ZipArchive::CM_BZIP2,
+                9 => ZipArchive::CM_LZMA,
+            ];
+            $compressionName = $compressions[$compressioName] ?? ZipArchive::CM_DEFAULT;
+             */
+            $compressionName = ZipArchive::CM_DEFAULT;
+
             foreach ($files as $file) {
                 if (in_array($file, $excludedFiles)) {
                     continue;
@@ -101,7 +132,7 @@ trait ZipTrait
                 } else {
                     $result = $zip->addFile($file, $relativePath);
                 }
-                $zip->setCompressionName($relativePath, ZipArchive::CM_DEFLATE);
+                $zip->setCompressionName($relativePath, $compressionName, $compression < 0 ? 6 : $compression);
             }
 
             // Zip the file.
@@ -122,6 +153,7 @@ trait ZipTrait
             . ' && ' . $this->zipGenerator
             . ' --quiet -X'
             . ' --recurse-paths '
+            . ($compression < 0 ? '' : " -$compression")
             . ($excluded ? ' --exclude ' . implode(' ', $excluded) : '')
             . escapeshellarg($destination) . ' ' . escapeshellarg('.');
         $result = $this->cli->execute($cmd);
