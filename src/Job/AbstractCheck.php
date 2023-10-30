@@ -84,6 +84,11 @@ abstract class AbstractCheck extends AbstractJob
     protected $filepath;
 
     /**
+     * @var resource|false
+     */
+    protected $handle;
+
+    /**
      * Default options for output (tsv).
      *
      * @var array
