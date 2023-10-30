@@ -94,6 +94,7 @@ trait ZipTrait
             }
 
             $skipHidden = in_array('.*', $exclude);
+            $skipZip = in_array('*.zip', $exclude);
             $sourceLength = mb_strlen($source);
 
             // TODO Find a better way to set the compression level for ZipArchive.
@@ -140,10 +141,12 @@ trait ZipTrait
             $filterIterator = new RecursiveCallbackFilterIterator(
                 $directoryIterator,
                 function (SplFileInfo $file, string $filepath, RecursiveDirectoryIterator $iterator)
-                use ($excludedDirs, $excludedFiles, $excludedDirsRegex, $skipHidden)
+                use ($excludedDirs, $excludedFiles, $excludedDirsRegex, $skipHidden, $skipZip)
                 : bool {
                     $filename = $file->getFilename();
                     if ($skipHidden && mb_substr($filename, 0, 1) === '.') {
+                        return false;
+                    } elseif ($skipZip && in_array($file->getExtension(), ['bz2', 'tar', 'gz', 'xz', 'zip'])) {
                         return false;
                     } elseif ($file->isFile()) {
                         return $file->isReadable()

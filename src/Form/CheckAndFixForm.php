@@ -650,6 +650,7 @@ class CheckAndFixForm extends Form
                         'htaccess' => '.htaccess', // @translate
                         'htpasswd' => '.htpasswd', // @translate
                         'hidden' => 'Hidden files (dot files)', // @translate
+                        'zip' => 'Compressed files (with extension bzip, bz2, tar, gz, xz, zip)', // @translate
                     ],
                 ],
                 'attributes' => [

@@ -27,6 +27,7 @@ class Backup extends AbstractCheck
         'htaccess',
         'htpasswd',
         'hidden',
+        'zip',
     ];
 
     public function perform(): void
@@ -207,6 +208,15 @@ class Backup extends AbstractCheck
         // Specific for now.
         if (!in_array('hidden', $include)) {
             $exclude[] = '.*';
+        }
+
+        if (!in_array('zip', $include)) {
+            $exclude[] = '*.bzip';
+            $exclude[] = '*.bz2';
+            $exclude[] = '*.tar';
+            $exclude[] = '*.gz';
+            $exclude[] = '*.xz';
+            $exclude[] = '*.zip';
         }
 
         return array_unique($exclude);
