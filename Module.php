@@ -91,6 +91,14 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
 
+        if (!$this->checkDestinationDir($basePath . '/backup')) {
+            $message = new \Omeka\Stdlib\Message(
+                'The directory "%s" is not writeable.', // @translate
+                $basePath
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
         /** @var \Omeka\Module\Manager $moduleManager */
         $modules = [
             'BulkCheck',
@@ -868,7 +876,7 @@ HTML;
      * @param string $dirPath Absolute path.
      * @return string|null
      */
-    protected function checkDestinationDir($dirPath)
+    protected function checkDestinationDir($dirPath): ?string
     {
         if (file_exists($dirPath)) {
             if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {

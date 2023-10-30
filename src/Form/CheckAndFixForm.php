@@ -26,6 +26,7 @@ class CheckAndFixForm extends Form
             ->appendFieldsetFilesDatabase()
             ->appendFieldsetResourceValues()
             ->appendFieldsetDatabase()
+            ->appendFieldsetBackup()
             ->appendFieldsetTasks()
         ;
 
@@ -101,6 +102,18 @@ class CheckAndFixForm extends Form
             ->get('db_log')
             ->add([
                 'name' => 'days',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('backup')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('backup')
+            ->get('backup_install')
+            ->add([
+                'name' => 'include',
                 'required' => false,
             ]);
 
@@ -567,6 +580,89 @@ class CheckAndFixForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'db_log-severity',
+                ],
+            ]);
+
+        return $this;
+    }
+
+    protected function appendFieldsetBackup(): self
+    {
+        $this
+            ->add([
+                'name' => 'backup',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Backup', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'backup',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('backup');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'backup_install' => 'Omeka, modules and themes (without directory /files)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'backup-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'backup_install',
+                'options' => [
+                    'label' => 'Options to backup Omeka install', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'backup_install',
+                ],
+            ]);
+        $fieldset->get('backup_install')
+            ->add([
+                'name' => 'include',
+                'type' => Element\MultiCheckbox::class,
+                'options' => [
+                    'label' => 'Include', // @translate
+                    // TODO Check size first and indicate it here.
+                    'value_options' => [
+                        'core' => 'Omeka sources files', // @translate
+                        'modules' => 'Modules', // @translate
+                        'themes' => 'Themes', // @translate
+                        // 'files' => 'Files (original, derivative, etc.)', // @translate
+                        'logs' => 'Logs', // @translate
+                        'local_config' => 'Config (local.config.php)', // @translate
+                        'database_ini' => 'database.ini', // @translate
+                        'htaccess' => '.htaccess', // @translate
+                        'htpasswd' => '.htpasswd', // @translate
+                        'hidden' => 'Hidden files (dot files)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'backup_omeka-include',
+                    'value' => [
+                        'core',
+                        'modules',
+                        'themes',
+                        'logs',
+                        'local_config',
+                        'htaccess',
+                        'hidden',
+                    ],
                 ],
             ]);
 
