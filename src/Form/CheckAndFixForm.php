@@ -753,6 +753,7 @@ class CheckAndFixForm extends Form
                     'value_options' => [
                         'code' => 'Code (opcache)', // @translate
                         'data' => 'Data (apcu)', // @translate
+                        'path' => 'Real paths', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -760,6 +761,7 @@ class CheckAndFixForm extends Form
                     'value' => [
                         'code',
                         'data',
+                        'path',
                     ],
                 ],
             ])

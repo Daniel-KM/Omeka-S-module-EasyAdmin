@@ -264,5 +264,10 @@ class CheckAndFixController extends AbstractActionController
                 $messenger->addWarning('The php extension "apcu" is not available.'); // @translate
             }
         }
+
+        if (in_array('path', $options['type'])) {
+            $result = @clearstatcache(true);
+            $messenger->addSuccess('The cache of real paths was reset.'); // @translate
+        }
     }
 }
