@@ -14,6 +14,8 @@ admin interface:
 - update modules (in a future version);
 - maintenance state for public and admin even when no migration;
 - checks database and files;
+- backup install;
+- clear php caches;
 - launch simple tasks, that can be any job of any module.
 
 Checks and fixes that are doable:
@@ -33,11 +35,17 @@ Checks and fixes that are doable:
   Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
 - check and fix sha256 hashes of files
 - check and fix positions of media (start from 1, without missing number)
+- check and set pre^cise media types (for example application/alto+xml instead of text/xml)
+- check and prepare dimensions of medias for module [Iiif Server]
+- check and fix the encoding (iso-8859 to utf-8) of resource values and page
+  contents (fix Windows issues)
+- check and update titles
+- check and update the primary media for each item
 - check and stop dead jobs (living in database, but non-existent in system)
 - check the size of the database table of sessions and remove them
 - check the size of the database table of logs and remove them
-- check and fix the encoding (iso-8859 to utf-8) of resource values and page
-  contents
+- backup install
+- clear php caches
 
 And many more.
 
@@ -201,6 +209,12 @@ admin interface with its option "Store job as a task".
 php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
 ```
 
+Another example: run a bulk export job whose config is stored with option "Store job as a task".
+
+```sh
+php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkExport\Job\Export' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_export_id": 1}'
+```
+
 Another example: reindex statistics after import of hits:
 ```sh
 sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'Statistics\Job\AggregateHits' --user-id 1 --server-url 'https://example.org' --base-path '/'
@@ -293,6 +307,7 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
+[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
