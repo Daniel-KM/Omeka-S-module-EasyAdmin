@@ -117,6 +117,15 @@ trait ZipTrait
              */
             $compressionName = ZipArchive::CM_DEFAULT;
 
+            if (method_exists($zip, 'isCompressionMethodSupported')
+                && !$zip->isCompressionMethodSupported($compressionName)
+            ) {
+                $this->logger->err(
+                    'The compression level is not supported. Using default config.' // @translate
+                );
+                $compressionName = ZipArchive::CM_DEFAULT;
+            }
+
             $excludedDirs = [];
             $excludedFiles = ['.', '..'];
             $excludedDirsRegex = [];
@@ -164,6 +173,10 @@ trait ZipTrait
             );
             $iterator = new RecursiveIteratorIterator($filterIterator, RecursiveIteratorIterator::CHILD_FIRST);
 
+            $this->logger->info(
+                'Preparation of the listing of files.' // @translate
+            );
+
             /** @var \SplFileInfo $file */
             $total = 0;
             foreach ($iterator as $filepath => $file) {
@@ -179,20 +192,16 @@ trait ZipTrait
                 }
                 $zip->setCompressionName($relativePath, $compressionName, $compression < 0 ? 6 : $compression);
                 ++$result['total'];
-                if (($result['total'] % 1000) === 0) {
-                    $this->logger->info(
-                        'An error occurred during finalization of the zip archive.' // @translate
-                    );
+                // It is useless to log info, because the zip is created during
+                // call to close().
+                if (($result['total'] % 10000) === 0) {
                     if ($this->shouldStop()) {
-                        $result['size'] = (int) filesize($destination);
                         $this->logger->notice(
-                            'Backup stopped: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%). Output removed.', // @translate
+                            'Backup stopped: {total_dirs} dirs, {total_files} files, size: {total_size} bytes prepared.', // @translate
                             [
-                                'total_dirs' => $result['total_dirs'],
-                                'total_files' => (int) $result['total_files'],
-                                'total_size' => (int) $result['total_size'],
-                                'size' => $result['size'],
-                                'ratio' => (int) ($result['size'] / $result['total_size'] * 100),
+                                'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
+                                'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
+                                'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
                             ]
                         );
                         $zip->close();
@@ -201,6 +210,28 @@ trait ZipTrait
                         return $result;
                     }
                 }
+            }
+
+            $this->logger->info(
+                'Backup to process: {total_dirs} dirs, {total_files} files, size: {total_size} bytes.', // @translate
+                [
+                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
+                    'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
+                    'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
+                ]
+            );
+
+            if (method_exists($zip, 'registerCancelCallback')) {
+                $zip->registerCancelCallback(function () {
+                    return $this->shouldStop() ? -1 : 0;
+                });
+
+                $zip->registerProgressCallback(0.1, function ($rate) {
+                    $this->logger->info(
+                        'Backup in progress: {percent}', // @translate
+                        ['percent' => $rate * 100]
+                    );
+                });
             }
 
             // Zip the file.

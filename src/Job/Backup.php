@@ -115,12 +115,12 @@ class Backup extends AbstractCheck
 
         if ($result['size']) {
             $this->logger->notice(
-                'Backup successfully created: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%)', // @translate
+                'Backup successfully created: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%).', // @translate
                 [
-                    'total_dirs' => $result['total_dirs'],
-                    'total_files' => $result['total_files'],
-                    'total_size' => $result['total_size'],
-                    'size' => $result['size'],
+                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
+                    'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
+                    'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
+                    'size' => number_format((int) $result['size'], 0, ',', ' '),
                     'ratio' => (int) ($result['size'] / $result['total_size'] * 100),
                 ]
             );
