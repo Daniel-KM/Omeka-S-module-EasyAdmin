@@ -28,8 +28,10 @@ class DefaultSiteFactory implements FactoryInterface
         }
         // Fix issues after Omeka install without public site, so very rarely.
         if (empty($id)) {
+            // Search first public site first.
             $slugs = $api->search('sites', ['is_public' => true, 'limit' => 1], ['initialize' => false, 'returnScalar' => 'slug'])->getContent();
             [$id, $slug] = $slugs ? [(int) key($slugs), reset($slugs)] : [null, null];
+            // Else first site.
             if (empty($id)) {
                 $slugs = $api->search('sites', ['limit' => 1], ['initialize' => false, 'returnScalar' => 'slug'])->getContent();
                 [$id, $slug] = $slugs ? [(int) key($slugs), reset($slugs)] : [null, null];

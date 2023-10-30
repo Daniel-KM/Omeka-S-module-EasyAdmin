@@ -26,6 +26,9 @@ $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
 
+$config = $services->get('Config');
+$basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+
 if (version_compare($oldVersion, '3.3.2', '<')) {
     $this->installDir();
 }
@@ -197,4 +200,31 @@ if (version_compare($oldVersion, '3.4.13', '<')) {
         'The script for tasks was updated and option `--job` is now passed by default. Check your cron tasks if you use it.' // @translate
     );
     $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.4.14', '<')) {
+    $message = new Message(
+        'New tasks were added to set the primary media of all items and to check resources.' // @translate
+    );
+    $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.4.15', '<')) {
+    if (!$this->checkDestinationDir($basePath . '/backup')) {
+        $message = new \Omeka\Stdlib\Message(
+            'The directory "%s" is not writeable.', // @translate
+            $basePath
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    }
+
+    $message = new Message(
+        'A new task allow to backup Omeka installation files (without directory /files).' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'A new task allow to clear php caches (code and data), in particular after an update or direct modification of code.' // @translate
+    );
+    $messenger->addSuccess($message);
 }
