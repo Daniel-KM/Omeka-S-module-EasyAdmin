@@ -349,10 +349,10 @@ class CheckAndFixForm extends Form
                         'files_size_fix' => 'Fix all file sizes in database (for example after hard import)', // @translate
                         'files_hash_check' => 'Check sha256 hashes of files', // @translate
                         'files_hash_fix' => 'Fix wrong sha256 of files', // @translate
-                        'files_dimension_check' => 'Check files dimensions (modules IIIF Server / Image Server)', // @translate
-                        'files_dimension_fix' => 'Fix files dimensions (modules IIIF Server / Image Server)', // @translate
                         'files_media_type_check' => 'Check generic media type of files, mainly for xml', // @translate
                         'files_media_type_fix' => 'Fix generic media type of files, mainly for xml', // @translate
+                        'files_dimension_check' => 'Check files dimensions (modules IIIF Server / Image Server)', // @translate
+                        'files_dimension_fix' => 'Fix files dimensions (modules IIIF Server / Image Server)', // @translate
                         'media_position_check' => 'Check positions of media (start from 1, without missing number)', // @translate
                         'media_position_fix' => 'Fix wrong positions of media', // @translate
                     ],

@@ -150,7 +150,7 @@ class AddonsController extends AbstractActionController
         $result = $this->downloadFile($addon['zip'], $zipFile);
         if (!$result) {
             $this->messenger()->addError(new PsrMessage(
-                'Unable to fetch the {type} "[name}".', // @translate
+                'Unable to fetch the {type} "{name}".', // @translate
                 ['type' => $type, 'name' => $addon['name']]
             ));
             return;
