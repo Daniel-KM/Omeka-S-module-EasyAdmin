@@ -27,6 +27,7 @@ class CheckAndFixForm extends Form
             ->appendFieldsetResourceValues()
             ->appendFieldsetDatabase()
             ->appendFieldsetBackup()
+            ->appendFieldsetCache()
             ->appendFieldsetTasks()
         ;
 
@@ -114,6 +115,18 @@ class CheckAndFixForm extends Form
             ->get('backup_install')
             ->add([
                 'name' => 'include',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('cache')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('cache')
+            ->get('cache_clear')
+            ->add([
+                'name' => 'type',
                 'required' => false,
             ]);
 
@@ -677,6 +690,77 @@ class CheckAndFixForm extends Form
                     'min' => '-1',
                     'max' => '9',
                     'value' => '-1',
+                ],
+            ])
+        ;
+
+        return $this;
+    }
+
+    protected function appendFieldsetCache(): self
+    {
+        $this
+            ->add([
+                'name' => 'cache',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Cache', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'cache',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('cache');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Cache php', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'cache_check' => 'Check php cache (after update or modifications of code)', // @translate
+                        'cache_fix' => 'Clear php cache', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'cache-process',
+                    'required' => false,
+                    'class' => 'fieldset-process'
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'cache_clear',
+                'options' => [
+                    'label' => 'Options to clear cache', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'cache_check cache_fix',
+                ],
+            ]);
+        $fieldset->get('cache_clear')
+            ->add([
+                'name' => 'type',
+                'type' => Element\MultiCheckbox::class,
+                'options' => [
+                    'label' => 'Types of cache', // @translate
+                    'value_options' => [
+                        'code' => 'Code (opcache)', // @translate
+                        'data' => 'Data (apcu)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'cache_clear-cache',
+                    'value' => [
+                        'code',
+                        'data',
+                    ],
                 ],
             ])
         ;

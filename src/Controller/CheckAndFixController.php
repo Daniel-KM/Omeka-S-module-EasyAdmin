@@ -142,6 +142,12 @@ class CheckAndFixController extends AbstractActionController
             case 'backup_install':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\Backup::class, $defaultParams + $params['backup']['backup_install']);
                 break;
+            case 'cache_check':
+            case 'cache_fix':
+                // This is not a job, because it is instant.
+                $this->checkCache($params['cache']['cache_clear'], $process === 'cache_fix');
+                $job = null;
+                break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
                 break;
@@ -161,39 +167,102 @@ class CheckAndFixController extends AbstractActionController
                 ]);
                 $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
                 $jobClass = $args['job'];
-                 if (!$jobClass) {
-                    $this->messenger()->addError(new PsrMessage(
+                 if ($jobClass) {
+                     $job = $dispatcher->dispatch($jobClass, $args['args']);
+                 } else {
+                     $job = null;
+                     $this->messenger()->addError(new PsrMessage(
                         'Unknown process "{process}"', // @translate
                         ['process' => $process]
                     ));
-                    return $view;
                 }
-                $job = $dispatcher->dispatch($jobClass, $args['args']);
                 break;
         }
 
-        $urlPlugin = $this->url();
-        $message = new PsrMessage(
-            'Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}logs{ae}).', // @translate
-            [
-                'link_job' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-                ),
-                'job_id' => $job->getId(),
-                'ae' => '</a>',
-                'link_log' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
-                )
-            ]
-        );
-        $message->setEscapeHtml(false);
-        $this->messenger()->addSuccess($message);
+        if ($job) {
+            $urlPlugin = $this->url();
+            $message = new PsrMessage(
+                'Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}logs{ae}).', // @translate
+                [
+                    'link_job' => sprintf(
+                        '<a href="%s">',
+                        htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                    ),
+                    'job_id' => $job->getId(),
+                    'ae' => '</a>',
+                    'link_log' => sprintf(
+                        '<a href="%s">',
+                        htmlspecialchars($urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
+                    )
+                ]
+            );
+            $message->setEscapeHtml(false);
+            $this->messenger()->addSuccess($message);
+        }
 
         // Reset the form after a submission.
         $form = $this->getForm(\EasyAdmin\Form\CheckAndFixForm::class);
         return $view
             ->setVariable('form', $form);
+    }
+
+    protected function checkCache(array $options, bool $fix): void
+    {
+        /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger  */
+        $messenger = $this->messenger();
+        if (empty($options['type'])) {
+            $messenger->addWarning('No type of cache selected.'); // @translate
+            return;
+        }
+
+        if (in_array('code', $options['type'])) {
+            $hasCache = function_exists('opcache_reset');
+            if ($hasCache) {
+                $result = @opcache_get_status(false);
+                if (!$result) {
+                    $messenger->addWarning('An issue occurred when checking status of "opcache" or the status is not enabled.'); // @translate
+                } else {
+                    /*
+                    $resultConfig = @opcache_get_configuration();
+                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($resultConfig, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $msg->setEscapeHtml(false);
+                    $messenger->addSuccess($msg);
+                    */
+                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($result, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $msg->setEscapeHtml(false);
+                    $messenger->addSuccess($msg);
+                }
+                if ($fix) {
+                    $result = opcache_reset();
+                    if ($result) {
+                        $messenger->addSuccess('The cache "opcache" was reset.'); // @translate
+                    } else {
+                        $messenger->addWarning('The cache "opcache" is disabled.'); // @translate
+                    }
+                }
+            } else {
+                $messenger->addWarning('The php extension "opcache" is not available.'); // @translate
+            }
+        }
+
+        if (in_array('data', $options['type'])) {
+            $hasCache = function_exists('apcu_clear_cache');
+            if ($hasCache) {
+                $result = @apcu_cache_info(true);
+                if (!$result) {
+                    $messenger->addWarning('An issue occurred when checking status of "apcu" or the status is disabled.'); // @translate
+                } else {
+                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($result, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $msg->setEscapeHtml(false);
+                    $messenger->addSuccess($msg);
+                }
+                if ($fix) {
+                    apcu_clear_cache();
+                    $messenger->addSuccess('The cache "apcu" was reset.'); // @translate
+                }
+            } else {
+                $messenger->addWarning('The php extension "apcu" is not available.'); // @translate
+            }
+        }
     }
 }
