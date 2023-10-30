@@ -2,6 +2,11 @@
 
 namespace EasyAdmin\Job;
 
+use FilesystemIterator;
+use RecursiveCallbackFilterIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 use ZipArchive;
 
 /**
@@ -46,44 +51,46 @@ trait ZipTrait
      * @param string $destination Full destination file name.
      * @param array $exclude Relative paths of folders and files from source.
      * @param int $compression From 0 to 9; -1 means auto.
-     * @return int Number of compressed files (-1 if undetermined, 0 if issue).
+     * @return array The result contains:
+     *   - error (bool): true if error
+     *   - total (int): Number of compressed directories and files
+     *   - total_dirs (int): Number of compressed directories
+     *   - total_files (int): Number of compressed files
+     *   - total_size (int): Total size of original files
+     *   - size (int): size of the archive
      */
     protected function zip(
         string $source,
         string $destination,
         array $exclude = [],
         int $compression = -1
-    ): int {
+    ): array {
+        $source = rtrim($source, '/\\');
+
         if ($compression > 9) {
             $compression = 9;
         } elseif ($compression < 0) {
             $compression = -1;
         }
 
-        $isCli = $this->zipGenerator !== 'ZipArchive';
-        $expand = $isCli ? '*' : '';
-
-        $excludedDirs = [];
-        $excludedFiles = [];
-        foreach ($exclude as $excluded) {
-            if (mb_substr($excluded, -1) === '/') {
-                $excludedDirs[] = $excluded . $expand;
-            } else {
-                $excludedFiles[] = $excluded;
-            }
-        }
+        $result = [
+            'error' => false,
+            'total' => 0,
+            'total_dirs' => 0,
+            'total_files' => 0,
+            'total_size' => 0,
+            'size' => 0,
+        ];
 
         if ($this->zipGenerator === 'ZipArchive') {
             // Create the zip.
             $zip = new ZipArchive();
             if ($zip->open($destination, ZipArchive::CREATE) !== true) {
-                return 0;
-            }
-
-            // Add all files.
-            $files = $this->recursiveGlob($source . DIRECTORY_SEPARATOR . '*');
-            if (empty($files)) {
-                return 0;
+                $this->logger->err(
+                    'An error occurred during creation of the zip archive.' // @translate
+                );
+                $result['error'] = true;
+                return $result;
             }
 
             $skipHidden = in_array('.*', $exclude);
@@ -109,39 +116,115 @@ trait ZipTrait
              */
             $compressionName = ZipArchive::CM_DEFAULT;
 
-            foreach ($files as $file) {
-                if (in_array($file, $excludedFiles)) {
-                    continue;
-                }
-                $filename = basename($file);
-                if ($skipHidden && mb_substr($filename, 0, 1) === '.') {
-                    continue;
-                }
-                $relativePath = mb_substr($file, $sourceLength + 1);
-                foreach ($excludedDirs as $excluded) {
-
-                }
-                if (in_array($relativePath, $exclude)) {
-                    continue;
-                }
-                if (mb_strpos($relativePath, $excludedDirs)) {
-
-                }
-                if (is_dir($file)) {
-                    $result = $zip->addEmptyDir($relativePath);
+            $excludedDirs = [];
+            $excludedFiles = ['.', '..'];
+            $excludedDirsRegex = [];
+            foreach ($exclude as $excluded) {
+                if (mb_substr($excluded, -1) === '/') {
+                    $name = $source . '/' . rtrim($excluded, '/\\');
+                    $excludedDirs[] = $name;
+                    $excludedDirsRegex[] = preg_quote($name . '/', '/');
                 } else {
-                    $result = $zip->addFile($file, $relativePath);
+                    $excludedFiles[] = $source . '/' . $excluded;
+                }
+            }
+            $excludedDirsRegex = $excludedDirsRegex ? '/^(?:' . implode('|', $excludedDirsRegex) . ')/u' : '';
+
+            $directoryIterator = new RecursiveDirectoryIterator(
+                $source,
+                FilesystemIterator::KEY_AS_PATHNAME
+                | FilesystemIterator::CURRENT_AS_FILEINFO
+                | FilesystemIterator::SKIP_DOTS
+                | FilesystemIterator::UNIX_PATHS
+            );
+            $filterIterator = new RecursiveCallbackFilterIterator(
+                $directoryIterator,
+                function (SplFileInfo $file, string $filepath, RecursiveDirectoryIterator $iterator)
+                use ($excludedDirs, $excludedFiles, $excludedDirsRegex, $skipHidden)
+                : bool {
+                    $filename = $file->getFilename();
+                    if ($skipHidden && mb_substr($filename, 0, 1) === '.') {
+                        return false;
+                    } elseif ($file->isFile()) {
+                        return $file->isReadable()
+                            && !in_array($filepath, $excludedFiles);
+                     } elseif ($file->isDir()) {
+                        return $file->isExecutable()
+                            && $file->isReadable()
+                            && !in_array($filepath, $excludedDirs)
+                            // Skip sub dirs, even if automatically managed.
+                            && (!$excludedDirsRegex || !preg_match($excludedDirsRegex, $filepath . '/'));
+                    } else {
+                        return false;
+                    }
+                }
+            );
+            $iterator = new RecursiveIteratorIterator($filterIterator, RecursiveIteratorIterator::CHILD_FIRST);
+
+            /** @var \SplFileInfo $file */
+            $total = 0;
+            foreach ($iterator as $filepath => $file) {
+                $relativePath = mb_substr($filepath, $sourceLength + 1);
+                ++$total;
+                if ($file->isDir()) {
+                    ++$result['total_dirs'];
+                    $zip->addEmptyDir($relativePath);
+                } else {
+                    ++$result['total_files'];
+                    $result['total_size'] += $file->getSize();
+                    $zip->addFile($filepath, $relativePath);
                 }
                 $zip->setCompressionName($relativePath, $compressionName, $compression < 0 ? 6 : $compression);
+                ++$result['total'];
+                if (($result['total'] % 1000) === 0) {
+                    $this->logger->info(
+                        'An error occurred during finalization of the zip archive.' // @translate
+                    );
+                    if ($this->shouldStop()) {
+                        $result['size'] = (int) filesize($destination);
+                        $this->logger->notice(
+                            'Backup stopped: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%). Output removed.', // @translate
+                            [
+                                'total_dirs' => $result['total_dirs'],
+                                'total_files' => (int) $result['total_files'],
+                                'total_size' => (int) $result['total_size'],
+                                'size' => $result['size'],
+                                'ratio' => (int) ($result['size'] / $result['total_size'] * 100),
+                            ]
+                        );
+                        $zip->close();
+                        @unlink($destination);
+                        $result['size'] = null;
+                        return $result;
+                    }
+                }
             }
 
             // Zip the file.
-            $result = $zip->close();
+            $resultZip = $zip->close();
+            if (!$resultZip) {
+                $this->logger->err(
+                    'An error occurred during finalization of the zip archive.' // @translate
+                );
+                $result['error'] = true;
+            } else {
+                $result['size'] = filesize($destination);
+            }
 
-            return empty($result) ? 0 : count($files);
+            return $result;
         }
 
         // Via zip on cli.
+        $excludedDirs = [];
+        $excludedFiles = [];
+        foreach ($exclude as $excluded) {
+            if (mb_substr($excluded, -1) === '/') {
+                $excludedDirs[] = $excluded . '*';
+            } else {
+                $excludedFiles[] = $excluded;
+            }
+        }
+
         $excludeDirs = array_map('escapeshellarg', $excludedDirs);
         $excludeFiles = array_map('escapeshellarg', $excludedFiles);
         $excluded = array_merge($excludeDirs, $excludeFiles);
@@ -156,26 +239,17 @@ trait ZipTrait
             . ($compression < 0 ? '' : " -$compression")
             . ($excluded ? ' --exclude ' . implode(' ', $excluded) : '')
             . escapeshellarg($destination) . ' ' . escapeshellarg('.');
-        $result = $this->cli->execute($cmd);
-        return $result === false ? 0 : -1;
-    }
 
-    /**
-     * Get all dirs and files of a directory, recursively, via glob().
-     *
-     * Does not support flag GLOB_BRACE
-     */
-    protected function recursiveGlob($pattern, $flags = 0): array
-    {
-        if (empty($pattern)) {
-            return [];
+        $resultZip = $this->cli->execute($cmd);
+        if ($resultZip === false) {
+            $this->logger->err(
+                'An error occurred during preparation of the zip archive.' // @translate
+            );
+            $result['error'] = true;
+        } else {
+            $result['size'] = filesize($destination);
         }
 
-        $files = glob($pattern, $flags);
-        foreach (glob(dirname($pattern) . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
-            $files = array_merge($files, $this->recursiveGlob($dir . DIRECTORY_SEPARATOR . basename($pattern), $flags));
-        }
-
-        return $files;
+        return $result;
     }
 }

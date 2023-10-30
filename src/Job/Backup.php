@@ -107,12 +107,22 @@ class Backup extends AbstractCheck
         $exclude = $this->includeToExclude($include);
 
         $result = $this->zip(OMEKA_PATH, $filePath, $exclude, $options['compression']);
-        if (!$result) {
+        if ($result['error']) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
-                'An error occurred during creation of the zip archive.' // @translate
-            );
             return null;
+        }
+
+        if ($result['size']) {
+            $this->logger->notice(
+                'Backup successfully created: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%)', // @translate
+                [
+                    'total_dirs' => $result['total_dirs'],
+                    'total_files' => $result['total_files'],
+                    'total_size' => $result['total_size'],
+                    'size' => $result['size'],
+                    'ratio' => (int) ($result['size'] / $result['total_size'] * 100),
+                ]
+            );
         }
 
         return $filePath;
