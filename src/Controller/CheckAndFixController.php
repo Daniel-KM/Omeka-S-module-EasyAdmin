@@ -265,8 +265,10 @@ class CheckAndFixController extends AbstractActionController
             }
         }
 
-        if (in_array('path', $options['type'])) {
-            $result = @clearstatcache(true);
+        if (in_array('path', $options['type'])
+            && $fix
+        ) {
+            @clearstatcache(true);
             $messenger->addSuccess('The cache of real paths was reset.'); // @translate
         }
     }

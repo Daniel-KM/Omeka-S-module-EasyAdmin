@@ -722,8 +722,8 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
-                        'cache_check' => 'Check php cache (after update or modifications of code)', // @translate
-                        'cache_fix' => 'Clear php cache', // @translate
+                        'cache_check' => 'Check php cache', // @translate
+                        'cache_fix' => 'Clear php cache (after update or modifications of code)', // @translate
                     ],
                 ],
                 'attributes' => [
