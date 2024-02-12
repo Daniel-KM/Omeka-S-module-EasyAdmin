@@ -22,6 +22,7 @@ $plugins = $services->get('ControllerPluginManager');
 $url = $services->get('ViewHelperManager')->get('url');
 $api = $plugins->get('api');
 $settings = $services->get('Omeka\Settings');
+$translate = $plugins->get('translate');
 $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
@@ -227,4 +228,15 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
         'A new task allow to clear php caches (code and data), in particular after an update or direct modification of code.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+
+if (version_compare($oldVersion, '3.4.16', '<')) {
+    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.52')) {
+        $message = new Message(
+            $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+            'Common', '3.4.52'
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    }
 }
