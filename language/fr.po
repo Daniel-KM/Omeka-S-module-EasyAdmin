@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-30 00:00+0000\n"
-"PO-Revision-Date: 2023-10-30 00:00+0000\n"
+"POT-Creation-Date: 2024-02-12 00:00+0000\n"
+"PO-Revision-Date: 2024-02-12 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: data/scripts/upgrade.php:65 src/Generic/AbstractModule.php:108
+#: data/scripts/upgrade.php:65
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -25,11 +25,11 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: Module.php:152
+#: Module.php:153
 msgid "WARNING:"
 msgstr "ATTENTION :"
 
-#: Module.php:158
+#: Module.php:159
 msgid ""
 "All stored files from checks and fixes, if any, will be removed from folder "
 "\"{folder}\"."
@@ -37,52 +37,17 @@ msgstr ""
 "Tous les enregistrements issus des vérifications seront supprimés du dossier "
 "« {folder} »."
 
-#: Module.php:164
+#: Module.php:165
 msgid "Remove directory \"files/check\""
 msgstr "Supprimer le dossier \"files/check\""
 
-#: Module.php:349
+#: Module.php:357
 msgid "Public view"
 msgstr "Vue publique"
 
-#: Module.php:539
+#: Module.php:547
 msgid "Bypass the lock"
 msgstr "Ignorer le verrou"
-
-#: src/Generic/AbstractModule.php:80 src/Generic/AbstractModule.php:88
-#: src/Generic/AbstractModule.php:890
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr "Ce module requiert le module \"%s\"."
-
-#: src/Generic/AbstractModule.php:93
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr "Ce module requiert les modules \"%s\"."
-
-#: src/Generic/AbstractModule.php:101
-msgid "This module has resources that cannot be installed."
-msgstr "Ce module a des ressources qui ne peuvent pas être installées."
-
-#: src/Generic/AbstractModule.php:398
-#, php-format
-msgid "The module removed tables \"%s\" from a previous broken install."
-msgstr ""
-"Le module a supprimé les tables \"%s\" depuis une installation échouée."
-
-#: src/Generic/AbstractModule.php:885
-#, php-format
-msgid "This module requires the module \"%1$s\", version %2$s or above."
-msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
-
-#: src/Generic/AbstractModule.php:982
-#, php-format
-msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
-msgstr ""
-"Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
-"plus disponibles."
 
 #: src/Job/FileDerivative.php:131 src/Job/FileDimension.php:104
 msgid "Not readable"
@@ -267,7 +232,7 @@ msgstr ""
 "De nouvelles tâches ont été ajoutées pour définir le média principal de "
 "chaque contenu et pour vérifier les ressources."
 
-#: data/scripts/upgrade.php:215 Module.php:88 Module.php:96
+#: data/scripts/upgrade.php:215 Module.php:89 Module.php:97
 #, php-format
 msgid "The directory \"%s\" is not writeable."
 msgstr "Le dossier \"%s\" n’est pas inscriptible."
@@ -385,7 +350,7 @@ msgstr "Tâche terminée."
 msgid "Task \"%1$s\" ended."
 msgstr "Tâche « %1$s » terminée."
 
-#: Module.php:80
+#: Module.php:81
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
@@ -393,16 +358,16 @@ msgstr ""
 "Mise à niveau du module BulkCheck : impossible de renommer le dossier "
 "\"files/bulk_check\" en \"files/check\". Essai de création."
 
-#: Module.php:120
+#: Module.php:121
 #, php-format
 msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
 msgstr "Le module \"%s\" a été mis à niveau par le module \"%s\" et supprimé."
 
-#: Module.php:485
+#: Module.php:493
 msgid "You edit already this resource somewhere since {date}."
 msgstr "Vous éditez déjà cette ressource quelque part depuis le {date}."
 
-#: Module.php:512 Module.php:649 Module.php:736 Module.php:842
+#: Module.php:520 Module.php:657 Module.php:744 Module.php:850
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
@@ -411,15 +376,15 @@ msgstr ""
 "verrouillé pour empêcher les modifications d’autres utilisateurs. Ce verrou "
 "est en place depuis le {date}."
 
-#: Module.php:640
+#: Module.php:648
 msgid "Warning:"
 msgstr "Attention :"
 
-#: Module.php:643
+#: Module.php:651
 msgid "You edit this resource somewhere since {date}."
 msgstr "Vous éditez cette ressource quelque part depuis le {date}."
 
-#: Module.php:710
+#: Module.php:718
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
@@ -427,7 +392,7 @@ msgstr ""
 "Le verrou en place depuis le {date} a été ignoré, mais l’utilisateur "
 "{user_name} peut finir sa propre édition."
 
-#: Module.php:722
+#: Module.php:730
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
@@ -436,13 +401,13 @@ msgstr ""
 "#{resource_id} éditée par l’utilisateur {user_name} (#{user_id}) depuis le "
 "{date}."
 
-#: Module.php:795
+#: Module.php:803
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 "Vous avez supprimé la ressource que vous éditiez quelque part depuis le "
 "{date}."
 
-#: Module.php:814
+#: Module.php:822
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
@@ -450,7 +415,7 @@ msgstr ""
 "Vous avez supprimé une ressource verrouillée en édition par {user_name} "
 "depuis le {date}."
 
-#: Module.php:828
+#: Module.php:836
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
@@ -459,15 +424,11 @@ msgstr ""
 "#{resource_id} éditée par l’utilisateur {user_name} (#{user_id}) depuis le "
 "{date}."
 
-#: Module.php:884 src/Job/AbstractCheck.php:347
-msgid "The directory \"{path}\" is not writeable."
-msgstr "Le dossier \"{path}\" n’est pas inscriptible."
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:137
+msgid "xmlns"
+msgstr "xmlns"
 
-#: Module.php:895 src/Job/AbstractCheck.php:358
-msgid "The directory \"{path}\" is not writeable: {error}."
-msgstr "Le dossier \"{path}\" n’est pas inscriptible : {error}"
-
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:149
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
 #, php-format
 msgid ""
 "Xml parsing error level %1$s, code %2$s, for file \"%3$s\" (media #%4$s), "
@@ -476,7 +437,7 @@ msgstr ""
 "Erreur de décomposition xml de niveau %1$s, code %2$s, pour le fichier "
 "« %3$s » (média #%4$s), ligne %5$s, colonne %6$s : %7$s"
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:164
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
 #, php-format
 msgid ""
 "The file \"%1$s\" (media #%2$s) is not parsable by xml reader neither dom."
@@ -484,7 +445,7 @@ msgstr ""
 "Le fichier « %1$s » (media #%2$s) n’est lisible ni par le lecteur xml, ni "
 "par le dom."
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:282
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:303
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -673,7 +634,7 @@ msgstr "Différent"
 msgid "You should reindex the Omeka metadata."
 msgstr "Vous devez réindexer les métadonnées Omeka."
 
-#: src/Job/DbResourceTitle.php:58 src/Job/LoopItems.php:42
+#: src/Job/DbResourceTitle.php:58 src/Job/LoopItems.php:41
 msgid "No resource to process."
 msgstr "Aucune ressource à traiter."
 
@@ -1249,15 +1210,15 @@ msgstr "Type de média dans la base de données"
 msgid "Real media type"
 msgstr "Type de média réel"
 
-#: src/Job/LoopItems.php:48
+#: src/Job/LoopItems.php:47
 msgid "Processing {count} resources."
 msgstr "Traitement de {count} ressources."
 
-#: src/Job/LoopItems.php:69
+#: src/Job/LoopItems.php:68
 msgid "The job \"{name}\" was stopped."
 msgstr "La tâche \"{name}\" a été arrêtée."
 
-#: src/Job/LoopItems.php:92
+#: src/Job/LoopItems.php:91
 msgid "End of the job: {count}/{total} processed."
 msgstr "Fin de la tâche : {count}/{total} traités."
 
@@ -1319,6 +1280,14 @@ msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
 msgstr ""
 "Erreur lors de l’enregistrement de \"{filename}\" (fichier temporaire : "
 "\"{tempfile}\") : {error}"
+
+#: src/Job/AbstractCheck.php:347
+msgid "The directory \"{path}\" is not writeable."
+msgstr "Le dossier \"{path}\" n’est pas inscriptible."
+
+#: src/Job/AbstractCheck.php:358
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr "Le dossier \"{path}\" n’est pas inscriptible : {error}"
 
 #: src/Form/SettingsFieldset.php:16
 msgid "Maintenance"
@@ -1829,13 +1798,13 @@ msgid "Cache php"
 msgstr "Cache php"
 
 #: src/Form/CheckAndFixForm.php:725
-msgid "Check php cache (after update or modifications of code)"
-msgstr ""
-"Vérifier le cache php (après une mise à jour ou des modifications de code)"
+msgid "Check php cache"
+msgstr "Vérifier le cache php"
 
 #: src/Form/CheckAndFixForm.php:726
-msgid "Clear php cache"
-msgstr "Effacer le cache php"
+msgid "Clear php cache (after update or modifications of code)"
+msgstr ""
+"Vider le cache php (après une mise à jour ou des modifications de code)"
 
 #: src/Form/CheckAndFixForm.php:741
 msgid "Options to clear cache"
@@ -2052,13 +2021,41 @@ msgstr "Le cache « apcu » a été effacé."
 msgid "The php extension \"apcu\" is not available."
 msgstr "L’extension php « apcu » n’est pas disponible."
 
-#: src/Controller/CheckAndFixController.php:270
+#: src/Controller/CheckAndFixController.php:272
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
 
 #: config/module.config.php:121
 msgid "Install addons"
 msgstr "Installer des extensions"
+
+#, php-format
+#~ msgid "This module requires the module \"%s\"."
+#~ msgstr "Ce module requiert le module \"%s\"."
+
+#, php-format
+#~ msgid "This module requires modules \"%s\"."
+#~ msgstr "Ce module requiert les modules \"%s\"."
+
+#~ msgid "This module has resources that cannot be installed."
+#~ msgstr "Ce module a des ressources qui ne peuvent pas être installées."
+
+#, php-format
+#~ msgid "The module removed tables \"%s\" from a previous broken install."
+#~ msgstr ""
+#~ "Le module a supprimé les tables \"%s\" depuis une installation échouée."
+
+#, php-format
+#~ msgid "This module requires the module \"%1$s\", version %2$s or above."
+#~ msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
+
+#, php-format
+#~ msgid ""
+#~ "The module \"%s\" was automatically deactivated because the dependencies "
+#~ "are unavailable."
+#~ msgstr ""
+#~ "Le module %s\" a été automatiquement désactivé car ses dépendances ne "
+#~ "sont plus disponibles."
 
 #~ msgid "Compressed files"
 #~ msgstr "Fichiers compressés"

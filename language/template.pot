@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-30 00:00+0000\n"
+"POT-Creation-Date: 2024-02-12 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,64 +17,32 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:65 src/Generic/AbstractModule.php:108
+#: data/scripts/upgrade.php:65
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
 msgstr ""
 
-#: Module.php:152
+#: Module.php:153
 msgid "WARNING:"
 msgstr ""
 
-#: Module.php:158
+#: Module.php:159
 msgid ""
 "All stored files from checks and fixes, if any, will be removed from folder "
 "\"{folder}\"."
 msgstr ""
 
-#: Module.php:164
+#: Module.php:165
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: Module.php:349
+#: Module.php:357
 msgid "Public view"
 msgstr ""
 
-#: Module.php:539
+#: Module.php:547
 msgid "Bypass the lock"
-msgstr ""
-
-#: src/Generic/AbstractModule.php:80 src/Generic/AbstractModule.php:88
-#: src/Generic/AbstractModule.php:890
-#, php-format
-msgid "This module requires the module \"%s\"."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:93
-#, php-format
-msgid "This module requires modules \"%s\"."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:101
-msgid "This module has resources that cannot be installed."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:398
-#, php-format
-msgid "The module removed tables \"%s\" from a previous broken install."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:885
-#, php-format
-msgid "This module requires the module \"%1$s\", version %2$s or above."
-msgstr ""
-
-#: src/Generic/AbstractModule.php:982
-#, php-format
-msgid ""
-"The module \"%s\" was automatically deactivated because the dependencies are "
-"unavailable."
 msgstr ""
 
 #: src/Job/FileDerivative.php:131 src/Job/FileDimension.php:104
@@ -239,7 +207,7 @@ msgid ""
 "resources."
 msgstr ""
 
-#: data/scripts/upgrade.php:215 Module.php:88 Module.php:96
+#: data/scripts/upgrade.php:215 Module.php:89 Module.php:97
 #, php-format
 msgid "The directory \"%s\" is not writeable."
 msgstr ""
@@ -347,85 +315,81 @@ msgstr ""
 msgid "Task \"%1$s\" ended."
 msgstr ""
 
-#: Module.php:80
+#: Module.php:81
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
 msgstr ""
 
-#: Module.php:120
+#: Module.php:121
 #, php-format
 msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
 msgstr ""
 
-#: Module.php:485
+#: Module.php:493
 msgid "You edit already this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:512 Module.php:649 Module.php:736 Module.php:842
+#: Module.php:520 Module.php:657 Module.php:744 Module.php:850
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
 msgstr ""
 
-#: Module.php:640
+#: Module.php:648
 msgid "Warning:"
 msgstr ""
 
-#: Module.php:643
+#: Module.php:651
 msgid "You edit this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:710
+#: Module.php:718
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
 msgstr ""
 
-#: Module.php:722
+#: Module.php:730
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: Module.php:795
+#: Module.php:803
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 
-#: Module.php:814
+#: Module.php:822
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
 msgstr ""
 
-#: Module.php:828
+#: Module.php:836
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: Module.php:884 src/Job/AbstractCheck.php:347
-msgid "The directory \"{path}\" is not writeable."
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:137
+msgid "xmlns"
 msgstr ""
 
-#: Module.php:895 src/Job/AbstractCheck.php:358
-msgid "The directory \"{path}\" is not writeable: {error}."
-msgstr ""
-
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:149
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:163
 #, php-format
 msgid ""
 "Xml parsing error level %1$s, code %2$s, for file \"%3$s\" (media #%4$s), "
 "line %5$s, column %6$s: %7$s"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:164
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:185
 #, php-format
 msgid ""
 "The file \"%1$s\" (media #%2$s) is not parsable by xml reader neither dom."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:282
+#: src/Mvc/Controller/Plugin/SpecifyMediaType.php:303
 msgid ""
 "Warning: some files contain invalid unicode characters and cannot be "
 "processed directly."
@@ -596,7 +560,7 @@ msgstr ""
 msgid "You should reindex the Omeka metadata."
 msgstr ""
 
-#: src/Job/DbResourceTitle.php:58 src/Job/LoopItems.php:42
+#: src/Job/DbResourceTitle.php:58 src/Job/LoopItems.php:41
 msgid "No resource to process."
 msgstr ""
 
@@ -1090,15 +1054,15 @@ msgstr ""
 msgid "Real media type"
 msgstr ""
 
-#: src/Job/LoopItems.php:48
+#: src/Job/LoopItems.php:47
 msgid "Processing {count} resources."
 msgstr ""
 
-#: src/Job/LoopItems.php:69
+#: src/Job/LoopItems.php:68
 msgid "The job \"{name}\" was stopped."
 msgstr ""
 
-#: src/Job/LoopItems.php:92
+#: src/Job/LoopItems.php:91
 msgid "End of the job: {count}/{total} processed."
 msgstr ""
 
@@ -1149,6 +1113,14 @@ msgstr ""
 
 #: src/Job/AbstractCheck.php:306
 msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
+msgstr ""
+
+#: src/Job/AbstractCheck.php:347
+msgid "The directory \"{path}\" is not writeable."
+msgstr ""
+
+#: src/Job/AbstractCheck.php:358
+msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:16
@@ -1608,11 +1580,11 @@ msgid "Cache php"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:725
-msgid "Check php cache (after update or modifications of code)"
+msgid "Check php cache"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:726
-msgid "Clear php cache"
+msgid "Clear php cache (after update or modifications of code)"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:741
@@ -1806,7 +1778,7 @@ msgstr ""
 msgid "The php extension \"apcu\" is not available."
 msgstr ""
 
-#: src/Controller/CheckAndFixController.php:270
+#: src/Controller/CheckAndFixController.php:272
 msgid "The cache of real paths was reset."
 msgstr ""
 
