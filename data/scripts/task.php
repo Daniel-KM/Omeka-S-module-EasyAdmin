@@ -302,7 +302,7 @@ if ($asTask) {
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
         $referenceIdProcessor->setReferenceId($referenceId);
         $logger->addProcessor($referenceIdProcessor);
-        $userIdProcessor = new \Log\Processor\UserId($user);
+        $userIdProcessor = new \Log\Log\Processor\UserId($user);
         $logger->addProcessor($userIdProcessor);
         unset($module);
     }
