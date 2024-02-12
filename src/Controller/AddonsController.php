@@ -2,11 +2,11 @@
 
 namespace EasyAdmin\Controller;
 
+use Common\Stdlib\PsrMessage;
 use Doctrine\Inflector\InflectorFactory;
 use EasyAdmin\Form\AddonsForm;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
-use Log\Stdlib\PsrMessage;
 use Omeka\Api\Representation\ModuleRepresentation;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 

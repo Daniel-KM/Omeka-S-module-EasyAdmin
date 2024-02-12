@@ -9,7 +9,7 @@
  * Nevertheless, the process is checked and must be a system one, not a web one.
  * The class must be a job one.
  *
- * The modules are not available inside this file (no Log\Stdlib\PsrMessage).
+ * The modules are not available inside this file (no \Common\Stdlib\PsrMessage).
  *
  * @todo Use the true Laminas console routing system.
  */

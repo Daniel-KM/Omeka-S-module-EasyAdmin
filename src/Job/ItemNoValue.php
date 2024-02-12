@@ -2,7 +2,7 @@
 
 namespace EasyAdmin\Job;
 
-use Log\Stdlib\PsrMessage;
+use Common\Stdlib\PsrMessage;
 
 class ItemNoValue extends AbstractCheckFile
 {

@@ -2,10 +2,10 @@
 
 namespace EasyAdmin\Controller;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\View\Model\ViewModel;
-use Log\Stdlib\PsrMessage;
 
 class CheckAndFixController extends AbstractActionController
 {

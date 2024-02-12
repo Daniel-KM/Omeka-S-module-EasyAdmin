@@ -2,11 +2,11 @@
 
 namespace EasyAdmin\Mvc\Controller\Plugin;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Session\Container;
 use Laminas\Uri\Http as HttpUri;
-use Log\Stdlib\PsrMessage;
 
 /**
  * List addons for Omeka.

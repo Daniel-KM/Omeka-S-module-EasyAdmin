@@ -2,9 +2,9 @@
 
 namespace EasyAdmin\File;
 
+use Common\Stdlib\PsrMessage;
 use Omeka\File\TempFile;
 use Omeka\Stdlib\ErrorStore;
-use Log\Stdlib\PsrMessage;
 
 /**
  * File validator service

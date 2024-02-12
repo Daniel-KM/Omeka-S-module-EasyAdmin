@@ -144,7 +144,21 @@ class SpecifyMediaType extends AbstractPlugin
 
             $error = libxml_get_last_error();
             if ($error) {
-                // TODO Use PsrMessage.
+                // TODO Message is kept for existing translations, but it is possible to log error directly.
+                /*
+                $this->logger->warn(
+                    'Xml parsing error level {level}, code {code}, for file "{file}" (media #{media_id}), line {line}, column {column}: {message}', // @translate
+                    [
+                        'level' => $error->level,
+                        'code' => $error->code,
+                        'file' => $error->file,
+                        'media_id' => $this->getMediaIdFromFilePath(),
+                        'line' => $error->line,
+                        'column' => $error->column,
+                        'message' => $error->message,
+                    ]
+                );
+                */
                 $message = new \Omeka\Stdlib\Message(
                     'Xml parsing error level %1$s, code %2$s, for file "%3$s" (media #%4$s), line %5$s, column %6$s: %7$s', // @translate
                     $error->level, $error->code, $error->file, $this->getMediaIdFromFilePath(), $error->line, $error->column, $error->message
@@ -160,6 +174,13 @@ class SpecifyMediaType extends AbstractPlugin
         // Try dom if xmlreader is too much strict.
         $dom = $this->loadAndFixXml();
         if (!$dom) {
+            // TODO Message is kept for existing translations, but it is possible to log error directly.
+            /*
+            $this->logger->err(
+                'The file "{file}" (media #{media_id}) is not parsable by xml reader neither dom.', // @translate
+                ['file' => $this->filepath, 'media_id' => $this->getMediaIdFromFilePath()]
+            );
+             */
             $message = new \Omeka\Stdlib\Message(
                 'The file "%1$s" (media #%2$s) is not parsable by xml reader neither dom.', // @translate
                 $this->filepath, $this->getMediaIdFromFilePath()
