@@ -277,6 +277,13 @@ class Module extends AbstractModule
             [$this, 'handleMainSettings']
         );
 
+        // Check last version of modules.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Module',
+            'view.browse.after',
+            [$this, 'checkAddonVersions']
+        );
+
         // Display a warn before uninstalling.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Module',
@@ -869,5 +876,12 @@ HTML;
             'DELETE FROM content_lock WHERE created < DATE_SUB(NOW(), INTERVAL :duration SECOND)',
             ['duration' => $duration]
         );
+    }
+
+    public function checkAddonVersions(Event $event): void
+    {
+        $view = $event->getTarget();
+        $view->headScript()
+            ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
     }
 }
