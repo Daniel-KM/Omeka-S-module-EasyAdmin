@@ -53,7 +53,7 @@ And many more.
 Installation
 ------------
 
-This module requires the module [Log] and the optional module [Generic].
+This module requires the module [Common], that should be installed first.
 
 * From the zip
 
@@ -289,10 +289,10 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2023 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM] on GitLab)
 
 This module is a merge and improvement of previous modules [Easy Install], [Next],
-[Maintenance] and [Bulk Check].
+[Maintenance], [Bulk Check] and [Generic].
 The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 
 
@@ -309,8 +309,8 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
+[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
-[Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
 [Content Lock]: https://www.drupal.org/project/content_lock
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
