@@ -2,7 +2,6 @@
 
 namespace EasyAdmin\Job;
 
-use Common\Stdlib\PsrMessage;
 use Omeka\Job\AbstractJob;
 
 /**
@@ -38,16 +37,16 @@ class LoopItems extends AbstractJob
         $totalToProcess = $api->search($resourceType, ['limit' => 0])->getTotalResults();
 
         if (empty($totalToProcess)) {
-            $logger->info(new PsrMessage(
+            $logger->info(
                 'No resource to process.' // @translate
-            ));
+            );
             return;
         }
 
-        $logger->info(new PsrMessage(
+        $logger->info(
             'Processing {count} resources.', // @translate
             ['count' => $totalToProcess]
-        ));
+        );
 
         $offset = 0;
         $totalProcessed = 0;
@@ -65,10 +64,10 @@ class LoopItems extends AbstractJob
 
             foreach ($resources as $resource) {
                 if ($this->shouldStop()) {
-                    $logger->warn(new PsrMessage(
+                    $logger->warn(
                         'The job "{name}" was stopped.', // @translate
                         ['name' => 'Loop items']
-                    ));
+                    );
                     break 2;
                 }
 
@@ -88,9 +87,9 @@ class LoopItems extends AbstractJob
             $offset += self::BULK_LIMIT;
         }
 
-        $logger->info(new PsrMessage(
+        $logger->info(
             'End of the job: {count}/{total} processed.', // @translate
             ['count' => $totalProcessed, 'total' => $totalToProcess]
-        ));
+        );
     }
 }
