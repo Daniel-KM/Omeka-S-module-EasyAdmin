@@ -2,7 +2,7 @@
 
 namespace EasyAdmin\Form;
 
-use EasyAdmin\Form\Element as EasyAdminElement;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element as OmekaElement;
@@ -24,7 +24,7 @@ class SettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'easyadmin_interface',
-                'type' => EasyAdminElement\OptionalMultiCheckbox::class,
+                'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'element_group' => 'resources',
                     'label' => 'Elements to display in resources admin pages', // @translate
@@ -65,7 +65,7 @@ class SettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'easyadmin_maintenance_mode',
-                'type' => EasyAdminElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'element_group' => 'maintenance',
                     'label' => 'Set Omeka under maintenance', // @translate

@@ -40,8 +40,6 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\Note::class => Form\Element\Note::class,
-            Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
-            Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [
