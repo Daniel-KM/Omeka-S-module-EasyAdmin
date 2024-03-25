@@ -27,7 +27,6 @@ return [
             'lastBrowsePage' => View\Helper\LastBrowsePage::class,
         ],
         'factories' => [
-            'defaultSite' => Service\ViewHelper\DefaultSiteFactory::class,
             'nextResource' => Service\ViewHelper\NextResourceFactory::class,
             'previousNext' => Service\ViewHelper\PreviousNextFactory::class,
             'previousResource' => Service\ViewHelper\PreviousResourceFactory::class,

@@ -358,6 +358,7 @@ class Module extends AbstractModule
 
         $html = $vars->offsetGet('content');
 
+        // TODO Add public view only when there is no site.
         if ($publicView) {
             $defaultSite = $plugins->get('defaultSite');
             $defaultSiteSlug = $defaultSite('slug');
