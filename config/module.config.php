@@ -7,10 +7,6 @@ return [
         'invokables' => [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
-        'factories' => [
-            'Omeka\File\TempFileFactory' => Service\File\TempFileFactoryFactory::class,
-            'Omeka\File\Validator' => Service\File\ValidatorFactory::class,
-        ],
     ],
     'listeners' => [
         Mvc\MvcListeners::class,
@@ -57,7 +53,6 @@ return [
     'controller_plugins' => [
         'factories' => [
             'easyAdminAddons' => Service\ControllerPlugin\AddonsFactory::class,
-            'specifyMediaType' => Service\ControllerPlugin\SpecifyMediaTypeFactory::class,
         ],
     ],
     // TODO Remove these routes and use main admin/default.
