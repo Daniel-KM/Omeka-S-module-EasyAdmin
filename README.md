@@ -35,7 +35,7 @@ Checks and fixes that are doable:
   Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
 - check and fix sha256 hashes of files
 - check and fix positions of media (start from 1, without missing number)
-- check and set pre^cise media types (for example application/alto+xml instead of text/xml)
+- check and set precise media types (for example application/alto+xml instead of text/xml)
 - check and prepare dimensions of medias for module [Iiif Server]
 - check and fix the encoding (iso-8859 to utf-8) of resource values and page
   contents (fix Windows issues)
@@ -53,6 +53,8 @@ And many more.
 Installation
 ------------
 
+See general end user documentation for [installing a module].
+
 This module requires the module [Common], that should be installed first.
 
 * From the zip
@@ -65,11 +67,7 @@ uncompress it in the `modules` directory.
 If the module was installed from the source, rename the name of the folder of
 the module to `EasyAdmin`.
 
-Uncompress files and rename module folder `EasyAdmin`.
-
 Then install it like any other Omeka module and follow the config instructions.
-
-See general end user documentation for [installing a module].
 
 In some cases, in particular when the server is behind a proxy, a firewall or a
 specific infrastructure, your may need to add credentials in your config (omeka
@@ -302,7 +300,7 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
 [Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
-[Installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [EasyAdmin.zip]: https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
