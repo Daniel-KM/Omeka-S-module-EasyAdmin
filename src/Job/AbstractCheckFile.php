@@ -66,6 +66,7 @@ abstract class AbstractCheckFile extends AbstractCheck
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
+        $empty = $translator->translate('[empty]'); // @translate
 
         $specifyMediaType = $this->getServiceLocator()->get('ControllerPluginManager')->get('specifyMediaType');
 
@@ -159,7 +160,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                                     'filename' => $filename,
                                     'type' => $column,
                                     'real_value' => $realValue,
-                                    'old_value' => $dbValue,
+                                    'old_value' => $dbValue ?: $empty,
                                 ]
                             );
                         }
