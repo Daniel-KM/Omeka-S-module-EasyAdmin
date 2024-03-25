@@ -154,8 +154,8 @@ class Module extends AbstractModule
             return;
         }
 
-        $serviceLocator = $this->getServiceLocator();
-        $t = $serviceLocator->get('MvcTranslator');
+        $services = $this->getServiceLocator();
+        $t = $services->get('MvcTranslator');
         $config = $this->getServiceLocator()->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 

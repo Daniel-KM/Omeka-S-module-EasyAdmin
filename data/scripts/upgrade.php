@@ -2,6 +2,7 @@
 
 namespace EasyAdmin;
 
+use Common\Stdlib\PsrMessage;
 use Omeka\Module\Exception\ModuleCannotInstallException;
 use Omeka\Stdlib\Message;
 
@@ -30,6 +31,14 @@ $entityManager = $services->get('Omeka\EntityManager');
 $config = $services->get('Config');
 $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.54')) {
+    $message = new Message(
+        $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+        'Common', '3.4.54'
+    );
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+}
+
 if (version_compare($oldVersion, '3.3.2', '<')) {
     $this->installDir();
 }
@@ -43,15 +52,18 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
         $connection->executeStatement($sql);
         $container = new \Laminas\Session\Container('EasyInstall');
         unset($container->addons);
-        $message = new Message(
-            'The module replaces the module %s. The upgrade is automatic.', // @translate
-            'Easy Install'
+        $message = new PsrMessage(
+            'The module replaces the module {module}. The upgrade is automatic.', // @translate
+            ['module' => 'Easy Install']
         );
     } else {
-        $message = new Message('It’s now possible to install %1$smodules and themes%2$s.', // @translate
-            // Route easy-admin is not available during upgrade.
-            sprintf('<a href="%s">', $url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons'])),
-            '</a>'
+        $message = new PsrMessage(
+            'It’s now possible to install {link}modules and themes{link_end}.', // @translate
+            [
+                // Route easy-admin is not available during upgrade.
+                'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons'])),
+                'link_end' => '</a>'
+            ]
         );
         $message->setEscapeHtml(false);
     }
@@ -62,7 +74,7 @@ if (version_compare($oldVersion, '3.3.6', '<')) {
     $sqlFile = $this->modulePath() . '/data/install/schema.sql';
     if (!$this->checkNewTablesFromFile($sqlFile)) {
         $translator = $services->get('MvcTranslator');
-        $message = new Message(
+        $message = new PsrMessage(
             $translator->translate('This module cannot install its tables, because they exist already. Try to remove them first.') // @translate
         );
         throw new ModuleCannotInstallException((string) $message);
@@ -71,11 +83,16 @@ if (version_compare($oldVersion, '3.3.6', '<')) {
 
     $settings->set('easyadmin_content_lock', true);
 
-    $message = new Message('A anti-concurrent editing feature has been added: when a user opens a resource for edition, others users cannot edit it until submission.'); // @translate
+    $message = new PsrMessage(
+        'A anti-concurrent editing feature has been added: when a user opens a resource for edition, others users cannot edit it until submission.' // @translate
+    );
     $messenger->addSuccess($message);
-    $message = new Message('This option can be enabled/disabled in %1$smain settings%2$s.', // @translate
-        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
-        '</a>'
+    $message = new PsrMessage(
+        'This option can be enabled/disabled in {link}main settings{link_end}.', // @translate
+        [
+            'iink' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+            'iink_end' => '</a>',
+        ]
     );
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
@@ -84,20 +101,28 @@ if (version_compare($oldVersion, '3.3.6', '<')) {
 if (version_compare($oldVersion, '3.3.7', '<')) {
     $settings->set('easyadmin_content_lock_duration', 86400);
 
-    $message = new Message('The content locks are removed after 24h by default.'); // @translate
+    $message = new PsrMessage('The content locks are removed after 24h by default.'); // @translate
     $messenger->addSuccess($message);
-    $message = new Message('This option can be enabled/disabled in %1$smain settings%2$s.', // @translate
-        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
-        '</a>'
+    $message = new PsrMessage(
+        'This option can be enabled/disabled in {link}main settings{link_end}.', // @translate
+        [
+            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+            'link_end' => '</a>',
+        ]
     );
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 
-    $message = new Message('A task has been added to manage precise xml media types, for example "application/alto+xml" instead of "text/xml".'); // @translate
+    $message = new PsrMessage(
+        'A task has been added to manage precise xml media types, for example "application/alto+xml" instead of "text/xml".' // @translate
+    );
     $messenger->addSuccess($message);
-    $message = new Message('This task can be run via the main %1$smenu%2$s.', // @translate
-        sprintf('<a href="%s">', $url('admin', [], true) . '/easy-admin/check-and-fix#files_database'),
-        '</a>'
+    $message = new PsrMessage(
+        'This task can be run via the main {link}menu{link_end}.', // @translate
+        [
+            'link' => sprintf('<a href="%s">', $url('admin', [], true) . '/easy-admin/check-and-fix#files_database'),
+            'link_end' => '</a>',
+        ]
     );
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
@@ -112,9 +137,9 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
         $connection->executeStatement($sql);
         $container = new \Laminas\Session\Container('BulkCheck');
         unset($container->addons);
-        $message = new Message(
-            'The module replaces the module %s. The upgrade is automatic.', // @translate
-            'Bulk Check'
+        $message = new PsrMessage(
+            'The module replaces the module {module}. The upgrade is automatic.', // @translate
+            ['module' => 'Bulk Check']
         );
         $messenger->addSuccess($message);
     }
@@ -130,14 +155,17 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
     if ($module) {
         $sql = 'DELETE FROM `module` WHERE `id` = "Maintenance";';
         $connection->executeStatement($sql);
-        $message = new Message(
-            'The module replaces the module %s. The upgrade is automatic.', // @translate
-            'Maintenance'
+        $message = new PsrMessage(
+            'The module replaces the module {module}. The upgrade is automatic.', // @translate
+            ['module' => 'Maintenance']
         );
     } else {
-        $message = new Message('It’s now possible to set the site in %1$smaintenance mode%2$s for public or users.', // @translate
-            sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
-            '</a>'
+        $message = new PsrMessage(
+            'It’s now possible to set the site in {link}maintenance mode{link_end} for public or users.', // @translate
+            [
+                'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+                'link_end' => '</a>',
+            ]
         );
         $message->setEscapeHtml(false);
     }
@@ -146,9 +174,12 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
 
 if (version_compare($oldVersion, '3.4.8', '<')) {
     $settings->set('easyadmin_interface', ['resource_public_view']);
-    $message = new Message('An %1$soption%2$s allows to display a link from the resource admin page to the public page.', // @translate
-        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
-        '</a>'
+    $message = new PsrMessage(
+        'An {link}soption{link_end} allows to display a link from the resource admin page to the public page.', // @translate
+        [
+            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+            'link_end' => '</a>'
+        ]
     );
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
@@ -170,9 +201,9 @@ if (version_compare($oldVersion, '3.4.9.2', '<')) {
         $sql = 'DELETE FROM `site_setting` WHERE `id` LIKE "' . strtolower($moduleName) . '_%";';
         $connection->executeStatement($sql);
         if ($module) {
-            $message = new \Omeka\Stdlib\Message(
-                'The module "%1$s" was upgraded by module "%2$s" and uninstalled.', // @translate
-                $module, 'Easy Admin'
+            $message = new PsrMessage(
+                'The module "{module}" was upgraded by module "{module_2}" and uninstalled.', // @translate
+                ['module' => $module, 'module_2' => 'Easy Admin']
             );
             $messenger->addWarning($message);
         }
@@ -181,9 +212,11 @@ if (version_compare($oldVersion, '3.4.9.2', '<')) {
 
 if (version_compare($oldVersion, '3.4.11', '<')) {
     $settings->set('easyadmin_interface', ['resource_public_view']);
-    $message = new Message('An %1$soption%2$s allows to display links to previous and next resources.', // @translate
-        sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
-        '</a>'
+    $message = new PsrMessage('An {link}option{link_end} allows to display links to previous and next resources.', // @translate
+        [
+            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+            'link_end' => '</a>',
+        ]
     );
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
@@ -197,14 +230,14 @@ if (version_compare($oldVersion, '3.4.12', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.13', '<')) {
-    $message = new Message(
+    $message = new PsrMessage(
         'The script for tasks was updated and option `--job` is now passed by default. Check your cron tasks if you use it.' // @translate
     );
     $messenger->addWarning($message);
 }
 
 if (version_compare($oldVersion, '3.4.14', '<')) {
-    $message = new Message(
+    $message = new PsrMessage(
         'New tasks were added to set the primary media of all items and to check resources.' // @translate
     );
     $messenger->addWarning($message);
@@ -213,30 +246,19 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
 if (version_compare($oldVersion, '3.4.15', '<')) {
     if (!$this->checkDestinationDir($basePath . '/backup')) {
         $message = new \Omeka\Stdlib\Message(
-            'The directory "%s" is not writeable.', // @translate
-            $basePath
+            'The directory "{dir}" is not writeable.', // @translate
+            ['dir' => $basePath]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
     }
 
-    $message = new Message(
+    $message = new PsrMessage(
         'A new task allow to backup Omeka installation files (without directory /files).' // @translate
     );
     $messenger->addSuccess($message);
 
-    $message = new Message(
+    $message = new PsrMessage(
         'A new task allow to clear php caches (code and data), in particular after an update or direct modification of code.' // @translate
     );
     $messenger->addSuccess($message);
-}
-
-
-if (version_compare($oldVersion, '3.4.16', '<')) {
-    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.54')) {
-        $message = new Message(
-            $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-            'Common', '3.4.54'
-        );
-        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
-    }
 }
