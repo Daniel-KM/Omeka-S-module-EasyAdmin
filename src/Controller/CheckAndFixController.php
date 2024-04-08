@@ -139,6 +139,10 @@ class CheckAndFixController extends AbstractActionController
             case 'db_log_clean':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbLog::class, $defaultParams + $params['database']['db_log']);
                 break;
+            case 'db_customvocab_missing_itemsets_check':
+            case 'db_customvocab_missing_itemsets_clean':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbCustomVocabMissingItemSets::class, $defaultParams + $params['database']['db_customvocab_missing_itemsets']);
+                break;
             case 'backup_install':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\Backup::class, $defaultParams + $params['backup']['backup_install']);
                 break;

@@ -105,6 +105,12 @@ class CheckAndFixForm extends Form
                 'name' => 'days',
                 'required' => false,
             ]);
+        $inputFilter->get('database')
+            ->get('db_customvocab_missing_itemsets')
+            ->add([
+                'name' => 'mode',
+                'required' => false,
+            ]);
 
         $inputFilter->get('backup')
             ->add([
@@ -483,6 +489,8 @@ class CheckAndFixForm extends Form
                         'db_session_recreate' => 'Remove all sessions (when table is too big)', // @translate
                         'db_log_check' => 'Check the size of the table of logs in database (module Log)', // @translate
                         'db_log_clean' => 'Remove old logs', // @translate
+                        'db_customvocab_missing_itemsets_check' => 'Check if all custom vocabs with item sets have an existing item set', // @translate
+                        'db_customvocab_missing_itemsets_clean' => 'Fix missing item sets of custom vocabs (replace or remove)', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -593,6 +601,37 @@ class CheckAndFixForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'db_log-severity',
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_customvocab_missing_itemsets',
+                'options' => [
+                    'label' => 'Options for custom vocabs', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'db_customvocab_missing_itemsets_check db_customvocab_missing_itemsets_clean',
+                ],
+            ]);
+        $fieldset->get('db_customvocab_missing_itemsets')
+            ->add([
+                'name' => 'mode',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Fix mode', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'replace' => 'Replace by a standard empty custom vocab', // @translate
+                        'remove' => 'Remove the custom vocab', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_customvocab_missing_itemsets-mode',
+                    'required' => false,
+                    'class' => 'db_customvocab_missing_itemsets-mode',
                 ],
             ]);
 
