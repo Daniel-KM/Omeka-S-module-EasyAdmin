@@ -403,8 +403,8 @@ class CheckAndFixForm extends Form
                         'db_resource_invalid_fix' => 'Fix all resources that are not valid', // @translate
                         'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
                         'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
-                        'item_no_value' => 'Check items without value (media values are not checked)', // @translate
-                        'item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
+                        'db_item_no_value' => 'Check items without value (media values are not checked)', // @translate
+                        'db_item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
                         'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
                         'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
                         'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate

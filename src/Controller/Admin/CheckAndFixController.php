@@ -109,9 +109,9 @@ class CheckAndFixController extends AbstractActionController
             case 'db_resource_incomplete_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceIncomplete::class, $defaultParams);
                 break;
-            case 'item_no_value':
-            case 'item_no_value_fix':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\ItemNoValue::class, $defaultParams);
+            case 'db_item_no_value':
+            case 'db_item_no_value_fix':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbItemNoValue::class, $defaultParams);
                 break;
             case 'db_utf8_encode_check':
             case 'db_utf8_encode_fix':

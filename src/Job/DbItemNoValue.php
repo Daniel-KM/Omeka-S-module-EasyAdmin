@@ -4,7 +4,7 @@ namespace EasyAdmin\Job;
 
 use Common\Stdlib\PsrMessage;
 
-class ItemNoValue extends AbstractCheckFile
+class DbItemNoValue extends AbstractCheckFile
 {
     protected $columns = [
         'item' => 'Item', // @translate
@@ -23,7 +23,7 @@ class ItemNoValue extends AbstractCheckFile
 
         $process = $this->getArg('process');
 
-        $this->checkItemNoValue($process === 'item_no_value_fix');
+        $this->checkItemNoValue($process === 'db_item_no_value_fix');
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
