@@ -98,6 +98,10 @@ class CheckAndFixController extends AbstractActionController
             case 'media_position_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\MediaPosition::class, $defaultParams);
                 break;
+            case 'db_resource_invalid_check':
+            case 'db_resource_invalid_fix':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceInvalid::class, $defaultParams);
+                break;
             case 'db_resource_incomplete_check':
             case 'db_resource_incomplete_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceIncomplete::class, $defaultParams);
