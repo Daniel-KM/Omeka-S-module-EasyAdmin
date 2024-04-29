@@ -1,10 +1,73 @@
 {
+    "name": "daniel-km/omeka-s-module-easy-admin",
+    "description": "Module for Omeka S that improves admin interface for curators: install modules and themes, check database and files, simplify bulk upload, block concurrent edition, run cron tasks, use json endpoints.",
+    "type": "library",
+    "license": "CECILL-2.1",
+    "authors": [
+        {
+            "name": "Daniel Berthereau",
+            "email": "Daniel.packagist@Berthereau.net"
+        }
+    ],
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin",
+    "support": {
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/issues",
+        "forum": "https://forum.omeka.org/"
+    },
+    "keywords": [
+        "Omeka S",
+        "module",
+        "admin",
+        "install",
+        "checks",
+        "bulk upload",
+        "curation"
+    ],
+    "require": {
+        "flowjs/flow-php-server": "^1.2",
+        "flowjs/flow.js": "^2.14",
+        "oomphinc/composer-installers-extender": "^2.0"
+    },
     "require-dev": {
         "biblibre/omeka-s-test-helper": "dev-master"
     },
     "autoload-dev": {
         "psr-4": {
             "EasyAdminTest\\": "test/EasyAdminTest/"
+        }
+    },
+   "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "type": "omeka-addon-asset",
+                "name": "flowjs/flow.js",
+                "version": "2.14.1",
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases/download/3.4.18/flow.min.js"
+                }
+            }
+        }
+    ],
+    "extra": {
+        "installer-types": [
+            "omeka-addon-asset"
+        ],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        },
+        "allow-plugins": {
+            "composer/installers": true,
+            "cweagans/composer-patches": true,
+            "oomphinc/composer-installers-extender": true
         }
     }
 }

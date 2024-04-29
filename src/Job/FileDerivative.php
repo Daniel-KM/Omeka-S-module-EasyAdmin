@@ -4,6 +4,10 @@ namespace EasyAdmin\Job;
 
 use Doctrine\Common\Collections\Criteria;
 
+/**
+ * @todo Merge with FileDerivativeBulkUpload?
+ * @see \EasyAdmin\Job\FileDerivativeBulkUpload
+ */
 class FileDerivative extends AbstractCheck
 {
     /**

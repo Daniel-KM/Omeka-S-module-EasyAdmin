@@ -11,6 +11,11 @@ return [
     'listeners' => [
         Mvc\MvcListeners::class,
     ],
+    'media_ingesters' => [
+        'factories' => [
+            'bulk_upload' => Service\MediaIngester\BulkUploadFactory::class,
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
@@ -49,6 +54,11 @@ return [
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
             'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
         ],
+        'factories' => [
+            // Class is not used as key, since it's set dynamically by sub-route
+            // and it should be available in acl (so alias is mapped later).
+            'EasyAdmin\Controller\Upload' => Service\Controller\UploadControllerFactory::class,
+        ],
     ],
     'controller_plugins' => [
         'factories' => [
@@ -83,6 +93,20 @@ return [
                                     ],
                                     'defaults' => [
                                         'controller' => 'CheckAndFix',
+                                        'action' => 'index',
+                                    ],
+                                ],
+                            ],
+                            'upload' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/upload[/:action]',
+                                    'constraints' => [
+                                        'action' => 'index',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'EasyAdmin\Controller',
+                                        'controller' => 'Upload',
                                         'action' => 'index',
                                     ],
                                 ],
@@ -135,6 +159,7 @@ return [
                 'resource_public_view',
                 // 'resource_previous_next',
             ],
+            'easyadmin_allow_empty_files' => false,
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             // Disable content lock by default.

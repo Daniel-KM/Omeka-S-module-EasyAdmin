@@ -41,6 +41,18 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_allow_empty_files',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Allow empty files in manual upload', // @translate
+                    'info' => 'In rare cases, an admin may want to upload empty files. This option requires to disable file validation or to add the media type "application/x-empty" in main settings.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_allow_empty_files',
+                ],
+            ])
+            ->add([
                 'name' => 'easyadmin_addon_notify_version_inactive',
                 'type' => Element\Checkbox::class,
                 'options' => [
