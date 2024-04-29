@@ -201,8 +201,8 @@ class UploadController extends AbstractActionController
             }
         }
 
-        $isEasyAdmin = !empty($headers['X-Is-Easy-Admim']);
-        if ($isEasyAdmin) {
+        $isBulkUploadForm = !empty($headers['X-Is-Bulk-Upload-Form']);
+        if ($isBulkUploadForm) {
             $localPath = $this->settings()->get('easyadmin_local_path');
             if (!$localPath) {
                 return $this->jsonError(
@@ -254,7 +254,7 @@ class UploadController extends AbstractActionController
                 ],
             ],
         ];
-        if ($isEasyAdmin && !empty($fileExists) && !empty($isFileDifferent)) {
+        if ($isBulkUploadForm && !empty($fileExists) && !empty($isFileDifferent)) {
             $output['message'] = $this->translate('An existing file was overridden.'); // @translate
         }
         return new JsonModel($output);

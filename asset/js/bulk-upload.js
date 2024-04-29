@@ -13,9 +13,9 @@
         const maxCountThumbnails = 200;
 
         // Manage the resource form and the bulk upload form.
-        const isEasyAdmin = $('#easy-admin').length === 1;
+        const isBulkUploadForm = $('#bulk-upload').length === 1;
 
-        const bulkUpload =isEasyAdmin
+        const bulkUpload =isBulkUploadForm
             ? $('#bulk-upload').find('.media-bulk-upload')
             : $($('#media-template-bulk_upload').data('template')).find('.media-bulk-upload');
         const allowedMediaTypes = bulkUpload.data('allowed-media-types') ? bulkUpload.data('allowed-media-types').split(',') : [];
@@ -27,7 +27,7 @@
         // @see https://github.com/flowjs/flow.js
         const initFlow = function () {
             // Get the last media in media list, that is the new one.
-            const mediaField = isEasyAdmin
+            const mediaField = isBulkUploadForm
                 ? $('#bulk-upload').find('.media-bulk-upload').last()[0]
                 : $('#media-list').find('.media-bulk-upload').last()[0];
             const wrapper = mediaField.closest('.media-field-wrapper');
@@ -59,7 +59,7 @@
                 permanentErrors: [403, 404, 412, 415, 500, 501],
                 headers: {
                     'X-Csrf': csrf,
-                    'X-Is-Easy-Admin': isEasyAdmin ? '1' : '0',
+                    'X-Is-Bulk-Upload-Form': isBulkUploadForm ? '1' : '0',
                 },
                 // Like default one, but prepend the main index to allow uploading same files multiple times in bulk-uploads.
                 generateUniqueIdentifier: (file) => {
@@ -416,7 +416,7 @@
                 fullProgressWait.style.display = 'none';
                 bulkUploadActions.style.display = 'block';
                 buttonPause.style.display = 'none';
-                if (!isEasyAdmin) {
+                if (!isBulkUploadForm) {
                     submitPartialLabel.style.display = 'none';
                     updateSubmitPartial(wrapper);
                 }
@@ -424,7 +424,7 @@
                 fullProgressWait.style.display = 'block';
                 bulkUploadActions.style.display = 'none';
                 buttonPause.style.removeProperty('display');
-                if (!isEasyAdmin) {
+                if (!isBulkUploadForm) {
                     submitPartialLabel.style.removeProperty('display');
                     updateSubmitPartial(wrapper);
                 }
@@ -454,7 +454,7 @@
         }
 
         function updateSubmitPartial(wrapper) {
-            if (isEasyAdmin) {
+            if (isBulkUploadForm) {
                 return;
             }
             const buttonSubmitPartial = wrapper.getElementsByClassName('submit-partial')[0];
@@ -496,7 +496,7 @@
             return true;
         }
 
-        if (isEasyAdmin) {
+        if (isBulkUploadForm) {
             initFlow();
         } else {
             $('#media-selector').on('click', 'button[type=button][data-media-type=bulk_upload]', initFlow);

@@ -301,6 +301,12 @@ class Module extends AbstractModule
             [$this, 'handleAfterSaveItem'],
             -10
         );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.update.post',
+            [$this, 'handleAfterSaveItem'],
+            -10
+        );
 
         // Content locking in admin board.
         // It is useless in public board, because there is the moderation.

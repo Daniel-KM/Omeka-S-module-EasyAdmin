@@ -146,6 +146,7 @@ return [
                         'controller' => 'upload',
                         'action' => 'files',
                         'resource' => 'EasyAdmin\Controller\Upload',
+                        'class' => 'o-icon- fa-cloud-upload-alt',
                     ],
                 ],
             ],
