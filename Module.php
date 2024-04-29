@@ -182,6 +182,7 @@ class Module extends AbstractModule
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         // Manage buttons in admin resources.
+        // TODO Use Omeka S v4.1 event "view.show.page_actions".
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.layout',
@@ -314,7 +315,7 @@ class Module extends AbstractModule
         }
 
         $controller = $params['__CONTROLLER__'] ?? $params['controller'] ?? '';
-        $controllers = [
+        $controllersToResourceTypes = [
             'item' => 'items',
             'item-set' => 'item_sets',
             'media' => 'media',
@@ -322,7 +323,7 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\ItemSet' => 'item_sets',
             'Omeka\Controller\Admin\Media' => 'media',
         ];
-        if (!isset($controllers[$controller])) {
+        if (!isset($controllersToResourceTypes[$controller])) {
             return;
         }
 
@@ -332,10 +333,14 @@ class Module extends AbstractModule
             return;
         }
 
+        $resourceType = $controllersToResourceTypes[$controller];
+        $controller = array_search($controller, $controllersToResourceTypes);
+
+        $services = $this->getServiceLocator();
         $plugins = $view->getHelperPluginManager();
 
-        $setting = $plugins->get('setting');
-        $interface = $setting('easyadmin_interface') ?: [];
+        $settings = $services->get('Omeka\Settings');
+        $interface = $settings->get('easyadmin_interface') ?: [];
         $publicView = in_array('resource_public_view', $interface);
         $previousNext = in_array('resource_previous_next', $interface);
         if (!$publicView && !$previousNext) {
@@ -343,14 +348,13 @@ class Module extends AbstractModule
         }
 
         /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+        // Normally, the current resource should be present in vars.
         $vars = $view->vars();
         if ($vars->offsetExists('resource')) {
             $resource = $vars->offsetGet('resource');
         } else {
-            // Normally, the current resource should be present in vars.
-            $api = $plugins->get('api');
             try {
-                $resource = $api->read($controllers[$controller], ['id' => $id], ['initialize' => false, 'finalize' => false])->getContent();
+                $resource = $services->get('Omeka\ApiManager')->read($resourceType, ['id' => $id], ['initialize' => false, 'finalize' => false])->getContent();
             } catch (\Exception $e) {
                 return;
             }
@@ -358,24 +362,67 @@ class Module extends AbstractModule
 
         $html = $vars->offsetGet('content');
 
-        // TODO Add public view only when there is no site.
+        // Add public view only when there is no site, since they are added in
+        // Omeka S v4.1 for items. But only for items: so for consistent ux, set
+        // the button in the new place for all resources.
         if ($publicView) {
-            $defaultSite = $plugins->get('defaultSite');
-            $defaultSiteSlug = $defaultSite('slug');
-            if ($defaultSiteSlug) {
-                $url = $resource->siteUrl($defaultSiteSlug);
-                if ($url) {
-                    $linkPublicView = $view->hyperlink(
-                        $view->translate('Public view'), // @translate
-                        $url,
-                        ['class' => 'button', 'target' => '_blank']
-                    );
-                    $html = preg_replace(
-                        '~<div id="page-actions">(.*?)</div>~s',
-                        '<div id="page-actions">' . $linkPublicView . ' $1 ' . '</div>',
-                        $html,
-                        1
-                    );
+            $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
+            $skip = !$isOldOmeka && $resourceType === 'items' && count($resource->sites());
+            if (!$skip) {
+                /** @var \Common\Stdlib\EasyMeta $easyMeta */
+                $url = $plugins->get('url');
+                $translate = $plugins->get('translate');
+                $hyperlink = $plugins->get('hyperlink');
+                $easyMeta = $services->get('EasyMeta');
+                $defaultSite = $plugins->get('defaultSite');
+                $defaultSiteSlug = $defaultSite('slug');
+                $res = $resourceType === 'media' ? $resource->item() : $resource;
+                $sites = $res->sites();
+                if (!count($sites) && $defaultSiteSlug) {
+                    $sites = [$defaultSite()];
+                }
+                if (count($sites)) {
+                    // See application/view/omeka/admin/item/show.phtml.
+                    $translatedCreated = $translate('Created');
+                    $resourceId = $resource->id();
+                    $translatedSites = $translate('Sites'); // @translate
+                    // The class item-sites is kept for css.
+                    $htmlSites = <<<HTML
+    <div class="meta-group $controller-sites item-sites">
+        <h4>$translatedSites</h4>
+
+HTML;
+                    $htmlSite = <<<'HTML'
+        <div class="value">
+            __SITE_TITLE__
+            __RESOURCE_LINK__
+        </div>
+
+HTML;
+                    foreach ($sites as $site) {
+                        $siteTitle = $site->title();
+                        $externalLinkText = new PsrMessage(
+                            'View this {resource_type} in "{site}"', // @translate
+                            ['resource_type' => $easyMeta->resourceLabel($resourceType), 'site' => $siteTitle]
+                        );
+                        $replace = [
+                            '__SITE_TITLE__' => $site->link($siteTitle),
+                            '__RESOURCE_LINK__' => $hyperlink(
+                                '',
+                                $url('site/resource-id', ['site-slug' => $site->slug(), 'controller' => $controller, 'id' => $resourceId]),
+                                ['class' => 'o-icon-external', 'target' => '_blank', 'aria-label' => $externalLinkText, 'title' => $externalLinkText]
+                            ),
+                        ];
+                        $htmlSites .= str_replace(array_keys($replace), array_values($replace), $htmlSite);
+                    }
+                    $htmlSites .= '    </div>' . PHP_EOL;
+
+                    $htmlCreated = <<<HTML
+    <div class="meta-group">
+        <h4>$translatedCreated</h4>
+
+HTML;
+                    $html = str_replace($htmlCreated, $htmlSites . $htmlCreated, $html);
                 }
             }
         }
