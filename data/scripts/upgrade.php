@@ -4,7 +4,6 @@ namespace EasyAdmin;
 
 use Common\Stdlib\PsrMessage;
 use Omeka\Module\Exception\ModuleCannotInstallException;
-use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this
@@ -32,7 +31,7 @@ $config = $services->get('Config');
 $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
 if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.55')) {
-    $message = new Message(
+    $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
         'Common', '3.4.55'
     );

@@ -34,7 +34,7 @@ class DbJob extends AbstractCheck
      */
     protected function checkDbJob($fix = false, $fixAll = false)
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
 SELECT id, pid, status
 FROM job
 WHERE id != :jobid
@@ -57,7 +57,7 @@ SQL;
             $sql = 'SELECT COUNT(id) FROM job';
             $countJobs = $this->connection->executeQuery($sql)->fetchOne();
 
-            $sql = <<<SQL
+            $sql = <<<'SQL'
 UPDATE job
 SET status = "stopped"
 WHERE id != :jobid
@@ -65,7 +65,7 @@ WHERE id != :jobid
 SQL;
             $stopped = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->rowCount();
 
-            $sql = <<<SQL
+            $sql = <<<'SQL'
 UPDATE job
 SET status = "error"
 WHERE id != :jobid

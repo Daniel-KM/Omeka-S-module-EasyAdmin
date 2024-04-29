@@ -29,7 +29,7 @@ return [
         ],
         'delegators' => [
             'Laminas\Form\View\Helper\FormElement' => [
-               Service\Delegator\FormElementDelegatorFactory::class,
+                __NAMESPACE__ => Service\Delegator\FormElementDelegatorFactory::class,
             ],
         ],
     ],
@@ -135,7 +135,7 @@ return [
                 'resource_public_view',
                 // 'resource_previous_next',
             ],
-            // Disable
+            // Disable content lock by default.
             'easyadmin_content_lock' => false,
             // 86400 seconds = 24 hours. 14400 = 4 hours.
             'easyadmin_content_lock_duration' => 14400,

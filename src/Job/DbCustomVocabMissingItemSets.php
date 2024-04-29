@@ -48,7 +48,7 @@ class DbCustomVocabMissingItemSets extends AbstractCheck
     {
         $dbname = $this->connection->getDatabase();
         $table = $this->connection->quote($table);
-        $sql = <<<SQL
+        $sql = <<<'SQL'
 SELECT *
 FROM information_schema.TABLES
 WHERE table_schema = "$dbname"
@@ -66,7 +66,7 @@ SQL;
      */
     protected function checkCustomVocabMissingItemSets(bool $fix = false, bool $remove = false): void
     {
-        $sqlList = <<<SQL
+        $sqlList = <<<'SQL'
 SELECT `custom_vocab`.`id`, `custom_vocab`.`label`
 FROM `custom_vocab`
 LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
@@ -91,8 +91,8 @@ SQL;
         );
 
         if ($fix && $remove) {
-            $sql = <<<SQL
-DELETE `custom_vocab` 
+            $sql = <<<'SQL'
+DELETE `custom_vocab`
 FROM `custom_vocab`
 LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
 WHERE `custom_vocab`.`item_set_id` IS NOT NULL
@@ -106,7 +106,7 @@ SQL;
                 'Missing item sets of custom vocabs were removed.' // @translate
             );
         } elseif ($fix) {
-            $sql = <<<SQL
+            $sql = <<<'SQL'
 UPDATE `custom_vocab`
 LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
 SET
