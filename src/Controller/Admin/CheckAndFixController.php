@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace EasyAdmin\Controller;
+namespace EasyAdmin\Controller\Admin;
 
 use Common\Stdlib\PsrMessage;
 use Laminas\Mvc\Controller\AbstractActionController;

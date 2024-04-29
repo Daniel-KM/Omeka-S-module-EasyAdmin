@@ -45,9 +45,9 @@ return [
     ],
     'controllers' => [
         'invokables' => [
-            'EasyAdmin\Controller\Addons' => Controller\AddonsController::class,
-            'EasyAdmin\Controller\CheckAndFix' => Controller\CheckAndFixController::class,
-            'Omeka\Controller\Maintenance' => Controller\MaintenanceController::class,
+            'EasyAdmin\Controller\Admin\Addons' => Controller\Admin\AddonsController::class,
+            'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
+            'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
         ],
     ],
     'controller_plugins' => [
@@ -65,7 +65,7 @@ return [
                         'options' => [
                             'route' => '/easy-admin',
                             'defaults' => [
-                                '__NAMESPACE__' => 'EasyAdmin\Controller',
+                                '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
                                 '__ADMIN__' => true,
                                 'controller' => 'CheckAndFix',
                                 'action' => 'index',
