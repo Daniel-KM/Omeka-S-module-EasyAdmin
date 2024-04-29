@@ -12,7 +12,6 @@ class CheckAndFixFormFactory implements FactoryInterface
     {
         $form = new CheckAndFIxForm(null, $options ?? []);
         $form->setEventManager($services->get('EventManager'));
-        return $form
-            ->setConnection($services->get('Omeka\Connection'));
+        return $form;
     }
 }

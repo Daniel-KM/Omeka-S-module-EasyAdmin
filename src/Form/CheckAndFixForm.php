@@ -2,7 +2,7 @@
 
 namespace EasyAdmin\Form;
 
-use Doctrine\DBAL\Connection;
+use Common\Form\Element as CommonElement;
 use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\EventManager\Event;
 use Laminas\Form\Element;
@@ -13,11 +13,6 @@ use Omeka\Form\Element as OmekaElement;
 class CheckAndFixForm extends Form
 {
     use EventManagerAwareTrait;
-
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
 
     public function init(): void
     {
@@ -198,8 +193,8 @@ class CheckAndFixForm extends Form
                     'attributes' => [
                         'class' => 'files_missing_fix',
                     ],
-                ]);
-            $fieldset->get('files_missing')
+                ])
+                ->get('files_missing')
                 ->add([
                     'name' => 'source_dir',
                     'type' => Element\Text::class,
@@ -234,8 +229,8 @@ class CheckAndFixForm extends Form
                     'attributes' => [
                         'class' => 'files_derivative',
                     ],
-                ]);
-            $fieldset->get('files_derivative')
+                ])
+                ->get('files_derivative')
                 ->add([
                     'name' => 'item_sets',
                     'type' => OmekaElement\ItemSetSelect::class,
@@ -252,11 +247,10 @@ class CheckAndFixForm extends Form
                 ])
                 ->add([
                     'name' => 'ingesters',
-                    'type' => Element\Select::class,
+                    'type' => CommonElement\MediaIngesterSelect::class,
                     'options' => [
                         'label' => 'Ingesters to process', // @translate
                         'empty_option' => 'All ingesters', // @translate
-                        'value_options' => $this->listIngesters(),
                     ],
                     'attributes' => [
                         'id' => 'files_derivative-ingesters',
@@ -268,11 +262,10 @@ class CheckAndFixForm extends Form
                 ])
                 ->add([
                     'name' => 'renderers',
-                    'type' => Element\Select::class,
+                    'type' => CommonElement\MediaRendererSelect::class,
                     'options' => [
                         'label' => 'Renderers to process', // @translate
                         'empty_option' => 'All renderers', // @translate
-                        'value_options' => $this->listRenderers(),
                     ],
                     'attributes' => [
                         'id' => 'files_derivative-renderers',
@@ -284,11 +277,10 @@ class CheckAndFixForm extends Form
                 ])
                 ->add([
                     'name' => 'media_types',
-                    'type' => Element\Select::class,
+                    'type' => CommonElement\MediaTypeSelect::class,
                     'options' => [
                         'label' => 'Media types to process', // @translate
                         'empty_option' => 'All media types', // @translate
-                        'value_options' => $this->listMediaTypes(),
                     ],
                     'attributes' => [
                         'id' => 'files_derivative-media_types',
@@ -399,7 +391,7 @@ class CheckAndFixForm extends Form
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
                         'db_loop_save' => 'Save all resources, for example to apply new settings via triggers', // @translate
-                        'db_resource_invalid_check' => 'Check if all resources are valid (items as item, etc).', // @translate
+                        'db_resource_invalid_check' => 'Check if all resources are valid (items as item, etc.)', // @translate
                         'db_resource_invalid_fix' => 'Fix all resources that are not valid', // @translate
                         'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
                         'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
@@ -474,8 +466,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'db_utf8_encode_check db_utf8_encode_fix',
                 ],
-            ]);
-        $fieldset->get('db_utf8_encode')
+            ])
+            ->get('db_utf8_encode')
             ->add([
                 'name' => 'type_resources',
                 'type' => Element\MultiCheckbox::class,
@@ -555,8 +547,8 @@ class CheckAndFixForm extends Form
                     'attributes' => [
                         'class' => 'db_content_lock_check db_content_lock_clean',
                     ],
-                ]);
-            $fieldset->get('db_content_lock')
+                ])
+                ->get('db_content_lock')
                 ->add([
                     'name' => 'hours',
                     'type' => Element\Number::class,
@@ -593,8 +585,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'db_session_check db_session_clean',
                 ],
-            ]);
-        $fieldset->get('db_session')
+            ])
+            ->get('db_session')
             ->add([
                 'name' => 'days',
                 'type' => Element\Number::class,
@@ -616,8 +608,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'db_log_check db_log_clean',
                 ],
-            ]);
-        $fieldset->get('db_log')
+            ])
+            ->get('db_log')
             ->add([
                 'name' => 'days',
                 'type' => Element\Number::class,
@@ -659,8 +651,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'db_customvocab_missing_itemsets_check db_customvocab_missing_itemsets_clean',
                 ],
-            ]);
-        $fieldset->get('db_customvocab_missing_itemsets')
+            ])
+            ->get('db_customvocab_missing_itemsets')
             ->add([
                 'name' => 'mode',
                 'type' => Element\Radio::class,
@@ -728,8 +720,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'backup_install',
                 ],
-            ]);
-        $fieldset->get('backup_install')
+            ])
+            ->get('backup_install')
             ->add([
                 'name' => 'include',
                 'type' => Element\MultiCheckbox::class,
@@ -827,8 +819,8 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'class' => 'cache_check cache_fix',
                 ],
-            ]);
-        $fieldset->get('cache_clear')
+            ])
+            ->get('cache_clear')
             ->add([
                 'name' => 'type',
                 'type' => Element\MultiCheckbox::class,
@@ -879,7 +871,7 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
-                        'db_fulltext_index' => 'Index full-text search (core job)', // @translate
+                        'db_fulltext_index' => 'Omeka: Index full-text search', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -889,36 +881,6 @@ class CheckAndFixForm extends Form
                 ],
             ]);
 
-        return $this;
-    }
-
-    protected function listIngesters(): array
-    {
-        $sql = 'SELECT DISTINCT(ingester) FROM media ORDER BY ingester ASC';
-        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
-        return ['' => 'All ingesters'] // @translate
-            + array_combine($result, $result);
-    }
-
-    protected function listRenderers(): array
-    {
-        $sql = 'SELECT DISTINCT(renderer) FROM media ORDER BY renderer ASC';
-        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
-        return ['' => 'All renderers'] // @translate
-            + array_combine($result, $result);
-    }
-
-    protected function listMediaTypes(): array
-    {
-        $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type ASC';
-        $result = $this->connection->executeQuery($sql)->fetchFirstColumn();
-        return ['' => 'All media types'] // @translate
-            + array_combine($result, $result);
-    }
-
-    public function setConnection(Connection $connection): self
-    {
-        $this->connection = $connection;
         return $this;
     }
 }
