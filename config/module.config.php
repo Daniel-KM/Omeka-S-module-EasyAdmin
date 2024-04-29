@@ -12,6 +12,9 @@ return [
         Mvc\MvcListeners::class,
     ],
     'media_ingesters' => [
+        'invokables' => [
+            'bulk_uploaded' => Media\Ingester\BulkUploaded::class,
+        ],
         'factories' => [
             'bulk_upload' => Service\MediaIngester\BulkUploadFactory::class,
         ],

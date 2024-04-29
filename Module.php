@@ -392,6 +392,12 @@ class Module extends AbstractModule
             [$this, 'checkAddonVersions']
         );
 
+        $sharedEventManager->attach(
+            \Omeka\Media\Ingester\Manager::class,
+            'service.registered_names',
+            [$this, 'handleMediaIngesterRegisteredNames']
+        );
+
         // Display a warn before uninstalling.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Module',
@@ -1359,5 +1365,16 @@ HTML;
         $view->headScript()
             ->appendScript($script)
             ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+    }
+
+    /**
+     * Avoid to display ingester in item edit, because it's an internal one.
+     */
+    public function handleMediaIngesterRegisteredNames(Event $event): void
+    {
+        $names = $event->getParam('registered_names');
+        $key = array_search('bulk_uploaded', $names);
+        unset($names[$key]);
+        $event->setParam('registered_names', $names);
     }
 }
