@@ -338,7 +338,7 @@ class UploadController extends AbstractActionController
         return $dirPath;
     }
 
-    protected function cleanTempDirectory()
+    protected function cleanTempDirectory(): void
     {
         if (!$this->tempDir) {
             return;

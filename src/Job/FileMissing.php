@@ -372,7 +372,7 @@ class FileMissing extends AbstractCheckFile
                                     }
                                 }
                                 if (!$hasCopyError) {
-                                    $result = copy($src,$dest);
+                                    $result = copy($src, $dest);
                                     if ($result) {
                                         $row['fixed'] = $yes;
                                         ++$totalSucceed;

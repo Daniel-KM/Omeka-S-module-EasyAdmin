@@ -154,9 +154,7 @@ if (empty($taskName)) {
 
 // TODO Use the plugin manager.
 $omekaModulesPath = OMEKA_PATH . '/modules';
-$modulePaths = array_values(array_filter(array_diff(scandir($omekaModulesPath), ['.', '..']), function ($file) use ($omekaModulesPath) {
-    return is_dir($omekaModulesPath . '/' . $file);
-}));
+$modulePaths = array_values(array_filter(array_diff(scandir($omekaModulesPath), ['.', '..']), fn ($file) => is_dir($omekaModulesPath . '/' . $file)));
 // Short task name.
 if (strpos($taskName, '\\') === false) {
     foreach ($modulePaths as $modulePath) {

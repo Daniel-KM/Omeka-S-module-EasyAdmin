@@ -172,11 +172,11 @@ class CheckAndFixController extends AbstractActionController
                 ]);
                 $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
                 $jobClass = $args['job'];
-                 if ($jobClass) {
-                     $job = $dispatcher->dispatch($jobClass, $args['args']);
-                 } else {
-                     $job = null;
-                     $this->messenger()->addError(new PsrMessage(
+                if ($jobClass) {
+                    $job = $dispatcher->dispatch($jobClass, $args['args']);
+                } else {
+                    $job = null;
+                    $this->messenger()->addError(new PsrMessage(
                         'Unknown process "{process}"', // @translate
                         ['process' => $process]
                     ));
@@ -198,7 +198,7 @@ class CheckAndFixController extends AbstractActionController
                     'link_log' => sprintf(
                         '<a href="%s">',
                         htmlspecialchars($urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
-                    )
+                    ),
                 ]
             );
             $message->setEscapeHtml(false);

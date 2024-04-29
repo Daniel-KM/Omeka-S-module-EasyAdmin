@@ -2,8 +2,6 @@
 
 namespace EasyAdmin\Job;
 
-use Omeka\Job\AbstractJob;
-
 /**
  * Update all items, so all modules that use api events are triggered.
  *

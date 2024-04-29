@@ -150,8 +150,7 @@ trait ZipTrait
             $filterIterator = new RecursiveCallbackFilterIterator(
                 $directoryIterator,
                 function (SplFileInfo $file, string $filepath, RecursiveDirectoryIterator $iterator)
-                use ($excludedDirs, $excludedFiles, $excludedDirsRegex, $skipHidden, $skipZip)
-                : bool {
+                    use ($excludedDirs, $excludedFiles, $excludedDirsRegex, $skipHidden, $skipZip): bool {
                     $filename = $file->getFilename();
                     if ($skipHidden && mb_substr($filename, 0, 1) === '.') {
                         return false;
@@ -160,7 +159,7 @@ trait ZipTrait
                     } elseif ($file->isFile()) {
                         return $file->isReadable()
                             && !in_array($filepath, $excludedFiles);
-                     } elseif ($file->isDir()) {
+                    } elseif ($file->isDir()) {
                         return $file->isExecutable()
                             && $file->isReadable()
                             && !in_array($filepath, $excludedDirs)
@@ -215,18 +214,16 @@ trait ZipTrait
             $this->logger->info(
                 'Backup to process: {total_dirs} dirs, {total_files} files, size: {total_size} bytes.', // @translate
                 [
-                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
-                    'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
-                    'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
+                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', "\u{202f}"),
+                    'total_files' => number_format((int) $result['total_files'], 0, ',', "\u{202f}"),
+                    'total_size' => number_format((int) $result['total_size'], 0, ',', "\u{202f}"),
                 ]
             );
 
             if (method_exists($zip, 'registerCancelCallback')) {
-                $zip->registerCancelCallback(function () {
-                    return $this->shouldStop() ? -1 : 0;
-                });
+                $zip->registerCancelCallback(fn () => $this->shouldStop() ? -1 : 0);
 
-                $zip->registerProgressCallback(0.1, function ($rate) {
+                $zip->registerProgressCallback(0.1, function ($rate): void {
                     $this->logger->info(
                         'Backup in progress: {percent}', // @translate
                         ['percent' => $rate * 100]

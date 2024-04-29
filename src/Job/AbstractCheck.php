@@ -19,7 +19,7 @@ abstract class AbstractCheck extends AbstractJob
 
     /**
      * Max number of rows to output in spreadsheet.
-     * @var integer
+     * @var int
      */
     const SPREADSHEET_ROW_LIMIT = 1000000;
 

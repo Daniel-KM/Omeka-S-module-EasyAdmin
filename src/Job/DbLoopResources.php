@@ -87,7 +87,7 @@ class DbLoopResources extends AbstractJob
 
         if (empty($totalToProcess)) {
             $this->logger->info(
-                'No {resource_type} to process.' // @translate
+                'No {resource_type} to process.', // @translate
                 ['resource_type' => $this->easyMeta->resourceLabel($resourceType)]
             );
             return;

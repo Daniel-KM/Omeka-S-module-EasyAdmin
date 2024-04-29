@@ -102,7 +102,7 @@ SQL;
                             'Media #{media_id}: Original file "{filename}" was missing.', // @translate
                             ['media_id' => $media->getId(), 'filename' => $filename]
                         );
-                        $row['note'] .= $message ."\n";
+                        $row['note'] .= $message . "\n";
                         $this->logger->err($message->getMessage(), $message->getContext());
                     } else {
                         // Creation of a folder is required for module ArchiveRepertory
@@ -126,14 +126,14 @@ SQL;
                                 'Media #{media_id}: Original file "{filename}" was moved.', // @translate
                                 ['media_id' => $media->getId(), 'filename' => $filename]
                             );
-                            $row['note'] .= $message ."\n";
+                            $row['note'] .= $message . "\n";
                             $this->logger->notice($message->getMessage(), $message->getContext());
                         } else {
                             $message = new PsrMessage(
                                 'Media #{media_id}: Original file "{filename}" cannot be moved.', // @translate
                                 ['media_id' => $media->getId(), 'filename' => $filename]
                             );
-                            $row['note'] .= $message ."\n";
+                            $row['note'] .= $message . "\n";
                             $this->logger->err($message->getMessage(), $message->getContext());
                             $row['fixed'] = $no;
                             $this->writeRow($row);

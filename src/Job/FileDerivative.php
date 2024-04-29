@@ -347,8 +347,6 @@ DQL;
             : explode(' ', $clean($ids));
 
         // Skip empty ranges, fake ranges  and ranges with multiple "-".
-        return array_values(array_filter($ids, function ($v) {
-            return !empty($v) && $v !== '-' && substr_count($v, '-') <= 1;
-        }));
+        return array_values(array_filter($ids, fn ($v) => !empty($v) && $v !== '-' && substr_count($v, '-') <= 1));
     }
 }

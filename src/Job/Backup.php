@@ -200,7 +200,7 @@ class Backup extends AbstractCheck
         }
 
         if (!in_array('modules', $include)) {
-            $exclude[] ='modules/';
+            $exclude[] = 'modules/';
         }
 
         if (!in_array('themes', $include)) {
@@ -208,7 +208,7 @@ class Backup extends AbstractCheck
         }
 
         if (!in_array('files', $include)) {
-            $exclude[] ='files/';
+            $exclude[] = 'files/';
         }
 
         if (!in_array('logs', $include)) {

@@ -32,7 +32,7 @@ class DbJob extends AbstractCheck
      * @param bool $fix
      * @param bool $fixAll
      */
-    protected function checkDbJob($fix = false, $fixAll = false)
+    protected function checkDbJob($fix = false, $fixAll = false): void
     {
         $sql = <<<'SQL'
 SELECT id, pid, status
@@ -95,9 +95,7 @@ SQL;
             'The following {count} jobs are dead: {job_ids}.', // @translate
             [
                 'count' => count($result),
-                'job_ids' => implode(', ', array_map(function ($v) {
-                    return '#' . $v['id'];
-                }, $result)),
+                'job_ids' => implode(', ', array_map(fn ($v) => '#' . $v['id'], $result)),
             ]
         );
 

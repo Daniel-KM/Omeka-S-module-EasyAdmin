@@ -61,7 +61,7 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
             [
                 // Route easy-admin is not available during upgrade.
                 'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons'])),
-                'link_end' => '</a>'
+                'link_end' => '</a>',
             ]
         );
         $message->setEscapeHtml(false);
@@ -177,7 +177,7 @@ if (version_compare($oldVersion, '3.4.8', '<')) {
         'An {link}soption{link_end} allows to display a link from the resource admin page to the public page.', // @translate
         [
             'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
-            'link_end' => '</a>'
+            'link_end' => '</a>',
         ]
     );
     $message->setEscapeHtml(false);

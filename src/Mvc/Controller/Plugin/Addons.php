@@ -332,9 +332,7 @@ class Addons extends AbstractPlugin
             return [];
         }
 
-        $list = array_filter(array_diff(scandir($dir), ['.', '..']), function ($file) use ($dir) {
-            return is_dir($dir . DIRECTORY_SEPARATOR . $file);
-        });
+        $list = array_filter(array_diff(scandir($dir), ['.', '..']), fn ($file) => is_dir($dir . DIRECTORY_SEPARATOR . $file));
 
         $dirs[$dir] = $list;
         return $dirs[$dir];

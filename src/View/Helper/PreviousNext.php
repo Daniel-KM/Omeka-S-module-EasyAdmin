@@ -38,16 +38,16 @@ class PreviousNext extends AbstractHelper
         $options['back'] = !empty($options['back']);
         $options['source_query'] = $options['source_query']
             ?? (empty($options['query']) ? 'session' : null);
-        $options['query'] = $options['query'] ?? null;
+        $options['query'] ??= null;
         $asArray = !empty($options['as_array']);
         unset($options['as_array']);
 
         $query = $this->getQuery($resourceName, $options['source_query'], $options['query']);
 
         if ($options['source_query'] === 'session') {
-            $lastBrowseUrl = $options['back'] || $asArray? $view->lastBrowsePage() : null;
+            $lastBrowseUrl = $options['back'] || $asArray ? $view->lastBrowsePage() : null;
         } else {
-            $lastBrowseUrl = $options['back'] || $asArray? $view->url($this->site ? 'site/resource' : 'admin/default', ['action' => ''], [], true) : null;
+            $lastBrowseUrl = $options['back'] || $asArray ? $view->url($this->site ? 'site/resource' : 'admin/default', ['action' => ''], [], true) : null;
         }
 
         // TODO Manage query for media.
@@ -58,7 +58,7 @@ class PreviousNext extends AbstractHelper
             $next = $this->nextMedia($resource);
         } else {
             [$previous, $next] = $this->getPreviousAndNextResourceIds($resource, $query);
-            $previous =  $previous
+            $previous = $previous
                 ? $view->api()->read($resourceName, ['id' => $previous])->getContent()
                 : null;
             $next = $next

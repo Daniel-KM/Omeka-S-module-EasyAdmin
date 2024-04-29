@@ -77,7 +77,7 @@ class DbContentLock extends AbstractCheck
         }
 
         if ($fix) {
-            $sql = str_replace ('SELECT COUNT(id) FROM', 'DELETE FROM', $sql);
+            $sql = str_replace('SELECT COUNT(id) FROM', 'DELETE FROM', $sql);
             $count = $this->connection->executeStatement($sql, $bind, $types);
             if ($userIds) {
                 $this->logger->notice(

@@ -90,7 +90,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
                 } else {
                     $this->logger->notice(
                         'Job stopped: {processed}/{total} processed.', // @translate
-                        ['processed' => $totalProcessed, 'total' => $totalToProcess, ]
+                        ['processed' => $totalProcessed, 'total' => $totalToProcess]
                     );
                 }
                 $this->logger->warn(
@@ -141,7 +141,7 @@ class FileMediaNoOriginal extends AbstractCheckFile
         } else {
             $this->logger->notice(
                 'End of process: {processed}/{total} processed.', // @translate
-                ['processed' => $totalProcessed, 'total' => $totalToProcess, ]
+                ['processed' => $totalProcessed, 'total' => $totalToProcess]
             );
         }
 

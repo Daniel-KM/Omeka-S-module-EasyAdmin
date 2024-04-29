@@ -9,7 +9,7 @@ use Omeka\Permissions\Acl;
 
 class MvcListeners extends AbstractListenerAggregate
 {
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,

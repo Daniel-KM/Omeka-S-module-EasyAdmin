@@ -3,8 +3,8 @@
 namespace EasyAdmin\Form;
 
 use Common\Form\Element as CommonElement;
-use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
@@ -179,139 +179,139 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'files_checkfix-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
-            $fieldset
-                ->add([
-                    'type' => Fieldset::class,
-                    'name' => 'files_missing',
-                    'options' => [
-                        'label' => 'Options for fix missing files', // @translate
-                    ],
-                    'attributes' => [
-                        'class' => 'files_missing_fix',
-                    ],
-                ])
-                ->get('files_missing')
-                ->add([
-                    'name' => 'source_dir',
-                    'type' => Element\Text::class,
-                    'options' => [
-                        'label' => 'Source for restoration', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_missing-source_dir',
-                        'placeholder' => '/server/path/to/my/source/directory', // @translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'extensions',
-                    'type' => Element\Text::class,
-                    'options' => [
-                        'label' => 'Limit to extensions', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_missing-extensions',
-                        'placeholder' => 'pdf, jpeg', // @translate
-                    ],
-                ])
-            ;
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'files_missing',
+                'options' => [
+                    'label' => 'Options for fix missing files', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'files_missing_fix',
+                ],
+            ])
+            ->get('files_missing')
+            ->add([
+                'name' => 'source_dir',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Source for restoration', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-source_dir',
+                    'placeholder' => '/server/path/to/my/source/directory', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'extensions',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Limit to extensions', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-extensions',
+                    'placeholder' => 'pdf, jpeg', // @translate
+                ],
+            ])
+        ;
 
-            $fieldset
-                ->add([
-                    'type' => Fieldset::class,
-                    'name' => 'files_derivative',
-                    'options' => [
-                        'label' => 'Options to rebuild derivative files (thumbnails)', // @translate
-                    ],
-                    'attributes' => [
-                        'class' => 'files_derivative',
-                    ],
-                ])
-                ->get('files_derivative')
-                ->add([
-                    'name' => 'item_sets',
-                    'type' => OmekaElement\ItemSetSelect::class,
-                    'options' => [
-                        'label' => 'Item sets', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-item_sets',
-                        'class' => 'chosen-select',
-                        'multiple' => true,
-                        'required' => false,
-                        'data-placeholder' => 'Select one or more item sets…', // @translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'ingesters',
-                    'type' => CommonElement\MediaIngesterSelect::class,
-                    'options' => [
-                        'label' => 'Ingesters to process', // @translate
-                        'empty_option' => 'All ingesters', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-ingesters',
-                        'class' => 'chosen-select',
-                        'multiple' => true,
-                        'placeholder' => 'Select ingesters to process', // @ translate
-                        'data-placeholder' => 'Select ingesters to process', // @ translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'renderers',
-                    'type' => CommonElement\MediaRendererSelect::class,
-                    'options' => [
-                        'label' => 'Renderers to process', // @translate
-                        'empty_option' => 'All renderers', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-renderers',
-                        'class' => 'chosen-select',
-                        'multiple' => true,
-                        'placeholder' => 'Select renderers to process', // @ translate
-                        'data-placeholder' => 'Select renderers to process', // @ translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'media_types',
-                    'type' => CommonElement\MediaTypeSelect::class,
-                    'options' => [
-                        'label' => 'Media types to process', // @translate
-                        'empty_option' => 'All media types', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-media_types',
-                        'class' => 'chosen-select',
-                        'multiple' => true,
-                        'placeholder' => 'Select media types to process', // @ translate
-                        'data-placeholder' => 'Select media types to process', // @ translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'media_ids',
-                    'type' => Element\Text::class,
-                    'options' => [
-                        'label' => 'Media ids', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-media_ids',
-                        'placeholder' => '2-6 8 38-52 80-', // @ translate
-                    ],
-                ])
-                ->add([
-                    'name' => 'original_without_thumbnails',
-                    'type' => Element\Checkbox::class,
-                    'options' => [
-                        'label' => 'Only originals without thumbnails', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'files_derivative-original_without_thumbnails',
-                    ],
-                ])
-            ;
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'files_derivative',
+                'options' => [
+                    'label' => 'Options to rebuild derivative files (thumbnails)', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'files_derivative',
+                ],
+            ])
+            ->get('files_derivative')
+            ->add([
+                'name' => 'item_sets',
+                'type' => OmekaElement\ItemSetSelect::class,
+                'options' => [
+                    'label' => 'Item sets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-item_sets',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'required' => false,
+                    'data-placeholder' => 'Select one or more item sets…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'ingesters',
+                'type' => CommonElement\MediaIngesterSelect::class,
+                'options' => [
+                    'label' => 'Ingesters to process', // @translate
+                    'empty_option' => 'All ingesters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-ingesters',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'placeholder' => 'Select ingesters to process', // @ translate
+                    'data-placeholder' => 'Select ingesters to process', // @ translate
+                ],
+            ])
+            ->add([
+                'name' => 'renderers',
+                'type' => CommonElement\MediaRendererSelect::class,
+                'options' => [
+                    'label' => 'Renderers to process', // @translate
+                    'empty_option' => 'All renderers', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-renderers',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'placeholder' => 'Select renderers to process', // @ translate
+                    'data-placeholder' => 'Select renderers to process', // @ translate
+                ],
+            ])
+            ->add([
+                'name' => 'media_types',
+                'type' => CommonElement\MediaTypeSelect::class,
+                'options' => [
+                    'label' => 'Media types to process', // @translate
+                    'empty_option' => 'All media types', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-media_types',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'placeholder' => 'Select media types to process', // @ translate
+                    'data-placeholder' => 'Select media types to process', // @ translate
+                ],
+            ])
+            ->add([
+                'name' => 'media_ids',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Media ids', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-media_ids',
+                    'placeholder' => '2-6 8 38-52 80-', // @ translate
+                ],
+            ])
+            ->add([
+                'name' => 'original_without_thumbnails',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Only originals without thumbnails', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-original_without_thumbnails',
+                ],
+            ])
+        ;
 
         return $this;
     }
@@ -358,7 +358,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'files_database-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
@@ -410,7 +410,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'resource_values-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
@@ -533,47 +533,47 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'database-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
-            $fieldset
-                ->add([
-                    'type' => Fieldset::class,
-                    'name' => 'db_content_lock',
-                    'options' => [
-                        'label' => 'Options to remove content locks', // @translate
-                    ],
-                    'attributes' => [
-                        'class' => 'db_content_lock_check db_content_lock_clean',
-                    ],
-                ])
-                ->get('db_content_lock')
-                ->add([
-                    'name' => 'hours',
-                    'type' => Element\Number::class,
-                    'options' => [
-                        'label' => 'Older than this number of hours', // @translate
-                    ],
-                    'attributes' => [
-                        'id' => 'db_content_lock-hours',
-                    ],
-                ])
-                ->add([
-                    'name' => 'user_id',
-                    'type' => OmekaElement\UserSelect::class,
-                    'options' => [
-                        'label' => 'Belonging to these users', // @translate
-                        'empty_option' => '',
-                    ],
-                    'attributes' => [
-                        'id' => 'db_content_lock-user_id',
-                        'multiple' => true,
-                        'required' => false,
-                        'class' => 'chosen-select',
-                        'data-placeholder' => 'Select users…', // @translate
-                    ],
-                ]);
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_content_lock',
+                'options' => [
+                    'label' => 'Options to remove content locks', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'db_content_lock_check db_content_lock_clean',
+                ],
+            ])
+            ->get('db_content_lock')
+            ->add([
+                'name' => 'hours',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Older than this number of hours', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'db_content_lock-hours',
+                ],
+            ])
+            ->add([
+                'name' => 'user_id',
+                'type' => OmekaElement\UserSelect::class,
+                'options' => [
+                    'label' => 'Belonging to these users', // @translate
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'db_content_lock-user_id',
+                    'multiple' => true,
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select users…', // @translate
+                ],
+            ]);
 
         $fieldset
             ->add([
@@ -706,7 +706,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'backup-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
@@ -805,7 +805,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'cache-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
@@ -877,7 +877,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'module_tasks-process',
                     'required' => false,
-                    'class' => 'fieldset-process'
+                    'class' => 'fieldset-process',
                 ],
             ]);
 
