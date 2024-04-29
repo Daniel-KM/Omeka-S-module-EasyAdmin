@@ -892,6 +892,12 @@ HTML;
 
     public function checkAddonVersions(Event $event): void
     {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        if (!$settings->get('version_notifications')) {
+            return;
+        }
+
         $view = $event->getTarget();
         $view->headScript()
             ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
