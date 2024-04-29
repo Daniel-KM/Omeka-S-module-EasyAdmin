@@ -23,6 +23,7 @@ $url = $services->get('ViewHelperManager')->get('url');
 $api = $plugins->get('api');
 $settings = $services->get('Omeka\Settings');
 $translate = $plugins->get('translate');
+$translator = $services->get('MvcTranslator');
 $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
@@ -72,7 +73,6 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
 if (version_compare($oldVersion, '3.3.6', '<')) {
     $sqlFile = $this->modulePath() . '/data/install/schema.sql';
     if (!$this->checkNewTablesFromFile($sqlFile)) {
-        $translator = $services->get('MvcTranslator');
         $message = new PsrMessage(
             $translator->translate('This module cannot install its tables, because they exist already. Try to remove them first.') // @translate
         );
@@ -144,7 +144,7 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
     }
 
     $maintenanceStatus = $settings->get('maintenance_status', false) ? 'no' : 'public';
-    $maintenanceText = $settings->get('maintenance_text') ?: $services->get('MvcTranslator')->translate('This site is down for maintenance. Please contact the site administrator for more information.'); // @translate
+    $maintenanceText = $settings->get('maintenance_text') ?: $translate('This site is down for maintenance. Please contact the site administrator for more information.'); // @translate
     $settings->set('easyadmin_maintenance_status', $maintenanceStatus);
     $settings->set('easyadmin_maintenance_text', $maintenanceText); // @translate
 
@@ -248,16 +248,52 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
             'The directory "{dir}" is not writeable.', // @translate
             ['dir' => $basePath]
         );
-        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 
     $message = new PsrMessage(
-        'A new task allow to backup Omeka installation files (without directory /files).' // @translate
+        'A new task allows to backup Omeka installation files (without directory /files).' // @translate
     );
     $messenger->addSuccess($message);
 
     $message = new PsrMessage(
-        'A new task allow to clear php caches (code and data), in particular after an update or direct modification of code.' // @translate
+        'A new task allows to clear php caches (code and data), in particular after an update or direct modification of code.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.18', '<')) {
+    $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/preload');
+    $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
+    $settings->set('easyadmin_addon_notify_version_inactive', true);
+    $settings->set('easyadmin_addon_notify_version_dev', false);
+
+    if (!$this->checkDestinationDir($settings->get('easyadmin_local_path'))) {
+        $message = new PsrMessage(
+            'The directory "{dir}" is not writeable.', // @translate
+            ['dir' => $basePath]
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+    }
+
+    $message = new PsrMessage(
+        'A new task allows to loop resources, for example to manage a new setting in template or in parameters via triggers.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'It is now possible to bulk upload files without any server limit (file size, post size, number of files) in item form and in a separate form (feature moved from module {link_module}Bulk Import{link_end}, fix {link_github}omeka/omeka-s #1785{link_end}).', // @translate
+        [
+            'link_module' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport" target="_blank" rel="noopener">',
+            'link_end' => '</a>',
+            'link_github' => '<a href="https://github.com/omeka/omeka-s/issues/1785" target="_blank" rel="noopener">',
+        ]
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new option allows to notify new version of inactive modules.' // @translate
     );
     $messenger->addSuccess($message);
 }

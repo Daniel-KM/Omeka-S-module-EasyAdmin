@@ -114,6 +114,12 @@ class Module extends AbstractModule
         }
 
         $this->installDir();
+
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $settings = $services->get('Omeka\Settings');
+        $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/preload');
+        $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
     }
 
     protected function installDir(): void
