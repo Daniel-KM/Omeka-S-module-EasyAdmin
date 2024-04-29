@@ -838,7 +838,6 @@ class CheckAndFixForm extends Form
                     'value_options' => [
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
                         'db_statistics_index' => 'Index statistics (module Statistics, needed only after direct import)', // @translate
-                        'db_thesaurus_index' => 'Index thesaurus (module Thesaurus)', // @translate
                     ],
                 ],
                 'attributes' => [

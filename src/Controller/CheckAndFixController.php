@@ -162,9 +162,6 @@ class CheckAndFixController extends AbstractActionController
             case 'db_statistics_index':
                 $job = $dispatcher->dispatch(\Statistics\Job\AggregateHits::class);
                 break;
-            case 'db_thesaurus_index':
-                $job = $dispatcher->dispatch(\Thesaurus\Job\Indexing::class);
-                break;
             default:
                 $eventManager = $this->getEventManager();
                 $args = $eventManager->prepareArgs([
