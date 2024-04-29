@@ -102,6 +102,9 @@ class CheckAndFixController extends AbstractActionController
             case 'db_resource_invalid_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceInvalid::class, $defaultParams);
                 break;
+            case 'db_loop_save':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbLoopResources::class, $defaultParams + $params['resource_values']['db_loop_save']);
+                break;
             case 'db_resource_incomplete_check':
             case 'db_resource_incomplete_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceIncomplete::class, $defaultParams);

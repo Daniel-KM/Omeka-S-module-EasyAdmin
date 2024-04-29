@@ -24,11 +24,6 @@ abstract class AbstractCheck extends AbstractJob
     const SPREADSHEET_ROW_LIMIT = 1000000;
 
     /**
-     * @var \Laminas\Log\Logger
-     */
-    protected $logger;
-
-    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
@@ -37,6 +32,11 @@ abstract class AbstractCheck extends AbstractJob
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
+
+    /**
+     * @var \Laminas\Log\Logger
+     */
+    protected $logger;
 
     /**
      * @var \Doctrine\DBAL\Connection
@@ -56,17 +56,17 @@ abstract class AbstractCheck extends AbstractJob
     /**
      * @var \Doctrine\ORM\EntityRepository
      */
-    protected $resourceRepository;
-
-        /**
-     * @var \Doctrine\ORM\EntityRepository
-     */
     protected $itemRepository;
 
     /**
      * @var \Doctrine\ORM\EntityRepository
      */
     protected $mediaRepository;
+
+    /**
+     * @var \Doctrine\ORM\EntityRepository
+     */
+    protected $resourceRepository;
 
     /**
      * @var array

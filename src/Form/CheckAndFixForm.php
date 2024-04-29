@@ -398,6 +398,7 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
+                        'db_loop_save' => 'Save all resources, for example to apply new settings via triggers', // @translate
                         'db_resource_invalid_check' => 'Check if all resources are valid (items as item, etc).', // @translate
                         'db_resource_invalid_fix' => 'Fix all resources that are not valid', // @translate
                         'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
@@ -418,6 +419,36 @@ class CheckAndFixForm extends Form
                     'id' => 'resource_values-process',
                     'required' => false,
                     'class' => 'fieldset-process'
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_loop_save',
+                'options' => [
+                    'label' => 'Options to loop resources', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'db_loop_save',
+                ],
+            ])
+            ->get('db_loop_save')
+            ->add([
+                'name' => 'resource_types',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'label' => 'Types of resources to process', // @translate
+                    'value_options' => [
+                        'items' => 'Items', // @translate
+                        'item_sets' => 'Item sets', // @translate
+                        'media' => 'Medias', // @translate
+                        'value_annotations' => 'Value annotations', // @translate
+                        'annotations' => 'Annotations', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_loop_save-resource_types',
                 ],
             ]);
 
