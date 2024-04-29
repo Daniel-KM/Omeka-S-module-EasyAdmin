@@ -8,15 +8,16 @@ Easy Admin (module for Omeka S)
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
 admin interface:
 
-- buttons to public view and previous/next resources in admin resource show page;
-- content lock to avoid concurrent edition;
-- install modules;
-- update modules (in a future version);
-- maintenance state for public and admin even when no migration;
-- checks database and files;
-- backup install;
-- clear php caches;
-- launch simple tasks, that can be any job of any module.
+- bulk upload multiple files in item form, bypassing any server post limits
+- buttons to public view and previous/next resources in admin resource show page
+- content lock to avoid concurrent edition
+- install modules
+- update modules (in a future version)
+- maintenance state for public and admin even when no migration
+- checks database and files
+- backup install
+- clear php caches
+- launch simple tasks, that can be any job of any module
 
 Checks and fixes that are doable:
 
@@ -46,6 +47,7 @@ Checks and fixes that are doable:
 - check the size of the database table of logs and remove them
 - backup install
 - clear php caches
+- loop resources, for example to update them when a new settings is set
 
 And many more.
 
@@ -76,18 +78,6 @@ file "config/local.config.php"), depending on your linux distribution:
 ```php
     'http_client' => [
         // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
-        'sslcapath' => '/usr/local/etc/ssl/certs/',
-        'sslcafile' => 'ca.crt',
-        // 'sslcapath' => '/etc/pki/tls/certs/',
-        // 'sslcafile' => 'ca-bundle.crt',
-    ],
-```
-
-In some cases, the path should be absolute:
-
-```php
-    'http_client' => [
-        // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
         'sslcapath' => '/usr/local/etc/ssl/certs',
         'sslcafile' => '/usr/local/etc/ssl/certs/ca.crt',
         // 'sslcapath' => '/etc/pki/tls/certs',
@@ -95,11 +85,30 @@ In some cases, the path should be absolute:
     ],
 ```
 
-You can find more information on the params in [Laminas help].
+In some cases, the path should be relative:
+
+```php
+    'http_client' => [
+        // 'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
+        'sslcapath' => '/usr/local/etc/ssl/certs/',
+        'sslcafile' => 'ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs/',
+        // 'sslcafile' => 'ca-bundle.crt',
+    ],
+```
+
+You can find more information on the params in [Laminas help] and [curl].
 
 
 Usage
 -----
+
+### Bulk Upload in item form and in separate form
+
+The module adds a way to bulk upload files manually without limit of [size or number of files]
+in resource form and via a separate bulk upload form for future imports.
+
+Simply select "Files" in the media list in item form.
 
 ### Buttons in resource page
 
@@ -109,6 +118,9 @@ The option can be enabled in main settings.
 
 Display a button "Public view" in resource show pages. The link is the resource
 page of  the default user site or the default site.
+
+This feature has been integrated partially in Omeka S v4.1, but only for items
+integrated in a site, not for item sets or media.
 
 #### Buttons to previous next resources
 
@@ -302,7 +314,9 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [EasyAdmin.zip]: https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases
+[size or number of files]: https://github.com/omeka/omeka-s/issues/1785
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
+[curl]: https://curl.se/libcurl/c/curl_easy_setopt.html
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
 [Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
