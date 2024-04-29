@@ -69,15 +69,21 @@ class DbLoopResources extends AbstractJob
             ['resource_types' => explode(', ', $resourceTypes)]
         );
 
+        $query = [];
+        $queryArg = $this->getArg('query');
+        if ($queryArg) {
+            parse_str(ltrim((string) $queryArg, "? \t\n\r\0\x0B"), $query);
+        }
+
         foreach ($resourceTypes as $resourceType) {
-            $this->processLoop($resourceType);
+            $this->processLoop($resourceType, $query ?: []);
         }
     }
 
-    protected function processLoop(string $resourceType): void
+    protected function processLoop(string $resourceType, array $query): void
     {
         // Don't load entities if the only information needed is total results.
-        $totalToProcess = $this->api->search($resourceType)->getTotalResults();
+        $totalToProcess = $this->api->search($resourceType, $query)->getTotalResults();
 
         if (empty($totalToProcess)) {
             $this->logger->info(

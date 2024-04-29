@@ -450,6 +450,18 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'db_loop_save-resource_types',
                 ],
+            ])
+            ->add([
+                'name' => 'query',
+                'type' => OmekaElement\Query::class,
+                'options' => [
+                    'label' => 'Query to limit resources to process', // @translate
+                    'info' => 'It is not recommended to use the query when multiple resource types are selected.', // @translate
+                    'query_resource_type' => null,
+                ],
+                'attributes' => [
+                    'id' => 'db_loop_save-query',
+                ],
             ]);
 
         $fieldset
