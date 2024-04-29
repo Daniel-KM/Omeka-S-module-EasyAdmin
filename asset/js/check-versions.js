@@ -54,8 +54,23 @@ $(document).ready(function() {
                 const moduleVersion = line.split("\t");
                 lastVersions[moduleVersion[0]] = moduleVersion[1];
             });
-            $('.version-notification').each(function(index) {
-                var addon = $(this);
+            $('#modules .module').each(function(index) {
+                const module = $(this);
+                const moduleAddon = module.find('.version-notification');
+                var addon;
+                // Get new versions for disabled versions too.
+                const  moduleName = module.find('.module-name').text().trim();
+                if (moduleAddon.length) {
+                    addon = moduleAddon;
+                } else if (notifyVersionInactive && unmanagedAddons[moduleName]) {
+                    const moduleId = unmanagedAddons[moduleName].id;
+                    const moduleVersion = unmanagedAddons[moduleName].version;
+                    module.find('.module-meta')
+                        .append(`<div class="version-notification" style="display: none; background-color:#fff6e6; color: orange;" data-addon-id="${moduleId}" data-current-version="${moduleVersion}">${msgNewVersion}</div>`);
+                    addon = module.find('.version-notification');
+                } else {
+                    return;
+                }
                 var addonId = addon.data('addon-id');
                 if (addonId in lastVersions) {
                     const currentVersion = addon.data('current-version');

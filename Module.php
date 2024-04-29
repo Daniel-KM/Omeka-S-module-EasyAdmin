@@ -901,5 +901,29 @@ HTML;
         $view = $event->getTarget();
         $view->headScript()
             ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+
+        $json = [];
+        foreach ($view->modules ?? [] as $module) {
+            if ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
+                $moduleId = $module->getId();
+                $moduleName = $module->getName();
+                $moduleVersion = $module->getIni('version') ?: $module->getDb('version');
+                if ($moduleId && $moduleName && $moduleVersion) {
+                    $json[$moduleName] = [
+                        'id' => $moduleId,
+                        'version' => $moduleVersion,
+                    ];
+                }
+            }
+        }
+
+        $notifyVersionInactive = (bool) $settings->get('easyadmin_addon_notify_version_inactive');
+
+        echo '<script>'
+            . 'const notifyVersionInactive = ' . json_encode($notifyVersionInactive) . ";\n"
+            // Keep original translation.
+            . 'const msgNewVersion = ' . json_encode(trim(sprintf($view->translate('A new version of this module is available. %s'), ''))) . ';'
+            . 'const unmanagedAddons = ' . json_encode($json, 320) . ";\n"
+            . '</script>';
     }
 }
