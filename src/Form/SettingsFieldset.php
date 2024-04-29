@@ -51,6 +51,17 @@ class SettingsFieldset extends Fieldset
                     'id' => 'easyadmin_addon_notify_version_inactive',
                 ],
             ])
+            ->add([
+                'name' => 'easyadmin_addon_notify_version_dev',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Notify development versions of modules', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_addon_notify_version_dev',
+                ],
+            ])
 
             ->add([
                 'name' => 'easyadmin_content_lock',

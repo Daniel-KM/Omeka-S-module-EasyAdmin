@@ -898,9 +898,8 @@ HTML;
             return;
         }
 
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
         $view = $event->getTarget();
-        $view->headScript()
-            ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
 
         $json = [];
         foreach ($view->modules ?? [] as $module) {
@@ -917,13 +916,23 @@ HTML;
             }
         }
 
-        $notifyVersionInactive = (bool) $settings->get('easyadmin_addon_notify_version_inactive');
+        $style = '.version-notification.new-version-is-dev { background-color:#fff6e6; color: orange; }'
+            . '.version-notification.new-version-is-dev::after { content: " (dev)"; color: red; }';
 
-        echo '<script>'
-            . 'const notifyVersionInactive = ' . json_encode($notifyVersionInactive) . ";\n"
+        $view->headStyle()
+            ->appendStyle($style);
+
+        $notifyVersionInactive = (bool) $settings->get('easyadmin_addon_notify_version_inactive');
+        $notifyVersionDev = (bool) $settings->get('easyadmin_addon_notify_version_dev');
+
+        $script = 'const notifyVersionInactive = ' . json_encode($notifyVersionInactive) . ";\n"
+            . 'const notifyVersionDev = ' . json_encode($notifyVersionDev) . ";\n"
             // Keep original translation.
             . 'const msgNewVersion = ' . json_encode(trim(sprintf($view->translate('A new version of this module is available. %s'), ''))) . ';'
-            . 'const unmanagedAddons = ' . json_encode($json, 320) . ";\n"
-            . '</script>';
+            . 'const unmanagedAddons = ' . json_encode($json, 320) . ";\n";
+
+        $view->headScript()
+            ->appendScript($script)
+            ->appendFile($view->assetUrl('js/check-versions.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
     }
 }

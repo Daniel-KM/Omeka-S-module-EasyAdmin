@@ -66,15 +66,21 @@ $(document).ready(function() {
                     const moduleId = unmanagedAddons[moduleName].id;
                     const moduleVersion = unmanagedAddons[moduleName].version;
                     module.find('.module-meta')
-                        .append(`<div class="version-notification" style="display: none; background-color:#fff6e6; color: orange;" data-addon-id="${moduleId}" data-current-version="${moduleVersion}">${msgNewVersion}</div>`);
+                        .append(`<div class="version-notification module-unmanaged" style="display: none;" data-addon-id="${moduleId}" data-current-version="${moduleVersion}">${msgNewVersion}</div>`);
                     addon = module.find('.version-notification');
                 } else {
                     return;
                 }
-                var addonId = addon.data('addon-id');
-                if (addonId in lastVersions) {
-                    const currentVersion = addon.data('current-version');
-                    const lastVersion = lastVersions[addonId];
+                const addonId = addon.data('addon-id');
+                const currentVersion = addon.data('current-version');
+                const lastVersion = addonId in lastVersions ? lastVersions[addonId] : null;
+                const lastVersionIsDev = lastVersion && lastVersion.match(/alpha|beta|dev/);
+                if (lastVersion
+                    && (notifyVersionDev || !lastVersionIsDev)
+                ) {
+                    if (lastVersionIsDev) {
+                        addon.addClass('new-version-is-dev');
+                    }
                     // Js package semver was replaced by compareVersions since Omeka S v4.0.1.
                     // Still try original comparator to keep original url.
                     if (compareVersions) {

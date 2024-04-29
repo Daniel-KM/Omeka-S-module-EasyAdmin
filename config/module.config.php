@@ -136,6 +136,7 @@ return [
                 // 'resource_previous_next',
             ],
             'easyadmin_addon_notify_version_inactive' => true,
+            'easyadmin_addon_notify_version_dev' => false,
             // Disable content lock by default.
             'easyadmin_content_lock' => false,
             // 86400 seconds = 24 hours. 14400 = 4 hours.
