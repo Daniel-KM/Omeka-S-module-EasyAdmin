@@ -28,7 +28,6 @@ $(document).ready(function() {
             if (v2parts.length === i) {
                 return 1;
             }
-
             if (v1parts[i] === v2parts[i]) {
                 continue;
             }
@@ -50,24 +49,37 @@ $(document).ready(function() {
      */
     $.get('https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/master/_data/omeka_s_modules_versions.tsv')
         .done(function(data) {
+            var lastVersions = {};
+            data.split("\n").forEach(line => {
+                const moduleVersion = line.split("\t");
+                lastVersions[moduleVersion[0]] = moduleVersion[1];
+            });
             $('.version-notification').each(function(index) {
                 var addon = $(this);
                 var addonId = addon.data('addon-id');
-                var lastVersions = {};
-                data.split("\n").forEach(line => {
-                    const moduleVersion = line.split("\t");
-                    lastVersions[moduleVersion[0]] = moduleVersion[1];
-                });
                 if (addonId in lastVersions) {
-                    // Still try semver to keep original url.
-                    try {
-                        if (semver.lt(addon.data('current-version'), lastVersions[addonId])) {
-                            addon.show();
+                    const currentVersion = addon.data('current-version');
+                    const lastVersion = lastVersions[addonId];
+                    // Js package semver was replaced by compareVersions since Omeka S v4.0.1.
+                    // Still try original comparator to keep original url.
+                    if (compareVersions) {
+                        try {
+                            if (compareVersions.compareVersions(currentVersion, lastVersion) === -1) {
+                                addon.show();
+                            }
+                            return;
+                        } catch (e) {
                         }
-                        return;
-                    } catch (e) {
+                    } else if (semver) {
+                        try {
+                            if (semver.lt(currentVersion, lastVersion)) {
+                                addon.show();
+                            }
+                            return;
+                        } catch (e) {
+                        }
                     }
-                    if (compareVersionNumbers(addon.data('current-version'), lastVersions[addonId]) < 0) {
+                    if (compareVersionNumbers(currentVersion, lastVersion) < 0) {
                         // Update the message with the module url if any.
                         var link = addon.closest('.module-meta').find('.module-name a');
                         link.length
@@ -78,5 +90,4 @@ $(document).ready(function() {
                 }
             });
         });
-
 });
