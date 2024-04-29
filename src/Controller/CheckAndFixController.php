@@ -159,9 +159,6 @@ class CheckAndFixController extends AbstractActionController
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
                 break;
-            case 'db_statistics_index':
-                $job = $dispatcher->dispatch(\Statistics\Job\AggregateHits::class);
-                break;
             default:
                 $eventManager = $this->getEventManager();
                 $args = $eventManager->prepareArgs([

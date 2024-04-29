@@ -837,7 +837,6 @@ class CheckAndFixForm extends Form
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
                         'db_fulltext_index' => 'Index full-text search (core job)', // @translate
-                        'db_statistics_index' => 'Index statistics (module Statistics, needed only after direct import)', // @translate
                     ],
                 ],
                 'attributes' => [
