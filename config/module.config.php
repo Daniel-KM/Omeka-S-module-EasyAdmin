@@ -102,7 +102,7 @@ return [
                                 'options' => [
                                     'route' => '/upload[/:action]',
                                     'constraints' => [
-                                        'action' => 'index',
+                                        'action' => 'index|files',
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'EasyAdmin\Controller',
@@ -139,6 +139,14 @@ return [
                         'controller' => 'addons',
                         'class' => 'o-icon- fa-puzzle-piece',
                     ],
+                    [
+                        // Not "Upload" because translation is not good here.
+                        'label' => 'Upload files', // @translate
+                        'route' => 'admin/easy-admin/upload',
+                        'controller' => 'upload',
+                        'action' => 'files',
+                        'resource' => 'EasyAdmin\Controller\Upload',
+                    ],
                 ],
             ],
         ],
@@ -159,6 +167,7 @@ return [
                 'resource_public_view',
                 // 'resource_previous_next',
             ],
+            'easyadmin_local_path' => OMEKA_PATH . '/files/import',
             'easyadmin_allow_empty_files' => false,
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,

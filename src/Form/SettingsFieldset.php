@@ -41,6 +41,18 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_local_path',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Folder for pre-uploaded files', // @translate
+                    'info' => 'For security reasons, local files to import should be inside this folder.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_local_path',
+                ],
+            ])
+            ->add([
                 'name' => 'easyadmin_allow_empty_files',
                 'type' => Element\Checkbox::class,
                 'options' => [

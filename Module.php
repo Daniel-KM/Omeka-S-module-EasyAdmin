@@ -154,6 +154,14 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
+        if (!$this->checkDestinationDir($basePath . '/import')) {
+            $message = new PsrMessage(
+                'The directory "{dir}" is not writeable.', // @translate
+                ['dir' => $basePath]
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+        }
+
         /** @var \Omeka\Module\Manager $moduleManager */
         $modules = [
             'BulkCheck',

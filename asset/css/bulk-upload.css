@@ -1,6 +1,11 @@
 /* Easy Admin: Bulk Upload styles */
 
 @media screen {
+    .bulk-uploads .subhead::before,
+    .bulk-uploads .no-resources:before {
+        content:"";
+    }
+
     /* Resource add/edit items for media files and folders */
     .media-bulk-upload .bulk-drop {
         display: flex;
@@ -10,6 +15,15 @@
     /* @todo Improve drag and drop with a file (requires js) */
     .media-bulk-upload .bulk-drop:hover {
         outline: 2px dashed grey;
+    }
+    #bulk-upload .media-bulk-upload .bulk-drop {
+        outline: 2px dashed lightgrey;
+    }
+    #bulk-upload .media-bulk-upload .bulk-drop:hover {
+        outline: 2px dashed grey;
+    }
+    #bulk-upload .media-bulk-upload .bulk-drop span {
+        padding-left: 10px;
     }
     #media-list .bulk-upload-actions {
         width: 100%;
