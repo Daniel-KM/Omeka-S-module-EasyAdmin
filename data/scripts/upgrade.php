@@ -264,14 +264,19 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
 
 if (version_compare($oldVersion, '3.4.18', '<')) {
     $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/preload');
+    $preload = $settings->get('easyadmin_local_path');
+    if (!$preload || $preload === $basePath || $preload === $basePath . '/') {
+        $settings->set('easyadmin_local_path', $basePath . '/preload');
+        $preload = $settings->get('easyadmin_local_path');
+    }
     $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
     $settings->set('easyadmin_addon_notify_version_inactive', true);
     $settings->set('easyadmin_addon_notify_version_dev', false);
 
-    if (!$this->checkDestinationDir($settings->get('easyadmin_local_path'))) {
+    if (!$this->checkDestinationDir($preload)) {
         $message = new PsrMessage(
             'The directory "{dir}" is not writeable.', // @translate
-            ['dir' => $basePath]
+            ['dir' => $preload]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
