@@ -53,7 +53,7 @@ SQL;
 
         $this->logger->notice(
             'There are {count} resources with invalid resource type: {json}.', // @translate
-            ['count' => count($result), 'json' => json_encode($result, 320)]
+            ['count' => count($result), 'json' => json_encode($result, 448)]
         );
 
         if (!$fix || !$result) {
@@ -100,7 +100,7 @@ SQL;
 
         $this->logger->notice(
             'There are {count} resources with invalid resource type that cannot be fixed automatically: {json}.', // @translate
-            ['count' => count($result), 'json' => json_encode($newList, 320)]
+            ['count' => count($result), 'json' => json_encode($newList, 448)]
         );
 
         return false;
