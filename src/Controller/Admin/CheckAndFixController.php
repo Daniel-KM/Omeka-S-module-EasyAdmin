@@ -153,8 +153,13 @@ class CheckAndFixController extends AbstractActionController
             case 'backup_install':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\Backup::class, $defaultParams + $params['backup']['backup_install']);
                 break;
+            case 'theme_templates_check':
+            case 'theme_templates_fix':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\ThemeTemplate::class, $defaultParams + $params['themes']['theme_templates'] + $params['themes']['theme_templates_warn']);
+                break;
             case 'cache_check':
             case 'cache_fix':
+                // TODO Manage instant job via synchronous jobs.
                 // This is not a job, because it is instant.
                 $this->checkCache($params['cache']['cache_clear'], $process === 'cache_fix');
                 $job = null;

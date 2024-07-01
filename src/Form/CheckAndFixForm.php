@@ -22,6 +22,7 @@ class CheckAndFixForm extends Form
             ->appendFieldsetResourceValues()
             ->appendFieldsetDatabase()
             ->appendFieldsetBackup()
+            ->appendFieldsetThemes()
             ->appendFieldsetCache()
             ->appendFieldsetTasks()
         ;
@@ -116,6 +117,18 @@ class CheckAndFixForm extends Form
             ->get('backup_install')
             ->add([
                 'name' => 'include',
+                'required' => false,
+            ]);
+
+        $inputFilter->get('themes')
+            ->add([
+                'name' => 'process',
+                'required' => false,
+            ]);
+        $inputFilter->get('themes')
+            ->get('theme_templates')
+            ->add([
+                'name' => 'modules',
                 'required' => false,
             ]);
 
@@ -773,6 +786,97 @@ class CheckAndFixForm extends Form
         return $this;
     }
 
+    protected function appendFieldsetThemes(): self
+    {
+        $this
+            ->add([
+                'name' => 'themes',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Themes', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'themes',
+                    'class' => 'field-container',
+                ],
+            ]);
+
+        $fieldset = $this->get('themes');
+        $fieldset
+            ->add([
+                'name' => 'process',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Tasks', // @translate
+                    // Fix the formatting issue of the label in Omeka.
+                    'label_attributes' => ['style' => 'display: inline-block'],
+                    'value_options' => [
+                        'theme_templates_check' => 'Check templates to migrate in themes for Omeka S v4.1', // @translate
+                        'theme_templates_fix' => 'Migrate templates in themes for Omeka S v4.1 (WARNING: backup themes first)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'themes-process',
+                    'required' => false,
+                    'class' => 'fieldset-process',
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'theme_templates',
+                'options' => [
+                    'label' => 'Options to migrate templates in themes', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'theme_templates_check theme_templates_fix',
+                ],
+            ])
+            ->get('theme_templates')
+            ->add([
+                'name' => 'modules',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Modules', // @translate
+                    'value_options' => [
+                        'Reference' => 'Reference',
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'theme_templates-modules',
+                ],
+            ])
+        ;
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'theme_templates_warn',
+                'options' => [
+                    'label' => 'Check backup', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'theme_templates_fix',
+                ],
+            ])
+            ->get('theme_templates_warn')
+            ->add([
+                'name' => 'backup_confirmed',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'I confirm to have an external backup of my themes and files', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'theme_templates_warn-backup_confirmed',
+                ],
+            ])
+        ;
+
+        return $this;
+    }
+
     protected function appendFieldsetCache(): self
     {
         $this
@@ -794,7 +898,7 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => 'Cache php', // @translate
+                    'label' => 'Tasks', // @translate
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
