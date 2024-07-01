@@ -39,6 +39,11 @@ abstract class AbstractCheck extends AbstractJob
     protected $logger;
 
     /**
+     * @var \Laminas\Mvc\I18n\Translator
+     */
+    protected $translator;
+
+    /**
      * @var \Doctrine\DBAL\Connection
      */
     protected $connection;
@@ -106,6 +111,13 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected $columns = [];
 
+    /**
+     * List of translatable columns.
+     *
+     * @var array
+     */
+    protected $columnsTranslatable = [];
+
     public function perform(): void
     {
         $services = $this->getServiceLocator();
@@ -117,6 +129,7 @@ abstract class AbstractCheck extends AbstractJob
         $this->logger = $services->get('Omeka\Logger');
         $this->logger->addProcessor($referenceIdProcessor);
         $this->api = $services->get('ControllerPluginManager')->get('api');
+        $this->translator = $services->get('MvcTranslator');
         $this->entityManager = $services->get('Omeka\EntityManager');
         // These two connections are not the same in doctrine.
         $this->dbalConnection = $services->get('Omeka\Connection');
@@ -178,10 +191,9 @@ abstract class AbstractCheck extends AbstractJob
             $this->options['escape'] = chr(0);
         }
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
         $row = [];
         foreach ($this->columns as $column) {
-            $row[] = $translator->translate($column);
+            $row[] = $this->translator->translate($column);
         }
         $this->writeRow($row);
 
@@ -217,6 +229,12 @@ abstract class AbstractCheck extends AbstractJob
         // Order row according to the columns when associative array.
         if (array_values($row) !== $row) {
             $row = array_replace($columnKeys, array_intersect_key($row, $columnKeys));
+        }
+
+        foreach ($this->columnsTranslatable as $translatable) {
+            if (!empty($row[$translatable])) {
+                $row[$translatable] = $this->translator->translate($row[$translatable]);
+            }
         }
 
         fputcsv($this->handle, $row, $this->options['delimiter'], $this->options['enclosure'], $this->options['escape']);
@@ -279,7 +297,7 @@ abstract class AbstractCheck extends AbstractJob
 
         $label = $this->getArg('process', '');
         $base = preg_replace('/[^A-Za-z0-9]/', '_', $label);
-        $base = $base ? substr(preg_replace('/_+/', '_', $base), 0, 20) . '-' : '';
+        $base = $base ? substr(preg_replace('/_+/', '_', $base), 0, 30) . '-' : '';
         $date = (new \DateTime())->format('Ymd-His');
         $extension = 'tsv';
 
