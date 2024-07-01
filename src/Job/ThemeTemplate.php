@@ -9,15 +9,17 @@ class ThemeTemplate extends AbstractCheck
         'theme' => 'Theme', // @translate
         'filepath' => 'File', // @translate
         'fixed' => 'Fixed', // @translate
-        'message' => 'Message', // @translate
+        'message_1' => 'Message 1', // @translate
         'message_2' => 'Message 2', // @translate
+        'message_3' => 'Message 3', // @translate
     ];
 
     protected $columnsTranslatable = [
         'module',
         'fixed',
-        'message',
+        'message_1',
         'message_2',
+        'message_3',
     ];
 
     protected $totalProcessed = 0;
@@ -137,6 +139,8 @@ class ThemeTemplate extends AbstractCheck
     {
         $start = mb_strlen(OMEKA_PATH . '/');
 
+        $themeConfigUpdated = false;
+
         foreach ($filepaths as $filepath) {
             $filename = basename($filepath);
             $row = [
@@ -144,8 +148,9 @@ class ThemeTemplate extends AbstractCheck
                 'theme' => $theme,
                 'filepath' => mb_substr($filepath, $start),
                 'fixed' => '',
-                'message' => '',
+                'message_1' => '',
                 'message_2' => '',
+                'message_3' => '',
             ];
 
             $source = $filepath;
@@ -157,6 +162,16 @@ class ThemeTemplate extends AbstractCheck
             $destinationDir = pathinfo($destination, PATHINFO_DIRNAME);
 
             $messages = [];
+
+            // Check config theme.
+            $themeConfigPath = dirname($filepath, 4) . '/config/theme.ini';
+            if (!file_exists($themeConfigPath)) {
+                $messages[] = 'The theme is invalid: no file config/theme.ini.'; // @translate
+            } elseif (file_exists($themeConfigPath) && !is_readable($themeConfigPath)) {
+                $messages[] = 'The theme file config/theme.ini is not readable.'; // @translate
+            } elseif (file_exists($themeConfigPath) && !is_writeable($themeConfigPath)) {
+                $messages[] = 'The theme file config/theme.ini is not writeable.'; // @translate
+            }
 
             // Check destination directory.
             $destinationDirExists = file_exists($destinationDir);
@@ -180,19 +195,35 @@ class ThemeTemplate extends AbstractCheck
                 $messages[] = 'The destination file exists.'; // @translate
             } elseif (!is_readable($source)) {
                 $messages[] = 'The source is not readable.'; // @translate
-            } elseif ($isFix && !$messages) {
+            }
+
+            // Fix.
+            if ($isFix && !$messages) {
                 $check = rename($source, $destination);
                 if ($check) {
-                    $row['fixed'] = 'Yes';
-                    ++$this->totalSucceed;
+                    if (!$themeConfigUpdated) {
+                        $string = sprintf($this->translator->translate('Automatically appended via module EasyAdmin on %s'), date('Y-m-d H:i:s'));
+                        file_put_contents($themeConfigPath, "\n\n; $string\n\n", FILE_APPEND);
+                        $themeConfigUpdated = true;
+                    }
+                    $basename = pathinfo($filename, PATHINFO_FILENAME);
+                    $label = ucfirst(str_replace(['-', '_'], ' ', $basename));
+                    $string = "block_templates.reference.$basename = \"$label\"\n";
+                    $check = file_put_contents($themeConfigPath, $string, FILE_APPEND);
+                    if ($check) {
+                        $row['fixed'] = 'Yes';
+                    } else {
+                        $messages[] = 'The file was moved, but the config/theme.ini cannot be updated.'; // @translate
+                    }
                 } else {
                     $messages[] = 'The source cannot be moved to destination.'; // @translate
                 }
             }
 
             if ($messages) {
-                $row['message'] = $messages[0];
+                $row['message_1'] = $messages[0];
                 $row['message_2'] = $messages[1] ?? '';
+                $row['message_3'] = $messages[2] ?? '';
                 ++$this->totalFailed;
                 $this->logger->warn(
                     'This process failed for template {template}: {message}', // @ŧranslate
