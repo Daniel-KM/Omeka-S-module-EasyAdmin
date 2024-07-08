@@ -475,7 +475,7 @@ class Module extends AbstractModule
         if ($publicView) {
             $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
             $skip = !$isOldOmeka && $resourceType === 'items' && count($resource->sites());
-            if (!$skip) {
+            if ($skip) {
                 $plugins = $services->get('ViewHelperManager');
                 $translate = $plugins->get('translate');
                 $htmlSites = $this->prepareSitesResource($resource);

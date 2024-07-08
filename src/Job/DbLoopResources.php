@@ -66,7 +66,7 @@ class DbLoopResources extends AbstractJob
 
         $this->logger->notice(
             'Resource types to process: {resource_types}.', // @translate
-            ['resource_types' => explode(', ', $resourceTypes)]
+            ['resource_types' => implode(', ', $resourceTypes)]
         );
 
         $query = [];
