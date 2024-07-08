@@ -263,7 +263,11 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.18', '<')) {
-    $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/preload');
+    $importLocalPath = $settings->get('bulkimport_local_path');
+    if (!$importLocalPath || !file_exists($importLocalPath) || !is_dir($importLocalPath) || !is_writeable($importLocalPath)) {
+        $importLocalPath = $basePath . '/preload';
+    }
+    $settings->set('easyadmin_local_path', $importLocalPath);
     $preload = $settings->get('easyadmin_local_path');
     if (!$preload || $preload === $basePath || $preload === $basePath . '/') {
         $settings->set('easyadmin_local_path', $basePath . '/preload');
