@@ -2235,8 +2235,8 @@ msgstr ""
 
 #: src/Controller/Admin/CheckAndFixController.php:195
 msgid ""
-"Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}"
-"logs{ae})."
+"Processing checks in background (job {link_job}#{job_id}{link_end}, {link_log}"
+"logs{link_end})."
 msgstr ""
 
 #: src/Controller/Admin/CheckAndFixController.php:224

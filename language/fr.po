@@ -2526,11 +2526,11 @@ msgstr "Processus inconnu « {process} »"
 
 #: src/Controller/Admin/CheckAndFixController.php:195
 msgid ""
-"Processing checks in background (job {link_job}#{job_id}{ae}, {link_log}"
-"logs{ae})."
+"Processing checks in background (job {link_job}#{job_id}{link_end}, {link_log}"
+"logs{link_end})."
 msgstr ""
-"Traitement en arrière-plan (tâche {link_job}#{job_id}{ae}, {link_log}"
-"journaux{ae})."
+"Traitement en arrière-plan (tâche {link_job}#{job_id}{link_end}, {link_log}"
+"journaux{link_end})."
 
 #: src/Controller/Admin/CheckAndFixController.php:224
 msgid "No type of cache selected."
