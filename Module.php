@@ -314,6 +314,12 @@ class Module extends AbstractModule
             -10
         );
 
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\AssetAdapter::class,
+            'api.create.post',
+            [$this, 'handleAfterSaveAsset']
+        );
+
         // Content locking in admin board.
         // It is useless in public board, because there is the moderation.
         $sharedEventManager->attach(
@@ -839,6 +845,138 @@ HTML;
             $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
             $dispatcher->dispatch(\EasyAdmin\Job\FileDerivativeBulkUpload::class, $args, $strategy);
         }
+    }
+
+    public function handleAfterSaveAsset(Event $event): void
+    {
+        /**
+         * @var \Omeka\Entity\Asset $asset
+         * @var \Omeka\Api\Request $request
+         */
+        $request = $event->getParam('request');
+
+        $optimize = $request->getValue('optimize');
+        if (!$optimize) {
+            return;
+        }
+
+        $fileData = $request->getFileData();
+        if (!empty($fileData['file']['error'])) {
+            return;
+        }
+
+        $asset = $event->getParam('response')->getContent();
+        if (!$asset) {
+            return;
+        }
+
+        // Process the optimization.
+
+        /**
+         * @var \Laminas\Log\Logger $logger
+         * @var \Omeka\File\TempFile $tempFile
+         * @var \Omeka\File\Downloader $downloader
+         * @var \Omeka\File\Store\StoreInterface $store
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         * @var \Omeka\Api\Adapter\AssetAdapter $assetAdapter
+         * @var \Omeka\File\ThumbnailManager $thumbnailManager
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         * @var \Omeka\Api\Representation\AssetRepresentation $assetRepresentation
+         */
+        $services = $this->getServiceLocator();
+        $store = $services->get('Omeka\File\Store');
+        $logger = $services->get('Omeka\Logger');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $downloader = $services->get('Omeka\File\Downloader');
+        $assetAdapter = $services->get('Omeka\ApiAdapterManager')->get('assets');
+        $thumbnailManager = $services->get('Omeka\File\ThumbnailManager');
+        $assetRepresentation = $assetAdapter->getRepresentation($asset);
+
+        // Get asset as a temp file.
+        $assetUrl = $assetRepresentation->assetUrl();
+        $errorStore = new \Omeka\Stdlib\ErrorStore;
+        $tempFile = $downloader->download($assetUrl, $errorStore);
+        if (!$tempFile) {
+            $logger->err(new PsrMessage(
+                'An error occurred when fetching asset "{asset_filename}" (#{asset_id}): {errors}', // @translate
+                ['asset_filename' => $asset->getName(), 'asset_id' => $asset->getId(), 'errors' => $errorStore->getErrors()]
+            ));
+            $messenger->addErrors($errorStore->getErrors());
+            return;
+        }
+
+        $thumbnailer = $thumbnailManager->buildThumbnailer();
+        $thumbnailer->setSource($tempFile);
+        // SetOptions() is required to set the path for ImageMagick when used.
+        $thumbnailer->setOptions([]);
+        try {
+            $newFilePath = $thumbnailer->create('default', 800);
+        } catch (\Exception $e) {
+            $message = new PsrMessage(
+                'An error occurred when optimizing asset "{asset_filename}" (#{asset_id}): {error}', // @translate
+                ['asset_filename' => $asset->getName(), 'asset_id' => $asset->getId(), 'error' => $e->getMessage()]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            $messenger->addError($message);
+            $tempFile->delete();
+            return;
+        }
+
+        // Check if the new size is really smaller: minimum 90% to keep quality.
+        $originalFileSize = $tempFile->getSize();
+        $newFileSize = filesize($newFilePath);
+        $gain = 100 - ($newFileSize * 100 / $originalFileSize);
+
+        // Remove the downloaded file.
+        $tempFile->delete();
+
+        if ($gain < 10) {
+            unlink($newFilePath);
+            return;
+        }
+
+        // Store the file with the new extension.
+        try {
+            $tempFile->setStorageId($asset->getStorageId());
+            $tempFile->setTempPath($newFilePath);
+            $tempFile->store('asset', 'jpg');
+        } catch (\Omeka\File\Exception\RuntimeException $e) {
+            $message = new PsrMessage(
+                'An error occurred when storing asset "{asset_filename}" (#{asset_id}): {error}', // @translate
+                ['asset_filename' => $asset->getName(), 'asset_id' => $asset->getId(), 'error' => $e->getMessage()]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            $messenger->addError($message);
+            $tempFile->delete();
+            return;
+        }
+
+        // Delete the temporary new file.
+        $tempFile->delete();
+
+        // Remove the original file if the extension was different.
+        if ($asset->getExtension() !== 'jpg') {
+            $store->delete('asset/' . $asset->getFilename());
+        }
+
+        // Update the asset in database with the new media type and extension.
+        if ($asset->getExtension() !== 'jpg'
+            || $asset->getMediaType() !== 'image/jpeg'
+        ) {
+            // Use entity manager to avoid a loop of events.
+            $asset->setExtension('jpg');
+            $asset->setMediaType('image/jpeg');
+            $entityManager = $services->get('Omeka\EntityManager');
+            $entityManager->persist($asset);
+            $entityManager->flush();
+        }
+
+        $message = new PsrMessage(
+            'The asset "{asset_filename}" (#{asset_id}) has been successfully optimized by {percent}%, from {size_1} to {size_2} bytes.', // @translate
+            ['asset_filename' => $asset->getName(), 'asset_id' => $asset->getId(), 'percent' => (int) $gain, 'size_1' => $originalFileSize, 'size_2' => $newFileSize]
+        );
+        $logger->notice($message->getMessage(), $message->getContext());
+        $messenger->addSuccess($message);
     }
 
     /**

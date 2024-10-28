@@ -1,0 +1,25 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ */
+
+$plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$uploadLimit = $plugins->get('uploadLimit');
+?>
+
+<h3 id="asset-upload-label"><?= $translate('Upload new asset') ?></h3>
+<form class="asset-upload" method="post" enctype="multipart/form-data" action="<?= $escape($url('admin/default', ['controller' => 'asset', 'action' => 'add'])) ?>">
+    <input type="file" name="file" accept="image/jpeg,image/png,image/gif,image/webp" required aria-labelledby="asset-upload-label"/>
+    <span><?= $uploadLimit() ?></span>
+    <label for="asset-upload-alt-text"><?= $translate('Alt text') ?></label>
+    <textarea id="asset-upload-alt-text" name="o:alt_text"></textarea>
+    <label for="optimize">
+        <input type="checkbox" name="optimize" id="optimize" value="1"/>
+        <?= $translate('Optimize size for web (may degrade quality)') ?>
+    </label>
+    <button type="submit"><?= $translate('Upload') ?></button>
+    <ul class="errors"></ul>
+</form>
