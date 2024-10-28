@@ -465,9 +465,9 @@ class Module extends AbstractModule
 
         $settings = $services->get('Omeka\Settings');
         $interface = $settings->get('easyadmin_interface') ?: [];
-        $publicView = in_array('resource_public_view', $interface);
-        $previousNext = in_array('resource_previous_next', $interface);
-        if (!$publicView && !$previousNext) {
+        $buttonPublicView = in_array('resource_public_view', $interface);
+        $buttonPreviousNext = in_array('resource_previous_next', $interface);
+        if (!$buttonPublicView && !$buttonPreviousNext) {
             return;
         }
 
@@ -489,32 +489,34 @@ class Module extends AbstractModule
         // Add public view only when there is no site, since they are added in
         // Omeka S v4.1 for items. But only for items: so for consistent ux, set
         // the button in the new place for all resources.
-        if ($publicView) {
+        if ($buttonPublicView) {
             $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
             $skip = !$isOldOmeka && $resourceType === 'items' && count($resource->sites());
-            if ($skip) {
+            if (!$skip) {
                 $plugins = $services->get('ViewHelperManager');
                 $translate = $plugins->get('translate');
                 $htmlSites = $this->prepareSitesResource($resource);
                 if ($resourceType === 'item_sets' && count($resource->sites())) {
                     $translated = $translate('Sites');
                     $htmlRegex = <<<REGEX
-<div class="meta-group">\s*<h4>$translated</h4>.*</div>\s*<div class="meta-group">
+<div class="meta-group[\w _-]*">\s*<h4>$translated</h4>.*</div>\s*<div class="meta-group
 REGEX;
-                    $html = preg_replace('~' . $htmlRegex . '~s', $htmlSites . '<div class="meta-group">', $html);
+                    $html = preg_replace('~' . $htmlRegex . '~s', $htmlSites . '<div class="meta-group', $html, 1);
                 } else {
                     $translated = $resourceType === 'item_sets' ? $translate('Items') : $translate('Created');
-                    $htmlPost = <<<HTML
-    <div class="meta-group">
+                    $htmlPost = <<<REGEX
+<div class="meta-group">
         <h4>$translated</h4>
-
-HTML;
-                    $html = str_replace($htmlPost, $htmlSites . $htmlPost, $html);
+REGEX;
+                    $htmlRegex = <<<REGEX
+<div class="meta-group">\s*<h4>$translated</h4>
+REGEX;
+                    $html = preg_replace('~' . $htmlRegex . '~s', $htmlSites . $htmlPost, $html, 1);
                 }
             }
         }
 
-        if ($previousNext) {
+        if ($buttonPreviousNext) {
             /** @see \EasyAdmin\View\Helper\PreviousNext */
             $linkBrowseView = $view->previousNext($resource, [
                 'source_query' => 'session',
@@ -538,8 +540,8 @@ HTML;
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $interface = $settings->get('easyadmin_interface') ?: [];
-        $publicView = in_array('resource_public_view', $interface);
-        if ($publicView) {
+        $buttonPublicView = in_array('resource_public_view', $interface);
+        if ($buttonPublicView) {
             /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
             $resource = $event->getParam('entity');
             // TODO Fix for item sets.
