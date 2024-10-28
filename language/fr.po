@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 00:00+0000\n"
-"PO-Revision-Date: 2024-07-01 00:00+0000\n"
+"POT-Creation-Date: 2024-10-28 00:00+0000\n"
+"PO-Revision-Date: 2024-10-28 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -46,11 +46,11 @@ msgstr ""
 msgid "Remove directory \"files/check\""
 msgstr "Supprimer le dossier \"files/check\""
 
-#: Module.php:585
+#: Module.php:604
 msgid "[not in site]"
 msgstr "[aucun site]"
 
-#: Module.php:996
+#: Module.php:1165
 msgid "Bypass the lock"
 msgstr "Ignorer le verrou"
 
@@ -323,6 +323,14 @@ msgstr ""
 msgid "Uploading in progress…"
 msgstr "Chargement en cours…"
 
+#: view/omeka/admin/asset/add-form.phtml:21
+msgid "Optimize size for web (may degrade quality)"
+msgstr "Optimiser la taille pour le web (peut dégrader la qualité)"
+
+#: view/omeka/admin/asset/show-details.phtml:18
+msgid "[unknown]"
+msgstr "[Inconnu]"
+
 #: data/scripts/upgrade.php:56 data/scripts/upgrade.php:140
 #: data/scripts/upgrade.php:158
 msgid "The module replaces the module {module}. The upgrade is automatic."
@@ -418,7 +426,7 @@ msgstr ""
 "De nouvelles tâches ont été ajoutées pour définir le média principal de "
 "chaque contenu et pour vérifier les ressources."
 
-#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:278 Module.php:149
+#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:149
 #: Module.php:157 Module.php:165
 msgid "The directory \"{dir}\" is not writeable."
 msgstr "Le dossier « {dir} » n’est pas accessible en écriture."
@@ -439,7 +447,7 @@ msgstr ""
 "Une nouvelle tâche permet d’effacer les caches php (code et données), en "
 "particulier après une mise à jour ou après une modification directe du code."
 
-#: data/scripts/upgrade.php:285
+#: data/scripts/upgrade.php:289
 msgid ""
 "A new task allows to loop resources, for example to manage a new setting in "
 "template or in parameters via triggers."
@@ -448,7 +456,7 @@ msgstr ""
 "exemple pour gérer une nouvelle option dans les modèles ou les paramètres "
 "via les déclencheurs."
 
-#: data/scripts/upgrade.php:290
+#: data/scripts/upgrade.php:294
 msgid ""
 "It is now possible to bulk upload files without any server limit (file size, "
 "post size, number of files) in item form and in a separate form (feature "
@@ -461,11 +469,15 @@ msgstr ""
 "(fonctionnalité déplacée depuis le module {link_module}Bulk "
 "Import{link_end}, implémente {link_github}omeka/omeka-s #1785{link_end})."
 
-#: data/scripts/upgrade.php:301
+#: data/scripts/upgrade.php:305
 msgid "A new option allows to notify new version of inactive modules."
 msgstr ""
 "Une nouvelle option permet de notifier les nouvelles versions des modules "
 "inactifs."
+
+#: data/scripts/upgrade.php:312
+msgid "It is now possible to optimize assets for web."
+msgstr "Il est désormais possible d’optimiser les fichiers pour le web."
 
 #: data/scripts/task.php:17
 msgid "/bootstrap.php"
@@ -579,76 +591,108 @@ msgstr ""
 "Mise à niveau du module BulkCheck : impossible de renommer le dossier "
 "\"files/bulk_check\" en \"files/check\". Essai de création."
 
-#: Module.php:581
+#: Module.php:600
 msgid "View this {resource_type} in \"{site}\""
 msgstr "Afficher le {resource_type} dans « {site} »"
 
-#: Module.php:677
+#: Module.php:696
 msgid "File successfuly uploaded."
 msgstr "Fichier téléversé avec succès."
 
-#: Module.php:678
+#: Module.php:697
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr "La taille des fichiers excède la valeur limite du serveur."
 
-#: Module.php:679
+#: Module.php:698
 msgid "The file size exceeds the specified limit."
 msgstr "La taille du fichier excède la taille maximale."
 
-#: Module.php:680
+#: Module.php:699
 msgid "The file was only partially uploaded."
 msgstr "Le fichier a été partiellement chargé."
 
-#: Module.php:681
+#: Module.php:700
 msgid "No file was uploaded."
 msgstr "Aucun fichier n’a été téléchargé."
 
-#: Module.php:682
+#: Module.php:701
 msgid "The temporary folder to store the file is missing."
 msgstr "Le dossier temporaire pour les fichiers est absent."
 
-#: Module.php:683
+#: Module.php:702
 msgid "Failed to write file to disk."
 msgstr "Impossible d’écrire le fichier sur le disque."
 
-#: Module.php:684
+#: Module.php:703
 msgid "A PHP extension stopped the file upload."
 msgstr "Une extension php a arrêté le téléchargement du fichier."
 
-#: Module.php:699 Module.php:704
+#: Module.php:718 Module.php:723
 msgid "There is no uploaded files."
 msgstr "Il n’y a aucun fichier téléchargé."
 
-#: Module.php:723
+#: Module.php:742
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr "Le fichier #{index} « {filename} » a une erreur : {error}."
 
-#: Module.php:730
+#: Module.php:749
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas commencer avec un « . »."
 
-#: Module.php:737
+#: Module.php:756
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas avoir de caractère réservé."
 
-#: Module.php:744
+#: Module.php:763
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} temporaire avec le nom « {filename} » ne doit pas "
 "contenir de caractère réservé."
 
-#: Module.php:752
+#: Module.php:771
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr "Le fichier #{index} « {filename} » est vide."
 
-#: Module.php:942
+#: Module.php:914
+msgid ""
+"An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
+"{errors}"
+msgstr ""
+"Une erreur est survenue lors de la récupération du fichier "
+"« {asset_filename} » (#{asset_id}): {errors}"
+
+#: Module.php:929
+msgid ""
+"An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
+"{error}"
+msgstr ""
+"Une erreur est survenue lors de l’optimisation du fichier "
+"« {asset_filename} » (#{asset_id}): {error}"
+
+#: Module.php:958
+msgid ""
+"An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
+"{error}"
+msgstr ""
+"Une erreur est survenue lors de l’enregistrement du fichier "
+"« {asset_filename} » (#{asset_id}): {error}."
+
+#: Module.php:995
+msgid ""
+"The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
+"by {percent}%, from {size_1} to {size_2} bytes."
+msgstr ""
+"Le fichier « {asset_filename} » (#{asset_id}) a été optimisé de {percent}%, "
+"de {size_1} à {size_2} octets."
+
+#: Module.php:1111
 msgid "You edit already this resource somewhere since {date}."
 msgstr "Vous éditez déjà cette ressource quelque part depuis le {date}."
 
-#: Module.php:969 Module.php:1106 Module.php:1193 Module.php:1299
+#: Module.php:1138 Module.php:1275 Module.php:1362 Module.php:1468
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
@@ -657,15 +701,15 @@ msgstr ""
 "verrouillé pour empêcher les modifications d’autres utilisateurs. Ce verrou "
 "est en place depuis le {date}."
 
-#: Module.php:1097
+#: Module.php:1266
 msgid "Warning:"
 msgstr "Attention :"
 
-#: Module.php:1100
+#: Module.php:1269
 msgid "You edit this resource somewhere since {date}."
 msgstr "Vous éditez cette ressource quelque part depuis le {date}."
 
-#: Module.php:1167
+#: Module.php:1336
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
@@ -673,7 +717,7 @@ msgstr ""
 "Le verrou en place depuis le {date} a été ignoré, mais l’utilisateur "
 "{user_name} peut finir sa propre édition."
 
-#: Module.php:1179
+#: Module.php:1348
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
@@ -682,13 +726,13 @@ msgstr ""
 "#{resource_id} éditée par l’utilisateur {user_name} (#{user_id}) depuis le "
 "{date}."
 
-#: Module.php:1252
+#: Module.php:1421
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 "Vous avez supprimé la ressource que vous éditiez quelque part depuis le "
 "{date}."
 
-#: Module.php:1271
+#: Module.php:1440
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
@@ -696,7 +740,7 @@ msgstr ""
 "Vous avez supprimé une ressource verrouillée en édition par {user_name} "
 "depuis le {date}."
 
-#: Module.php:1285
+#: Module.php:1454
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
@@ -2526,8 +2570,8 @@ msgstr "Processus inconnu « {process} »"
 
 #: src/Controller/Admin/CheckAndFixController.php:195
 msgid ""
-"Processing checks in background (job {link_job}#{job_id}{link_end}, {link_log}"
-"logs{link_end})."
+"Processing checks in background (job {link_job}#{job_id}{link_end}, "
+"{link_log}logs{link_end})."
 msgstr ""
 "Traitement en arrière-plan (tâche {link_job}#{job_id}{link_end}, {link_log}"
 "journaux{link_end})."
@@ -2575,7 +2619,7 @@ msgstr "L’extension php « apcu » n’est pas disponible."
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
 
-#: config/module.config.php:140
+#: config/module.config.php:142
 msgid "Install addons"
 msgstr "Installer des extensions"
 

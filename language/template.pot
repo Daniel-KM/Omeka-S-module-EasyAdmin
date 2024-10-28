@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 00:00+0000\n"
+"POT-Creation-Date: 2024-10-28 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,11 +42,11 @@ msgstr ""
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: Module.php:585
+#: Module.php:604
 msgid "[not in site]"
 msgstr ""
 
-#: Module.php:996
+#: Module.php:1165
 msgid "Bypass the lock"
 msgstr ""
 
@@ -310,6 +310,14 @@ msgstr ""
 msgid "Uploading in progress…"
 msgstr ""
 
+#: view/omeka/admin/asset/add-form.phtml:21
+msgid "Optimize size for web (may degrade quality)"
+msgstr ""
+
+#: view/omeka/admin/asset/show-details.phtml:18
+msgid "[unknown]"
+msgstr ""
+
 #: data/scripts/upgrade.php:56 data/scripts/upgrade.php:140
 #: data/scripts/upgrade.php:158
 msgid "The module replaces the module {module}. The upgrade is automatic."
@@ -383,7 +391,7 @@ msgid ""
 "resources."
 msgstr ""
 
-#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:278 Module.php:149
+#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:149
 #: Module.php:157 Module.php:165
 msgid "The directory \"{dir}\" is not writeable."
 msgstr ""
@@ -400,13 +408,13 @@ msgid ""
 "an update or direct modification of code."
 msgstr ""
 
-#: data/scripts/upgrade.php:285
+#: data/scripts/upgrade.php:289
 msgid ""
 "A new task allows to loop resources, for example to manage a new setting in "
 "template or in parameters via triggers."
 msgstr ""
 
-#: data/scripts/upgrade.php:290
+#: data/scripts/upgrade.php:294
 msgid ""
 "It is now possible to bulk upload files without any server limit (file size, "
 "post size, number of files) in item form and in a separate form (feature "
@@ -414,8 +422,12 @@ msgid ""
 "omeka-s #1785{link_end})."
 msgstr ""
 
-#: data/scripts/upgrade.php:301
+#: data/scripts/upgrade.php:305
 msgid "A new option allows to notify new version of inactive modules."
+msgstr ""
+
+#: data/scripts/upgrade.php:312
+msgid "It is now possible to optimize assets for web."
 msgstr ""
 
 #: data/scripts/task.php:17
@@ -520,108 +532,132 @@ msgid ""
 "into \"files/check\". Trying to create it."
 msgstr ""
 
-#: Module.php:581
+#: Module.php:600
 msgid "View this {resource_type} in \"{site}\""
 msgstr ""
 
-#: Module.php:677
+#: Module.php:696
 msgid "File successfuly uploaded."
 msgstr ""
 
-#: Module.php:678
+#: Module.php:697
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr ""
 
-#: Module.php:679
+#: Module.php:698
 msgid "The file size exceeds the specified limit."
 msgstr ""
 
-#: Module.php:680
+#: Module.php:699
 msgid "The file was only partially uploaded."
 msgstr ""
 
-#: Module.php:681
+#: Module.php:700
 msgid "No file was uploaded."
 msgstr ""
 
-#: Module.php:682
+#: Module.php:701
 msgid "The temporary folder to store the file is missing."
 msgstr ""
 
-#: Module.php:683
+#: Module.php:702
 msgid "Failed to write file to disk."
 msgstr ""
 
-#: Module.php:684
+#: Module.php:703
 msgid "A PHP extension stopped the file upload."
 msgstr ""
 
-#: Module.php:699 Module.php:704
+#: Module.php:718 Module.php:723
 msgid "There is no uploaded files."
 msgstr ""
 
-#: Module.php:723
+#: Module.php:742
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr ""
 
-#: Module.php:730
+#: Module.php:749
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 
-#: Module.php:737
+#: Module.php:756
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:744
+#: Module.php:763
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:752
+#: Module.php:771
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr ""
 
-#: Module.php:942
+#: Module.php:914
+msgid ""
+"An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
+"{errors}"
+msgstr ""
+
+#: Module.php:929
+msgid ""
+"An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
+"{error}"
+msgstr ""
+
+#: Module.php:958
+msgid ""
+"An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
+"{error}"
+msgstr ""
+
+#: Module.php:995
+msgid ""
+"The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
+"by {percent}%, from {size_1} to {size_2} bytes."
+msgstr ""
+
+#: Module.php:1111
 msgid "You edit already this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:969 Module.php:1106 Module.php:1193 Module.php:1299
+#: Module.php:1138 Module.php:1275 Module.php:1362 Module.php:1468
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
 msgstr ""
 
-#: Module.php:1097
+#: Module.php:1266
 msgid "Warning:"
 msgstr ""
 
-#: Module.php:1100
+#: Module.php:1269
 msgid "You edit this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:1167
+#: Module.php:1336
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
 msgstr ""
 
-#: Module.php:1179
+#: Module.php:1348
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: Module.php:1252
+#: Module.php:1421
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 
-#: Module.php:1271
+#: Module.php:1440
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
 msgstr ""
 
-#: Module.php:1285
+#: Module.php:1454
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
@@ -2235,8 +2271,8 @@ msgstr ""
 
 #: src/Controller/Admin/CheckAndFixController.php:195
 msgid ""
-"Processing checks in background (job {link_job}#{job_id}{link_end}, {link_log}"
-"logs{link_end})."
+"Processing checks in background (job {link_job}#{job_id}{link_end}, "
+"{link_log}logs{link_end})."
 msgstr ""
 
 #: src/Controller/Admin/CheckAndFixController.php:224
@@ -2278,6 +2314,6 @@ msgstr ""
 msgid "The cache of real paths was reset."
 msgstr ""
 
-#: config/module.config.php:140
+#: config/module.config.php:142
 msgid "Install addons"
 msgstr ""
