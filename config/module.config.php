@@ -49,6 +49,8 @@ return [
         'factories' => [
             Form\AddonsForm::class => Service\Form\AddonsFormFactory::class,
             Form\CheckAndFixForm::class => Service\Form\CheckAndFixFormFactory::class,
+            // TODO Remove fix when integrated in Omeka S (fix #2236).
+            'Omeka\Form\AssetEditForm' => Service\Form\FormWithEventManagerFactory::class,
         ],
     ],
     'controllers' => [
