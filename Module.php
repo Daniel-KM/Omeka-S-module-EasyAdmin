@@ -314,10 +314,21 @@ class Module extends AbstractModule
             -10
         );
 
+        // Optimize asset.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\AssetAdapter::class,
             'api.create.post',
             [$this, 'handleAfterSaveAsset']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\AssetAdapter::class,
+            'api.update.post',
+            [$this, 'handleAfterSaveAsset']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\AssetEditForm::class,
+            'form.add_elements',
+            [$this, 'handleFormAsset']
         );
 
         // Content locking in admin board.
@@ -977,6 +988,17 @@ HTML;
         );
         $logger->notice($message->getMessage(), $message->getContext());
         $messenger->addSuccess($message);
+    }
+
+    public function handleFormAsset(Event $event): void
+    {
+        /** @var \Omeka\Form\AssetEditForm $form */
+        $form = $event->getTarget();
+        $element = new \Laminas\Form\Element\Checkbox();
+        $element
+            ->setName('optimize')
+            ->setLabel('Optimize size for web (may degrade quality)'); // @translate
+        $form->add($element);
     }
 
     /**
