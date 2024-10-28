@@ -974,6 +974,13 @@ HTML;
         if ($asset->getExtension() !== 'jpg'
             || $asset->getMediaType() !== 'image/jpeg'
         ) {
+            // Update the original name with the new extension only when there
+            // was one.
+            $assetName = $asset->getName();
+            $assetExtension = $asset->getExtension();
+            if (!strcasecmp((string) pathinfo($assetName, PATHINFO_EXTENSION), $assetExtension)) {
+                $asset->setName(mb_substr($assetName, 0, - mb_strlen($assetExtension) - 1) . '.jpg');
+            }
             // Use entity manager to avoid a loop of events.
             $asset->setExtension('jpg');
             $asset->setMediaType('image/jpeg');
