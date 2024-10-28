@@ -306,3 +306,10 @@ if (version_compare($oldVersion, '3.4.18', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.21', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to optimize assets for web.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
