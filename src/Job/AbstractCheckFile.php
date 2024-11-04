@@ -18,6 +18,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                 'Column {type} does not exist or cannot be checked.', // @translate
                 ['type' => $column]
             );
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return false;
         }
 
@@ -264,17 +265,25 @@ abstract class AbstractCheckFile extends AbstractCheck
             : '/^.+\.(' . implode('|', $extensions) . ')$/i';
         $directory = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
         $iterator = new \RecursiveIteratorIterator($directory);
-        $regex = new \RegexIterator($iterator, $regex, \RecursiveRegexIterator::GET_MATCH);
+        $regexIterator = new \RegexIterator($iterator, $regex, \RecursiveRegexIterator::GET_MATCH);
         $files = [];
-        if ($absolute) {
-            foreach ($regex as $file) {
-                $files[] = reset($file);
+        try {
+            if ($absolute) {
+                foreach ($regexIterator as $file) {
+                    $files[] = reset($file);
+                }
+            } else {
+                $dirLength = mb_strlen($dir) + 1;
+                foreach ($regexIterator as $file) {
+                    $files[] = mb_substr(reset($file), $dirLength);
+                }
             }
-        } else {
-            $dirLength = mb_strlen($dir) + 1;
-            foreach ($regex as $file) {
-                $files[] = mb_substr(reset($file), $dirLength);
-            }
+        } catch (\Exception $e) {
+            $this->logger->err(
+                'Directory or file not readable: {error}', // @translate
+                ['exception' => $e->getMessage()]
+            );
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
         }
         sort($files);
         return $files;
