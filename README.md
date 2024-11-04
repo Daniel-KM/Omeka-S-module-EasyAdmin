@@ -249,6 +249,8 @@ TODO
   each time (ready in modules [Iiif Server] and [Image Server]).
 - [ ] Remove old logs.
 - [ ] A main cleaning task.
+- [ ] Add a checkbox in page assets to optimise assets in batch.
+- [ ] Add a deduplicator for assets (and replace assets used as resource thumbnails and in pages).
 
 
 Warning
