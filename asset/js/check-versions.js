@@ -83,7 +83,7 @@ $(document).ready(function() {
                     }
                     // Js package semver was replaced by compareVersions since Omeka S v4.0.1.
                     // Still try original comparator to keep original url.
-                    if (compareVersions) {
+                    if (typeof compareVersions !== 'undefined') {
                         try {
                             if (compareVersions.compareVersions(currentVersion, lastVersion) === -1) {
                                 addon.show();
@@ -91,7 +91,7 @@ $(document).ready(function() {
                             return;
                         } catch (e) {
                         }
-                    } else if (semver) {
+                    } else if (typeof semver !== 'undefined') {
                         try {
                             if (semver.lt(currentVersion, lastVersion)) {
                                 addon.show();
