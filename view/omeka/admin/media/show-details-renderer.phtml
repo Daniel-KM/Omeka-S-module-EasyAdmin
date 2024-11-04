@@ -1,0 +1,16 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\MediaRepresentation $media
+ * @var \Omeka\Api\Representation\MediaRepresentation $resource
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+?>
+
+    <div class="meta-group">
+        <h4><?= $translate('Renderer') ?></h4>
+        <div class="value"><?= $escape($translate($media->renderer())) ?></div>
+    </div>

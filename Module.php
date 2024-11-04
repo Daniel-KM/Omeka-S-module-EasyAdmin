@@ -537,13 +537,15 @@ REGEX;
 
     public function handleViewDetailsResource(Event $event): void
     {
+        /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+        $resource = $event->getParam('entity');
+
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
+
         $interface = $settings->get('easyadmin_interface') ?: [];
         $buttonPublicView = in_array('resource_public_view', $interface);
         if ($buttonPublicView) {
-            /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
-            $resource = $event->getParam('entity');
             // TODO Fix for item sets.
             $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
             $skip = !$isOldOmeka && $resource->resourceName() === 'items' && count($resource->sites());
@@ -551,6 +553,14 @@ REGEX;
                 $htmlSites = $this->prepareSitesResource($resource);
                 echo $htmlSites;
             }
+        }
+
+        if ($resource instanceof \Omeka\Api\Representation\MediaRepresentation) {
+            $view = $event->getTarget();
+            echo $view->partial('admin/media/show-details-renderer', [
+                'media' => $resource,
+                'resource' => $resource,
+            ]);
         }
     }
 
