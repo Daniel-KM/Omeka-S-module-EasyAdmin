@@ -313,3 +313,18 @@ if (version_compare($oldVersion, '3.4.21', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.22', '<')) {
+    // Refresh the list of addons.
+    // The plugin is not available during install.
+    require_once __DIR__ . '/../../src/Mvc/Controller/Plugin/Addons.php';
+    $addons = new \EasyAdmin\Mvc\Controller\Plugin\Addons(
+        $services->get('Omeka\HttpClient')
+    );
+    $addons(true);
+
+    $message = new PsrMessage(
+        'It is now possible to install a curated selection of modules.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
