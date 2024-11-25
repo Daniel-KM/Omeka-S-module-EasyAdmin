@@ -22,11 +22,9 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
 <?= $this->pageTitle($translate('Upload files'), 1, $translate('Easy Admin')) ?>
 
 <p>
-    <?= $translate('Upload files without size or number limitation and without direct access to server.') ?>
-</p>
-
-<p>
-    <?= $translate('All uploaded files will be stored directly at the root of the configured directory.') ?>
+    <?= sprintf(
+        $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s or %3$sBulk Import%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
+        '<a href="https://omeka.org/s/modules/FileSideload/" target="_blank">', '</a>', '<a href="https://omeka.org/s/modules/BulkImport" target="_blank">') ?>
 </p>
 
 <p>
@@ -35,17 +33,17 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
 
 <div id="bulk-upload" class="media-field-wrapper">
     <div class="field media-bulk-upload" data-main-index="__index__" <?= $htmlAttributes($data) ?>>
-        <div class="field">
+        <div class="field field-drag-and-drop">
             <div class="inputs bulk-drop">
                 <span><?= $escape($translate('Drag and drop')) ?></span>
             </div>
         </div>
-        <div class="field">
+        <div class="field field-browse-files">
             <div class="inputs">
                 <button type="button" class="button-browse button-browse-files"><?= $escape($translate('Browse files')) ?></button>
             </div>
         </div>
-        <div class="field">
+        <div class="field field-browse-folders">
             <div class="inputs">
                 <button type="button" class="button-browse button-browse-directory" webkitdirectory="webkitdirectory"><?= $escape($translate('Select directory')) ?></button>
             </div>

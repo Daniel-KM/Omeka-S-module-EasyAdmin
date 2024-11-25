@@ -1,6 +1,8 @@
-/* Easy Admin: Bulk Upload styles */
+/* Easy Admin */
 
 @media screen {
+    /* Bulk Upload styles */
+
     .bulk-uploads .subhead::before,
     .bulk-uploads .no-resources:before {
         content:"";
@@ -106,5 +108,11 @@
     }
     .media-info.messages.warning {
         color: orange;
+    }
+
+    /** Tools. */
+
+    .media-field-wrapper .field.field-drag-and-drop {
+        height: 50vh;
     }
 }
