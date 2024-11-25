@@ -12,12 +12,29 @@ class AddonsFormFactory implements FactoryInterface
     {
         $plugins = $services->get('ControllerPluginManager');
 
-        $settings = $services->get('Omeka\Settings');
-        $selections = $settings->get('easyadmin_selections_modules') ?: [];
+        $csv = @file_get_contents('https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/refs/heads/master/_data/omeka_s_selections.csv');
+        $selections = [];
+        if ($csv) {
+            $headers = [];
+            $isFirst = true;
+            foreach (explode("\n", $csv) as $row) {
+                $row = str_getcsv($row) ?: [];
+                if ($isFirst) {
+                    $headers = array_flip($row);
+                    $isFirst = false;
+                } elseif ($row) {
+                    $name = $row[$headers['Name']] ?? '';
+                    if ($name) {
+                        $selections[] = $name;
+                    }
+                }
+            }
+        }
 
         $form = new AddonsForm();
         return $form
             ->setAddons($plugins->get('easyAdminAddons'))
-            ->setSelections($selections);
+            ->setSelections($selections)
+        ;
     }
 }

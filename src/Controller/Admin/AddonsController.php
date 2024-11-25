@@ -52,49 +52,49 @@ class AddonsController extends AbstractActionController
         $data = $form->getData();
 
         if (!empty($data['selection'])) {
-            $selections = $this->settings()->get('easyadmin_selections_modules') ?: [];
-            $selectionModules = $selections[$data['selection']] ?? [];
+            $selections = $this->getSelectionsModules();
+            $selectionAddons = $selections[$data['selection']] ?? [];
             $unknowns = [];
             $existings = [];
             $errors = [];
             $installeds = [];
-            foreach ($selectionModules as $module) {
-                $addon = $addons->dataFromNamespace($module);
+            foreach ($selectionAddons as $addonName) {
+                $addon = $addons->dataFromNamespace($addonName);
                 if (!$addon) {
-                    $unknowns[] = $module;
+                    $unknowns[] = $addonName;
                 } elseif ($addons->dirExists($addon)) {
-                    $existings[] = $module;
+                    $existings[] = $addonName;
                 } else {
                     $result = $this->installAddon($addon);
                     if ($result) {
-                        $installeds[] = $module;
+                        $installeds[] = $addonName;
                     } else {
-                        $errors[] = $module;
+                        $errors[] = $addonName;
                     }
                 }
             }
             if (count($unknowns)) {
                 $messenger->addWarning(new PsrMessage(
-                    'The following modules of the selection are unknown: {modules}.', // @translate
-                    ['modules' => implode(', ', $unknowns)]
+                    'The following modules of the selection are unknown: {addons}.', // @translate
+                    ['addons' => implode(', ', $unknowns)]
                 ));
             }
             if (count($existings)) {
                 $messenger->addNotice(new PsrMessage(
-                    'The following modules are already installed: {modules}.', // @translate
-                    ['modules' => implode(', ', $existings)]
+                    'The following modules are already installed: {addons}.', // @translate
+                    ['addons' => implode(', ', $existings)]
                 ));
             }
             if (count($errors)) {
                 $messenger->addError(new PsrMessage(
-                    'The following modules cannot be installed: {modules}.', // @translate
-                    ['modules' => implode(', ', $errors)]
+                    'The following modules cannot be installed: {addons}.', // @translate
+                    ['addons' => implode(', ', $errors)]
                 ));
             }
             if (count($installeds)) {
                 $messenger->addSuccess(new PsrMessage(
-                    'The following modules have been installed: {modules}.', // @translate
-                    ['modules' => implode(', ', $installeds)]
+                    'The following modules have been installed: {addons}.', // @translate
+                    ['addons' => implode(', ', $installeds)]
                 ));
             }
             return $this->redirect()->toRoute(null, ['action' => 'index'], true);
@@ -465,6 +465,33 @@ class AddonsController extends AbstractActionController
         /** @var \Omeka\Api\Representation\ModuleRepresentation[] $modules */
         $modules = $this->api()->search('modules', ['id' => $module])->getContent();
         return $modules[$module] ?? null;
+    }
+
+    /**
+     * Get curated selections of modules from the web.
+     */
+    protected function getSelectionsModules(): array
+    {
+        $csv = @file_get_contents('https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/refs/heads/master/_data/omeka_s_selections.csv');
+        $selections = [];
+        if ($csv) {
+            // Get the column for name and modules.
+            $headers = [];
+            $isFirst = true;
+            foreach (explode("\n", $csv) as $row) {
+                $row = str_getcsv($row) ?: [];
+                if ($isFirst) {
+                    $headers = array_flip($row);
+                    $isFirst = false;
+                } elseif ($row) {
+                    $name = $row[$headers['Name']] ?? '';
+                    if ($name) {
+                        $selections[$name] = array_map('trim', explode(',', $row[$headers['Modules and themes']] ?? ''));
+                    }
+                }
+            }
+        }
+        return $selections;
     }
 
     /**

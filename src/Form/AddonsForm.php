@@ -70,9 +70,9 @@ class AddonsForm extends Form
                 'name' => 'selection',
                 'type' => Select::class,
                 'options' => [
-                    'label' => 'Curated selections of modules', // @translate
+                    'label' => 'Curated selections of modules and themes', // @translate
                     'empty_option' => '',
-                    'value_options' => array_combine(array_keys($this->selections), array_keys($this->selections)),
+                    'value_options' => array_combine($this->selections, $this->selections),
                 ],
                 'attributes' => [
                     'id' => 'selection',
