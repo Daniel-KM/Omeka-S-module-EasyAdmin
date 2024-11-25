@@ -13,6 +13,11 @@ class AddonsForm extends Form
      */
     protected $addons;
 
+    /**
+     * @var array
+     */
+    protected $selections = [];
+
     public function init(): void
     {
         $addonLabels = [
@@ -59,6 +64,30 @@ class AddonsForm extends Form
                     'required' => false,
                 ]);
         }
+
+        $this
+            ->add([
+                'name' => 'selection',
+                'type' => Select::class,
+                'options' => [
+                    'label' => 'Curated selections of modules', // @translate
+                    'empty_option' => '',
+                    'value_options' => array_combine(array_keys($this->selections), array_keys($this->selections)),
+                ],
+                'attributes' => [
+                    'id' => 'selection',
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select below…', // @translate
+                ],
+            ])
+        ;
+
+        $inputFilter = $this->getInputFilter();
+        $inputFilter
+            ->add([
+                'name' => 'selection',
+                'required' => false,
+            ]);
     }
 
     public function setAddons(Addons $addons): self
@@ -70,5 +99,16 @@ class AddonsForm extends Form
     public function getAddons(): Addons
     {
         return $this->addons;
+    }
+
+    public function setSelections(array $selections): self
+    {
+        $this->selections = $selections;
+        return $this;
+    }
+
+    public function getSelections(): array
+    {
+        return $this->selections;
     }
 }

@@ -27,8 +27,13 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin easy-admin-addo
 </p>
 
 <p class="explanation">
-    <?= $translate('Select either a module or a theme.') ?>
+    <?= $translate('Select either a module, a theme or a selection. Only one choice can be submitted at a time.') ?>
     <?= $translate('Addons with an asterisk are already downloaded.') ?>
+</p>
+
+<p class="explanation">
+    <?= sprintf($translate('See the details of the %1$scurated selections of modules%2$s.'),
+        '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/blob/master/config/selections.config.php" rel="noopener" target="_blank">', '</a>') ?>
 </p>
 
 <?= $this->form()->openTag($form) ?>

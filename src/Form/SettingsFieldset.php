@@ -111,6 +111,54 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_selections_modules',
+                'type' => CommonElement\GroupTextarea::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Curated selections or modules', // @translate
+                    'info' => 'Use the canonical name of the module (case sensitive, without space)', // @translate
+                    'default_group_name' => 'Selection %s',
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_selections_modules',
+                    'rows' => 12,
+                    'placeholder' => <<<'TXT'
+                        # Database for researcher
+                        Common
+                        CustomOntology
+                        CustomVocab
+                        DataTypeRdf
+                        EasyAdmin
+                        Log
+                        NumericDataTypes
+                        
+                        # Standard digital library for libraries
+                        AdvancedResourceTemplate
+                        AdvancedSearch
+                        BlockPlus
+                        BulkEdit
+                        BulkExport
+                        BulkImport
+                        Coins
+                        Common
+                        ContactUs
+                        CustomOntology
+                        CustomVocab
+                        DataTypeRdf
+                        EasyAdmin
+                        IiifServer
+                        ImageServer
+                        Log
+                        Mirador
+                        NumericDataTypes
+                        OaiPmhRepository
+                        Reference
+                        ValueSuggest
+                        TXT,
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_maintenance_mode',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

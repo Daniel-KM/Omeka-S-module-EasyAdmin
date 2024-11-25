@@ -12,8 +12,12 @@ class AddonsFormFactory implements FactoryInterface
     {
         $plugins = $services->get('ControllerPluginManager');
 
+        $settings = $services->get('Omeka\Settings');
+        $selections = $settings->get('easyadmin_selections_modules') ?: [];
+
         $form = new AddonsForm();
         return $form
-            ->setAddons($plugins->get('easyAdminAddons'));
+            ->setAddons($plugins->get('easyAdminAddons'))
+            ->setSelections($selections);
     }
 }

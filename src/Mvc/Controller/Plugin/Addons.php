@@ -127,6 +127,23 @@ class Addons extends AbstractPlugin
     }
 
     /**
+     * Get addon data from the namespace of the module.
+     */
+    public function dataFromNamespace(string $namespace, ?string $type = null): array
+    {
+        $list = $type
+            ? (isset($this->addons[$type]) ? [$type => $this->addons[$type]] : [])
+            : $this->addons;
+        foreach ($list as $type => $addonsForType) {
+            $addonsUrl = array_column($addonsForType, 'url', 'dir');
+            if (isset($addonsUrl[$namespace]) && isset($addonsForType[$addonsUrl[$namespace]])) {
+                return $addonsForType[$addonsUrl[$namespace]];
+            }
+        }
+        return [];
+    }
+
+    /**
      * Get addon data from the url of the repository.
      */
     public function dataFromUrl(string $url, string $type): array
@@ -229,6 +246,7 @@ class Addons extends AbstractPlugin
                 : array_filter(array_map('trim', explode(',', $row[$headers['Dependencies']])));
 
             $zip = $row[$headers['Last released zip']];
+            // Warning: the url with master may not have dependencies.
             if (!$zip) {
                 switch ($server) {
                     case 'github.com':
@@ -250,6 +268,7 @@ class Addons extends AbstractPlugin
             $addon['basename'] = basename($url);
             $addon['dir'] = $addonName;
             $addon['version'] = $version;
+            $addon['url'] = $url;
             $addon['zip'] = $zip;
             $addon['dependencies'] = $dependencies;
 
@@ -283,6 +302,7 @@ class Addons extends AbstractPlugin
 
             $version = $data['latest_version'];
             $url = 'https://github.com/' . $data['owner'] . '/' . $data['repo'];
+            // Warning: the url with master may not have dependencies.
             $zip = $data['versions'][$version]['download_url'] ?? $url . '/archive/master.zip';
 
             $addon = [];
@@ -292,6 +312,7 @@ class Addons extends AbstractPlugin
             $addon['basename'] = $data['dirname'];
             $addon['dir'] = $data['dirname'];
             $addon['version'] = $data['latest_version'];
+            $addon['url'] = $url;
             $addon['zip'] = $zip;
             $addon['dependencies'] = [];
 

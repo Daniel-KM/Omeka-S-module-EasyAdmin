@@ -51,6 +51,55 @@ class AddonsController extends AbstractActionController
 
         $data = $form->getData();
 
+        if (!empty($data['selection'])) {
+            $selections = $this->settings()->get('easyadmin_selections_modules') ?: [];
+            $selectionModules = $selections[$data['selection']] ?? [];
+            $unknowns = [];
+            $existings = [];
+            $errors = [];
+            $installeds = [];
+            foreach ($selectionModules as $module) {
+                $addon = $addons->dataFromNamespace($module);
+                if (!$addon) {
+                    $unknowns[] = $module;
+                } elseif ($addons->dirExists($addon)) {
+                    $existings[] = $module;
+                } else {
+                    $result = $this->installAddon($addon);
+                    if ($result) {
+                        $installeds[] = $module;
+                    } else {
+                        $errors[] = $module;
+                    }
+                }
+            }
+            if (count($unknowns)) {
+                $messenger->addWarning(new PsrMessage(
+                    'The following modules of the selection are unknown: {modules}.', // @translate
+                    ['modules' => implode(', ', $unknowns)]
+                ));
+            }
+            if (count($existings)) {
+                $messenger->addNotice(new PsrMessage(
+                    'The following modules are already installed: {modules}.', // @translate
+                    ['modules' => implode(', ', $existings)]
+                ));
+            }
+            if (count($errors)) {
+                $messenger->addError(new PsrMessage(
+                    'The following modules cannot be installed: {modules}.', // @translate
+                    ['modules' => implode(', ', $errors)]
+                ));
+            }
+            if (count($installeds)) {
+                $messenger->addSuccess(new PsrMessage(
+                    'The following modules have been installed: {modules}.', // @translate
+                    ['modules' => implode(', ', $installeds)]
+                ));
+            }
+            return $this->redirect()->toRoute(null, ['action' => 'index'], true);
+        }
+
         foreach ($addons->types() as $type) {
             $url = $data[$type] ?? null;
             if ($url) {
