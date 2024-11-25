@@ -73,16 +73,16 @@ class Addons extends AbstractPlugin
      *
      * @return array
      */
-    public function __invoke(): array
+    public function __invoke(bool $refresh = false): array
     {
         // Build the list of addons only once.
-        if (!$this->isEmpty()) {
+        if (!$refresh && !$this->isEmpty()) {
             return $this->addons;
         }
 
         // Check the cache.
         $container = new Container('EasyAdmin');
-        if (isset($container->addons)) {
+        if (!$refresh && !isset($container->addons)) {
             $this->addons = $container->addons;
             if (!$this->isEmpty()) {
                 return $this->addons;
