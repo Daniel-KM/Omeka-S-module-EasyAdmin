@@ -17,6 +17,7 @@ class CheckAndFixForm extends Form
     public function init(): void
     {
         $this
+            ->setAttribute('id', 'form-check-and-fix')
             ->appendFieldsetFilesCheckFix()
             ->appendFieldsetFilesDatabase()
             ->appendFieldsetResourceValues()
@@ -26,6 +27,25 @@ class CheckAndFixForm extends Form
             ->appendFieldsetCache()
             ->appendFieldsetTasks()
         ;
+
+        $taskWarnings = [
+            'files_missing_fix_db',
+            'files_media_no_original_fix',
+            'theme_templates_fix',
+        ];
+        $this->setAttribute('data-tasks-warning', implode(',', $taskWarnings));
+
+        $this
+            ->add([
+                'name' => 'toggle_tasks_with_warning',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display dangerous tasks', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'toggle_tasks_with_warning',
+                ],
+            ]);
 
         $event = new Event('form.add_elements', $this);
         $this->getEventManager()->triggerEvent($event);
