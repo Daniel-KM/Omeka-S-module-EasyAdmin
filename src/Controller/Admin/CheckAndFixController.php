@@ -175,8 +175,24 @@ class CheckAndFixController extends AbstractActionController
                     'job' => null,
                     'args' => [],
                 ]);
-                $eventManager->triggerEvent(new MvcEvent('easyadmin.job', null, $args));
+                $eventManager->trigger('easyadmin.job', $this, $args);
                 $jobClass = $args['job'];
+                // TODO Remove this fix when it will be pushed for all known modules.
+                if (!$jobClass) {
+                    /*
+                    [
+                        'Compilatio' => '3.4.2',
+                        'Dante' => '3.4.7',
+                        'Guest' => '3.4.29',
+                        'IiifServer' => '3.6.23',
+                        'Reference' => '3.4.51',
+                        'Statistics' => '3.4.9',
+                        'Thesaurus' => '3.4.19',
+                    ];
+                    */
+                    $eventManager->trigger('easyadmin.job', null, $args);
+                    $jobClass = $args['job'];
+                }
                 if ($jobClass) {
                     $job = $dispatcher->dispatch($jobClass, $args['args']);
                 } else {
