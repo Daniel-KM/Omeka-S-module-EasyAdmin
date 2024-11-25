@@ -61,7 +61,7 @@ class Addons extends AbstractPlugin
      *
      * @var array
      */
-    protected $addons;
+    protected $addons = [];
 
     public function __construct(HttpClient $httpClient)
     {
@@ -73,7 +73,7 @@ class Addons extends AbstractPlugin
      *
      * @return array
      */
-    public function __invoke()
+    public function __invoke(): array
     {
         // Build the list of addons only once.
         if (!$this->isEmpty()) {
@@ -104,10 +104,8 @@ class Addons extends AbstractPlugin
 
     /**
      * Check if the lists of addons are empty.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         if (empty($this->addons)) {
             return true;
@@ -122,22 +120,16 @@ class Addons extends AbstractPlugin
 
     /**
      * Get the list of default types.
-     *
-     * @return array
      */
-    public function types()
+    public function types(): array
     {
         return array_keys($this->data);
     }
 
     /**
-     * Get addon data.
-     *
-     * @param string $url
-     * @param string $type
-     * @return array
+     * Get addon data from the url of the repository.
      */
-    public function dataForUrl($url, $type)
+    public function dataFromUrl(string $url, string $type): array
     {
         return $this->addons && isset($this->addons[$type][$url])
             ? $this->addons[$type][$url]
@@ -148,9 +140,8 @@ class Addons extends AbstractPlugin
      * Check if an addon is installed.
      *
      * @param array $addon
-     * @return bool
      */
-    public function dirExists($addon)
+    public function dirExists($addon): bool
     {
         $destination = OMEKA_PATH . $this->data[$addon['type']]['destination'];
         $existings = $this->listDirsInDir($destination);
@@ -163,9 +154,8 @@ class Addons extends AbstractPlugin
      * Helper to list the addons from a web page.
      *
      * @param string $type
-     * @return array
      */
-    protected function listAddonsForType($type)
+    protected function listAddonsForType($type): array
     {
         if (!isset($this->data[$type]['source'])) {
             return [];
@@ -191,9 +181,8 @@ class Addons extends AbstractPlugin
      * Helper to get content from an external url.
      *
      * @param string $url
-     * @return string
      */
-    protected function fileGetContents($url)
+    protected function fileGetContents($url): ?string
     {
         $uri = new HttpUri($url);
         $client = $this->httpClient;
@@ -217,9 +206,8 @@ class Addons extends AbstractPlugin
      *
      * @param string $csv
      * @param string $type
-     * @return array
      */
-    protected function extractAddonList($csv, $type)
+    protected function extractAddonList($csv, $type): array
     {
         $list = [];
 
@@ -278,9 +266,8 @@ class Addons extends AbstractPlugin
      *
      * @param string $json
      * @param string $type
-     * @return array
      */
-    protected function extractAddonListFromOmeka($json, $type)
+    protected function extractAddonListFromOmeka($json, $type): array
     {
         $list = [];
 
@@ -318,9 +305,8 @@ class Addons extends AbstractPlugin
      * List directories in a directory, not recursively.
      *
      * @param string $dir
-     * @return array
      */
-    protected function listDirsInDir($dir)
+    protected function listDirsInDir($dir): array
     {
         static $dirs;
 

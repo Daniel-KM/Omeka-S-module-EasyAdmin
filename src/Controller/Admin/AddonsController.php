@@ -14,15 +14,21 @@ class AddonsController extends AbstractActionController
 {
     public function indexAction()
     {
-        $view = new ViewModel;
+        /**
+         * @var \EasyAdmin\Form\AddonsForm $form
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         */
 
-        /** @var \EasyAdmin\Form\AddonsForm $form */
         $form = $this->getForm(AddonsForm::class);
-        $view->form = $form;
+        $messenger = $this->messenger();
+
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
 
         $addons = $form->getAddons();
         if ($addons->isEmpty()) {
-            $this->messenger()->addWarning(
+            $messenger->addWarning(
                 'No addon to list: check your connection.' // @translate
             );
             return $view;
@@ -37,7 +43,7 @@ class AddonsController extends AbstractActionController
         $form->setData($this->params()->fromPost());
 
         if (!$form->isValid()) {
-            $this->messenger()->addError(
+            $messenger->addError(
                 'There was an error on the form. Please try again.' // @translate
             );
             return $view;
@@ -48,11 +54,11 @@ class AddonsController extends AbstractActionController
         foreach ($addons->types() as $type) {
             $url = $data[$type] ?? null;
             if ($url) {
-                $addon = $addons->dataForUrl($url, $type);
+                $addon = $addons->dataFromUrl($url, $type);
                 if ($addons->dirExists($addon)) {
                     // Hack to get a clean message.
                     $type = str_replace('omeka', '', $type);
-                    $this->messenger()->addError(new PsrMessage(
+                    $messenger->addError(new PsrMessage(
                         'The {type} "{name}" is already downloaded.', // @translate
                         ['type' => $type, 'name' => $addon['name']]
                     ));
@@ -63,7 +69,7 @@ class AddonsController extends AbstractActionController
             }
         }
 
-        $this->messenger()->addError(
+        $messenger->addError(
             'Nothing processed. Please try again.' // @translate
         );
         return $this->redirect()->toRoute(null, ['action' => 'index'], true);
@@ -71,11 +77,15 @@ class AddonsController extends AbstractActionController
 
     /**
      * Helper to install an addon.
-     *
-     * @param array $addon
      */
-    protected function installAddon(array $addon): void
+    protected function installAddon(array $addon): bool
     {
+        /**
+         * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
+         */
+
+        $messenger = $this->messenger();
+
         switch ($addon['type']) {
             case 'module':
                 $destination = OMEKA_PATH . '/modules';
@@ -86,7 +96,7 @@ class AddonsController extends AbstractActionController
                 $type = 'theme';
                 break;
             default:
-                return;
+                return false;
         }
 
         $missingDependencies = [];
@@ -104,23 +114,23 @@ class AddonsController extends AbstractActionController
             }
         }
         if ($missingDependencies) {
-            $this->messenger()->addError(new PsrMessage(
+            $messenger->addError(new PsrMessage(
                 'The module "{module}" requires the dependencies "{names}" installed and enabled first.', // @translate
                 ['module' => $addon['name'], 'names' => implode('", "', $missingDependencies)]
             ));
-            return;
+            return false;
         }
 
         $isWriteableDestination = is_writeable($destination);
         if (!$isWriteableDestination) {
-            $this->messenger()->addError(new PsrMessage(
+            $messenger->addError(new PsrMessage(
                 'The {type} directory is not writeable by the server.', // @translate
                 ['type' => $type]
             ));
-            return;
+            return false;
         }
         // Add a message for security hole.
-        $this->messenger()->addWarning(new PsrMessage(
+        $messenger->addWarning(new PsrMessage(
             'Don’t forget to protect the {type} directory from writing after installation.', // @translate
             ['type' => $type]
         ));
@@ -130,30 +140,30 @@ class AddonsController extends AbstractActionController
         if (file_exists($zipFile)) {
             $result = @unlink($zipFile);
             if (!$result) {
-                $this->messenger()->addError(new PsrMessage(
+                $messenger->addError(new PsrMessage(
                     'A zipfile exists with the same name in the {type} directory and cannot be removed.', // @translate
                     ['type' => $type]
                 ));
-                return;
+                return false;
             }
         }
 
         if (file_exists($destination . DIRECTORY_SEPARATOR . $addon['dir'])) {
-            $this->messenger()->addError(new PsrMessage(
+            $messenger->addError(new PsrMessage(
                 'The {type} directory "{name}" already exists.', // @translate
                 ['type' => $type, 'name' => $addon['dir']]
             ));
-            return;
+            return false;
         }
 
         // Get the zip file from server.
         $result = $this->downloadFile($addon['zip'], $zipFile);
         if (!$result) {
-            $this->messenger()->addError(new PsrMessage(
+            $messenger->addError(new PsrMessage(
                 'Unable to fetch the {type} "{name}".', // @translate
                 ['type' => $type, 'name' => $addon['name']]
             ));
-            return;
+            return false;
         }
 
         // Unzip downloaded file.
@@ -162,11 +172,11 @@ class AddonsController extends AbstractActionController
         unlink($zipFile);
 
         if (!$result) {
-            $this->messenger()->addError(new PsrMessage(
+            $messenger->addError(new PsrMessage(
                 'An error occurred during the unzipping of the {type} "{name}".', // @translate
                 ['type' => $type, 'name' => $addon['name']]
             ));
-            return;
+            return false;
         }
 
         // Move the addon to its destination.
@@ -184,16 +194,16 @@ class AddonsController extends AbstractActionController
                     /** @var \Omeka\Api\Representation\ModuleRepresentation @module */
                     $module = $this->getModule('Generic');
                     if (empty($module)
-                        || version_compare($module->getJsonLd()['o:ini']['version'] ?? '', '3.4.43', '<')
+                        || version_compare($module->getJsonLd()['o:ini']['version'] ?? '', '3.4.47', '<')
                     ) {
-                        $this->messenger()->addError(new PsrMessage(
+                        $messenger->addError(new PsrMessage(
                             'The module "{name}" requires the dependency "Generic" version "{version}" available first.', // @translate
-                            ['name' => $addon['name'], 'version' => '3.4.43']
+                            ['name' => $addon['name'], 'version' => '3.4.47']
                         ));
                         // Remove the folder to avoid a fatal error (Generic is a
                         // required abstract class).
                         $this->rmDir($destination . DIRECTORY_SEPARATOR . $addon['dir']);
-                        return;
+                        return false;
                     }
                 }
             }
@@ -203,18 +213,20 @@ class AddonsController extends AbstractActionController
             'If "{name}" doesn’t appear in the list of {type}, its directory may need to be renamed.', // @translate
             ['name' => $addon['name'], 'type' => InflectorFactory::create()->build()->pluralize($type)]
         );
-        $this->messenger()->add(
+        $messenger->add(
             $result ? Messenger::NOTICE : Messenger::WARNING,
             $message
         );
-        $this->messenger()->addSuccess(new PsrMessage(
+        $messenger->addSuccess(new PsrMessage(
             '{type} uploaded successfully', // @translate
             ['type' => ucfirst($type)]
         ));
 
-        $this->messenger()->addNotice(new PsrMessage(
+        $messenger->addNotice(new PsrMessage(
             'It is always recommended to read the original readme or help of the addon.' // @translate
         ));
+
+        return true;
     }
 
     /**
@@ -224,7 +236,7 @@ class AddonsController extends AbstractActionController
      * @param string $destination
      * @return bool
      */
-    protected function downloadFile($source, $destination)
+    protected function downloadFile($source, $destination): bool
     {
         $handle = @fopen($source, 'rb');
         if (empty($handle)) {
@@ -242,7 +254,7 @@ class AddonsController extends AbstractActionController
      * @param string $destination A writeable dir.
      * @return bool
      */
-    protected function unzipFile($source, $destination)
+    protected function unzipFile($source, $destination): bool
     {
         // Unzip via php-zip.
         if (class_exists('ZipArchive')) {
@@ -290,7 +302,7 @@ class AddonsController extends AbstractActionController
      * @param string $addon
      * @return bool
      */
-    protected function moveAddon($addon)
+    protected function moveAddon($addon): bool
     {
         switch ($addon['type']) {
             case 'module':

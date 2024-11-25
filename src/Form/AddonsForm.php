@@ -22,8 +22,7 @@ class AddonsForm extends Form
             'theme' => 'Themes web', // @translate
         ];
 
-        $addons = $this->getAddons();
-        $list = $addons();
+        $list = $this->addons->__invoke();
         foreach ($list as $addonType => $addonsForType) {
             if (empty($addonsForType)) {
                 continue;
@@ -32,31 +31,33 @@ class AddonsForm extends Form
             foreach ($addonsForType as $url => $addon) {
                 $label = $addon['name'];
                 $label .= $addon['version'] ? ' [v' . $addon['version'] . ']' : '[]';
-                $label .= $addons->dirExists($addon) ? ' *' : '';
+                $label .= $this->addons->dirExists($addon) ? ' *' : '';
                 $valueOptions[$url] = $label;
             }
 
-            $this->add([
-                'name' => $addonType,
-                'type' => Select::class,
-                'options' => [
-                    'label' => $addonLabels[$addonType],
-                    'info' => '',
-                    'empty_option' => '',
-                    'value_options' => $valueOptions,
-                ],
-                'attributes' => [
-                    'id' => $addonType,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select below…', // @translate
-                ],
-            ]);
+            $this
+                ->add([
+                    'name' => $addonType,
+                    'type' => Select::class,
+                    'options' => [
+                        'label' => $addonLabels[$addonType],
+                        'info' => '',
+                        'empty_option' => '',
+                        'value_options' => $valueOptions,
+                    ],
+                    'attributes' => [
+                        'id' => $addonType,
+                        'class' => 'chosen-select',
+                        'data-placeholder' => 'Select below…', // @translate
+                    ],
+                ]);
 
             $inputFilter = $this->getInputFilter();
-            $inputFilter->add([
-                'name' => $addonType,
-                'required' => false,
-            ]);
+            $inputFilter
+                ->add([
+                    'name' => $addonType,
+                    'required' => false,
+                ]);
         }
     }
 
