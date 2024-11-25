@@ -11,7 +11,8 @@ admin interface:
 - bulk upload multiple files in item form, bypassing any server post limits
 - buttons to public view and previous/next resources in admin resource show page
 - content lock to avoid concurrent edition
-- install modules
+- install modules and themes
+- install [curated selection of modules]
 - update modules (in a future version)
 - maintenance state for public and admin even when no migration
 - checks database and files
@@ -304,12 +305,16 @@ Copyright
 * Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM] on GitLab)
 
 This module is a merge and improvement of previous modules [Easy Install], [Next],
-[Maintenance], [Bulk Check] and [Generic].
-The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
+[Maintenance], [Bulk Check] and [Generic]. The idea of [Easy Install] comes from
+the plugin [Escher] for [Omeka Classic].
+
+The curated selections of modules was implemented for the [digital library Manioc]
+of the [Université des Antilles et de la Guyane].
 
 
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Omeka S]: https://omeka.org/s
+[curated selection of modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_selections.html
 [Easy Install]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyInstall
 [Bulk Check]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkCheck
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
@@ -336,5 +341,7 @@ The idea of [Easy Install] comes from the plugin [Escher] for [Omeka Classic].
 [OSI]: http://opensource.org
 [Escher]: https://github.com/AcuGIS/Escher
 [Omeka Classic]: https://omeka.org/classic
+[digital library Manioc]: http://www.manioc.org
+[Université des Antilles et de la Guyane]: http://www.univ-ag.fr
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
