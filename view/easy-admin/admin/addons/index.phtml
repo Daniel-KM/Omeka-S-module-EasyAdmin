@@ -4,25 +4,39 @@
  * @var \EasyAdmin\Form\AddonsForm $form
  */
 
-$translate = $this->plugin('translate');
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+
 $form->prepare();
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
+
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin easy-admin-addons');
 ?>
 
-<?php echo $this->pageTitle($translate('Easy Admin')); ?>
+<?= $this->pageTitle($translate('Install addons'), 1, $translate('Easy Admin')) ?>
+
 <p class="explanation">
-    <?php echo sprintf($translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
+    <?= sprintf($translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html" rel="noopener" target="_blank">', '</a>',
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html" rel="noopener" target="_blank">', '</a>',
-        '<a href="https://omeka.org/s" rel="noopener" target="_blank">', '</a>'); ?>
-</p>
-<p class="explanation">
-    <?php echo $translate('Select either a module or a theme.'); ?>
-    <?php echo $translate('Addons with an asterisk are already downloaded.'); ?>
+        '<a href="https://omeka.org/s" rel="noopener" target="_blank">', '</a>') ?>
 </p>
 
-<?php echo $this->form()->openTag($form); ?>
-<?php echo $this->formCollection($form, false); ?>
-<fieldset id='upload'>
-    <button type="submit"><?php echo $translate('Upload'); ?></button>
-</fieldset>
-<?php echo $this->form()->closeTag($form); ?>
+<p class="explanation">
+    <?= $translate('Select either a module or a theme.') ?>
+    <?= $translate('Addons with an asterisk are already downloaded.') ?>
+</p>
+
+<?= $this->form()->openTag($form) ?>
+
+<div id="page-actions">
+    <input type="submit" name="upload" value="<?= $escape($translate('Upload')) ?>">
+</div>
+
+<?= $this->formCollection($form, false) ?>
+
+<?= $this->form()->closeTag($form) ?>

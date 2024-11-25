@@ -1,0 +1,10 @@
+/* Easy Admin */
+
+@media screen {
+    .easy-admin .subhead::before {
+        content: "";
+    }
+    .easy-admin-addons .chosen-container .chosen-results {
+        max-height: 50vh;
+    }
+}

@@ -148,7 +148,6 @@ return [
                         // Not "Upload" because translation is not good here.
                         'label' => 'Upload files', // @translate
                         'route' => 'admin/easy-admin/upload',
-                        'controller' => 'upload',
                         'action' => 'files',
                         'resource' => 'EasyAdmin\Controller\Upload',
                         'class' => 'o-icon- fa-cloud-upload-alt',

@@ -13,6 +13,8 @@ $form->prepare();
 
 $this->htmlElement('body')->appendAttribute('class', 'easy-admin check-and-fix browse');
 
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
 $this->headScript()
     ->appendFile($assetUrl('js/easy-admin.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
 ;
