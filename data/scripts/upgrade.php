@@ -321,7 +321,13 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
     $addons = new \EasyAdmin\Mvc\Controller\Plugin\Addons(
         $services->get('Omeka\HttpClient')
     );
-    $addons(true);
+    try {
+        $addons(true);
+    } catch (\Exception $e) {
+        // Addons may fail behind a proxy without internet access.
+        $container = new \Laminas\Session\Container('EasyAdmin');
+        unset($container->addons);
+    }
 
     $message = new PsrMessage(
         'It is now possible to install a curated selection of modules.' // @translate
