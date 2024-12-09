@@ -21,6 +21,10 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
 
 <?= $this->pageTitle($translate('Upload files'), 1, $translate('Easy Admin')) ?>
 
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
+</nav>
+
 <p>
     <?= sprintf(
         $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s or %3$sBulk Import%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
