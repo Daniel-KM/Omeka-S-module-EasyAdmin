@@ -80,6 +80,13 @@ class Addons extends AbstractPlugin
      */
     protected $expirationSeconds = 3600;
 
+    /**
+     * Cache for the list of selections.
+     *
+     * @var array
+     */
+    protected $selections = [];
+
     public function __construct(
         Api $api,
         HttpClient $httpClient,
@@ -109,7 +116,7 @@ class Addons extends AbstractPlugin
 
         // Check the cache.
         $container = new Container('EasyAdmin');
-        if (!$refresh && !isset($container->addons)) {
+        if (!$refresh && isset($container->addons)) {
             $this->addons = $container->addons;
             if (!$this->isEmpty()) {
                 return $this->addons;
@@ -132,8 +139,25 @@ class Addons extends AbstractPlugin
     /**
      * Get curated selections of modules from the web.
      */
-    public function getSelections(): array
+    public function getSelections(bool $refresh = false): array
     {
+        // Build the list of selections only once.
+        $isEmpty = !count($this->selections);
+
+        if (!$refresh && !$isEmpty) {
+            return $this->selections;
+        }
+
+        // Check the cache.
+        $container = new Container('EasyAdmin');
+        if (!$refresh && isset($container->selections)) {
+            $this->selections = $container->selections;
+            $isEmpty = !count($this->selections);
+            if (!$isEmpty) {
+                return $this->selections;
+            }
+        }
+
         $csv = @file_get_contents('https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/refs/heads/master/_data/omeka_s_selections.csv');
         $selections = [];
         if ($csv) {
@@ -153,6 +177,12 @@ class Addons extends AbstractPlugin
                 }
             }
         }
+
+        $container->selections = $this->selections;
+        $container
+            ->setExpirationSeconds($this->expirationSeconds)
+            ->setExpirationHops($this->expirationHops);
+
         return $selections;
     }
 
