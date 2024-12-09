@@ -604,6 +604,25 @@ class Addons extends AbstractPlugin
             if ($result === true) {
                 $result = $zip->extractTo($destination);
                 $zip->close();
+            } else {
+                /*
+                $zipErrors = [
+                    ZipArchive::ER_EXISTS => 'File already exists',
+                    ZipArchive::ER_INCONS => 'Zip archive inconsistent',
+                    ZipArchive::ER_INVAL => 'Invalid argument',
+                    ZipArchive::ER_MEMORY => 'Malloc failure',
+                    ZipArchive::ER_NOENT => 'No such file',
+                    ZipArchive::ER_NOZIP => 'Not a zip archive',
+                    ZipArchive::ER_OPEN => 'Can’t open file',
+                    ZipArchive::ER_READ => 'Read error',
+                    ZipArchive::ER_SEEK => 'Seek error',
+                ];
+                $this->logger->err(
+                    'Error when unzipping: {msg}', // @translate
+                    ['msg' => $zipErrors[$result] ?? 'Other zip error']
+                );
+                */
+                $result = false;
             }
         }
 
@@ -821,7 +840,7 @@ class Addons extends AbstractPlugin
         if (strpos($dirPath, '/..') !== false || substr($dirPath, 0, 1) !== '/') {
             return false;
         }
-        $files = array_diff(scandir($dirPath), ['.', '..']);
+        $files = array_diff(scandir($dirPath) ?: [], ['.', '..']);
         foreach ($files as $file) {
             $path = $dirPath . '/' . $file;
             if (is_dir($path)) {
