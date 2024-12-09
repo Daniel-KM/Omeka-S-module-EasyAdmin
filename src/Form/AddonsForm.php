@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Form;
 
+use Common\Form\Element as CommonElement;
 use EasyAdmin\Mvc\Controller\Plugin\Addons;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
@@ -43,7 +44,7 @@ class AddonsForm extends Form
             $this
                 ->add([
                     'name' => $addonType,
-                    'type' => Element\Select::class,
+                    'type' => CommonElement\OptionalSelect::class,
                     'options' => [
                         'label' => $addonLabels[$addonType],
                         'info' => '',
@@ -56,20 +57,13 @@ class AddonsForm extends Form
                         'data-placeholder' => 'Select below…', // @translate
                     ],
                 ]);
-
-            $inputFilter = $this->getInputFilter();
-            $inputFilter
-                ->add([
-                    'name' => $addonType,
-                    'required' => false,
-                ]);
         }
 
         if (!empty($this->selections)) {
             $this
                 ->add([
                     'name' => 'selection',
-                    'type' => Element\Select::class,
+                    'type' => CommonElement\OptionalSelect::class,
                     'options' => [
                         'label' => 'Curated selections of modules and themes', // @translate
                         'empty_option' => '',
@@ -81,7 +75,7 @@ class AddonsForm extends Form
                         'data-placeholder' => 'Select below…', // @translate
                     ],
                 ]);
-            }
+        }
 
         $this
             ->add([
@@ -95,13 +89,6 @@ class AddonsForm extends Form
                 ],
             ])
         ;
-
-        $inputFilter = $this->getInputFilter();
-        $inputFilter
-            ->add([
-                'name' => 'selection',
-                'required' => false,
-            ]);
     }
 
     public function setAddons(Addons $addons): self
