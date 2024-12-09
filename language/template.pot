@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 00:00+0000\n"
+"POT-Creation-Date: 2024-12-09 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -179,17 +179,17 @@ msgid "Upload files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/upload/files.phtml:38
+#: view/easy-admin/admin/upload/files.phtml:42
 msgid "Drag and drop"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/upload/files.phtml:43
+#: view/easy-admin/admin/upload/files.phtml:47
 msgid "Browse files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/upload/files.phtml:48
+#: view/easy-admin/admin/upload/files.phtml:52
 msgid "Select directory"
 msgstr ""
 
@@ -230,7 +230,7 @@ msgid "Alphabetic (with folder)"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/upload/files.phtml:57
+#: view/easy-admin/admin/upload/files.phtml:61
 msgid "Hide uploaded files"
 msgstr ""
 
@@ -263,42 +263,38 @@ msgid "Install addons"
 msgstr ""
 
 #: view/easy-admin/admin/addons/index.phtml:20
-#: view/easy-admin/admin/check-and-fix/index.phtml:23
+#: view/easy-admin/admin/check-and-fix/index.phtml:22
 #: view/easy-admin/admin/upload/files.phtml:22
 msgid "Easy Admin"
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:23
+#: view/easy-admin/admin/addons/index.phtml:27
 #, php-format
 msgid ""
 "For more information on addons, see the pages %smodules%s and %sthemes%s or "
 "on %sOmeka.org%s."
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:30
+#: view/easy-admin/admin/addons/index.phtml:34
 msgid ""
 "Select either a module, a theme or a selection. Only one choice can be "
 "submitted at a time."
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:31
+#: view/easy-admin/admin/addons/index.phtml:35
 msgid "Addons with an asterisk are already downloaded."
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:35
+#: view/easy-admin/admin/addons/index.phtml:39
 #, php-format
 msgid "See the details of the %1$scurated selections of modules%2$s."
 msgstr ""
 
-#: view/easy-admin/admin/check-and-fix/index.phtml:23
+#: view/easy-admin/admin/check-and-fix/index.phtml:22
 msgid "Check and fix"
 msgstr ""
 
-#: view/easy-admin/admin/check-and-fix/index.phtml:25
-msgid "Checks and fixes"
-msgstr ""
-
-#: view/easy-admin/admin/upload/files.phtml:26
+#: view/easy-admin/admin/upload/files.phtml:30
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
@@ -307,14 +303,14 @@ msgid ""
 "directory."
 msgstr ""
 
-#: view/easy-admin/admin/upload/files.phtml:31
+#: view/easy-admin/admin/upload/files.phtml:35
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
 "be overridden."
 msgstr ""
 
-#: view/easy-admin/admin/upload/files.phtml:67
+#: view/easy-admin/admin/upload/files.phtml:71
 msgid "Uploading in progress…"
 msgstr ""
 
@@ -442,12 +438,53 @@ msgstr ""
 msgid "It is now possible to optimize assets for web."
 msgstr ""
 
-#: data/scripts/upgrade.php:326
+#: data/scripts/upgrade.php:335
 msgid "It is now possible to install a curated selection of modules."
 msgstr ""
 
-#: data/scripts/task.php:17
-msgid "/bootstrap.php"
+#: data/scripts/task.php:21
+msgid ""
+"Usage: php data/scripts/task.php [arguments]\n"
+"\n"
+"Required arguments:\n"
+"  -t --task [Name]\n"
+"\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
+"\t\tbasename (\"LoopItems\"). You should take care of case\n"
+"\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
+"\n"
+"  -u --user-id [#id]\n"
+"\t\tThe Omeka user id is required, else the job won’t have any\n"
+"\t\trights.\n"
+"\n"
+"Recommended arguments:\n"
+"  -s --server-url [url]\n"
+"\t\tThe url of the server to build resource urls (default:\n"
+"\t\t\"http://localhost\").\n"
+"\n"
+"  -b --base-path [path]\n"
+"\t\tThe url path to complete the server url (default: \"/\").\n"
+"\n"
+"Optional arguments:\n"
+"  -a --args [json]\n"
+"\t\tArguments to pass to the task. Arguments are specific to\n"
+"\t\teach job. To find them, check the code, or run a job\n"
+"\t\tmanually then check the job page in admin interface.\n"
+"\n"
+"  -k --as-task\n"
+"\t\tProcess a a simple task and do not create a job. May be\n"
+"\t\tused for tasks that do not need to be checked as a job.\n"
+"\t\tThis is the inverse of the deprecated argument --job.\n"
+"\n"
+"Deprecated arguments:\n"
+"  -j --job\n"
+"\t\tCreate a standard job that will be checkable in admin\n"
+"\t\tinterface. In any case, all logs are available in logs with\n"
+"\t\ta reference code. It allows to process jobs that are not\n"
+"\t\ttaskable.\n"
+"\t\tThis option is now set by default and is useless.\n"
+"\n"
+"  -h --help\n"
+"\t\tThis help."
 msgstr ""
 
 #: data/scripts/task.php:81
@@ -679,8 +716,66 @@ msgid ""
 "edited by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:213
+#: src/Mvc/Controller/Plugin/Addons.php:300
 msgid "Unable to fetch the url {url}."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:446
+msgid ""
+"The module \"{module}\" requires the dependencies \"{names}\" installed and "
+"enabled first."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:455
+msgid "The {type} directory is not writeable by the server."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:462
+msgid ""
+"Don’t forget to protect the {type} directory from writing after installation."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:472
+msgid ""
+"A zipfile exists with the same name in the {type} directory and cannot be "
+"removed."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:481
+msgid "The {type} directory \"{name}\" already exists."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:491
+msgid "Unable to fetch the {type} \"{name}\"."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:504
+msgid "An error occurred during the unzipping of the {type} \"{name}\"."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:528
+msgid ""
+"The module \"{name}\" requires the dependency \"Generic\" version "
+"\"{version}\" available first."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:541
+msgid ""
+"If \"{name}\" doesn’t appear in the list of {type}, its directory may need "
+"to be renamed."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:549
+msgid "{type} uploaded successfully"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:554
+msgid ""
+"It is always recommended to read the original readme or help of the addon."
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:804
+msgid "Failed to execute command: {command}"
 msgstr ""
 
 #: src/Job/DbResourceIncomplete.php:20 src/Job/DbResourceInvalid.php:20
@@ -738,6 +833,22 @@ msgstr ""
 
 #: src/Job/DbJob.php:124
 msgid "A total of {count} dead jobs have been cleaned."
+msgstr ""
+
+#: src/Job/ManageAddons.php:86
+msgid "The following modules of the selection are unknown: {addons}."
+msgstr ""
+
+#: src/Job/ManageAddons.php:92
+msgid "The following modules are already installed: {addons}."
+msgstr ""
+
+#: src/Job/ManageAddons.php:99
+msgid "The following modules cannot be installed: {addons}."
+msgstr ""
+
+#: src/Job/ManageAddons.php:105
+msgid "The following modules have been installed: {addons}."
 msgstr ""
 
 #: src/Job/AbstractCheckFile.php:18
@@ -2169,28 +2280,32 @@ msgstr ""
 msgid "Omeka: Index full-text search"
 msgstr ""
 
-#: src/Form/AddonsForm.php:24
+#: src/Form/AddonsForm.php:25
 msgid "Modules Omeka.org"
 msgstr ""
 
-#: src/Form/AddonsForm.php:25
+#: src/Form/AddonsForm.php:26
 msgid "Themes Omeka.org"
 msgstr ""
 
-#: src/Form/AddonsForm.php:26
+#: src/Form/AddonsForm.php:27
 msgid "Modules web"
 msgstr ""
 
-#: src/Form/AddonsForm.php:27
+#: src/Form/AddonsForm.php:28
 msgid "Themes web"
 msgstr ""
 
-#: src/Form/AddonsForm.php:56 src/Form/AddonsForm.php:80
+#: src/Form/AddonsForm.php:57 src/Form/AddonsForm.php:75
 msgid "Select below…"
 msgstr ""
 
-#: src/Form/AddonsForm.php:73
+#: src/Form/AddonsForm.php:68
 msgid "Curated selections of modules and themes"
+msgstr ""
+
+#: src/Form/AddonsForm.php:85
+msgid "Refresh lists of addons and selections"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:55
@@ -2211,94 +2326,30 @@ msgstr ""
 msgid "Bulk uploaded"
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:32
+#: src/Controller/Admin/AddonsController.php:31
 msgid "No addon to list: check your connection."
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:47
+#: src/Controller/Admin/AddonsController.php:46
 msgid "There was an error on the form. Please try again."
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:78
-msgid "The following modules of the selection are unknown: {addons}."
+#: src/Controller/Admin/AddonsController.php:58
+msgid "The lists of addons and selections were refreshed."
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:84
-msgid "The following modules are already installed: {addons}."
+#: src/Controller/Admin/AddonsController.php:79
+msgid ""
+"Processing install of selection \"{selection}\" in background (job {link_job}"
+"#{job_id}{link_end}, {link_log}logs{link_end})."
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:90
-msgid "The following modules cannot be installed: {addons}."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:96
-msgid "The following modules have been installed: {addons}."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:111
+#: src/Controller/Admin/AddonsController.php:109
 msgid "The {type} \"{name}\" is already downloaded."
 msgstr ""
 
-#: src/Controller/Admin/AddonsController.php:122
+#: src/Controller/Admin/AddonsController.php:120
 msgid "Nothing processed. Please try again."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:167
-msgid ""
-"The module \"{module}\" requires the dependencies \"{names}\" installed and "
-"enabled first."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:176
-msgid "The {type} directory is not writeable by the server."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:183
-msgid ""
-"Don’t forget to protect the {type} directory from writing after installation."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:193
-msgid ""
-"A zipfile exists with the same name in the {type} directory and cannot be "
-"removed."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:202
-msgid "The {type} directory \"{name}\" already exists."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:212
-msgid "Unable to fetch the {type} \"{name}\"."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:225
-msgid "An error occurred during the unzipping of the {type} \"{name}\"."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:249
-msgid ""
-"The module \"{name}\" requires the dependency \"Generic\" version "
-"\"{version}\" available first."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:262
-msgid ""
-"If \"{name}\" doesn’t appear in the list of {type}, its directory may need "
-"to be renamed."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:270
-msgid "{type} uploaded successfully"
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:275
-msgid ""
-"It is always recommended to read the original readme or help of the addon."
-msgstr ""
-
-#: src/Controller/Admin/AddonsController.php:529
-msgid "Failed to execute command: {command}"
 msgstr ""
 
 #: src/Controller/Admin/CheckAndFixController.php:47
@@ -2315,41 +2366,45 @@ msgid ""
 "{link_log}logs{link_end})."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:240
+#: src/Controller/Admin/CheckAndFixController.php:242
 msgid "No type of cache selected."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:249
+#: src/Controller/Admin/CheckAndFixController.php:251
 msgid ""
 "An issue occurred when checking status of \"opcache\" or the status is not "
 "enabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:264
+#: src/Controller/Admin/CheckAndFixController.php:266
 msgid "The cache \"opcache\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:266
+#: src/Controller/Admin/CheckAndFixController.php:268
 msgid "The cache \"opcache\" is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:270
+#: src/Controller/Admin/CheckAndFixController.php:272
 msgid "The php extension \"opcache\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:279
+#: src/Controller/Admin/CheckAndFixController.php:281
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:287
+#: src/Controller/Admin/CheckAndFixController.php:289
 msgid "The cache \"apcu\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:290
+#: src/Controller/Admin/CheckAndFixController.php:292
 msgid "The php extension \"apcu\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:298
+#: src/Controller/Admin/CheckAndFixController.php:300
 msgid "The cache of real paths was reset."
+msgstr ""
+
+#: config/module.config.php:136 config/module.config.php:160
+msgid "Checks and fixes"
 msgstr ""
