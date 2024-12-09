@@ -218,7 +218,9 @@ class CheckAndFixController extends AbstractActionController
                     'link_end' => '</a>',
                     'link_log' => sprintf(
                         '<a href="%s">',
-                        htmlspecialchars($urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]]))
+                        htmlspecialchars(class_exists(\Log\Module::class)
+                            ? $urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
+                            : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log']))
                     ),
                 ]
             );

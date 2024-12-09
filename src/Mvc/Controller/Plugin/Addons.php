@@ -17,6 +17,8 @@ use ZipArchive;
 
 /**
  * Manage addons for Omeka.
+ *
+ * @todo This plugin can be simplified if the lists contain all the data.
  */
 class Addons extends AbstractPlugin
 {
@@ -97,11 +99,6 @@ class Addons extends AbstractPlugin
         $this->messenger = $messenger;
     }
 
-    /**
-     * Return the addon list.
-     *
-     * @return array
-     */
     public function __invoke(): self
     {
         return $this;
@@ -158,8 +155,8 @@ class Addons extends AbstractPlugin
             }
         }
 
+        $this->selections = [];
         $csv = @file_get_contents('https://raw.githubusercontent.com/Daniel-KM/UpgradeToOmekaS/refs/heads/master/_data/omeka_s_selections.csv');
-        $selections = [];
         if ($csv) {
             // Get the column for name and modules.
             $headers = [];
@@ -172,7 +169,7 @@ class Addons extends AbstractPlugin
                 } elseif ($row) {
                     $name = $row[$headers['Name']] ?? '';
                     if ($name) {
-                        $selections[$name] = array_map('trim', explode(',', $row[$headers['Modules and themes']] ?? ''));
+                        $this->selections[$name] = array_map('trim', explode(',', $row[$headers['Modules and themes']] ?? ''));
                     }
                 }
             }
@@ -183,7 +180,7 @@ class Addons extends AbstractPlugin
             ->setExpirationSeconds($this->expirationSeconds)
             ->setExpirationHops($this->expirationHops);
 
-        return $selections;
+        return $this->selections;
     }
 
     /**
@@ -435,7 +432,7 @@ class Addons extends AbstractPlugin
                 if (empty($module)
                     || (
                         $dependency !== 'Generic'
-                        && $module->getJsonLd()['o:state'] !== \Omeka\Module\Manager::STATE_ACTIVE
+                            && $module->getJsonLd()['o:state'] !== \Omeka\Module\Manager::STATE_ACTIVE
                     )
                 ) {
                     $missingDependencies[] = $dependency;
@@ -520,7 +517,7 @@ class Addons extends AbstractPlugin
             if (file_exists($moduleFile) && filesize($moduleFile)) {
                 $modulePhp = file_get_contents($moduleFile);
                 if (strpos($modulePhp, 'use Generic\AbstractModule;')) {
-                    /** @var \Omeka\Api\Representation\ModuleRepresentation @module */
+                    /** @var \Omeka\Api\Representation\ModuleRepresentation $module */
                     $module = $this->getModule('Generic');
                     if (empty($module)
                         || version_compare($module->getJsonLd()['o:ini']['version'] ?? '', '3.4.47', '<')
