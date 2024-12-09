@@ -53,49 +53,38 @@ class AddonsController extends AbstractActionController
         if (!empty($data['selection'])) {
             $selections = $addons->getSelections();
             $selectionAddons = $selections[$data['selection']] ?? [];
-            $unknowns = [];
-            $existings = [];
-            $errors = [];
-            $installeds = [];
-            foreach ($selectionAddons as $addonName) {
-                $addon = $addons->dataFromNamespace($addonName);
-                if (!$addon) {
-                    $unknowns[] = $addonName;
-                } elseif ($addons->dirExists($addon)) {
-                    $existings[] = $addonName;
-                } else {
-                    $result = $addons->installAddon($addon);
-                    if ($result) {
-                        $installeds[] = $addonName;
-                    } else {
-                        $errors[] = $addonName;
-                    }
-                }
-            }
-            if (count($unknowns)) {
-                $messenger->addWarning(new PsrMessage(
-                    'The following modules of the selection are unknown: {addons}.', // @translate
-                    ['addons' => implode(', ', $unknowns)]
-                ));
-            }
-            if (count($existings)) {
-                $messenger->addNotice(new PsrMessage(
-                    'The following modules are already installed: {addons}.', // @translate
-                    ['addons' => implode(', ', $existings)]
-                ));
-            }
-            if (count($errors)) {
-                $messenger->addError(new PsrMessage(
-                    'The following modules cannot be installed: {addons}.', // @translate
-                    ['addons' => implode(', ', $errors)]
-                ));
-            }
-            if (count($installeds)) {
-                $messenger->addSuccess(new PsrMessage(
-                    'The following modules have been installed: {addons}.', // @translate
-                    ['addons' => implode(', ', $installeds)]
-                ));
-            }
+            // For big selections (about 10 seconds to install an addon), a
+            // background job avoids a time out.
+            $strategy = count($selectionAddons) > 3
+                ? null
+                : $this->api()->read('vocabularies', 1)->getContent()->getServiceLocator()->get(\Omeka\Job\DispatchStrategy\Synchronous::class);
+            /** @var \Omeka\Mvc\Controller\Plugin\JobDispatcher $dispatcher */
+            $dispatcher = $this->jobDispatcher();
+            $args = [
+                'selection' => $data['selection'],
+            ];
+            $job = $dispatcher->dispatch(\EasyAdmin\Job\ManageAddons::class, $args, $strategy);
+            $urlPlugin = $this->url();
+            $message = new PsrMessage(
+                'Processing install of selection "{selection}" in background (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
+                [
+                    'selection' => $data['selection'],
+                    'link_job' => sprintf(
+                        '<a href="%s">',
+                        htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
+                    ),
+                    'job_id' => $job->getId(),
+                    'link_end' => '</a>',
+                    'link_log' => sprintf(
+                        '<a href="%s">',
+                        htmlspecialchars(class_exists(\Log\Module::class)
+                            ? $urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
+                            : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log']))
+                    ),
+                ]
+            );
+            $message->setEscapeHtml(false);
+            $this->messenger()->addSuccess($message);
             return $this->redirect()->toRoute(null, ['action' => 'index'], true);
         }
 
