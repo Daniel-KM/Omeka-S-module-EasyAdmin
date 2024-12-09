@@ -19,6 +19,10 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin easy-admin-addo
 
 <?= $this->pageTitle($translate('Install addons'), 1, $translate('Easy Admin')) ?>
 
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
+</nav>
+
 <p class="explanation">
     <?= sprintf($translate('For more information on addons, see the pages %smodules%s and %sthemes%s or on %sOmeka.org%s.'),
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html" rel="noopener" target="_blank">', '</a>',

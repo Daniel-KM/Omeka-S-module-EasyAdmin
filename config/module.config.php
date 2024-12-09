@@ -155,6 +155,25 @@ return [
                 ],
             ],
         ],
+        'EasyAdmin' => [
+            [
+                'label' => 'Checks and fixes', // @translate
+                'route' => 'admin/easy-admin/default',
+                'controller' => 'check-and-fix',
+            ],
+            [
+                'label' => 'Install addons', // @translate
+                'route' => 'admin/easy-admin/default',
+                'controller' => 'addons',
+            ],
+            [
+                // Not "Upload" because translation is not good here.
+                'label' => 'Upload files', // @translate
+                'route' => 'admin/easy-admin/upload',
+                'action' => 'files',
+                'resource' => 'EasyAdmin\Controller\Upload',
+            ],
+        ],
     ],
     'translator' => [
         'translation_file_patterns' => [

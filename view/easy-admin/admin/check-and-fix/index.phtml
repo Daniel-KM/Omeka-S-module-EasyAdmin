@@ -5,7 +5,6 @@
  */
 
 $plugins = $this->getHelperPluginManager();
-$escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 
@@ -22,7 +21,9 @@ $this->headScript()
 
 <?= $this->pageTitle($translate('Check and fix'), 1, $translate('Easy Admin')) ?>
 
-<h2><?= $escape($translate('Checks and fixes')) ?></h2>
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
+</nav>
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">
