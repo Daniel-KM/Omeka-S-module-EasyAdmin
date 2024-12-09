@@ -3,7 +3,7 @@
 namespace EasyAdmin\Form;
 
 use EasyAdmin\Mvc\Controller\Plugin\Addons;
-use Laminas\Form\Element\Select;
+use Laminas\Form\Element;
 use Laminas\Form\Form;
 
 class AddonsForm extends Form
@@ -43,7 +43,7 @@ class AddonsForm extends Form
             $this
                 ->add([
                     'name' => $addonType,
-                    'type' => Select::class,
+                    'type' => Element\Select::class,
                     'options' => [
                         'label' => $addonLabels[$addonType],
                         'info' => '',
@@ -65,19 +65,33 @@ class AddonsForm extends Form
                 ]);
         }
 
+        if (!empty($this->selections)) {
+            $this
+                ->add([
+                    'name' => 'selection',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'label' => 'Curated selections of modules and themes', // @translate
+                        'empty_option' => '',
+                        'value_options' => array_combine($this->selections, $this->selections),
+                    ],
+                    'attributes' => [
+                        'id' => 'selection',
+                        'class' => 'chosen-select',
+                        'data-placeholder' => 'Select below…', // @translate
+                    ],
+                ]);
+            }
+
         $this
             ->add([
-                'name' => 'selection',
-                'type' => Select::class,
+                'name' => 'reset_cache',
+                'type' => Element\Checkbox::class,
                 'options' => [
-                    'label' => 'Curated selections of modules and themes', // @translate
-                    'empty_option' => '',
-                    'value_options' => array_combine($this->selections, $this->selections),
+                    'label' => 'Refresh lists of addons and selections', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'selection',
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select below…', // @translate
+                    'id' => 'reset_cache',
                 ],
             ])
         ;
