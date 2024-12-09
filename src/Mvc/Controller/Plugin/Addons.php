@@ -382,7 +382,7 @@ class Addons extends AbstractPlugin
     /**
      * Helper to install an addon.
      */
-    protected function installAddon(array $addon): bool
+    public function installAddon(array $addon): bool
     {
         switch ($addon['type']) {
             case 'module':
