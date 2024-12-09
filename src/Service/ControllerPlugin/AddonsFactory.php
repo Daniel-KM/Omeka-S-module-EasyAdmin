@@ -10,8 +10,13 @@ class AddonsFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
+        // Plugins may not be available in background job.
+        $plugins = $services->get('ControllerPluginManager');
+
         return new Addons(
-            $services->get('Omeka\HttpClient')
+            $plugins->get('api'),
+            $services->get('Omeka\HttpClient'),
+            $plugins->get('messenger')
         );
     }
 }

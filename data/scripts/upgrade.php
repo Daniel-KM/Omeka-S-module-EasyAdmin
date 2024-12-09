@@ -319,10 +319,12 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
     // The plugin is not available during install.
     require_once __DIR__ . '/../../src/Mvc/Controller/Plugin/Addons.php';
     $addons = new \EasyAdmin\Mvc\Controller\Plugin\Addons(
-        $services->get('Omeka\HttpClient')
+        $plugins->get('api'),
+        $services->get('Omeka\HttpClient'),
+        $plugins->get('messenger'),
     );
     try {
-        $addons(true);
+        $addons->getLists(true);
     } catch (\Exception $e) {
         // Addons may fail behind a proxy without internet access.
         $container = new \Laminas\Session\Container('EasyAdmin');
