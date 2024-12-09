@@ -1,6 +1,6 @@
 /* Easy Admin */
 
-@media screen {
+@media all {
     .easy-admin .subhead::before {
         content: "";
     }
