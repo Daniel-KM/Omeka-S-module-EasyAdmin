@@ -4,6 +4,7 @@ namespace EasyAdmin\Mvc\Controller\Plugin;
 
 use Common\Stdlib\PsrMessage;
 use Laminas\Http\Client as HttpClient;
+use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\Session\Container;
 use Laminas\Uri\Http as HttpUri;
@@ -205,8 +206,12 @@ class Addons extends AbstractPlugin
         $client = $this->httpClient;
         $client->reset();
         $client->setUri($uri);
-        $response = $client->send();
-        $response = $response->isOk() ? $response->getBody() : null;
+        try {
+            $response = $client->send();
+            $response = $response->isOk() ? $response->getBody() : null;
+        } catch (RuntimeException $e) {
+            $response = null;
+        }
 
         if (empty($response)) {
             $this->getController()->messenger()->addError(new PsrMessage(
