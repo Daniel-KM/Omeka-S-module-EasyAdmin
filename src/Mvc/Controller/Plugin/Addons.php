@@ -297,6 +297,7 @@ class Addons extends AbstractPlugin
             $name = $row[$headers['Name']];
             $version = $row[$headers['Last version']];
             $addonName = preg_replace('~[^A-Za-z0-9]~', '', $name);
+            $dirname = $row[$headers['Directory name']] ?: $addonName;
             $server = strtolower(parse_url($url, PHP_URL_HOST));
             $dependencies = empty($headers['Dependencies']) || empty($row[$headers['Dependencies']])
                 ? []
@@ -323,7 +324,7 @@ class Addons extends AbstractPlugin
             $addon['server'] = $server;
             $addon['name'] = $name;
             $addon['basename'] = basename($url);
-            $addon['dir'] = $addonName;
+            $addon['dir'] = $dirname;
             $addon['version'] = $version;
             $addon['url'] = $url;
             $addon['zip'] = $zip;
