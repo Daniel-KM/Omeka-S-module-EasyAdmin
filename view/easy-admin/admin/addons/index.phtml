@@ -28,16 +28,13 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin easy-admin-addo
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html" rel="noopener" target="_blank">', '</a>',
         '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html" rel="noopener" target="_blank">', '</a>',
         '<a href="https://omeka.org/s" rel="noopener" target="_blank">', '</a>') ?>
+    <?= sprintf($translate('See the details of the %1$scurated selections of modules%2$s.'),
+        sprintf('<a href="https://daniel-km.github.io/UpgradeToOmekaS%s/omeka_s_selections.html" rel="noopener" target="_blank">', substr($this->fallbackSetting('locale', ['user', 'global'], 'en'), 0, 2) === 'fr' ? '/fr' : ''), '</a>') ?>
 </p>
 
 <p class="explanation">
     <?= $translate('Select either a module, a theme or a selection. Only one choice can be submitted at a time.') ?>
     <?= $translate('Addons with an asterisk are already downloaded.') ?>
-</p>
-
-<p class="explanation">
-    <?= sprintf($translate('See the details of the %1$scurated selections of modules%2$s.'),
-        '<a href="https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_selections.html" rel="noopener" target="_blank">', '</a>') ?>
 </p>
 
 <?= $this->form()->openTag($form) ?>
