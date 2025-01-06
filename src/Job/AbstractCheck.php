@@ -29,6 +29,21 @@ abstract class AbstractCheck extends AbstractJob
     protected $api;
 
     /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connectionDbal;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connectionOrm;
+
+    /**
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
@@ -42,21 +57,6 @@ abstract class AbstractCheck extends AbstractJob
      * @var \Laminas\Mvc\I18n\Translator
      */
     protected $translator;
-
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
-
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $dbalConnection;
-
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $ormConnection;
 
     /**
      * @var \Doctrine\ORM\EntityRepository
@@ -132,9 +132,9 @@ abstract class AbstractCheck extends AbstractJob
         $this->translator = $services->get('MvcTranslator');
         $this->entityManager = $services->get('Omeka\EntityManager');
         // These two connections are not the same in doctrine.
-        $this->dbalConnection = $services->get('Omeka\Connection');
-        $this->ormConnection = $this->entityManager->getConnection();
-        $this->connection = $this->dbalConnection;
+        $this->connectionDbal = $services->get('Omeka\Connection');
+        $this->connectionOrm = $this->entityManager->getConnection();
+        $this->connection = $this->connectionDbal;
         $this->resourceRepository = $this->entityManager->getRepository(\Omeka\Entity\Resource::class);
         $this->itemRepository = $this->entityManager->getRepository(\Omeka\Entity\Item::class);
         $this->mediaRepository = $this->entityManager->getRepository(\Omeka\Entity\Media::class);

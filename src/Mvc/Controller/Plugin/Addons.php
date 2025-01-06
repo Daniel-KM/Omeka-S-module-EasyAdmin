@@ -18,6 +18,9 @@ use ZipArchive;
 /**
  * Manage addons for Omeka.
  *
+ * A simplified version can be found in tool Install Omeka S.
+ * @see https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_install.html
+ *
  * @todo This plugin can be simplified if the lists contain all the data.
  */
 class Addons extends AbstractPlugin
