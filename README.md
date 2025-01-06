@@ -302,7 +302,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2017-2025 (see [Daniel-KM] on GitLab)
 
 This module is a merge and improvement of previous modules [Easy Install], [Next],
 [Maintenance], [Bulk Check] and [Generic]. The idea of [Easy Install] comes from
