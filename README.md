@@ -52,6 +52,21 @@ Checks and fixes that are doable:
 
 And many more.
 
+Modules that add tasks:
+- [Compilatio]
+  - Send files to https://compilatio.net, an anti-plagiarism app.
+  - Append urls to https://compilatio.net for files checked by Compilatio.
+- [Guest]
+  - Reset acceptation of conditions.
+- [Iiif Server]
+  - Convert old three-columns table contents to new four columns.
+- [Reference]
+  - Reindex references.
+- [Thesaurus]
+  - Reindex thesaurus.
+- [Zip]
+  - Create zips.
+
 
 Installation
 ------------
@@ -240,6 +255,18 @@ php '/path/to/omeka/application/data/scripts/perform-job.php' --job-id 1 --serve
 ```
 
 
+Development
+-----------
+
+To append a new task:
+- Add the name and label of the task via event `form.add_elements` on `\EasyAdmin\Form\JobsForm`.
+- Eventually add a fieldset with specific options.
+- Add the name of the job class and its params via event `easyadmin.job`, on
+  class `\EasyAdmin\Controller\JobController`.
+
+See an example in [Compilatio], [Reference], [Thesaurus], etc.
+
+
 TODO
 ----
 
@@ -320,6 +347,13 @@ of the [Université des Antilles et de la Guyane].
 [Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
 [Maintenance]: https://gitlab.com/Daniel-KM/Omeka-S-module-Maintenance
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/
+[Compilatio]: https://gitlab.com/Daniel-KM/Omeka-S-module-Compilatio
+[Guest]: https://gitlab.com/Daniel-KM/Omeka-S-module-Guest
+[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
+[Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
+[Thesaurus]: https://gitlab.com/Daniel-KM/Omeka-S-module-Thesaurus
+[Zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Zip
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [EasyAdmin.zip]: https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases
 [size or number of files]: https://github.com/omeka/omeka-s/issues/1785
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
@@ -331,7 +365,6 @@ of the [Université des Antilles et de la Guyane].
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Content Lock]: https://www.drupal.org/project/content_lock
-[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
 [Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
 [themes]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_themes.html
