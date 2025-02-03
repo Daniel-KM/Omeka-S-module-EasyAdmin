@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-09 00:00+0000\n"
-"PO-Revision-Date: 2024-12-09 00:00+0000\n"
+"POT-Creation-Date: 2025-02-03 00:00+0000\n"
+"PO-Revision-Date: 2025-02-03 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -936,7 +936,7 @@ msgstr "Aucune tâche abandonnée."
 
 #: src/Job/DbJob.php:95
 msgid "The following {count} jobs are dead: {job_ids}."
-msgstr "Les tâches suivantes {count} sont abandonnées : {job_ids}."
+msgstr "Les {count} tâches suivantes sont abandonnées : {job_ids}."
 
 #: src/Job/DbJob.php:124
 msgid "A total of {count} dead jobs have been cleaned."
@@ -948,15 +948,15 @@ msgstr "Les modules suivants de la sélection sont inconnus : {addons}."
 
 #: src/Job/ManageAddons.php:92
 msgid "The following modules are already installed: {addons}."
-msgstr "Les tâches suivantes sont déjà installés : {addons}."
+msgstr "Les modules suivants sont déjà installés : {addons}."
 
 #: src/Job/ManageAddons.php:99
 msgid "The following modules cannot be installed: {addons}."
-msgstr "Les tâches suivantes ne peuvent pas être installés : {addons}."
+msgstr "Les modules suivants ne peuvent pas être installés : {addons}."
 
 #: src/Job/ManageAddons.php:105
 msgid "The following modules have been installed: {addons}."
-msgstr "Les tâches suivantes ont été installés : {addons}."
+msgstr "Les modules suivants ont été installés : {addons}."
 
 #: src/Job/AbstractCheckFile.php:18
 msgid "Column {type} does not exist or cannot be checked."
