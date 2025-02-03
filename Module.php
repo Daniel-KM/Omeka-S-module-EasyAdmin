@@ -499,18 +499,18 @@ class Module extends AbstractModule
                 if ($resourceType === 'item_sets' && count($resource->sites())) {
                     $translated = $translate('Sites');
                     $htmlRegex = <<<REGEX
-<div class="meta-group[\w _-]*">\s*<h4>$translated</h4>.*</div>\s*<div class="meta-group
-REGEX;
+                        <div class="meta-group[\w _-]*">\s*<h4>$translated</h4>.*</div>\s*<div class="meta-group
+                        REGEX;
                     $html = preg_replace('~' . $htmlRegex . '~s', $htmlSites . '<div class="meta-group', $html, 1);
                 } else {
                     $translated = $resourceType === 'item_sets' ? $translate('Items') : $translate('Created');
                     $htmlPost = <<<REGEX
-<div class="meta-group">
-        <h4>$translated</h4>
-REGEX;
+                        <div class="meta-group">
+                                <h4>$translated</h4>
+                        REGEX;
                     $htmlRegex = <<<REGEX
-<div class="meta-group">\s*<h4>$translated</h4>
-REGEX;
+                        <div class="meta-group">\s*<h4>$translated</h4>
+                        REGEX;
                     $html = preg_replace('~' . $htmlRegex . '~s', $htmlSites . $htmlPost, $html, 1);
                 }
             }
@@ -598,12 +598,11 @@ REGEX;
         $htmlSites = '';
 
         $htmlSite = <<<'HTML'
-        <div class="value">
-            __SITE_TITLE__
-            __RESOURCE_LINK__
-        </div>
-
-HTML;
+            <div class="value">
+                __SITE_TITLE__
+                __RESOURCE_LINK__
+            </div>
+            HTML . "\n";
         foreach ($sites as $site) {
             $siteTitle = $site->title();
             $externalLinkText = new PsrMessage(
@@ -624,12 +623,11 @@ HTML;
         // The class item-sites is kept for css.
         $translatedSites = $translate('Sites'); // @translate
         $html = <<<HTML
-    <div class="meta-group $controller-sites item-sites">
-        <h4>$translatedSites</h4>
-        $htmlSites
-    </div>
-
-HTML;
+            <div class="meta-group $controller-sites item-sites">
+                <h4>$translatedSites</h4>
+                $htmlSites
+            </div>
+           HTML . "\n";
         return $html;
     }
 
@@ -1154,24 +1152,24 @@ HTML;
         $messenger->add($isPost ? \Omeka\Mvc\Controller\Plugin\Messenger::ERROR : \Omeka\Mvc\Controller\Plugin\Messenger::WARNING, $message);
 
         $html = <<<'HTML'
-<label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="edit-{entity_name}"/>{message_bypass}</label>
-<div class="easy-admin confirm-delete">
-    <label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>
-    <script>
-        $(document).ready(function() {
-            $('.easy-admin.confirm-delete').prependTo('#delete.sidebar #confirmform');
-            const buttonPageAction = $('#page-actions button[type=submit]');
-            const buttonSidebar = $('#delete.sidebar #confirmform input[name=submit]');
-            buttonPageAction.prop('disabled', true);
-            buttonSidebar.prop('disabled', true);
-            $('.bypass-content-lock').on('change', function () {
-                const button = $(this).parent().parent().hasClass('confirm-delete') ? buttonSidebar : buttonPageAction;
-                button.prop('disabled', !$(this).is(':checked'));
-            });
-        });
-    </script>
-</div>
-HTML;
+            <label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="edit-{entity_name}"/>{message_bypass}</label>
+            <div class="easy-admin confirm-delete">
+                <label><input type="checkbox" name="bypass_content_lock" class="bypass-content-lock" value="1" form="confirmform"/>{message_bypass}</label>
+                <script>
+                    $(document).ready(function() {
+                        $('.easy-admin.confirm-delete').prependTo('#delete.sidebar #confirmform');
+                        const buttonPageAction = $('#page-actions button[type=submit]');
+                        const buttonSidebar = $('#delete.sidebar #confirmform input[name=submit]');
+                        buttonPageAction.prop('disabled', true);
+                        buttonSidebar.prop('disabled', true);
+                        $('.bypass-content-lock').on('change', function () {
+                            const button = $(this).parent().parent().hasClass('confirm-delete') ? buttonSidebar : buttonPageAction;
+                            button.prop('disabled', !$(this).is(':checked'));
+                        });
+                    });
+                </script>
+            </div>
+            HTML;
         $message = $view->translate('Bypass the lock'); // @translate
         $message = new PsrMessage($html, ['entity_name' => $controllerNames[$entityName], 'message_bypass' => $message]);
         $message->setEscapeHtml(false);
@@ -1249,27 +1247,27 @@ HTML;
         $isCurrentUser = $user->getId() === $contentLockUser->getId();
 
         $html = <<<'HTML'
-<div class="easy-admin confirm-delete">
-    <p class="error">
-        <strong>%1$s</strong>
-        %2$s
-    </p>
-    %3$s
-    <script>
-        $(document).ready(function() {
-            $('.easy-admin.confirm-delete').prependTo('#sidebar .sidebar-content #confirmform');
-            if (!$('.easy-admin.confirm-delete .bypass-content-lock').length) {
-                return;
-            }
-            const buttonSidebar = $('.sidebar #sidebar-confirm input[name=submit]');
-            buttonSidebar.prop('disabled', true);
-            $('.bypass-content-lock').on('change', function () {
-                buttonSidebar.prop('disabled', !$(this).is(':checked'));
-            });
-        });
-    </script>
-</div>
-HTML;
+            <div class="easy-admin confirm-delete">
+                <p class="error">
+                    <strong>%1$s</strong>
+                    %2$s
+                </p>
+                %3$s
+                <script>
+                    $(document).ready(function() {
+                        $('.easy-admin.confirm-delete').prependTo('#sidebar .sidebar-content #confirmform');
+                        if (!$('.easy-admin.confirm-delete .bypass-content-lock').length) {
+                            return;
+                        }
+                        const buttonSidebar = $('.sidebar #sidebar-confirm input[name=submit]');
+                        buttonSidebar.prop('disabled', true);
+                        $('.bypass-content-lock').on('change', function () {
+                            buttonSidebar.prop('disabled', !$(this).is(':checked'));
+                        });
+                    });
+                </script>
+            </div>
+            HTML;
 
         $translator = $services->get('MvcTranslator');
 

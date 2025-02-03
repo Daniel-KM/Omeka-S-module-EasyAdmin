@@ -52,40 +52,40 @@ class DbValueAnnotationTemplate extends AbstractCheck
 
         // Get the default template id for all templates.
         $sql = <<<'SQL'
-SELECT
-    `resource_template_id` AS rtid,
-    REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(
-        `data`, '"value_annotations_template":', -1
-    ), ',', 1), '}', 1), '"', '') AS vartid
-FROM `resource_template_data`
-WHERE `data` LIKE '%"value#_annotations#_template":%' ESCAPE "#"
-    AND `data` NOT LIKE '%"value#_annotations#_template":""%' ESCAPE "#"
-    AND `data` NOT LIKE '%"value#_annotations#_template":"none"%' ESCAPE "#"
-;
-SQL;
+            SELECT
+                `resource_template_id` AS rtid,
+                REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(
+                    `data`, '"value_annotations_template":', -1
+                ), ',', 1), '}', 1), '"', '') AS vartid
+            FROM `resource_template_data`
+            WHERE `data` LIKE '%"value#_annotations#_template":%' ESCAPE "#"
+                AND `data` NOT LIKE '%"value#_annotations#_template":""%' ESCAPE "#"
+                AND `data` NOT LIKE '%"value#_annotations#_template":"none"%' ESCAPE "#"
+            ;
+            SQL;
         $rtVaTemplates = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         // Get the specific template id for all property templates.
         $sql = <<<'SQL'
-SELECT
-    CONCAT(`resource_template_property`.`resource_template_id`, "-", `property_id`),
-    REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(
-        `data`, '"value_annotations_template":', -1
-    ), ',', 1), '}', 1), '"', '') AS vartid
-FROM `resource_template_property_data`
-JOIN `resource_template_property` ON `resource_template_property`.`id` = `resource_template_property_data`.`resource_template_property_id`
-WHERE `data` LIKE '%"value#_annotations#_template":%' ESCAPE "#"
-;
-SQL;
+            SELECT
+                CONCAT(`resource_template_property`.`resource_template_id`, "-", `property_id`),
+                REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(
+                    `data`, '"value_annotations_template":', -1
+                ), ',', 1), '}', 1), '"', '') AS vartid
+            FROM `resource_template_property_data`
+            JOIN `resource_template_property` ON `resource_template_property`.`id` = `resource_template_property_data`.`resource_template_property_id`
+            WHERE `data` LIKE '%"value#_annotations#_template":%' ESCAPE "#"
+            ;
+            SQL;
         $rtpVaTemplates = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         // Get the main class associated with the templates.
         $sql = <<<'SQL'
-SELECT `id`, `resource_class_id`
-FROM `resource_template`
-WHERE `resource_class_id` IS NOT NULL
-;
-SQL;
+            SELECT `id`, `resource_class_id`
+            FROM `resource_template`
+            WHERE `resource_class_id` IS NOT NULL
+            ;
+            SQL;
         $templateClasses = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         // Set default value annotation template when there is no specific property
@@ -128,14 +128,14 @@ SQL;
             $rtVaClassesString = 'NULL';
         }
 
-        $sql = <<<SQL
-SELECT COUNT(`resource`.`id`)
-FROM `resource`
-INNER JOIN `value` ON `value`.`value_annotation_id` = `resource`.`id`
-LEFT JOIN `resource` AS `resource_main` ON `resource_main`.`id` = `value`.`resource_id`
-WHERE `value`.`value_annotation_id` IS NOT NULL
-;
-SQL;
+        $sql = <<<'SQL'
+            SELECT COUNT(`resource`.`id`)
+            FROM `resource`
+            INNER JOIN `value` ON `value`.`value_annotation_id` = `resource`.`id`
+            LEFT JOIN `resource` AS `resource_main` ON `resource_main`.`id` = `value`.`resource_id`
+            WHERE `value`.`value_annotation_id` IS NOT NULL
+            ;
+            SQL;
         $result = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'There are {total} value annotations that may be updated if a template is set.', // @translate
@@ -148,15 +148,15 @@ SQL;
 
         // Do the update.
         $sql = <<<SQL
-UPDATE `resource`
-INNER JOIN `value` ON `value`.`value_annotation_id` = `resource`.`id`
-LEFT JOIN `resource` AS `resource_main` ON `resource_main`.`id` = `value`.`resource_id`
-SET
-    `resource`.`resource_class_id` = $rtVaClassesString,
-    `resource`.`resource_template_id` = $rtVaTemplatesString
-WHERE `value`.`value_annotation_id` IS NOT NULL
-;
-SQL;
+            UPDATE `resource`
+            INNER JOIN `value` ON `value`.`value_annotation_id` = `resource`.`id`
+            LEFT JOIN `resource` AS `resource_main` ON `resource_main`.`id` = `value`.`resource_id`
+            SET
+                `resource`.`resource_class_id` = $rtVaClassesString,
+                `resource`.`resource_template_id` = $rtVaTemplatesString
+            WHERE `value`.`value_annotation_id` IS NOT NULL
+            ;
+            SQL;
 
         $result = $this->connection->executeStatement($sql);
         $this->logger->notice(

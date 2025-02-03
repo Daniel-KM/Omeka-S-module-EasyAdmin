@@ -46,15 +46,14 @@ class DbCustomVocabMissingItemSets extends AbstractCheck
 
     protected function checkTableExists(string $table): bool
     {
-        $dbname = $this->connection->getDatabase();
         $table = $this->connection->quote($table);
         $sql = <<<'SQL'
-SELECT *
-FROM information_schema.TABLES
-WHERE table_schema = "$dbname"
-    AND table_name = $table
-LIMIT 1;
-SQL;
+            SELECT *
+            FROM information_schema.TABLES
+            WHERE table_schema = "$dbname"
+                AND table_name = $table
+            LIMIT 1;
+            SQL;
         return (bool) $this->connection->executeQuery($sql)->fetchOne();
     }
 
@@ -67,15 +66,15 @@ SQL;
     protected function checkCustomVocabMissingItemSets(bool $fix = false, bool $remove = false): void
     {
         $sqlList = <<<'SQL'
-SELECT `custom_vocab`.`id`, `custom_vocab`.`label`
-FROM `custom_vocab`
-LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
-WHERE `custom_vocab`.`item_set_id` IS NOT NULL
-    AND `custom_vocab`.`terms` IS NULL
-    AND `custom_vocab`.`uris` IS NULL
-    AND `item_set`.`id` = NULL
-;
-SQL;
+            SELECT `custom_vocab`.`id`, `custom_vocab`.`label`
+            FROM `custom_vocab`
+            LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
+            WHERE `custom_vocab`.`item_set_id` IS NOT NULL
+                AND `custom_vocab`.`terms` IS NULL
+                AND `custom_vocab`.`uris` IS NULL
+                AND `item_set`.`id` = NULL
+            ;
+            SQL;
         $result = $this->connection->executeQuery($sqlList)->fetchAllKeyValue();
 
         if (!count($result)) {
@@ -92,32 +91,32 @@ SQL;
 
         if ($fix && $remove) {
             $sql = <<<'SQL'
-DELETE `custom_vocab`
-FROM `custom_vocab`
-LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
-WHERE `custom_vocab`.`item_set_id` IS NOT NULL
-    AND `custom_vocab`.`terms` IS NULL
-    AND `custom_vocab`.`uris` IS NULL
-    AND `item_set`.`id` = NULL
-;
-SQL;
+                DELETE `custom_vocab`
+                FROM `custom_vocab`
+                LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
+                WHERE `custom_vocab`.`item_set_id` IS NOT NULL
+                    AND `custom_vocab`.`terms` IS NULL
+                    AND `custom_vocab`.`uris` IS NULL
+                    AND `item_set`.`id` = NULL
+                ;
+                SQL;
             $this->connection->executeStatement($sql);
             $this->logger->notice(
                 'Missing item sets of custom vocabs were removed.' // @translate
             );
         } elseif ($fix) {
             $sql = <<<'SQL'
-UPDATE `custom_vocab`
-LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
-SET
-    `item_set_id` = NULL,
-    `terms` = "{}"
-WHERE `custom_vocab`.`item_set_id` IS NOT NULL
-    AND `custom_vocab`.`terms` IS NULL
-    AND `custom_vocab`.`uris` IS NULL
-    AND `item_set`.`id` = NULL
-;
-SQL;
+                UPDATE `custom_vocab`
+                LEFT JOIN `item_set` ON `item_set`.`id` = `custom_vocab`.`item_set_id`
+                SET
+                    `item_set_id` = NULL,
+                    `terms` = "{}"
+                WHERE `custom_vocab`.`item_set_id` IS NOT NULL
+                    AND `custom_vocab`.`terms` IS NULL
+                    AND `custom_vocab`.`uris` IS NULL
+                    AND `item_set`.`id` = NULL
+                ;
+                SQL;
             $this->connection->executeStatement($sql);
             $this->logger->notice(
                 'Missing item sets of custom vocabs were replaced by standard empty custom vocabs.' // @translate

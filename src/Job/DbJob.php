@@ -35,12 +35,12 @@ class DbJob extends AbstractCheck
     protected function checkDbJob($fix = false, $fixAll = false): void
     {
         $sql = <<<'SQL'
-SELECT id, pid, status
-FROM job
-WHERE id != :jobid
-    AND status IN ("starting", "stopping", "in_progress")
-ORDER BY id ASC;
-SQL;
+            SELECT id, pid, status
+            FROM job
+            WHERE id != :jobid
+                AND status IN ("starting", "stopping", "in_progress")
+            ORDER BY id ASC;
+            SQL;
 
         // Fetch all: jobs are few, except if admin never checks result of jobs.
         $result = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->fetchAllAssociative();
@@ -58,19 +58,19 @@ SQL;
             $countJobs = $this->connection->executeQuery($sql)->fetchOne();
 
             $sql = <<<'SQL'
-UPDATE job
-SET status = "stopped"
-WHERE id != :jobid
-    AND status IN ("starting", "stopping");
-SQL;
+                UPDATE job
+                SET status = "stopped"
+                WHERE id != :jobid
+                    AND status IN ("starting", "stopping");
+                SQL;
             $stopped = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->rowCount();
 
             $sql = <<<'SQL'
-UPDATE job
-SET status = "error"
-WHERE id != :jobid
-    AND status IN ("in_progress");
-SQL;
+                UPDATE job
+                SET status = "error"
+                WHERE id != :jobid
+                    AND status IN ("in_progress");
+                SQL;
             $error = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->rowCount();
 
             $this->logger->notice(

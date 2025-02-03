@@ -38,12 +38,12 @@ class DbItemPrimaryMedia extends AbstractCheck
     protected function checkDbPrimaryMedia(bool $fix): bool
     {
         $sql = <<<'SQL'
-SELECT COUNT(`item`.`id`)
-FROM `item`
-INNER JOIN `media` ON `media`.`item_id` = `item`.`id`
-WHERE `item`.`primary_media_id` IS NULL
-;
-SQL;
+            SELECT COUNT(`item`.`id`)
+            FROM `item`
+            INNER JOIN `media` ON `media`.`item_id` = `item`.`id`
+            WHERE `item`.`primary_media_id` IS NULL
+            ;
+            SQL;
         $result = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'There are {total} items without primary media.', // @translate
@@ -56,14 +56,14 @@ SQL;
 
         // Do the update.
         $sql = <<<'SQL'
-UPDATE `item`
-INNER JOIN `media` ON `media`.`item_id` = `item`.`id`
-SET
-    `item`.`primary_media_id` = `media`.`id`
-WHERE `item`.`primary_media_id` IS NULL
-    AND `media`.`position` = 1
-;
-SQL;
+            UPDATE `item`
+            INNER JOIN `media` ON `media`.`item_id` = `item`.`id`
+            SET
+                `item`.`primary_media_id` = `media`.`id`
+            WHERE `item`.`primary_media_id` IS NULL
+                AND `media`.`position` = 1
+            ;
+            SQL;
 
         $result = $this->connection->executeStatement($sql);
         $this->logger->notice(

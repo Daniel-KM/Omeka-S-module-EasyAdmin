@@ -151,70 +151,70 @@ class BulkUpload implements IngesterInterface
         // TODO Sort by media-type.
 
         return <<<HTML
-<div class="field media-bulk-upload" data-main-index="__index__" $dataAttributes>
-    <div class="field-meta">
-        <label for="media-file-input-__index__">$uploadFiles</label>
-    </div>
-    <div class="inputs bulk-drop">
-        <span>$divDrop</span>
-        <div>
-            <button type="button" class="button-browse button-browse-files">$browseFiles</button>
-            <button type="button" class="button-browse button-browse-directory" webkitdirectory="webkitdirectory">$browseDirectory</button>
-        </div>
-    </div>
-</div>
-<input type="hidden" name="o:media[__index__][file_index]" value="__index__"/>
-<input type="file" value="" class="submit-ready" style="display: none; visibility: hidden"/>
-<input type="hidden" name="filesData[file][__index__]" value="[]" class="filesdata"/>
-<div class="field bulk-upload-actions-pre empty">
-    <div class="bulk-upload-actions-more">
-        <label class="hide-upload-label">
-            <input type="checkbox" class="hide-uploaded" name="hide-uploaded"/>
-            <span>$hideUploaded</span>
-        </label>
-        <label class="submit-partial-label">
-            <input type="checkbox" class="submit-partial" name="submit-partial"/>
-            <span>$submitPartial</span>
-        </label>
-    </div>
-    <div class="bulk-upload-actions-button">
-        <button type="button" class="button-pause">$buttonPause</button>
-    </div>
-    <div class="media-files-input-full-progress">
-        <div class="progress-count">
-            <span class="progress-current"></span> / <span class="progress-total"></span>
-        </div>
-        <span class="progress-wait">$wait</span>
-    </div>
-</div>
-<div class="field bulk-upload-actions">
-    <div class="bulk-upload-actions-sort">
-        <label class="field-meta">$sortText</label>
-        <select class="select-sort chosen-select" aria-label="$sortText" placeholder="$sortTextEllipsis" data-placeholder="$sortTextEllipsis">
-            <option value="" selected="selected"></option>
-            <optgroup label="$sortByName">
-                <option value="ascii">$sortAscii</option>
-                <option value="alpha">$sortAlpha</option>
-                <option value="ascii-path">$sortAsciiPath</option>
-                <option value="alpha-path">$sortAlphaPath</option>
-            </optgroup>
-            <optgroup label="$sortByExtensionFirst">
-                <option value="extension-ascii">$sortAscii</option>
-                <option value="extension-alpha">$sortAlpha</option>
-                <option value="extension-ascii-path">$sortAsciiPath</option>
-                <option value="extension-alpha-path">$sortAlphaPath</option>
-            </optgroup>
-            <optgroup label="$sortByExtensionLast">
-                <option value="ascii-extension">$sortAscii</option>
-                <option value="alpha-extension">$sortAlpha</option>
-                <option value="ascii-path-extension">$sortAsciiPath</option>
-                <option value="alpha-path-extension">$sortAlphaPath</option>
-            </optgroup>
-        </select>
-    </div>
-</div>
-<div class="field media-files-input-preview"><ol></ol></div>
-HTML;
+            <div class="field media-bulk-upload" data-main-index="__index__" $dataAttributes>
+                <div class="field-meta">
+                    <label for="media-file-input-__index__">$uploadFiles</label>
+                </div>
+                <div class="inputs bulk-drop">
+                    <span>$divDrop</span>
+                    <div>
+                        <button type="button" class="button-browse button-browse-files">$browseFiles</button>
+                        <button type="button" class="button-browse button-browse-directory" webkitdirectory="webkitdirectory">$browseDirectory</button>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="o:media[__index__][file_index]" value="__index__"/>
+            <input type="file" value="" class="submit-ready" style="display: none; visibility: hidden"/>
+            <input type="hidden" name="filesData[file][__index__]" value="[]" class="filesdata"/>
+            <div class="field bulk-upload-actions-pre empty">
+                <div class="bulk-upload-actions-more">
+                    <label class="hide-upload-label">
+                        <input type="checkbox" class="hide-uploaded" name="hide-uploaded"/>
+                        <span>$hideUploaded</span>
+                    </label>
+                    <label class="submit-partial-label">
+                        <input type="checkbox" class="submit-partial" name="submit-partial"/>
+                        <span>$submitPartial</span>
+                    </label>
+                </div>
+                <div class="bulk-upload-actions-button">
+                    <button type="button" class="button-pause">$buttonPause</button>
+                </div>
+                <div class="media-files-input-full-progress">
+                    <div class="progress-count">
+                        <span class="progress-current"></span> / <span class="progress-total"></span>
+                    </div>
+                    <span class="progress-wait">$wait</span>
+                </div>
+            </div>
+            <div class="field bulk-upload-actions">
+                <div class="bulk-upload-actions-sort">
+                    <label class="field-meta">$sortText</label>
+                    <select class="select-sort chosen-select" aria-label="$sortText" placeholder="$sortTextEllipsis" data-placeholder="$sortTextEllipsis">
+                        <option value="" selected="selected"></option>
+                        <optgroup label="$sortByName">
+                            <option value="ascii">$sortAscii</option>
+                            <option value="alpha">$sortAlpha</option>
+                            <option value="ascii-path">$sortAsciiPath</option>
+                            <option value="alpha-path">$sortAlphaPath</option>
+                        </optgroup>
+                        <optgroup label="$sortByExtensionFirst">
+                            <option value="extension-ascii">$sortAscii</option>
+                            <option value="extension-alpha">$sortAlpha</option>
+                            <option value="extension-ascii-path">$sortAsciiPath</option>
+                            <option value="extension-alpha-path">$sortAlphaPath</option>
+                        </optgroup>
+                        <optgroup label="$sortByExtensionLast">
+                            <option value="ascii-extension">$sortAscii</option>
+                            <option value="alpha-extension">$sortAlpha</option>
+                            <option value="ascii-path-extension">$sortAsciiPath</option>
+                            <option value="alpha-path-extension">$sortAlphaPath</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+            <div class="field media-files-input-preview"><ol></ol></div>
+            HTML;
     }
 
     /**

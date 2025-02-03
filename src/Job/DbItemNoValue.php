@@ -41,16 +41,16 @@ class DbItemNoValue extends AbstractCheckFile
      */
     protected function checkItemNoValue($fix = false)
     {
-        $sql = <<<SQL
-SELECT item.id AS i, resource.created AS c, COUNT(media.id) AS m
-FROM item
-LEFT JOIN resource ON resource.id = item.id
-LEFT JOIN value ON value.resource_id = item.id
-LEFT JOIN media ON media.item_id = item.id
-WHERE value.id IS NULL
-GROUP BY item.id
-ORDER BY item.id ASC;
-SQL;
+        $sql = <<<'SQL'
+            SELECT item.id AS i, resource.created AS c, COUNT(media.id) AS m
+            FROM item
+            LEFT JOIN resource ON resource.id = item.id
+            LEFT JOIN value ON value.resource_id = item.id
+            LEFT JOIN media ON media.item_id = item.id
+            WHERE value.id IS NULL
+            GROUP BY item.id
+            ORDER BY item.id ASC;
+            SQL;
         // They are generally few.
         $items = $this->connection->executeQuery($sql)->fetchAllAssociative();
 

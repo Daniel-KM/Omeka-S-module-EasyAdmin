@@ -45,21 +45,21 @@ class DbSession extends AbstractCheck
 
         $dbname = $this->connection->getDatabase();
         $sqlSize = <<<SQL
-SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
-FROM information_schema.TABLES
-WHERE table_schema = "$dbname"
-    AND table_name = "$this->table";
-SQL;
+            SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
+            FROM information_schema.TABLES
+            WHERE table_schema = "$dbname"
+                AND table_name = "$this->table";
+            SQL;
         $size = $this->connection->executeQuery($sqlSize)->fetchOne();
 
         if ($recreate) {
             $sql = <<<SQL
-SET foreign_key_checks = 0;
-CREATE TABLE `session_new` LIKE `session`;
-RENAME TABLE `session` TO `session_old`, `session_new` TO `session`;
-DROP TABLE `session_old`;
-SET foreign_key_checks = 1;
-SQL;
+                SET foreign_key_checks = 0;
+                CREATE TABLE `session_new` LIKE `session`;
+                RENAME TABLE `session` TO `session_old`, `session_new` TO `session`;
+                DROP TABLE `session_old`;
+                SET foreign_key_checks = 1;
+                SQL;
             $this->connection->executeStatement($sql);
             return;
         }

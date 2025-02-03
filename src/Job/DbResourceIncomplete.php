@@ -55,12 +55,16 @@ class DbResourceIncomplete extends AbstractCheck
         if ($joinAnnotation) {
             try {
                 $this->connection->executeQuery('SELECT id FROM annotation_part')->fetchOne();
-                $joinAnnotation .= "\n" . 'LEFT JOIN `annotation_part` ON `annotation_part`.`id` = `resource`.`id`'
-                    . "\n" . 'LEFT JOIN `annotation_body` ON `annotation_body`.`id` = `resource`.`id`'
-                    . "\n" . 'LEFT JOIN `annotation_target` ON `annotation_target`.`id` = `resource`.`id`';
-                $whereAnnotation .= "\n" . '    AND `annotation_part`.`id` IS NULL'
-                    . "\n" . '    AND `annotation_body`.`id` IS NULL'
-                    . "\n" . '    AND `annotation_target`.`id` IS NULL';
+                $joinAnnotation .= "\n" . <<<'SQL'
+                    LEFT JOIN `annotation_part` ON `annotation_part`.`id` = `resource`.`id`
+                    LEFT JOIN `annotation_body` ON `annotation_body`.`id` = `resource`.`id`
+                    LEFT JOIN `annotation_target` ON `annotation_target`.`id` = `resource`.`id`
+                    SQL;
+                $whereAnnotation .= "\n" . <<<'SQL'
+                        AND `annotation_part`.`id` IS NULL
+                        AND `annotation_body`.`id` IS NULL
+                        AND `annotation_target`.`id` IS NULL
+                    SQL;
             } catch (\Exception $e) {
                 // Nothing to do.
             }
@@ -69,20 +73,20 @@ class DbResourceIncomplete extends AbstractCheck
         $totalResources = $this->connection->executeQuery('SELECT COUNT(`resource`.`id`) FROM `resource`')->fetchOne();
 
         $sql = <<<SQL
-SELECT COUNT(`resource`.`id`)
-FROM `resource`
-LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-$joinValueAnnotation
-$joinAnnotation
-WHERE `item`.`id` IS NULL
-    AND `item_set`.`id` IS NULL
-    AND `media`.`id` IS NULL
-    $whereValueAnnotation
-    $whereAnnotation
-;
-SQL;
+            SELECT COUNT(`resource`.`id`)
+            FROM `resource`
+            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
+            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
+            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
+            $joinValueAnnotation
+            $joinAnnotation
+            WHERE `item`.`id` IS NULL
+                AND `item_set`.`id` IS NULL
+                AND `media`.`id` IS NULL
+                $whereValueAnnotation
+                $whereAnnotation
+            ;
+            SQL;
         $result = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'There are {count}/{total} resources that are not specified.', // @translate
@@ -95,20 +99,20 @@ SQL;
 
         // Do the update.
         $sql = <<<SQL
-DELETE `resource`
-FROM `resource`
-LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-$joinValueAnnotation
-$joinAnnotation
-WHERE `item`.`id` IS NULL
-    AND `item_set`.`id` IS NULL
-    AND `media`.`id` IS NULL
-    $whereValueAnnotation
-    $whereAnnotation
-;
-SQL;
+            DELETE `resource`
+            FROM `resource`
+            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
+            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
+            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
+            $joinValueAnnotation
+            $joinAnnotation
+            WHERE `item`.`id` IS NULL
+                AND `item_set`.`id` IS NULL
+                AND `media`.`id` IS NULL
+                $whereValueAnnotation
+                $whereAnnotation
+            ;
+            SQL;
         $result = $this->connection->executeStatement($sql);
         $this->logger->notice(
             '{count}/{total} resources that were not specified were removed.', // @translate
