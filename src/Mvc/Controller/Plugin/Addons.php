@@ -107,32 +107,9 @@ class Addons extends AbstractPlugin
         return $this;
     }
 
-    public function getLists(bool $refresh = false): array
+    public function getAddons(bool $refresh = false): array
     {
-        // Build the list of addons only once.
-        if (!$refresh && !$this->isEmpty()) {
-            return $this->addons;
-        }
-
-        // Check the cache.
-        $container = new Container('EasyAdmin');
-        if (!$refresh && isset($container->addons)) {
-            $this->addons = $container->addons;
-            if (!$this->isEmpty()) {
-                return $this->addons;
-            }
-        }
-
-        $this->addons = [];
-        foreach ($this->types() as $addonType) {
-            $this->addons[$addonType] = $this->listAddonsForType($addonType);
-        }
-
-        $container->addons = $this->addons;
-        $container
-            ->setExpirationSeconds($this->expirationSeconds)
-            ->setExpirationHops($this->expirationHops);
-
+        $this->initAddons($refresh);
         return $this->addons;
     }
 
@@ -187,7 +164,7 @@ class Addons extends AbstractPlugin
     }
 
     /**
-     * Check if the lists of addons are empty.
+     * Check if the lists of addons are empty before init.
      */
     public function isEmpty(): bool
     {
@@ -215,9 +192,11 @@ class Addons extends AbstractPlugin
      */
     public function dataFromNamespace(string $namespace, ?string $type = null): array
     {
+        $listAddons = $this->getAddons();
+
         $list = $type
-            ? (isset($this->addons[$type]) ? [$type => $this->addons[$type]] : [])
-            : $this->addons;
+            ? (isset($listAddons[$type]) ? [$type => $listAddons[$type]] : [])
+            : $listAddons;
         foreach ($list as $type => $addonsForType) {
             $addonsUrl = array_column($addonsForType, 'url', 'dir');
             if (isset($addonsUrl[$namespace]) && isset($addonsForType[$addonsUrl[$namespace]])) {
@@ -232,8 +211,9 @@ class Addons extends AbstractPlugin
      */
     public function dataFromUrl(string $url, string $type): array
     {
-        return $this->addons && isset($this->addons[$type][$url])
-            ? $this->addons[$type][$url]
+        $listAddons = $this->getAddons();
+        return $listAddons && isset($listAddons[$type][$url])
+            ? $listAddons[$type][$url]
             : [];
     }
 
@@ -249,6 +229,35 @@ class Addons extends AbstractPlugin
         $existings = array_map('strtolower', $existings);
         return in_array(strtolower($addon['dir']), $existings)
             || in_array(strtolower($addon['basename']), $existings);
+    }
+
+    protected function initAddons(bool $refresh = false): self
+    {
+        // Build the list of addons only once.
+        if (!$refresh && !$this->isEmpty()) {
+            return $this;
+        }
+
+        // Check the cache.
+        $container = new Container('EasyAdmin');
+        if (!$refresh && isset($container->addons)) {
+            $this->addons = $container->addons;
+            if (!$this->isEmpty()) {
+                return $this;
+            }
+        }
+
+        $this->addons = [];
+        foreach ($this->types() as $addonType) {
+            $this->addons[$addonType] = $this->listAddonsForType($addonType);
+        }
+
+        $container->addons = $this->addons;
+        $container
+            ->setExpirationSeconds($this->expirationSeconds)
+            ->setExpirationHops($this->expirationHops);
+
+        return $this;
     }
 
     /**

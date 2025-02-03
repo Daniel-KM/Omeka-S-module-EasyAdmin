@@ -52,7 +52,7 @@ class AddonsController extends AbstractActionController
         $form->get('reset_cache')->setValue('0');
 
         if (!empty($data['reset_cache'])) {
-            $addons->getLists(true);
+            $addons->getAddons(true);
             $addons->getSelections(true);
             $messenger->addSuccess(
                 'The lists of addons and selections were refreshed.' // @translate

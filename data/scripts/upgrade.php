@@ -324,7 +324,7 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
         $plugins->get('messenger'),
     );
     try {
-        $addons->getLists(true);
+        $addons->getAddons(true);
     } catch (\Exception $e) {
         // Addons may fail behind a proxy without internet access.
         $container = new \Laminas\Session\Container('EasyAdmin');

@@ -28,8 +28,8 @@ class AddonsForm extends Form
             'theme' => 'Themes web', // @translate
         ];
 
-        $list = $this->addons->getLists();
-        foreach ($list as $addonType => $addonsForType) {
+        $listAddons = $this->addons->getAddons();
+        foreach ($listAddons as $addonType => $addonsForType) {
             if (empty($addonsForType)) {
                 continue;
             }
