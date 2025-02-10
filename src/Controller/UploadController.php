@@ -292,8 +292,13 @@ class UploadController extends AbstractActionController
             'data-translate-unknown-error' => $this->translate('An issue occurred.'), // @translate
         ];
 
+        $localPath = $settings->get('easyadmin_local_path');
+
         return (new ViewModel([
             'data' => $data,
+            'fileIterator' => $localPath && file_exists($localPath) && is_dir($localPath)
+                ? new FilesystemIterator($localPath)
+                : null,
         ]))->setTemplate('easy-admin/admin/upload/files');
     }
 

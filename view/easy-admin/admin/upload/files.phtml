@@ -2,6 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $data
+ * @var \FilesystemIterator|null $fileIterator
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -75,3 +76,41 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
     </div>
     <div class="field media-files-input-preview"><ol></ol></div>
 </div>
+
+<?php if ($fileIterator): ?>
+
+<table class="tablesaw" data-tablesaw-mode="stack">
+    <thead>
+        <tr>
+            <th><?= $escape($translate('File')) ?></th>
+            <th><?= $escape($translate('Date')) ?></th>
+            <th><?= $escape($translate('Size')) ?></th>
+            <th><?= $escape($translate('Media type')) ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        /** @var \SplFileInfo $file */
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        foreach ($fileIterator as $file):
+            if (!$file->isFile() || $file->isDir() || !$file->isReadable() || substr($file->getFilename(), 0, 1) === '.') continue;
+            $mediaType = finfo_file($finfo, $file->getRealPath());
+            ?>
+        <tr>
+            <td><?= $escape($file->getFilename()) ?></td>
+            <td><?=  date('Y-m-d H:i:s', $file->getMTime()) ?></td>
+            <td><?= $file->getSize() ?></td>
+            <td><?= $mediaType  ?></td>
+        </tr>
+        <?php endforeach; ?>
+        <?php finfo_close($finfo); ?>
+    </tbody>
+</table>
+
+<?php else: ?>
+
+<p>
+	<?= $translate('No files.') ?>
+</p>
+
+<?php endif; ?>
