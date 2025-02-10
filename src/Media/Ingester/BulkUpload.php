@@ -158,8 +158,8 @@ class BulkUpload implements IngesterInterface
                 <div class="inputs bulk-drop">
                     <span>$divDrop</span>
                     <div>
-                        <button type="button" class="button-browse button-browse-files">$browseFiles</button>
-                        <button type="button" class="button-browse button-browse-directory" webkitdirectory="webkitdirectory">$browseDirectory</button>
+                        <button type="button" class="button button-browse button-browse-files">$browseFiles</button>
+                        <button type="button" class="button button-browse button-browse-directory" webkitdirectory="webkitdirectory">$browseDirectory</button>
                     </div>
                 </div>
             </div>
@@ -178,7 +178,7 @@ class BulkUpload implements IngesterInterface
                     </label>
                 </div>
                 <div class="bulk-upload-actions-button">
-                    <button type="button" class="button-pause">$buttonPause</button>
+                    <button type="button" class="button button-pause">$buttonPause</button>
                 </div>
                 <div class="media-files-input-full-progress">
                     <div class="progress-count">
