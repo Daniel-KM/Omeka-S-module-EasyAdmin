@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright 2017-2024 Daniel Berthereau
+ * Copyright 2017-2025 Daniel Berthereau
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/or
@@ -46,7 +46,7 @@ use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Module\AbstractModule;
 
 /**
- * Easy Admin
+ * Easy Admin.
  *
  * @copyright Daniel Berthereau, 2017-2025
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
@@ -255,6 +255,8 @@ class Module extends AbstractModule
             'view.layout',
             [$this, 'handleViewLayoutResource']
         );
+
+        // Manage default and public site links in right sidebar.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.details',
@@ -548,7 +550,9 @@ class Module extends AbstractModule
         if ($buttonPublicView) {
             // TODO Fix for item sets.
             $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
-            $skip = !$isOldOmeka && $resource->resourceName() === 'items' && count($resource->sites());
+            $skip = !$isOldOmeka
+                && $resource->resourceName() === 'items'
+                && count($resource->sites());
             if (!$skip) {
                 $htmlSites = $this->prepareSitesResource($resource);
                 echo $htmlSites;
@@ -579,8 +583,7 @@ class Module extends AbstractModule
         $hasSites = count($sites);
         if (!$hasSites && $defaultSiteSlug) {
             $sites = [$defaultSite()];
-        }
-        if (!count($sites)) {
+        } elseif (!count($sites)) {
             return '';
         }
 
