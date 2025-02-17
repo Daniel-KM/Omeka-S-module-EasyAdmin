@@ -12,6 +12,8 @@ use Omeka\Stdlib\ErrorStore;
 
 class UploadController extends AbstractActionController
 {
+    use TraitEasyDir;
+
     const STATUS_SUCCESS = 'success';
     const STATUS_ERROR = 'error';
 
@@ -154,28 +156,10 @@ class UploadController extends AbstractActionController
         }
 
         $filename = (string) $flowRequest->getFileName();
-        if (strlen($filename) < 3 || strlen($filename) > 200) {
+        $result = $this->checkFilename($filename);
+        if ($result) {
             return $this->jsonError(
-                $this->translate('Filename too much short or long.'), // @translate
-                Response::STATUS_CODE_412
-            );
-        }
-
-        if (substr($filename, 0, 1) === '.'
-            || strpos($filename, '/') !== false
-            || strpos($filename, '$') !== false
-            || strpos($filename, '`') !== false
-        ) {
-            return $this->jsonError(
-                $this->translate('Filename contains forbidden characters.'), // @translate
-                Response::STATUS_CODE_412
-            );
-        }
-
-        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        if (!strlen($extension)) {
-            return $this->jsonError(
-                $this->translate('Filename has no extension.'), // @translate
+                $this->translate($result),
                 Response::STATUS_CODE_412
             );
         }
@@ -201,20 +185,12 @@ class UploadController extends AbstractActionController
         }
 
         $isBulkUploadForm = !empty($headers['X-Is-Bulk-Upload-Form']);
+        $result = null;
         if ($isBulkUploadForm) {
             $localPath = $this->settings()->get('easyadmin_local_path');
-            if (!$localPath) {
-                return $this->jsonError(
-                    $this->translate('Local path is not configured.'), // @translate
-                    Response::STATUS_CODE_500
-                );
-            }
-            $localPath = $this->checkDestinationDir($localPath);
-            if (!$localPath) {
-                return $this->jsonError(
-                    $this->translate('Local path is not writeable.'), // @translate
-                    Response::STATUS_CODE_500
-                );
+            $result = $this->checkLocalPath($localPath);
+            if (is_string($result)) {
+                return $this->jsonError($this->translate($result), Response::STATUS_CODE_500);
             }
             $newDestination = rtrim($localPath, '//') . '/' . $filename;
             $fileExists = file_exists($newDestination);
@@ -268,36 +244,6 @@ class UploadController extends AbstractActionController
             'message' => $message,
             'code' => $statusCode,
         ]);
-    }
-
-    /**
-     * Check or create the destination folder.
-     *
-     * @param string $dirPath Absolute path.
-     * @return string|null
-     */
-    protected function checkDestinationDir(string $dirPath): ?string
-    {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
-                $this->logger()->err(
-                    'The directory "{path}" is not writeable.', // @translate
-                    ['path' => $dirPath]
-                );
-                return null;
-            }
-            return $dirPath;
-        }
-
-        $result = @mkdir($dirPath, 0775, true);
-        if (!$result) {
-            $this->logger()->err(
-                'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message']]
-            );
-            return null;
-        }
-        return $dirPath;
     }
 
     protected function cleanTempDirectory(): void

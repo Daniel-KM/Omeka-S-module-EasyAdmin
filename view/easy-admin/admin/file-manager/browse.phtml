@@ -3,24 +3,35 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $data
  * @var \FilesystemIterator|null $fileIterator
+ * @var bool $isAdminUser
+ * @var string $returnQuery
+ * @var \Omeka\Form\ConfirmForm $formDeleteSelected
+ * @var \Omeka\Form\ConfirmForm $formDeleteAll
  */
 
 $plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
 $escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 $htmlAttributes = $plugins->get('htmlAttributes');
+$userIsAllowed = $plugins->get('userIsAllowed');
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/bulk-upload.css', 'EasyAdmin'));
 $this->headScript()
     ->appendFile($assetUrl('vendor/flow.js/flow.min.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
-    ->appendFile($assetUrl('js/bulk-upload.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('js/bulk-upload.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
+    ->appendFile($assetUrl('js/file-manager.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
 
 $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse file-manager');
+
+$userIsAllowedDelete = $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 'delete');
 ?>
 
-<?= $this->pageTitle($translate('Upload files'), 1, $translate('Easy Admin')) ?>
+<?= $this->pageTitle($translate('File manager'), 1, $translate('Easy Admin')) ?>
 
 <nav class="section-nav">
     <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
@@ -28,8 +39,12 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse fi
 
 <p>
     <?= sprintf(
-        $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s or %3$sBulk Import%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
-        '<a href="https://omeka.org/s/modules/FileSideload/" target="_blank">', '</a>', '<a href="https://omeka.org/s/modules/BulkImport" target="_blank">') ?>
+        $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s, %3$sBulk Import%2$s, or %4$sTimeline%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
+        '<a href="https://omeka.org/s/modules/FileSideload/" target="_blank" rel="noopener">',
+        '</a>',
+        '<a href="https://omeka.org/s/modules/BulkImport" target="_blank" rel="noopener">',
+        '<a href="https://omeka.org/s/modules/Timeline" target="_blank" rel="noopener">'
+    ) ?>
 </p>
 
 <p>
@@ -77,40 +92,131 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse fi
     <div class="field media-files-input-preview"><ol></ol></div>
 </div>
 
+<?php $this->trigger('view.browse.before'); ?>
+
 <?php if ($fileIterator): ?>
 
-<table class="tablesaw" data-tablesaw-mode="stack">
-    <thead>
-        <tr>
-            <th><?= $escape($translate('File')) ?></th>
-            <th><?= $escape($translate('Date')) ?></th>
-            <th><?= $escape($translate('Size')) ?></th>
-            <th><?= $escape($translate('Media type')) ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        /** @var \SplFileInfo $file */
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        foreach ($fileIterator as $file):
-            if (!$file->isFile() || $file->isDir() || !$file->isReadable() || substr($file->getFilename(), 0, 1) === '.') continue;
-            $mediaType = finfo_file($finfo, $file->getRealPath());
-            ?>
-        <tr>
-            <td><?= $escape($file->getFilename()) ?></td>
-            <td><?=  date('Y-m-d H:i:s', $file->getMTime()) ?></td>
-            <td><?= $file->getSize() ?></td>
-            <td><?= $mediaType  ?></td>
-        </tr>
-        <?php endforeach; ?>
-        <?php finfo_close($finfo); ?>
-    </tbody>
-</table>
+<form method="post" id="batch-form" class="disable-unsaved-warning"><?php // TODO Use the right right. ?>
+
+    <?php if ($isAdminUser && $userIsAllowed(\Omeka\Api\Adapter\ItemAdapter::class, 'batch_update')): ?>
+    <div class="batch-inputs">
+        <select class="batch-actions-select" aria-label="<?= $translate('Batch actions') ?>">
+            <option value="default"><?= $translate('Batch actions') ?></option>
+            <option value="delete-selected" disabled="disabled"><?= $translate('Delete selected'); ?></option>
+            <?php if ($userIsAllowed(\Omeka\Api\Adapter\ItemAdapter::class, 'batch_delete_all')): ?>
+            <option value="delete-all"><?= $translate('Delete all') ?></option>
+            <?php endif; ?>
+        </select>
+        <div class="batch-actions">
+            <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
+            <input type="hidden" name="query" class="batch-query" value="<?= $escapeAttr(json_encode($this->params()->fromQuery())) ?>"/>
+            <a class="delete button sidebar-content delete-selected" data-sidebar-selector="#sidebar-delete-selected"><?= $translate('Go') ?></a>
+            <a class="delete button sidebar-content delete-all" data-sidebar-selector="#sidebar-delete-all"><?= $translate('Go') ?></a>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <table class="tablesaw batch-edit" data-tablesaw-mode="stack">
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" class="select-all" aria-label="<?= $translate('Select all') ?>"/>
+                    <?= $translate('File') ?>
+                </th>
+                <th><?= $escape($translate('Date')) ?></th>
+                <th><?= $escape($translate('Size')) ?></th>
+                <th><?= $escape($translate('Media type')) ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            /** @var \SplFileInfo $file */
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $totalFiles = 0;
+            foreach ($fileIterator as $file):
+                $filename = $file->getFilename();
+                if (!$file->isFile() || $file->isDir() || !$file->isReadable() || mb_substr($filename, 0, 1) === '.') continue;
+                ++$totalFiles;
+                $mediaType = finfo_file($finfo, $file->getRealPath());
+                ?>
+            <tr>
+                <td>
+                    <?php if ($isAdminUser): ?>
+                    <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"/>
+                    <?php endif; ?>
+                    <?= $escape($filename) ?>
+                    <ul class="actions">
+                        <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
+                        <?php if ($userIsAllowedDelete): ?>
+                        <li><?= $hyperlink('', '#', [
+                            'data-sidebar-selector' => '#sidebar',
+                            'data-sidebar-content-url' => $url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['filename' => $filename]]),
+                            'class' => 'o-icon-delete sidebar-content',
+                            'title' => $translate('Delete'),
+                        ]) ?></li>
+                        <?php endif; ?>
+                    </ul>
+                </td>
+                <td><?=  date('Y-m-d H:i:s', $file->getMTime()) ?></td>
+                <td><?= $file->getSize() ?></td>
+                <td><?= $mediaType  ?></td>
+            </tr>
+            <?php endforeach; ?>
+            <?php finfo_close($finfo); ?>
+        </tbody>
+    </table>
+
+</form>
+
+<?php $this->trigger('view.browse.after'); ?>
+
+<?php if ($userIsAllowedDelete): ?>
+
+<div id="sidebar" class="sidebar">
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <div class="sidebar-content"></div>
+</div>
+
+<div id="sidebar-delete-selected" class="sidebar">
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <div class="sidebar-content">
+        <div id="sidebar-confirm">
+            <h3><?= $translate('Delete files') ?></h3>
+            <p><?= $translate('Are you sure you would like to delete the selected files?') ?></p>
+            <p class="error"><?= sprintf(
+                $translate('%1$sWarning%2$s: this action will permanently delete %3$s files and cannot be undone.'),
+                '<strong>', '</strong>', '<strong><span id="delete-selected-count"></span></strong>'
+            ) ?></p>
+            <?= $this->form($formDeleteSelected) ?>
+        </div>
+    </div>
+</div>
+
+<div id="sidebar-delete-all" class="sidebar">
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <div class="sidebar-content">
+        <div id="sidebar-confirm">
+            <h3><?= $translate('Delete files') ?></h3>
+            <p><?= $translate('Are you sure you would like to delete all files on all pages of this result?') ?></p>
+            <p class="error"><?= sprintf(
+                $translate('%1$sWarning%2$s: this action will permanently delete %3$s files and cannot be undone.'),
+                '<strong>', '</strong>',
+                sprintf('<strong><span id="delete-selected-all">%s</span></strong>', number_format($totalFiles)) // TODO Use paginator.
+            ) ?></p>
+            <label><input type="checkbox" name="confirm-delete-all-check"> <?= $translate('Are you sure?') ?></label>
+            <?= $this->form($formDeleteAll) ?>
+        </div>
+    </div>
+</div>
+
+<?php endif; ?>
 
 <?php else: ?>
 
-<p>
-       <?= $translate('No files.') ?>
-</p>
+<div class="no-resources no-files">
+    <p>
+        <?= $translate('No files.') ?>
+    </p>
+</div>
 
 <?php endif; ?>

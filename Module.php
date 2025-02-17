@@ -100,6 +100,8 @@ class Module extends AbstractModule
                 ['EasyAdmin\Controller\Admin\FileManager'],
                 [
                     'browse',
+                    'delete',
+                    'delete-confirm',
                 ]
             )
         ;

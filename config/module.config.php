@@ -57,12 +57,12 @@ return [
         'invokables' => [
             'EasyAdmin\Controller\Admin\Addons' => Controller\Admin\AddonsController::class,
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
-            'EasyAdmin\Controller\Admin\FileManager' => Controller\Admin\FileManagerController::class,
             'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
         ],
         'factories' => [
             // Class is not used as key, since it's set dynamically by sub-route
             // and it should be available in acl (so alias is mapped later).
+            'EasyAdmin\Controller\Admin\FileManager' => Service\Controller\FileManagerControllerFactory::class,
             'EasyAdmin\Controller\Upload' => Service\Controller\UploadControllerFactory::class,
         ],
     ],
@@ -113,7 +113,7 @@ return [
                                     'defaults' => [
                                         '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
                                         'controller' => 'FileManager',
-                                        'action' => 'browse',
+                                        'action' => 'browse|delete-confirm|delete',
                                     ],
                                 ],
                             ],
@@ -161,7 +161,7 @@ return [
                     ],
                     [
                         // Not "Upload" because translation is not good here.
-                        'label' => 'Upload files', // @translate
+                        'label' => 'File manager', // @translate
                         'route' => 'admin/easy-admin/file-manager',
                         'action' => 'browse',
                         'resource' => 'EasyAdmin\Controller\Admin\FileManager',
@@ -182,7 +182,7 @@ return [
                 'controller' => 'addons',
             ],
             [
-                'label' => 'Upload files', // @translate
+                'label' => 'File manager', // @translate
                 'route' => 'admin/easy-admin/file-manager',
                 'action' => 'browse',
                 'resource' => 'EasyAdmin\Controller\Admin\FileManager',
