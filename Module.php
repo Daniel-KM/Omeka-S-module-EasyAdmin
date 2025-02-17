@@ -629,7 +629,7 @@ class Module extends AbstractModule
                 ['resource_type' => $easyMeta->resourceLabel($resourceType), 'site' => $siteTitle]
             );
             $replace = [
-                '__SITE_TITLE__' => $site->link($siteTitle) . ($hasSites ? '' : $translate('[not in site]')), // @translate
+                '__SITE_TITLE__' => $site->link($siteTitle) . ($hasSites ? '' : ' ' . $translate('[not in site]')), // @translate
                 '__RESOURCE_LINK__' => $hyperlink(
                     '',
                     $url('site/resource-id', ['site-slug' => $site->slug(), 'controller' => $controller, 'id' => $resourceId]),

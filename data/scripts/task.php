@@ -37,7 +37,7 @@ Recommended arguments:
 		"http://localhost").
 
   -b --base-path [path]
-		The url path to complete the server url (default: "/").
+		The path to complete the server url (default: "/").
 
 Optional arguments:
   -a --args [json]
@@ -58,10 +58,10 @@ Deprecated arguments:
 		taskable.
 		This option is now set by default and is useless.
 
+Other arguments:
   -h --help
 		This help.
-MSG;
-// @translate
+MSG; // @translate
 
 $taskName = null;
 $userId = null;
