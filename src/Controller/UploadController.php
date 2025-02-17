@@ -184,6 +184,14 @@ class UploadController extends AbstractActionController
             }
         }
 
+        $validateFilename = $this->checkFilename($filename);
+        if (is_string($validateFilename)) {
+            return $this->jsonError(
+                $this->translate($validateFilename),
+                Response::STATUS_CODE_415
+            );
+        }
+
         $isBulkUploadForm = !empty($headers['X-Is-Bulk-Upload-Form']);
         $result = null;
         if ($isBulkUploadForm) {

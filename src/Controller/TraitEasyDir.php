@@ -18,10 +18,10 @@ trait TraitEasyDir
             return 'Filename too much short or long.'; // @translate
         }
 
-        if (substr($filename, 0, 1) === '.'
-            || strpos($filename, '/') !== false
-            || strpos($filename, '$') !== false
-            || strpos($filename, '`') !== false
+        $forbiddenCharacters = '/\\?<>:*%|"\'`&#;';
+        if (mb_substr($filename, 0, 1) === '.'
+            || mb_strpos($filename, '..') !== false
+            || preg_match('~' . preg_quote($forbiddenCharacters, '~'). '~', $filename)
         ) {
             return 'Filename contains forbidden characters.'; // @translate;
         }
