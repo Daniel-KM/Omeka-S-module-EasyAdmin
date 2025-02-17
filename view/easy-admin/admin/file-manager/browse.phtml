@@ -17,7 +17,7 @@ $this->headScript()
     ->appendFile($assetUrl('vendor/flow.js/flow.min.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/bulk-upload.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
 
-$this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse file-manager');
 ?>
 
 <?= $this->pageTitle($translate('Upload files'), 1, $translate('Easy Admin')) ?>
@@ -110,7 +110,7 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin bulk-uploads');
 <?php else: ?>
 
 <p>
-	<?= $translate('No files.') ?>
+       <?= $translate('No files.') ?>
 </p>
 
 <?php endif; ?>

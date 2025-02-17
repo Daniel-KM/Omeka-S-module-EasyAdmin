@@ -1,10 +1,10 @@
 /* Easy Admin */
 
 @media all {
-    /* Bulk Upload styles */
+    /* Bulk upload and file manager styles */
 
-    .bulk-uploads .subhead::before,
-    .bulk-uploads .no-resources:before {
+    .file-manager .subhead::before,
+    .file-manager .no-resources:before {
         content:"";
     }
 

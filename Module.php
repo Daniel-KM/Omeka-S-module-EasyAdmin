@@ -94,7 +94,15 @@ class Module extends AbstractModule
                 [
                     'index',
                 ]
-            );
+            )
+            ->allow(
+                $roles,
+                ['EasyAdmin\Controller\Admin\FileManager'],
+                [
+                    'browse',
+                ]
+            )
+        ;
     }
 
     protected function preInstall(): void

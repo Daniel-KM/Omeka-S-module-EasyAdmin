@@ -57,6 +57,7 @@ return [
         'invokables' => [
             'EasyAdmin\Controller\Admin\Addons' => Controller\Admin\AddonsController::class,
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
+            'EasyAdmin\Controller\Admin\FileManager' => Controller\Admin\FileManagerController::class,
             'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
         ],
         'factories' => [
@@ -102,12 +103,26 @@ return [
                                     ],
                                 ],
                             ],
+                            'file-manager' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/file-manager[/:action]',
+                                    'constraints' => [
+                                        'action' => 'browse',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
+                                        'controller' => 'FileManager',
+                                        'action' => 'browse',
+                                    ],
+                                ],
+                            ],
                             'upload' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
                                     'route' => '/upload[/:action]',
                                     'constraints' => [
-                                        'action' => 'index|files',
+                                        'action' => 'index|upload',
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'EasyAdmin\Controller',
@@ -147,9 +162,9 @@ return [
                     [
                         // Not "Upload" because translation is not good here.
                         'label' => 'Upload files', // @translate
-                        'route' => 'admin/easy-admin/upload',
-                        'action' => 'files',
-                        'resource' => 'EasyAdmin\Controller\Upload',
+                        'route' => 'admin/easy-admin/file-manager',
+                        'action' => 'browse',
+                        'resource' => 'EasyAdmin\Controller\Admin\FileManager',
                         'class' => 'o-icon- fa-cloud-upload-alt',
                     ],
                 ],
@@ -167,11 +182,10 @@ return [
                 'controller' => 'addons',
             ],
             [
-                // Not "Upload" because translation is not good here.
                 'label' => 'Upload files', // @translate
-                'route' => 'admin/easy-admin/upload',
-                'action' => 'files',
-                'resource' => 'EasyAdmin\Controller\Upload',
+                'route' => 'admin/easy-admin/file-manager',
+                'action' => 'browse',
+                'resource' => 'EasyAdmin\Controller\Admin\FileManager',
             ],
         ],
     ],
