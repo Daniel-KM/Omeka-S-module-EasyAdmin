@@ -70,6 +70,12 @@ class Module extends AbstractModule
     {
         parent::onBootstrap($event);
 
+        /** @var \Omeka\Settings\Settings $settings */
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        if ($settings->get('easyadmin_display_exception')) {
+            ini_set('display_errors', 1);
+        }
+
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
 

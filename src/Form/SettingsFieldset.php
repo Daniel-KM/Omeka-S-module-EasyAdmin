@@ -111,6 +111,20 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_display_exception',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Display error on screen', // @translate
+                    'info' => 'This option helps fix issues and should be unset in production. For development, use the key "APPLICATION_ENV" in file .htaccess.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_display_exception',
+                    'required' => false,
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_maintenance_mode',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

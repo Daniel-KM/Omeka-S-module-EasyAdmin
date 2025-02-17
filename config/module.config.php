@@ -199,6 +199,7 @@ return [
             'easyadmin_content_lock' => false,
             // 86400 seconds = 24 hours. 14400 = 4 hours.
             'easyadmin_content_lock_duration' => 14400,
+            'easyadmin_display_exception' => false,
             'easyadmin_maintenance_mode' => '',
             'easyadmin_maintenance_text' => 'This site is down for maintenance. Please contact the site administrator for more information.', // @translate
         ],
