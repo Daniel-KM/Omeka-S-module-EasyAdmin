@@ -336,3 +336,10 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.27', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to upload and delete local files in a configurated directory.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
