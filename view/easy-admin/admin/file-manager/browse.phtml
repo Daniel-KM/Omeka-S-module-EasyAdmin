@@ -1,6 +1,8 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $localPath
+ * @var bool $isLocalPathValid
  * @var array $data
  * @var \FilesystemIterator|null $fileIterator
  * @var bool $isAdminUser
@@ -28,7 +30,7 @@ $this->headScript()
 
 $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse file-manager');
 
-$userIsAllowedDelete = $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 'delete');
+$userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 'delete');
 ?>
 
 <?= $this->pageTitle($translate('File manager'), 1, $translate('Easy Admin')) ?>
@@ -50,6 +52,8 @@ $userIsAllowedDelete = $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 
 <p>
     <?= sprintf($translate('%1$sWarning%2$s: existing files with the same name than uploaded files will be overridden.'), '<strong>', '</strong>') ?>
 </p>
+
+<?php if (!$isLocalPathValid) return; ?>
 
 <div id="bulk-upload" class="media-field-wrapper">
     <div class="field media-bulk-upload" data-main-index="__index__" <?= $htmlAttributes($data) ?>>
@@ -170,7 +174,7 @@ $userIsAllowedDelete = $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 
 
 <?php $this->trigger('view.browse.after'); ?>
 
-<?php if ($userIsAllowedDelete): ?>
+<?php if ($userIsAllowedDelete && $formDeleteSelected): ?>
 
 <div id="sidebar" class="sidebar">
     <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>

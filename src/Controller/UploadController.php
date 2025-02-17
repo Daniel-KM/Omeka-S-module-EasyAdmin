@@ -30,16 +30,23 @@ class UploadController extends AbstractActionController
     /**
      * @var string
      */
+    protected $basePath;
+
+    /**
+     * @var string
+     */
     protected $tempDir;
 
     public function __construct(
         TempFileFactory $tempFileFactory,
         Validator $validator,
+        string $basePath,
         string $tempDir
     ) {
         $this->tempFileFactory = $tempFileFactory;
-        $this->tempDir = $tempDir;
         $this->validator = $validator;
+        $this->basePath = $basePath;
+        $this->tempDir = $tempDir;
     }
 
     /**

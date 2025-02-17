@@ -22,13 +22,20 @@ class FileManagerController extends AbstractActionController
     /**
      * @var string
      */
+    protected $basePath;
+
+    /**
+     * @var string
+     */
     protected $tempDir;
 
     public function __construct(
         Acl $acl,
+        string $basePath,
         string $tempDir
     ) {
         $this->acl = $acl;
+        $this->basePath = $basePath;
         $this->tempDir = $tempDir;
     }
 
@@ -81,12 +88,10 @@ class FileManagerController extends AbstractActionController
 
         $localPath = $this->settings()->get('easyadmin_local_path');
         $result = $this->checkLocalPath($localPath);
+        $isLocalPathValid = !$result;
 
-        if ($result) {
-            $this->messenger()->addError($this->translate($result));
-            $formDeleteSelected = null;
-            $formDeleteAll = null;
-        } else {
+        if ($isLocalPathValid) {
+            $isLocalPathValid = true;
             /** @var \Omeka\Form\ConfirmForm $formDeleteSelected */
             $formDeleteSelected = $this->getForm(ConfirmForm::class);
             $formDeleteSelected
@@ -102,9 +107,15 @@ class FileManagerController extends AbstractActionController
                 ->setButtonLabel('Confirm Delete'); // @translate
             $formDeleteAll
                 ->get('submit')->setAttribute('disabled', true);
+        } else {
+            $this->messenger()->addError($this->translate($result));
+            $formDeleteSelected = null;
+            $formDeleteAll = null;
         }
 
         return (new ViewModel([
+            'localPath' => $localPath,
+            'isLocalPathValid' => $isLocalPathValid,
             'data' => $data,
             'fileIterator' => $fileIterator,
             'formDeleteSelected' => $formDeleteSelected,

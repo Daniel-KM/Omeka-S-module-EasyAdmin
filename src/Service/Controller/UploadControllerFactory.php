@@ -10,10 +10,13 @@ class UploadControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $tempDir = $services->get('Config')['temp_dir'] ?: sys_get_temp_dir();
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: OMEKA_PATH . '/files';
+        $tempDir = $config['temp_dir'] ?: sys_get_temp_dir();
         return new UploadController(
             $services->get(\Omeka\File\TempFileFactory::class),
             $services->get(\Omeka\File\Validator::class),
+            $basePath,
             rtrim($tempDir, '/\\')
         );
     }

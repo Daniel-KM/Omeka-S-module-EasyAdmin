@@ -43,6 +43,28 @@ trait TraitEasyDir
         if (!$localPath) {
             return 'Local path is not configured.'; // @translate
         }
+
+        $localPathDir = rtrim($localPath, '/') . '/';
+
+        if ($localPathDir === $this->basePath
+            || mb_strpos($localPathDir, $this->basePath . '/') !== 0
+        ) {
+            return 'Local path should be a sub-directory of /files.'; // @translate
+        }
+
+        $standardDirectories = [
+            'asset',
+            'large',
+            'medium',
+            'original',
+            'square',
+        ];
+        foreach ($standardDirectories as $dir) {
+            if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
+                return 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+            }
+        }
+
         $localPath = $this->checkDestinationDir($localPath);
         if (!$localPath) {
             return 'Local path is not writeable.'; // @translate
