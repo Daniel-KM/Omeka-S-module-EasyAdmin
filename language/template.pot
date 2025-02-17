@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 00:00+0000\n"
+"POT-Creation-Date: 2025-02-17 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/scripts/upgrade.php:36 Module.php:102
+#: data/scripts/upgrade.php:36 Module.php:118
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
@@ -28,124 +28,88 @@ msgid ""
 "remove them first."
 msgstr ""
 
-#: Module.php:221
+#: Module.php:237
 msgid "WARNING:"
 msgstr ""
 
-#: Module.php:227
+#: Module.php:243
 msgid ""
 "All stored files from checks and fixes, if any, will be removed from folder "
 "\"{folder}\"."
 msgstr ""
 
-#: Module.php:233
+#: Module.php:249
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: Module.php:614
-msgid "[not in site]"
-msgstr ""
-
-#: Module.php:1175
-msgid "Bypass the lock"
-msgstr ""
-
-#: src/Controller/UploadController.php:62
-msgid "User not authenticated."
-msgstr ""
-
-#: src/Controller/UploadController.php:75
-msgid "The request must originate from the server."
-msgstr ""
-
-#: src/Controller/UploadController.php:85
-msgid "Expired, invalid or missing CSRF token."
-msgstr ""
-
-#: src/Controller/UploadController.php:152
-msgid "The file is empty."
-msgstr ""
-
-#: src/Controller/UploadController.php:160
-msgid "Filename too much short or long."
-msgstr ""
-
-#: src/Controller/UploadController.php:171
-msgid "Filename contains forbidden characters."
-msgstr ""
-
-#: src/Controller/UploadController.php:179
-msgid "Filename has no extension."
-msgstr ""
-
-#: src/Controller/UploadController.php:209
-msgid "Local path is not configured."
-msgstr ""
-
-#: src/Controller/UploadController.php:216
-msgid "Local path is not writeable."
-msgstr ""
-
-#: src/Controller/UploadController.php:225
-msgid "A file with the same name exists and is not writeable."
-msgstr ""
-
-#: src/Controller/UploadController.php:235
-msgid "An error occurred when storing file."
-msgstr ""
-
-#: src/Controller/UploadController.php:258
-msgid "An existing file was overridden."
-msgstr ""
-
-#: src/Controller/UploadController.php:286
+#: src/Controller/Admin/FileManagerController.php:65
 #: src/Media/Ingester/BulkUpload.php:121
 msgid "Pause"
 msgstr ""
 
-#: src/Controller/UploadController.php:287
+#: src/Controller/Admin/FileManagerController.php:66
 #: src/Media/Ingester/BulkUpload.php:122
 msgid "Resume"
 msgstr ""
 
-#: src/Controller/UploadController.php:288
+#: src/Controller/Admin/FileManagerController.php:67
 #: src/Media/Ingester/BulkUpload.php:123
 msgid "No files currently selected for upload"
 msgstr ""
 
-#: src/Controller/UploadController.php:290
+#: src/Controller/Admin/FileManagerController.php:69
 #: src/Media/Ingester/BulkUpload.php:125
 msgid "Not a valid file type or extension. Update your selection."
 msgstr ""
 
-#: src/Controller/UploadController.php:291
+#: src/Controller/Admin/FileManagerController.php:70
 #: src/Media/Ingester/BulkUpload.php:126
 msgid "Not a valid file type, extension or size. Update your selection."
 msgstr ""
 
-#: src/Controller/UploadController.php:292
+#: src/Controller/Admin/FileManagerController.php:71
 #: src/Media/Ingester/BulkUpload.php:127
 msgid "An issue occurred."
+msgstr ""
+
+#: src/Controller/UploadController.php:70
+msgid "User not authenticated."
+msgstr ""
+
+#: src/Controller/UploadController.php:83
+msgid "The request must originate from the server."
+msgstr ""
+
+#: src/Controller/UploadController.php:93
+msgid "Expired, invalid or missing CSRF token."
+msgstr ""
+
+#: src/Controller/UploadController.php:160
+msgid "The file is empty."
+msgstr ""
+
+#: src/Controller/UploadController.php:215
+msgid "A file with the same name exists and is not writeable."
+msgstr ""
+
+#: src/Controller/UploadController.php:225
+msgid "An error occurred when storing file."
+msgstr ""
+
+#: src/Controller/UploadController.php:248
+msgid "An existing file was overridden."
 msgstr ""
 
 #: src/Job/AbstractCheckFile.php:70
 msgid "[empty]"
 msgstr ""
 
-#: src/Job/FileDerivative.php:135 src/Job/FileDimension.php:104
-msgid "Not readable"
-msgstr ""
-
-#: src/Job/FileDerivative.php:136
-msgid "Not writeable"
-msgstr ""
-
-#: src/Job/FileDerivative.php:137
-msgid "Failed"
-msgstr ""
-
 #: src/Job/FileDimension.php:103
 msgid "Missing file"
+msgstr ""
+
+#: src/Job/FileDimension.php:104
+msgid "Not readable"
 msgstr ""
 
 #: src/Job/FileDimension.php:105
@@ -174,22 +138,21 @@ msgid "Automatically appended via module EasyAdmin on %s"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:132
-#: view/easy-admin/admin/upload/files.phtml:22
 msgid "Upload files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/upload/files.phtml:42
+#: view/easy-admin/admin/file-manager/browse.phtml:62
 msgid "Drag and drop"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/upload/files.phtml:47
+#: view/easy-admin/admin/file-manager/browse.phtml:67
 msgid "Browse files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/upload/files.phtml:52
+#: view/easy-admin/admin/file-manager/browse.phtml:72
 msgid "Select directory"
 msgstr ""
 
@@ -230,7 +193,7 @@ msgid "Alphabetic (with folder)"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/upload/files.phtml:61
+#: view/easy-admin/admin/file-manager/browse.phtml:81
 msgid "Hide uploaded files"
 msgstr ""
 
@@ -264,7 +227,7 @@ msgstr ""
 
 #: view/easy-admin/admin/addons/index.phtml:20
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
-#: view/easy-admin/admin/upload/files.phtml:22
+#: view/easy-admin/admin/file-manager/browse.phtml:36
 msgid "Easy Admin"
 msgstr ""
 
@@ -275,43 +238,77 @@ msgid ""
 "on %sOmeka.org%s."
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:34
+#: view/easy-admin/admin/addons/index.phtml:31
+#, php-format
+msgid "See the details of the %1$scurated selections of modules%2$s."
+msgstr ""
+
+#: view/easy-admin/admin/addons/index.phtml:36
 msgid ""
 "Select either a module, a theme or a selection. Only one choice can be "
 "submitted at a time."
 msgstr ""
 
-#: view/easy-admin/admin/addons/index.phtml:35
+#: view/easy-admin/admin/addons/index.phtml:37
 msgid "Addons with an asterisk are already downloaded."
-msgstr ""
-
-#: view/easy-admin/admin/addons/index.phtml:39
-#, php-format
-msgid "See the details of the %1$scurated selections of modules%2$s."
 msgstr ""
 
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
 msgid "Check and fix"
 msgstr ""
 
-#: view/easy-admin/admin/upload/files.phtml:30
+#: view/easy-admin/admin/file-manager/browse.phtml:36
+msgid "File manager"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:44
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
-"server, for example for %1$sFile Sideload%2$s or %3$sBulk Import%2$s. All "
-"uploaded files will be stored directly at the root of the configured "
-"directory."
+"server, for example for %1$sFile Sideload%2$s, %3$sBulk Import%2$s, or "
+"%4$sTimeline%2$s. All uploaded files will be stored directly at the root of "
+"the configured directory."
 msgstr ""
 
-#: view/easy-admin/admin/upload/files.phtml:35
+#: view/easy-admin/admin/file-manager/browse.phtml:53
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
 "be overridden."
 msgstr ""
 
-#: view/easy-admin/admin/upload/files.phtml:71
+#: view/easy-admin/admin/file-manager/browse.phtml:91
 msgid "Uploading in progress…"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:149
+msgid "Select file"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:188
+#: view/easy-admin/admin/file-manager/browse.phtml:203
+msgid "Delete files"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:189
+msgid "Are you sure you would like to delete the selected files?"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:191
+#: view/easy-admin/admin/file-manager/browse.phtml:206
+#, php-format
+msgid ""
+"%1$sWarning%2$s: this action will permanently delete %3$s files and cannot "
+"be undone."
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:204
+msgid ""
+"Are you sure you would like to delete all files on all pages of this result?"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:222
+msgid "No files."
 msgstr ""
 
 #: view/omeka/admin/asset/add-form.phtml:21
@@ -375,7 +372,7 @@ msgid ""
 "page to the public page."
 msgstr ""
 
-#: data/scripts/upgrade.php:204 Module.php:189
+#: data/scripts/upgrade.php:204 Module.php:205
 msgid ""
 "The module \"{module}\" was upgraded by module \"{module_2}\" and "
 "uninstalled."
@@ -399,8 +396,8 @@ msgid ""
 "resources."
 msgstr ""
 
-#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:149
-#: Module.php:157 Module.php:165
+#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:165
+#: Module.php:173 Module.php:181
 msgid "The directory \"{dir}\" is not writeable."
 msgstr ""
 
@@ -442,6 +439,12 @@ msgstr ""
 msgid "It is now possible to install a curated selection of modules."
 msgstr ""
 
+#: data/scripts/upgrade.php:342
+msgid ""
+"It is now possible to upload and delete local files in a configurated "
+"directory."
+msgstr ""
+
 #: data/scripts/task.php:21
 msgid ""
 "Usage: php data/scripts/task.php [arguments]\n"
@@ -462,7 +465,7 @@ msgid ""
 "\t\t\"http://localhost\").\n"
 "\n"
 "  -b --base-path [path]\n"
-"\t\tThe url path to complete the server url (default: \"/\").\n"
+"\t\tThe path to complete the server url (default: \"/\").\n"
 "\n"
 "Optional arguments:\n"
 "  -a --args [json]\n"
@@ -483,6 +486,7 @@ msgid ""
 "\t\ttaskable.\n"
 "\t\tThis option is now set by default and is useless.\n"
 "\n"
+"Other arguments:\n"
 "  -h --help\n"
 "\t\tThis help."
 msgstr ""
@@ -574,207 +578,219 @@ msgstr ""
 msgid "Task \"%1$s\" ended."
 msgstr ""
 
-#: Module.php:111
+#: Module.php:127
 msgid ""
 "The libraries should be installed. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:141
+#: Module.php:157
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
 msgstr ""
 
-#: Module.php:610
+#: Module.php:628
 msgid "View this {resource_type} in \"{site}\""
 msgstr ""
 
-#: Module.php:706
+#: Module.php:632
+msgid "[not in site]"
+msgstr ""
+
+#: Module.php:723
 msgid "File successfuly uploaded."
 msgstr ""
 
-#: Module.php:707
+#: Module.php:724
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr ""
 
-#: Module.php:708
+#: Module.php:725
 msgid "The file size exceeds the specified limit."
 msgstr ""
 
-#: Module.php:709
+#: Module.php:726
 msgid "The file was only partially uploaded."
 msgstr ""
 
-#: Module.php:710
+#: Module.php:727
 msgid "No file was uploaded."
 msgstr ""
 
-#: Module.php:711
+#: Module.php:728
 msgid "The temporary folder to store the file is missing."
 msgstr ""
 
-#: Module.php:712
+#: Module.php:729
 msgid "Failed to write file to disk."
 msgstr ""
 
-#: Module.php:713
+#: Module.php:730
 msgid "A PHP extension stopped the file upload."
 msgstr ""
 
-#: Module.php:728 Module.php:733
+#: Module.php:745 Module.php:750
 msgid "There is no uploaded files."
 msgstr ""
 
-#: Module.php:752
+#: Module.php:769
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr ""
 
-#: Module.php:759
+#: Module.php:776
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 
-#: Module.php:766
+#: Module.php:783
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:773
+#: Module.php:790
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:781
+#: Module.php:798
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr ""
 
-#: Module.php:924
+#: Module.php:941
 msgid ""
 "An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
 "{errors}"
 msgstr ""
 
-#: Module.php:939
+#: Module.php:956
 msgid ""
 "An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
 msgstr ""
 
-#: Module.php:968
+#: Module.php:985
 msgid ""
 "An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
 msgstr ""
 
-#: Module.php:1005
+#: Module.php:1022
 msgid ""
 "The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
 "by {percent}%, from {size_1} to {size_2} bytes."
 msgstr ""
 
-#: Module.php:1121
+#: Module.php:1138
 msgid "You edit already this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:1148 Module.php:1285 Module.php:1372 Module.php:1478
+#: Module.php:1165 Module.php:1302 Module.php:1389 Module.php:1495
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
 msgstr ""
 
-#: Module.php:1276
+#: Module.php:1192 Module.php:1308
+msgid "Bypass the lock"
+msgstr ""
+
+#: Module.php:1293
 msgid "Warning:"
 msgstr ""
 
-#: Module.php:1279
+#: Module.php:1296
 msgid "You edit this resource somewhere since {date}."
 msgstr ""
 
-#: Module.php:1346
+#: Module.php:1363
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
 msgstr ""
 
-#: Module.php:1358
+#: Module.php:1375
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: Module.php:1431
+#: Module.php:1448
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 
-#: Module.php:1450
+#: Module.php:1467
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
 msgstr ""
 
-#: Module.php:1464
+#: Module.php:1481
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:300
+#: src/Mvc/Controller/Plugin/Addons.php:309
 msgid "Unable to fetch the url {url}."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:446
+#: src/Mvc/Controller/Plugin/Addons.php:456
 msgid ""
 "The module \"{module}\" requires the dependencies \"{names}\" installed and "
 "enabled first."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:455
+#: src/Mvc/Controller/Plugin/Addons.php:465
 msgid "The {type} directory is not writeable by the server."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:462
+#: src/Mvc/Controller/Plugin/Addons.php:472
 msgid ""
 "Don’t forget to protect the {type} directory from writing after installation."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:472
+#: src/Mvc/Controller/Plugin/Addons.php:482
 msgid ""
 "A zipfile exists with the same name in the {type} directory and cannot be "
 "removed."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:481
+#: src/Mvc/Controller/Plugin/Addons.php:491
 msgid "The {type} directory \"{name}\" already exists."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:491
+#: src/Mvc/Controller/Plugin/Addons.php:501
 msgid "Unable to fetch the {type} \"{name}\"."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:504
+#: src/Mvc/Controller/Plugin/Addons.php:514
 msgid "An error occurred during the unzipping of the {type} \"{name}\"."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:528
+#: src/Mvc/Controller/Plugin/Addons.php:538
 msgid ""
 "The module \"{name}\" requires the dependency \"Generic\" version "
 "\"{version}\" available first."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:541
+#: src/Mvc/Controller/Plugin/Addons.php:551
 msgid ""
 "If \"{name}\" doesn’t appear in the list of {type}, its directory may need "
 "to be renamed."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:549
+#: src/Mvc/Controller/Plugin/Addons.php:559
 msgid "{type} uploaded successfully"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:554
+#: src/Mvc/Controller/Plugin/Addons.php:564
 msgid ""
 "It is always recommended to read the original readme or help of the addon."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/Addons.php:804
+#: src/Mvc/Controller/Plugin/Addons.php:610
+msgid "ZipArchive"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/Addons.php:833
 msgid "Failed to execute command: {command}"
 msgstr ""
 
@@ -791,11 +807,11 @@ msgstr ""
 msgid "Process \"{process}\" completed."
 msgstr ""
 
-#: src/Job/DbResourceIncomplete.php:88
+#: src/Job/DbResourceIncomplete.php:92
 msgid "There are {count}/{total} resources that are not specified."
 msgstr ""
 
-#: src/Job/DbResourceIncomplete.php:114
+#: src/Job/DbResourceIncomplete.php:118
 msgid "{count}/{total} resources that were not specified were removed."
 msgstr ""
 
@@ -1329,6 +1345,14 @@ msgid ""
 "total of {total} medias)."
 msgstr ""
 
+#: src/Job/FileDerivative.php:136
+msgid "Not writeable"
+msgstr ""
+
+#: src/Job/FileDerivative.php:137
+msgid "Failed"
+msgstr ""
+
 #: src/Job/FileDerivative.php:157
 msgid ""
 "The job \"Derivative Images\" was stopped: {count]/{total} resources "
@@ -1515,21 +1539,21 @@ msgid ""
 "The custom vocab with missing item sets will be updated as simple empty list."
 msgstr ""
 
-#: src/Job/DbCustomVocabMissingItemSets.php:83
+#: src/Job/DbCustomVocabMissingItemSets.php:82
 msgid "There is no custom vocab with a missing item set."
 msgstr ""
 
-#: src/Job/DbCustomVocabMissingItemSets.php:89
+#: src/Job/DbCustomVocabMissingItemSets.php:88
 msgid ""
 "There are {count} custom vocabs that references a missing item set: "
 "{item_sets}."
 msgstr ""
 
-#: src/Job/DbCustomVocabMissingItemSets.php:106
+#: src/Job/DbCustomVocabMissingItemSets.php:105
 msgid "Missing item sets of custom vocabs were removed."
 msgstr ""
 
-#: src/Job/DbCustomVocabMissingItemSets.php:123
+#: src/Job/DbCustomVocabMissingItemSets.php:122
 msgid ""
 "Missing item sets of custom vocabs were replaced by standard empty custom "
 "vocabs."
@@ -1676,11 +1700,11 @@ msgstr ""
 msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
 msgstr ""
 
-#: src/Job/AbstractCheck.php:365 src/Controller/UploadController.php:322
+#: src/Job/AbstractCheck.php:365 src/Controller/TraitEasyDir.php:86
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:376 src/Controller/UploadController.php:333
+#: src/Job/AbstractCheck.php:376 src/Controller/TraitEasyDir.php:97
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -1743,18 +1767,28 @@ msgid "Number of seconds before automatic removing of the lock"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:118
+msgid "Display error on screen"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:119
+msgid ""
+"This option helps fix issues and should be unset in production. For "
+"development, use the key \"APPLICATION_ENV\" in file .htaccess."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:132
 msgid "Set Omeka under maintenance"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:121
+#: src/Form/SettingsFieldset.php:135
 msgid "Public front-end"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:122
+#: src/Form/SettingsFieldset.php:136
 msgid "Admin (except global admins)"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:136
+#: src/Form/SettingsFieldset.php:150
 msgid "Text to display for maintenance"
 msgstr ""
 
@@ -2352,59 +2386,127 @@ msgstr ""
 msgid "Nothing processed. Please try again."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:47
+#: src/Controller/Admin/FileManagerController.php:148
+msgid "file"
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:182
+msgid "You must select at least one file to batch delete."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:198
+#: src/Controller/Admin/FileManagerController.php:241
+msgid "{count} files were removed."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:202
+#: src/Controller/Admin/FileManagerController.php:245
+msgid "No file removed."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:248
+msgid "No local path."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:283
+msgid "The file cannot be removed."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:289
+msgid "File successfully deleted"
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:293
+msgid "An issue occurred during deletion."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:46
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:201
+#: src/Controller/Admin/CheckAndFixController.php:200
 msgid "Unknown process \"{process}\""
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:211
+#: src/Controller/Admin/CheckAndFixController.php:210
 msgid ""
 "Processing checks in background (job {link_job}#{job_id}{link_end}, "
 "{link_log}logs{link_end})."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:242
+#: src/Controller/Admin/CheckAndFixController.php:241
 msgid "No type of cache selected."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:251
+#: src/Controller/Admin/CheckAndFixController.php:250
 msgid ""
 "An issue occurred when checking status of \"opcache\" or the status is not "
 "enabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:266
+#: src/Controller/Admin/CheckAndFixController.php:265
 msgid "The cache \"opcache\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:268
+#: src/Controller/Admin/CheckAndFixController.php:267
 msgid "The cache \"opcache\" is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:272
+#: src/Controller/Admin/CheckAndFixController.php:271
 msgid "The php extension \"opcache\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:281
+#: src/Controller/Admin/CheckAndFixController.php:280
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:289
+#: src/Controller/Admin/CheckAndFixController.php:288
 msgid "The cache \"apcu\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:292
+#: src/Controller/Admin/CheckAndFixController.php:291
 msgid "The php extension \"apcu\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:300
+#: src/Controller/Admin/CheckAndFixController.php:299
 msgid "The cache of real paths was reset."
 msgstr ""
 
-#: config/module.config.php:136 config/module.config.php:160
+#: src/Controller/TraitEasyDir.php:14
+msgid "Filename empty."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:18
+msgid "Filename too much short or long."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:26
+msgid "Filename contains forbidden characters."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:31
+msgid "Filename has no extension."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:44
+msgid "Local path is not configured."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:52
+msgid "Local path should be a sub-directory of /files."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:64
+msgid ""
+"Local path cannot be a directory managed by Omeka and should be inside /"
+"files."
+msgstr ""
+
+#: src/Controller/TraitEasyDir.php:70
+msgid "Local path is not writeable."
+msgstr ""
+
+#: config/module.config.php:151 config/module.config.php:175
 msgid "Checks and fixes"
 msgstr ""
