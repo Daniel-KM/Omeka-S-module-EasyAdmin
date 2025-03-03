@@ -163,10 +163,11 @@ class UploadController extends AbstractActionController
         }
 
         $filename = (string) $flowRequest->getFileName();
-        $result = $this->checkFilename($filename);
-        if ($result) {
+        $errorMessage = null;
+        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
+        if (!$isFilenameValid) {
             return $this->jsonError(
-                $this->translate($result),
+                $this->translate($errorMessage),
                 Response::STATUS_CODE_412
             );
         }
@@ -191,10 +192,11 @@ class UploadController extends AbstractActionController
             }
         }
 
-        $validateFilename = $this->checkFilename($filename);
-        if (is_string($validateFilename)) {
+        $errorMessage = null;
+        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
+        if (!$isFilenameValid) {
             return $this->jsonError(
-                $this->translate($validateFilename),
+                $this->translate($errorMessage),
                 Response::STATUS_CODE_415
             );
         }
@@ -202,10 +204,10 @@ class UploadController extends AbstractActionController
         $isBulkUploadForm = !empty($headers['X-Is-Bulk-Upload-Form']);
         $result = null;
         if ($isBulkUploadForm) {
-            $localPath = $this->settings()->get('easyadmin_local_path');
-            $result = $this->checkLocalPath($localPath);
-            if (is_string($result)) {
-                return $this->jsonError($this->translate($result), Response::STATUS_CODE_500);
+            $errorMessage = null;
+            $localPath = $this->getAndCheckLocalPath($errorMessage);
+            if (!$localPath) {
+                return $this->jsonError($this->translate($errorMessage), Response::STATUS_CODE_500);
             }
             $newDestination = rtrim($localPath, '//') . '/' . $filename;
             $fileExists = file_exists($newDestination);

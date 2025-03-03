@@ -71,8 +71,9 @@ class FileManagerController extends AbstractActionController
             'data-translate-unknown-error' => $this->translate('An issue occurred.'), // @translate
         ];
 
-        $localPath = $settings->get('easyadmin_local_path');
-        if ($localPath && file_exists($localPath) && is_dir($localPath)) {
+        $errorMessage = null;
+        $localPath = $this->getAndCheckLocalPath($errorMessage);
+        if ($localPath) {
             $fileIterator = new FilesystemIterator($localPath);
             // TODO Use pagination.
             // $this->paginator($fileIterator->getTotalResults());
@@ -86,12 +87,9 @@ class FileManagerController extends AbstractActionController
         $returnQuery = $this->params()->fromQuery();
         unset($returnQuery['page']);
 
-        $localPath = $this->settings()->get('easyadmin_local_path');
-        $result = $this->checkLocalPath($localPath);
-        $isLocalPathValid = !$result;
-
-        if ($isLocalPathValid) {
-            $isLocalPathValid = true;
+        $errorMessage = null;
+        $localPath = $this->getAndCheckLocalPath($errorMessage);
+        if ($localPath) {
             /** @var \Omeka\Form\ConfirmForm $formDeleteSelected */
             $formDeleteSelected = $this->getForm(ConfirmForm::class);
             $formDeleteSelected
@@ -108,14 +106,14 @@ class FileManagerController extends AbstractActionController
             $formDeleteAll
                 ->get('submit')->setAttribute('disabled', true);
         } else {
-            $this->messenger()->addError($this->translate($result));
+            $this->messenger()->addError($this->translate($errorMessage));
             $formDeleteSelected = null;
             $formDeleteAll = null;
         }
 
         return (new ViewModel([
             'localPath' => $localPath,
-            'isLocalPathValid' => $isLocalPathValid,
+            'isLocalPathValid' => (bool) $localPath,
             'data' => $data,
             'fileIterator' => $fileIterator,
             'formDeleteSelected' => $formDeleteSelected,
@@ -127,16 +125,18 @@ class FileManagerController extends AbstractActionController
 
     public function deleteConfirmAction()
     {
-        $localPath = $this->settings()->get('easyadmin_local_path');
-        $result = $this->checkLocalPath($localPath);
-        if ($result) {
-            throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($result));
+        $errorMessage = null;
+        $localPath = $this->getAndCheckLocalPath($errorMessage);
+        if (!$localPath) {
+            throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
         $linkTitle = (bool) $this->params()->fromQuery('link-title', true);
         $filename = $this->params()->fromQuery('filename');
-        if ($this->checkFilename($filename)) {
-            throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($result));
+        $errorMessage = null;
+        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
+        if (!$isFilenameValid) {
+            throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
         $form = $this->getForm(ConfirmForm::class);
@@ -216,9 +216,9 @@ class FileManagerController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
-            $localPath = $this->settings()->get('easyadmin_local_path');
-            $result = $this->checkLocalPath($localPath);
-            if (!is_string($result)) {
+            $errorMessage = null;
+            $localPath = $this->getAndCheckLocalPath($errorMessage);
+            if ($localPath) {
                 $fileIterator = new FilesystemIterator($localPath);
                 $totalFiles = 0;
                 foreach ($fileIterator as $file) {
@@ -245,7 +245,7 @@ class FileManagerController extends AbstractActionController
                     $this->messenger()->addWarning('No file removed.'); // @translate
                 }
             } else {
-                $this->messenger()->addError('No local path.'); // @translate
+                $this->messenger()->addError($errorMessage ?: 'No local path.'); // @translate
             }
         } else {
             $this->messenger()->addFormErrors($form);
@@ -260,16 +260,17 @@ class FileManagerController extends AbstractActionController
      */
     protected function deleteFile(string $filename): bool
     {
-        $localPath = $this->settings()->get('easyadmin_local_path');
-        $result = $this->checkLocalPath($localPath);
-        if (is_string($result)) {
-            $this->messenger()->addError($result);
+        $errorMessage = null;
+        $localPath = $this->getAndCheckLocalPath($errorMessage);
+        if (!$localPath) {
+            $this->messenger()->addError($errorMessage);
             return false;
         }
 
-        $result = $this->checkFilename($filename);
-        if ($result) {
-            $this->messenger()->addError($result);
+        $errorMessage = null;
+        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
+        if (!$isFilenameValid) {
+            $this->messenger()->addError($errorMessage);
             return false;
         }
 

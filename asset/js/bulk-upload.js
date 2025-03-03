@@ -227,7 +227,7 @@
             return (!allowedMediaTypes.length || allowedMediaTypes.includes(file.type))
                 && (!allowedExtensions.length || allowedExtensions.includes(extension.toLowerCase()))
                 && file.name.substr(0, 1) !== '.'
-                && /^[^{}$?!<>\/\\]+$/.test(file.name)
+                && /^[^\/\\?!<>:*%|{}"`&$#]+$/.test(file.name)
                 && (allowEmptyFiles || file.size > 0);
         }
 

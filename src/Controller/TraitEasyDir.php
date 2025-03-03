@@ -4,44 +4,54 @@ namespace EasyAdmin\Controller;
 
 trait TraitEasyDir
 {
+    protected function getAndCheckLocalPath(?string &$errorMessage = null): ?string
+    {
+        $localPath = $this->settings()->get('easyadmin_local_path');
+        $result = $this->checkLocalPath($localPath, $errorMessage);
+        return $result
+            ? $localPath
+            : null;
+    }
+
     /**
      * @param string $filename
      * @return string|null Null if no error.
      */
-    protected function checkFilename(?string $filename): ?string
+    protected function checkFilename(?string $filename, ?string &$errorMessage = null): bool
     {
         if (!$filename) {
-            return 'Filename empty.'; // @translate
+            $errorMessage = 'Filename empty.'; // @translate
+            return false;
         }
 
         if (mb_strlen($filename) < 3 || mb_strlen($filename) > 200) {
-            return 'Filename too much short or long.'; // @translate
+            $errorMessage = 'Filename too much short or long.'; // @translate
+            return false;
         }
 
-        $forbiddenCharacters = '/\\?<>:*%|"\'`&#;';
+        $forbiddenCharacters = '/\\?!<>:*%|{}"`&$#;';
         if (mb_substr($filename, 0, 1) === '.'
             || mb_strpos($filename, '..') !== false
             || preg_match('~' . preg_quote($forbiddenCharacters, '~'). '~', $filename)
         ) {
-            return 'Filename contains forbidden characters.'; // @translate;
+            $errorMessage = 'Filename contains forbidden characters.'; // @translate;
+            return false;
         }
 
         $extension = mb_strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         if (!mb_strlen($extension)) {
-            return 'Filename has no extension.'; // @translate
+            $errorMessage = 'Filename has no extension.'; // @translate
+            return false;
         }
 
-        return null;
+        return true;
     }
 
-    /**
-     * @param string $localPath
-     * @return string|null Null if no error.
-     */
-    protected function checkLocalPath(?string $localPath): ?string
+    protected function checkLocalPath(?string $localPath, ?string &$errorMessage = null): bool
     {
         if (!$localPath) {
-            return 'Local path is not configured.'; // @translate
+            $errorMessage = 'Local path is not configured.'; // @translate
+            return false;
         }
 
         $localPathDir = rtrim($localPath, '/') . '/';
@@ -49,7 +59,8 @@ trait TraitEasyDir
         if ($localPathDir === $this->basePath
             || mb_strpos($localPathDir, $this->basePath . '/') !== 0
         ) {
-            return 'Local path should be a sub-directory of /files.'; // @translate
+            $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
+            return false;
         }
 
         $standardDirectories = [
@@ -61,22 +72,30 @@ trait TraitEasyDir
         ];
         foreach ($standardDirectories as $dir) {
             if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
-                return 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+                $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+                return false;
             }
+        }
+
+        if ($localPathDir === '/') {
+            $errorMessage = 'Local path cannot be the root directory.'; // @translate
+            return false;
         }
 
         $localPath = $this->checkDestinationDir($localPath);
         if (!$localPath) {
-            return 'Local path is not writeable.'; // @translate
+            $errorMessage = 'Local path is not writeable.'; // @translate
+            return false;
         }
-        return null;
+
+        return true;
     }
 
     /**
      * Check or create the destination folder.
      *
-     * @param string $dirPath Absolute path.
-     * @return string|null
+     * @param string $dirPath Absolute path of the directory to check.
+     * @return string|null The dirpath if valid, else null.
      */
     protected function checkDestinationDir(string $dirPath): ?string
     {
