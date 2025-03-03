@@ -166,7 +166,7 @@ return [
                         'route' => 'admin/easy-admin/file-manager',
                         'action' => 'browse',
                         'resource' => 'EasyAdmin\Controller\Admin\FileManager',
-                        'class' => 'o-icon- fa-cloud-upload-alt',
+                        'class' => 'o-icon- fa-folder-open',
                     ],
                 ],
             ],

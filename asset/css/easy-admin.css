@@ -1,6 +1,19 @@
 @media all {
-    .easy-admin .subhead::before {
+    .easy-admin .subhead::before,
+    .easy-admin-addons .no-resources:before {
         content: "";
+    }
+    .check-and-fix .subhead::before,
+    .check-and-fix .no-resources:before {
+        content:"";
+    }
+    .easy-admin-addons .subhead::before,
+    .easy-admin-addons .no-resources:before {
+        content:"";
+    }
+    .file-manager .subhead::before,
+    .file-manager .no-resources:before {
+        content:"";
     }
     .easy-admin-addons .chosen-container .chosen-results {
         max-height: 50vh;

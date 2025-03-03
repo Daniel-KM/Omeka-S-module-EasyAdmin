@@ -5,7 +5,7 @@
 
     .file-manager .subhead::before,
     .file-manager .no-resources:before {
-        content:"";
+        content:"";
     }
 
     .file-manager .actions .disabled {
