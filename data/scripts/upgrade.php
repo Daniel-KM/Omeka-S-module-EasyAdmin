@@ -343,3 +343,10 @@ if (version_compare($oldVersion, '3.4.27', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.28', '<')) {
+    $message = new PsrMessage(
+        'To allow to upload files in a specific path outside of directory files/, update the file config.local.php.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
