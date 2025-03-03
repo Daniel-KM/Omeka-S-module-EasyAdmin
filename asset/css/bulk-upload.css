@@ -8,6 +8,13 @@
         content:"";
     }
 
+    .file-manager .actions .disabled {
+		color: currentColor;
+		cursor: not-allowed;
+		opacity: 0.5;
+		text-decoration: none;
+	}
+
     /* Resource add/edit items for media files and folders */
     .media-bulk-upload .bulk-drop {
         display: flex;

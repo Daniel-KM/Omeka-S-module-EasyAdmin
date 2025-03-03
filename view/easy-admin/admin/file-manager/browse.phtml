@@ -146,18 +146,24 @@ $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controll
             <tr>
                 <td>
                     <?php if ($isAdminUser): ?>
-                    <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"/>
+                    <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"<?= $file->isWritable() ? '' : ' disabled="disabled"' ?>/>
                     <?php endif; ?>
                     <?= $escape($filename) ?>
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
                         <?php if ($userIsAllowedDelete): ?>
+                        <?php if ($file->isWritable()): ?>
                         <li><?= $hyperlink('', '#', [
                             'data-sidebar-selector' => '#sidebar',
                             'data-sidebar-content-url' => $url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['filename' => $filename]]),
                             'class' => 'o-icon-delete sidebar-content',
                             'title' => $translate('Delete'),
                         ]) ?></li>
+                        <?php else: ?>
+                        <li>
+                            <span class="o-icon-delete sidebar-content disabled" title="<?= $translate('Delete') ?>"></span>
+                        </li>
+                        <?php endif; ?>
                         <?php endif; ?>
                     </ul>
                 </td>
