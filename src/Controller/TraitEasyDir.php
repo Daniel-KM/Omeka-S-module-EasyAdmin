@@ -13,10 +13,37 @@ trait TraitEasyDir
             : null;
     }
 
-    /**
-     * @param string $filename
-     * @return string|null Null if no error.
-     */
+    protected function checkFile(?string $filename, ?string &$errorMessage = null): bool
+    {
+        $errorMessage = null;
+        $localPath = $this->getAndCheckLocalPath($errorMessage);
+        if (!$localPath) {
+            $this->messenger()->addError($errorMessage);
+            return false;
+        }
+
+        $errorMessage = null;
+        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
+        if (!$isFilenameValid) {
+            $this->messenger()->addError($errorMessage);
+            return false;
+        }
+
+        $filepath = rtrim($localPath, '//') . '/' . $filename;
+        $fileExists = file_exists($filepath);
+        if (!$fileExists) {
+            $this->messenger()->addError('The file does not exist.'); // @ŧranslate
+            return false;
+        }
+
+        if (is_dir($filepath)) {
+            $this->messenger()->addError('The file is a dir.'); // @translate
+            return false;
+        }
+
+        return true;
+    }
+
     protected function checkFilename(?string $filename, ?string &$errorMessage = null): bool
     {
         if (!$filename) {

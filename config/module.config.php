@@ -44,6 +44,7 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\Note::class => Form\Element\Note::class,
+            Form\ConfigForm::class => Form\ConfigForm::class,
             Form\SettingsFieldset::class => Form\SettingsFieldset::class,
         ],
         'factories' => [

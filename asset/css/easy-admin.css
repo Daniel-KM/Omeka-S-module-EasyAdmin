@@ -5,4 +5,8 @@
     .easy-admin-addons .chosen-container .chosen-results {
         max-height: 50vh;
     }
+
+    #toggle-display-dir {
+        text-align: right;
+    }
 }

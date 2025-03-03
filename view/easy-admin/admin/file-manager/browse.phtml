@@ -22,7 +22,8 @@ $htmlAttributes = $plugins->get('htmlAttributes');
 $userIsAllowed = $plugins->get('userIsAllowed');
 
 $this->headLink()
-    ->appendStylesheet($assetUrl('css/bulk-upload.css', 'EasyAdmin'));
+    ->appendStylesheet($assetUrl('css/bulk-upload.css', 'EasyAdmin'))
+    ->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
 $this->headScript()
     ->appendFile($assetUrl('vendor/flow.js/flow.min.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/bulk-upload.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
@@ -31,6 +32,8 @@ $this->headScript()
 $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse file-manager');
 
 $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 'delete');
+
+$displayDir = !empty($_POST['display_dir']);
 ?>
 
 <?= $this->pageTitle($translate('File manager'), 1, $translate('Easy Admin')) ?>
@@ -100,6 +103,13 @@ $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controll
 
 <?php if ($fileIterator): ?>
 
+<form  id="toggle-display-dir" method="post">
+    <input type="hidden" name="display_dir" id="display_dir" value="<?= (int) !$displayDir ?>"/>
+    <button type="submit" class="button">
+        <?= $displayDir ? $translate('Hide folders') : $translate('Display folders') ?>
+    </button>
+</form>
+
 <form method="post" id="batch-form" class="disable-unsaved-warning"><?php // TODO Use the right right. ?>
 
     <?php if ($isAdminUser && $userIsAllowed(\Omeka\Api\Adapter\ItemAdapter::class, 'batch_update')): ?>
@@ -139,20 +149,28 @@ $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controll
             $totalFiles = 0;
             foreach ($fileIterator as $file):
                 $filename = $file->getFilename();
-                if (!$file->isFile() || $file->isDir() || !$file->isReadable() || mb_substr($filename, 0, 1) === '.') continue;
-                ++$totalFiles;
-                $mediaType = finfo_file($finfo, $file->getRealPath());
+                if (!$file->isReadable() || mb_substr($filename, 0, 1) === '.') continue;
+                $isFile = $file->isFile();
+                $isDir = $file->isDir();
+                if (!$isFile && !$isDir) continue;
+                if ($isDir) {
+                    if (!$displayDir) continue;
+                    $mediaType = null;
+                } else {
+                    ++$totalFiles;
+                    $mediaType = finfo_file($finfo, $file->getRealPath());
+                }
                 ?>
             <tr>
                 <td>
                     <?php if ($isAdminUser): ?>
-                    <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"<?= $file->isWritable() ? '' : ' disabled="disabled"' ?>/>
+                    <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"<?= !$isDir && $file->isWritable() ? '' : ' disabled="disabled"' ?>/>
                     <?php endif; ?>
                     <?= $escape($filename) ?>
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
                         <?php if ($userIsAllowedDelete): ?>
-                        <?php if ($file->isWritable()): ?>
+                        <?php if (!$isDir && $file->isWritable()): ?>
                         <li><?= $hyperlink('', '#', [
                             'data-sidebar-selector' => '#sidebar',
                             'data-sidebar-content-url' => $url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['filename' => $filename]]),
@@ -168,7 +186,7 @@ $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controll
                     </ul>
                 </td>
                 <td><?=  date('Y-m-d H:i:s', $file->getMTime()) ?></td>
-                <td><?= $file->getSize() ?></td>
+                <td><?= $isDir ? '' : $file->getSize() ?></td>
                 <td><?= $mediaType  ?></td>
             </tr>
             <?php endforeach; ?>

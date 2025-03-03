@@ -146,6 +146,12 @@ class FileManagerController extends AbstractActionController
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
+        $errorMessage = null;
+        $isFileValid = $this->checkFile($filename, $errorMessage);
+        if (!$isFileValid) {
+            throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
+        }
+
         $form = $this->getForm(ConfirmForm::class);
         $form->setAttribute('action', $this->url()->fromRoute('admin/easy-admin/file-manager', ['action' => 'delete'], ['query' => ['filename' => $filename]], true));
 
@@ -287,7 +293,12 @@ class FileManagerController extends AbstractActionController
             return true;
         }
 
-        if (!is_writeable($filepath) || !is_file($filepath) || is_dir($filepath)) {
+        if (is_dir($filepath)) {
+            $this->messenger()->addError('It is forbidden to remove a folder.'); // @translate
+            return false;
+        }
+
+        if (!is_writeable($filepath) || !is_file($filepath)) {
             $this->messenger()->addError('The file cannot be removed.'); // @translate
             return false;
         }

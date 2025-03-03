@@ -14,7 +14,7 @@ class ConfigForm extends Form
                 'name' => 'easyadmin_local_path_any_files',
                 'type' => Element\Checkbox::class,
                 'options' => [
-                    'label' => 'Allow to use any directory inside files', // @translate
+                    'label' => 'Allow to display any folder inside the folder files', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_local_path_any_files',
