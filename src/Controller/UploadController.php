@@ -28,6 +28,11 @@ class UploadController extends AbstractActionController
     protected $validator;
 
     /**
+     * @var bool
+     */
+    protected $allowAnyPath;
+
+    /**
      * @var string
      */
     protected $basePath;
@@ -40,11 +45,13 @@ class UploadController extends AbstractActionController
     public function __construct(
         TempFileFactory $tempFileFactory,
         Validator $validator,
+        bool $allowAnyPath,
         string $basePath,
         string $tempDir
     ) {
         $this->tempFileFactory = $tempFileFactory;
         $this->validator = $validator;
+        $this->allowAnyPath = $allowAnyPath;
         $this->basePath = $basePath;
         $this->tempDir = $tempDir;
     }

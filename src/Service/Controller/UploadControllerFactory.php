@@ -16,6 +16,7 @@ class UploadControllerFactory implements FactoryInterface
         return new UploadController(
             $services->get(\Omeka\File\TempFileFactory::class),
             $services->get(\Omeka\File\Validator::class),
+            (bool) $config['easyadmin']['config']['easyadmin_local_path_any'],
             $basePath,
             rtrim($tempDir, '/\\')
         );

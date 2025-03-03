@@ -20,6 +20,11 @@ class FileManagerController extends AbstractActionController
     protected $acl;
 
     /**
+     * @var bool
+     */
+    protected $allowAnyPath;
+
+    /**
      * @var string
      */
     protected $basePath;
@@ -31,10 +36,12 @@ class FileManagerController extends AbstractActionController
 
     public function __construct(
         Acl $acl,
+        bool $allowAnyPath,
         string $basePath,
         string $tempDir
     ) {
         $this->acl = $acl;
+        $this->allowAnyPath = $allowAnyPath;
         $this->basePath = $basePath;
         $this->tempDir = $tempDir;
     }

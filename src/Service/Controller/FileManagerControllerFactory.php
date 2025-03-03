@@ -15,6 +15,7 @@ class FileManagerControllerFactory implements FactoryInterface
         $tempDir = $config['temp_dir'] ?: sys_get_temp_dir();
         return new FileManagerController(
             $services->get('Omeka\Acl'),
+            (bool) $config['easyadmin']['config']['easyadmin_local_path_any'],
             $basePath,
             rtrim($tempDir, '/\\')
         );

@@ -200,6 +200,11 @@ return [
         ],
     ],
     'easyadmin' => [
+        'config' => [
+            // This option should be set in local.config.php.
+            // For security, it should not be set in production or check rights.
+            'easyadmin_local_path_any' => false,
+        ],
         'settings' => [
             'easyadmin_interface' => [
                 'resource_public_view',

@@ -56,24 +56,26 @@ trait TraitEasyDir
 
         $localPathDir = rtrim($localPath, '/') . '/';
 
-        if ($localPathDir === $this->basePath
-            || mb_strpos($localPathDir, $this->basePath . '/') !== 0
-        ) {
-            $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
-            return false;
-        }
-
-        $standardDirectories = [
-            'asset',
-            'large',
-            'medium',
-            'original',
-            'square',
-        ];
-        foreach ($standardDirectories as $dir) {
-            if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
-                $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+        if (empty($this->allowAnyPath)) {
+            if ($localPathDir === $this->basePath
+                || mb_strpos($localPathDir, $this->basePath . '/') !== 0
+            ) {
+                $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
                 return false;
+            }
+
+            $standardDirectories = [
+                'asset',
+                'large',
+                'medium',
+                'original',
+                'square',
+            ];
+            foreach ($standardDirectories as $dir) {
+                if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
+                    $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+                    return false;
+                }
             }
         }
 
