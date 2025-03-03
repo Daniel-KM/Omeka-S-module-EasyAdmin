@@ -126,6 +126,20 @@ in resource form and via a separate bulk upload form for future imports.
 
 Simply select "Files" in the media list in item form.
 
+For security, some characters are forbidden in filenames. Media-types and
+extensions are checked according to main settings too.
+
+To list files in this directory and to delete them, use the file manager, via
+the link Easy admin in the left sidebar, then tab File manager.
+
+The base path can be set in main settings. By default, only paths inside
+directory files/ and that are not managed by Omeka are allowed. To bypass this
+limit, an option in the config form allows to use any path inside files/.
+Another option allows to use any other writeable directory update. For this one,
+update the file config.local.php for key "easyadmin_local_path_any".
+**Warning**: there are security implications with this option, so check access
+rights or use it only temporarily.
+
 ### Buttons in resource page
 
 The option can be enabled in main settings.
