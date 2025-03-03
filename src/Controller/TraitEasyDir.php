@@ -64,17 +64,19 @@ trait TraitEasyDir
                 return false;
             }
 
-            $standardDirectories = [
-                'asset',
-                'large',
-                'medium',
-                'original',
-                'square',
-            ];
-            foreach ($standardDirectories as $dir) {
-                if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
-                    $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
-                    return false;
+            if (!$this->settings()->get('easyadmin_local_path_any_files')) {
+                $standardDirectories = [
+                    'asset',
+                    'large',
+                    'medium',
+                    'original',
+                    'square',
+                ];
+                foreach ($standardDirectories as $dir) {
+                    if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
+                        $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
+                        return false;
+                    }
                 }
             }
         }

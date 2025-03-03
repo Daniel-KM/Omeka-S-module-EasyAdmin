@@ -201,6 +201,7 @@ return [
     ],
     'easyadmin' => [
         'config' => [
+            'easyadmin_local_path_any_files' => false,
             // This option should be set in local.config.php.
             // For security, it should not be set in production or check rights.
             'easyadmin_local_path_any' => false,
