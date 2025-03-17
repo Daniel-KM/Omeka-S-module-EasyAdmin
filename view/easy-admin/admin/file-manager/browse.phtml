@@ -1,6 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $localUrl
  * @var string $localPath
  * @var bool $isLocalPathValid
  * @var array $data
@@ -172,6 +173,14 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
                     <?php endif; ?>
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
+                        <?php if ($localUrl): ?>
+                        <li><?= $hyperlink('', $localUrl. '/' . rawurlencode($filename), [
+                            'download' => $filename,
+                            'target' => '_self',
+                            'class' => 'o-icon- fa-cloud-download-alt download',
+                            'title' => $translate('Download'),
+                        ]) ?></li>
+                        <?php endif; ?>
                         <?php if ($userIsAllowedDelete): ?>
                         <?php if (!$isDir && $file->isWritable()): ?>
                         <li><?= $hyperlink('', '#', [

@@ -32,17 +32,24 @@ class FileManagerController extends AbstractActionController
     /**
      * @var string
      */
+    protected $baseUri;
+
+    /**
+     * @var string
+     */
     protected $tempDir;
 
     public function __construct(
         Acl $acl,
         bool $allowAnyPath,
         string $basePath,
+        ?string $baseUri,
         string $tempDir
     ) {
         $this->acl = $acl;
         $this->allowAnyPath = $allowAnyPath;
         $this->basePath = $basePath;
+        $this->baseUri = $baseUri;
         $this->tempDir = $tempDir;
     }
 
@@ -84,7 +91,12 @@ class FileManagerController extends AbstractActionController
             $fileIterator = new FilesystemIterator($localPath);
             // TODO Use pagination.
             // $this->paginator($fileIterator->getTotalResults());
+            // Get the specific part.
+            $base = $this->baseUri ? rtrim($this->baseUri, '/') : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
+            $partPath = mb_substr($localPath, mb_strlen(rtrim($this->basePath, '/')) + 1);
+            $localUrl = $base . '/' . $partPath;
         } else {
+            $localUrl = null;
             $fileIterator = null;
         }
 
@@ -119,6 +131,7 @@ class FileManagerController extends AbstractActionController
         }
 
         return (new ViewModel([
+            'localUrl' => $localUrl,
             'localPath' => $localPath,
             'isLocalPathValid' => (bool) $localPath,
             'data' => $data,

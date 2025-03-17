@@ -12,11 +12,13 @@ class FileManagerControllerFactory implements FactoryInterface
     {
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: OMEKA_PATH . '/files';
+        $baseUri = $config['file_store']['local']['base_uri'] ?: null;
         $tempDir = $config['temp_dir'] ?: sys_get_temp_dir();
         return new FileManagerController(
             $services->get('Omeka\Acl'),
             (bool) $config['easyadmin']['config']['easyadmin_local_path_any'],
             $basePath,
+            $baseUri,
             rtrim($tempDir, '/\\')
         );
     }
