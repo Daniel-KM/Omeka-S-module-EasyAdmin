@@ -136,7 +136,7 @@ The base path can be set in main settings. By default, only paths inside
 directory files/ and that are not managed by Omeka are allowed. To bypass this
 limit, an option in the config form allows to use any path inside files/.
 Another option allows to use any other writeable directory update. For this one,
-update the file config.local.php for key "easyadmin_local_path_any".
+update the file local.config.php for key "easyadmin_local_path_any".
 **Warning**: there are security implications with this option, so check access
 rights or use it only temporarily.
 
