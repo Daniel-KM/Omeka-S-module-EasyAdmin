@@ -248,9 +248,9 @@ class Module extends AbstractModule
         $html .= '</p>';
 
         $html .= '<p>';
-        $html .= sprintf(
-            $t->translate('All stored files from checks and fixes, if any, will be removed from folder "{folder}".'), // @translate
-            $basePath . '/check'
+        $html .= new PsrMessage(
+            'All stored files from checks and fixes, if any, will be removed from folder "{folder}".', // @translate
+            ['folder' => $basePath . '/check']
         );
         $html .= '</p>';
 
