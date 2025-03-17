@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-17 00:00+0000\n"
-"PO-Revision-Date: 2025-02-17 00:00+0000\n"
+"POT-Creation-Date: 2025-03-17 00:00+0000\n"
+"PO-Revision-Date: 2025-03-17 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -30,78 +30,70 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: Module.php:237
+#: Module.php:246
 msgid "WARNING:"
 msgstr "ATTENTION :"
 
-#: Module.php:243
-msgid ""
-"All stored files from checks and fixes, if any, will be removed from folder "
-"\"{folder}\"."
-msgstr ""
-"Tous les enregistrements issus des vérifications seront supprimés du dossier "
-"« {folder} »."
-
-#: Module.php:249
+#: Module.php:258
 msgid "Remove directory \"files/check\""
 msgstr "Supprimer le dossier \"files/check\""
 
-#: src/Controller/Admin/FileManagerController.php:65
+#: src/Controller/Admin/FileManagerController.php:79
 #: src/Media/Ingester/BulkUpload.php:121
 msgid "Pause"
 msgstr "Pause"
 
-#: src/Controller/Admin/FileManagerController.php:66
+#: src/Controller/Admin/FileManagerController.php:80
 #: src/Media/Ingester/BulkUpload.php:122
 msgid "Resume"
 msgstr "Reprendre"
 
-#: src/Controller/Admin/FileManagerController.php:67
+#: src/Controller/Admin/FileManagerController.php:81
 #: src/Media/Ingester/BulkUpload.php:123
 msgid "No files currently selected for upload"
 msgstr "Rien n’a été choisi pour le téléversement"
 
-#: src/Controller/Admin/FileManagerController.php:69
+#: src/Controller/Admin/FileManagerController.php:83
 #: src/Media/Ingester/BulkUpload.php:125
 msgid "Not a valid file type or extension. Update your selection."
 msgstr "Type ou extension de fichier invalide. Modifiez votre sélection."
 
-#: src/Controller/Admin/FileManagerController.php:70
+#: src/Controller/Admin/FileManagerController.php:84
 #: src/Media/Ingester/BulkUpload.php:126
 msgid "Not a valid file type, extension or size. Update your selection."
 msgstr ""
 "Type, extension ou taille de fichier invalide. Modifiez votre sélection."
 
-#: src/Controller/Admin/FileManagerController.php:71
+#: src/Controller/Admin/FileManagerController.php:85
 #: src/Media/Ingester/BulkUpload.php:127
 msgid "An issue occurred."
 msgstr "Un problème est survenu."
 
-#: src/Controller/UploadController.php:70
+#: src/Controller/UploadController.php:77
 msgid "User not authenticated."
 msgstr "Utilisateur non authentifié."
 
-#: src/Controller/UploadController.php:83
+#: src/Controller/UploadController.php:90
 msgid "The request must originate from the server."
 msgstr "La requête doit provenir du serveur."
 
-#: src/Controller/UploadController.php:93
+#: src/Controller/UploadController.php:100
 msgid "Expired, invalid or missing CSRF token."
 msgstr "Jeton CSRF expiré, invalide ou manquant."
 
-#: src/Controller/UploadController.php:160
+#: src/Controller/UploadController.php:167
 msgid "The file is empty."
 msgstr "Le fichier est vide."
 
-#: src/Controller/UploadController.php:215
+#: src/Controller/UploadController.php:224
 msgid "A file with the same name exists and is not writeable."
 msgstr "Un fichier existe avec le même nom et ne peut pas être supprimé."
 
-#: src/Controller/UploadController.php:225
+#: src/Controller/UploadController.php:234
 msgid "An error occurred when storing file."
 msgstr "Une erreur est survenue lors de l’enregistrement du fichier."
 
-#: src/Controller/UploadController.php:248
+#: src/Controller/UploadController.php:257
 msgid "An existing file was overridden."
 msgstr "Un fichier existant a été écrasé."
 
@@ -121,19 +113,19 @@ msgstr "Non lisible"
 msgid "Empty file"
 msgstr "Fichier vide"
 
-#: src/Job/FileMissing.php:242
+#: src/Job/FileMissing.php:239
 msgid "No source"
 msgstr "Pas de source"
 
-#: src/Job/FileMissing.php:243
+#: src/Job/FileMissing.php:240
 msgid "Copy issue"
 msgstr "Problème de copie"
 
-#: src/Job/FileMissing.php:244
+#: src/Job/FileMissing.php:241
 msgid "Item removed"
 msgstr "Contenu supprimé"
 
-#: src/Job/FileMissing.php:245
+#: src/Job/FileMissing.php:242
 msgid "Item not removed: more than one media"
 msgstr "Contenu non supprimé : plus d’un média"
 
@@ -147,17 +139,17 @@ msgid "Upload files"
 msgstr "Téléverser"
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/file-manager/browse.phtml:62
+#: view/easy-admin/admin/file-manager/browse.phtml:67
 msgid "Drag and drop"
 msgstr "Déposer"
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/file-manager/browse.phtml:67
+#: view/easy-admin/admin/file-manager/browse.phtml:72
 msgid "Browse files"
 msgstr "Parcourir"
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/file-manager/browse.phtml:72
+#: view/easy-admin/admin/file-manager/browse.phtml:77
 msgid "Select directory"
 msgstr "Choisir un dossier"
 
@@ -198,7 +190,7 @@ msgid "Alphabetic (with folder)"
 msgstr "Alphabétique (avec le dossier)"
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/file-manager/browse.phtml:81
+#: view/easy-admin/admin/file-manager/browse.phtml:86
 msgid "Hide uploaded files"
 msgstr "Cacher les fichiers téléchargés"
 
@@ -232,7 +224,8 @@ msgstr "Installer des extensions"
 
 #: view/easy-admin/admin/addons/index.phtml:20
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
-#: view/easy-admin/admin/file-manager/browse.phtml:36
+#: view/easy-admin/admin/cron/index.phtml:22
+#: view/easy-admin/admin/file-manager/browse.phtml:41
 msgid "Easy Admin"
 msgstr "Easy Admin"
 
@@ -266,11 +259,15 @@ msgstr "Les extensions avec un astérisque sont déjà téléchargées."
 msgid "Check and fix"
 msgstr "Réparation"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:36
+#: view/easy-admin/admin/cron/index.phtml:22
+msgid "Regular tasks"
+msgstr "Tâches régulières"
+
+#: view/easy-admin/admin/file-manager/browse.phtml:41
 msgid "File manager"
 msgstr "Gestionnaire de fichiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:44
+#: view/easy-admin/admin/file-manager/browse.phtml:49
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
@@ -283,7 +280,7 @@ msgstr ""
 "%3$sBulk Import%2$s ou %4$sTimeline%2$s. Tous les fichiers versés seront "
 "enregistrés directement à la racine du dossier configuré."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:53
+#: view/easy-admin/admin/file-manager/browse.phtml:58
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
@@ -292,25 +289,37 @@ msgstr ""
 "%1$sAttention%2$s : les fichiers existants ayant le même nom que les "
 "fichiers téléchargés seront écrasés."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:91
+#: view/easy-admin/admin/file-manager/browse.phtml:96
 msgid "Uploading in progress…"
 msgstr "Chargement en cours…"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:149
+#: view/easy-admin/admin/file-manager/browse.phtml:129
+msgid "Hide folders"
+msgstr "Cacher les dossiers"
+
+#: view/easy-admin/admin/file-manager/browse.phtml:129
+msgid "Display folders"
+msgstr "Afficher les dossiers"
+
+#: view/easy-admin/admin/file-manager/browse.phtml:167
 msgid "Select file"
 msgstr "Choisir un fichier"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:188
-#: view/easy-admin/admin/file-manager/browse.phtml:203
+#: view/easy-admin/admin/file-manager/browse.phtml:181
+msgid "Download"
+msgstr "Télécharger"
+
+#: view/easy-admin/admin/file-manager/browse.phtml:224
+#: view/easy-admin/admin/file-manager/browse.phtml:239
 msgid "Delete files"
 msgstr "Supprimer les fichiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:189
+#: view/easy-admin/admin/file-manager/browse.phtml:225
 msgid "Are you sure you would like to delete the selected files?"
 msgstr "Êtes-vous sûr de vouloir supprimer tous les fichiers sélectionnés ?"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:191
-#: view/easy-admin/admin/file-manager/browse.phtml:206
+#: view/easy-admin/admin/file-manager/browse.phtml:227
+#: view/easy-admin/admin/file-manager/browse.phtml:242
 #, php-format
 msgid ""
 "%1$sWarning%2$s: this action will permanently delete %3$s files and cannot "
@@ -319,14 +328,14 @@ msgstr ""
 "%1$sAttention%2$s : cette action supprimera %3$s fichiers de manière "
 "définitive et ne pourra pas être annulée."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:204
+#: view/easy-admin/admin/file-manager/browse.phtml:240
 msgid ""
 "Are you sure you would like to delete all files on all pages of this result?"
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer tous les fichiers de toutes les pages de "
 "résultat ?"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:222
+#: view/easy-admin/admin/file-manager/browse.phtml:258
 msgid "No files."
 msgstr "Aucun fichier."
 
@@ -405,7 +414,7 @@ msgstr ""
 "Une {link}option{link_end} permet d’afficher un lien depuis la page "
 "d’administration de chaque ressource vers la page publique."
 
-#: data/scripts/upgrade.php:204 Module.php:205
+#: data/scripts/upgrade.php:204 Module.php:214
 msgid ""
 "The module \"{module}\" was upgraded by module \"{module_2}\" and "
 "uninstalled."
@@ -437,8 +446,8 @@ msgstr ""
 "De nouvelles tâches ont été ajoutées pour définir le média principal de "
 "chaque contenu et pour vérifier les ressources."
 
-#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:165
-#: Module.php:173 Module.php:181
+#: data/scripts/upgrade.php:248 data/scripts/upgrade.php:282 Module.php:174
+#: Module.php:182 Module.php:190
 msgid "The directory \"{dir}\" is not writeable."
 msgstr "Le dossier « {dir} » n’est pas accessible en écriture."
 
@@ -503,95 +512,26 @@ msgstr ""
 "Il est désormais possible de téléverser et de supprimer des fichiers locaux "
 "dans un dossier défini."
 
-#: data/scripts/task.php:21
+#: data/scripts/upgrade.php:349
 msgid ""
-"Usage: php data/scripts/task.php [arguments]\n"
-"\n"
-"Required arguments:\n"
-"  -t --task [Name]\n"
-"\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
-"\t\tbasename (\"LoopItems\"). You should take care of case\n"
-"\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
-"\n"
-"  -u --user-id [#id]\n"
-"\t\tThe Omeka user id is required, else the job won’t have any\n"
-"\t\trights.\n"
-"\n"
-"Recommended arguments:\n"
-"  -s --server-url [url]\n"
-"\t\tThe url of the server to build resource urls (default:\n"
-"\t\t\"http://localhost\").\n"
-"\n"
-"  -b --base-path [path]\n"
-"\t\tThe path to complete the server url (default: \"/\").\n"
-"\n"
-"Optional arguments:\n"
-"  -a --args [json]\n"
-"\t\tArguments to pass to the task. Arguments are specific to\n"
-"\t\teach job. To find them, check the code, or run a job\n"
-"\t\tmanually then check the job page in admin interface.\n"
-"\n"
-"  -k --as-task\n"
-"\t\tProcess a a simple task and do not create a job. May be\n"
-"\t\tused for tasks that do not need to be checked as a job.\n"
-"\t\tThis is the inverse of the deprecated argument --job.\n"
-"\n"
-"Deprecated arguments:\n"
-"  -j --job\n"
-"\t\tCreate a standard job that will be checkable in admin\n"
-"\t\tinterface. In any case, all logs are available in logs with\n"
-"\t\ta reference code. It allows to process jobs that are not\n"
-"\t\ttaskable.\n"
-"\t\tThis option is now set by default and is useless.\n"
-"\n"
-"Other arguments:\n"
-"  -h --help\n"
-"\t\tThis help."
+"To allow to upload files in a specific path outside of directory files/, "
+"update the file local.config.php."
 msgstr ""
-"Usage : php data/scripts/task.php [arguments]\n"
-"\n"
-"Arguments obligatoires :\n"
-"  -t --task [Nom]\n"
-"\t\tClasse complète de la tâche (« EasyAdmin\\Job\\LoopItems »)\n"
-"\t\tou nom de base (« LoopItems »). Il est recommandé de vérifier\n"
-"\t\tla casse, d’échapper « \\ » ou de mettre entre « ' » les noms sur\n"
-"\t\tl’invite de commande.\n"
-"\n"
-"  -u --user-id [#id]\n"
-"\t\tL’id de l’utilisateur Omeka est obligatoire, sinon la tâche n’aura \n"
-"\t\taucuns droits.\n"
-"\n"
-"Arguments recommandés :\n"
-"  -s --server-url [url]\n"
-"\t\tL’url du serveur pour construire les urls des ressources (défaut :\n"
-"\t\t\"http://localhost\").\n"
-"\n"
-"  -b --base-path [chemin]\n"
-"\t\tLe chemin pour compléter l’url du serveur(défault : « / »).\n"
-"\n"
-"Arguments facultatifs :\n"
-"  -a --args [json]\n"
-"\t\tArguments spécifiques à passer à la tâche. Pour les trouver,\n"
-"\t\tconsultez le code ou lancez une tâche manuellement puis\n"
-"\t\tconsultez la page de la tâche dans l’interface admin.\n"
-"\n"
-"  -k --as-task\n"
-"\t\tLancer la tâche en tant que tâche simple sans la créer dans Omeka.\n"
-"\t\tCela peut être utilisé pour les tâches qui n’ont pas besoin d’être "
-"vérifiés dans Omeka.\n"
-"\t\tC’est l’inverse de l’argument obsolète --job.\n"
-"\n"
-"Arguments obsolètes :\n"
-"  -j --job\n"
-"\t\tCréer une tâche standard qui pourra être vérifiée dans l’interface\n"
-"\t\tadmin. Dans tous les cas, tous les journaux sont consultables avec\n"
-"\t\tle code de référence. Cela permet de lancer des tâches qui ne\n"
-"\t\tpas être lancées en tant que tâches simples.\n"
-"\t\tCette option est désormais activée par défaut est inutile.\n"
-"\n"
-"Autres arguments :\n"
-"  -h --help\n"
-"\t\tCette aide."
+"Pour autoriser le téléchargement des fichiers dans un dossier hors le "
+"dossier files/, indiquez-le dans le fichier local.config.php."
+
+#: data/scripts/upgrade.php:361
+msgid ""
+"It is now possible to define regular tasks to remove sessions regularly. A "
+"first cleaning of old ones is launched."
+msgstr ""
+"Il est désormais possible de définir des tâches régulières pour supprimer "
+"des sessions régulièrement. Un premier nettoyage des vieilles sessions a été "
+"lancé."
+
+#: data/scripts/task.php:17
+msgid "/bootstrap.php"
+msgstr "/bootstrap.php"
 
 #: data/scripts/task.php:81
 #, php-format
@@ -693,7 +633,7 @@ msgstr ""
 "Les dépendances doivent être installées. Consulter la documentation "
 "d’installation du module."
 
-#: Module.php:157
+#: Module.php:166
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
@@ -701,76 +641,84 @@ msgstr ""
 "Mise à niveau du module BulkCheck : impossible de renommer le dossier "
 "\"files/bulk_check\" en \"files/check\". Essai de création."
 
-#: Module.php:628
+#: Module.php:252
+msgid ""
+"All stored files from checks and fixes, if any, will be removed from folder "
+"\"{folder}\"."
+msgstr ""
+"Tous les enregistrements issus des vérifications seront supprimés du dossier "
+"« {folder} »."
+
+#: Module.php:687
 msgid "View this {resource_type} in \"{site}\""
 msgstr "Afficher le {resource_type} dans « {site} »"
 
-#: Module.php:632
+#: Module.php:691
 msgid "[not in site]"
 msgstr "[aucun site]"
 
-#: Module.php:723
+#: Module.php:782
 msgid "File successfuly uploaded."
 msgstr "Fichier téléversé avec succès."
 
-#: Module.php:724
+#: Module.php:783
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr "La taille des fichiers excède la valeur limite du serveur."
 
-#: Module.php:725
+#: Module.php:784
 msgid "The file size exceeds the specified limit."
 msgstr "La taille du fichier excède la taille maximale."
 
-#: Module.php:726
+#: Module.php:785
 msgid "The file was only partially uploaded."
 msgstr "Le fichier a été partiellement chargé."
 
-#: Module.php:727
+#: Module.php:786
 msgid "No file was uploaded."
 msgstr "Aucun fichier n’a été téléchargé."
 
-#: Module.php:728
+#: Module.php:787
 msgid "The temporary folder to store the file is missing."
 msgstr "Le dossier temporaire pour les fichiers est absent."
 
-#: Module.php:729
+#: Module.php:788
 msgid "Failed to write file to disk."
 msgstr "Impossible d’écrire le fichier sur le disque."
 
-#: Module.php:730
+#: Module.php:789
 msgid "A PHP extension stopped the file upload."
 msgstr "Une extension php a arrêté le téléchargement du fichier."
 
-#: Module.php:745 Module.php:750
+#: Module.php:804 Module.php:809
 msgid "There is no uploaded files."
 msgstr "Il n’y a aucun fichier téléchargé."
 
-#: Module.php:769
+#: Module.php:828
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr "Le fichier #{index} « {filename} » a une erreur : {error}."
 
-#: Module.php:776
+#: Module.php:835
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas commencer avec un « . »."
 
-#: Module.php:783
+#: Module.php:842
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas avoir de caractère réservé."
 
-#: Module.php:790
+#: Module.php:849
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} temporaire avec le nom « {filename} » ne doit pas "
 "contenir de caractère réservé."
 
-#: Module.php:798
+#: Module.php:857
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr "Le fichier #{index} « {filename} » est vide."
 
-#: Module.php:941
+#: Module.php:1000
 msgid ""
 "An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
 "{errors}"
@@ -778,7 +726,7 @@ msgstr ""
 "Une erreur est survenue lors de la récupération du fichier "
 "« {asset_filename} » (#{asset_id}): {errors}"
 
-#: Module.php:956
+#: Module.php:1015
 msgid ""
 "An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
@@ -786,7 +734,7 @@ msgstr ""
 "Une erreur est survenue lors de l’optimisation du fichier "
 "« {asset_filename} » (#{asset_id}): {error}"
 
-#: Module.php:985
+#: Module.php:1044
 msgid ""
 "An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
@@ -794,7 +742,7 @@ msgstr ""
 "Une erreur est survenue lors de l’enregistrement du fichier "
 "« {asset_filename} » (#{asset_id}): {error}."
 
-#: Module.php:1022
+#: Module.php:1081
 msgid ""
 "The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
 "by {percent}%, from {size_1} to {size_2} bytes."
@@ -802,11 +750,11 @@ msgstr ""
 "Le fichier « {asset_filename} » (#{asset_id}) a été optimisé de {percent}%, "
 "de {size_1} à {size_2} octets."
 
-#: Module.php:1138
+#: Module.php:1197
 msgid "You edit already this resource somewhere since {date}."
 msgstr "Vous éditez déjà cette ressource quelque part depuis le {date}."
 
-#: Module.php:1165 Module.php:1302 Module.php:1389 Module.php:1495
+#: Module.php:1224 Module.php:1361 Module.php:1448 Module.php:1554
 msgid ""
 "This content is being edited by the user {user_name} and is therefore locked "
 "to prevent other users changes. This lock is in place since {date}."
@@ -815,19 +763,19 @@ msgstr ""
 "verrouillé pour empêcher les modifications d’autres utilisateurs. Ce verrou "
 "est en place depuis le {date}."
 
-#: Module.php:1192 Module.php:1308
+#: Module.php:1251 Module.php:1367
 msgid "Bypass the lock"
 msgstr "Ignorer le verrou"
 
-#: Module.php:1293
+#: Module.php:1352
 msgid "Warning:"
 msgstr "Attention :"
 
-#: Module.php:1296
+#: Module.php:1355
 msgid "You edit this resource somewhere since {date}."
 msgstr "Vous éditez cette ressource quelque part depuis le {date}."
 
-#: Module.php:1363
+#: Module.php:1422
 msgid ""
 "The lock in place since {date} has been bypassed, but the user {user_name} "
 "can override it on save."
@@ -835,7 +783,7 @@ msgstr ""
 "Le verrou en place depuis le {date} a été ignoré, mais l’utilisateur "
 "{user_name} peut finir sa propre édition."
 
-#: Module.php:1375
+#: Module.php:1434
 msgid ""
 "User {user} (#{userid}) tried to save {resource_name} #{resource_id} edited "
 "by the user {user_name} (#{user_id}) since {date}."
@@ -844,13 +792,13 @@ msgstr ""
 "#{resource_id} éditée par l’utilisateur {user_name} (#{user_id}) depuis le "
 "{date}."
 
-#: Module.php:1448
+#: Module.php:1507
 msgid "You removed the resource you are editing somewhere since {date}."
 msgstr ""
 "Vous avez supprimé la ressource que vous éditiez quelque part depuis le "
 "{date}."
 
-#: Module.php:1467
+#: Module.php:1526
 msgid ""
 "You removed a resource currently locked in edition by {user_name} since "
 "{date}."
@@ -858,7 +806,7 @@ msgstr ""
 "Vous avez supprimé une ressource verrouillée en édition par {user_name} "
 "depuis le {date}."
 
-#: Module.php:1481
+#: Module.php:1540
 msgid ""
 "User {user} (#{userid}) tried to delete {resource_name} #{resource_id} "
 "edited by the user {user_name} (#{user_id}) since {date}."
@@ -1045,23 +993,23 @@ msgstr ""
 msgid "{total_no} media have no original file, so no {type}."
 msgstr "{total_no} média n’ont pas de fichier original, et donc pas de {type}."
 
-#: src/Job/AbstractCheckFile.php:56 src/Job/FileMissing.php:201
+#: src/Job/AbstractCheckFile.php:56 src/Job/FileMissing.php:198
 msgid "Checking {total} media with original files."
 msgstr "Vérification de {total} médias avec des fichiers originaux."
 
-#: src/Job/AbstractCheckFile.php:62 src/Job/FileMissing.php:216
+#: src/Job/AbstractCheckFile.php:62 src/Job/FileMissing.php:213
 #: src/Job/MediaPosition.php:27
 msgid "No media to process."
 msgstr "Aucun média à traiter."
 
 #: src/Job/AbstractCheckFile.php:92 src/Job/FileMediaNoOriginal.php:104
-#: src/Job/FileDimension.php:147 src/Job/FileMissing.php:310
+#: src/Job/FileDimension.php:147 src/Job/FileMissing.php:307
 msgid "{processed}/{total} media processed."
 msgstr "{processed}/{total} média traités."
 
 #: src/Job/AbstractCheckFile.php:98 src/Job/DbResourceTitle.php:100
 #: src/Job/DbUtf8Encode.php:182 src/Job/FileMediaNoOriginal.php:97
-#: src/Job/FileDimension.php:140 src/Job/FileMissing.php:303
+#: src/Job/FileDimension.php:140 src/Job/FileMissing.php:300
 #: src/Job/MediaPosition.php:61 src/Job/FileExcess.php:120
 msgid "The job was stopped."
 msgstr "La tâche a été arrêtée."
@@ -1406,7 +1354,7 @@ msgstr ""
 "Vérification des dimensions de {total} médias image/audio/vidéo avec les "
 "fichiers originaux et vignettes."
 
-#: src/Job/FileDimension.php:130 src/Job/FileMissing.php:281
+#: src/Job/FileDimension.php:130 src/Job/FileMissing.php:278
 msgid ""
 "Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed, {total_fixed} fixed."
@@ -1414,7 +1362,7 @@ msgstr ""
 "Tâche arrêtée : {processed}/{total} traités, {total_succeed} avec succès, "
 "{total_failed} échecs, {total_fixed} corrigés."
 
-#: src/Job/FileDimension.php:250 src/Job/FileMissing.php:415
+#: src/Job/FileDimension.php:250 src/Job/FileMissing.php:412
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed, {total_fixed} fixed."
@@ -1497,44 +1445,44 @@ msgstr ""
 "Les fichiers dérivés ne sont pas reconstruits automatiquement. Vérifiez-les "
 "et recréez-les avec les autres traitements."
 
-#: src/Job/FileMissing.php:87
+#: src/Job/FileMissing.php:84
 msgid "Source directory \"{path}\" is not set or not readable."
 msgstr "Le dossier source \"{path}\" n’est pas prêt ou non lisible."
 
-#: src/Job/FileMissing.php:96
+#: src/Job/FileMissing.php:93
 msgid "Source directory \"{path}\" should be a real path ({realpath})."
 msgstr "Le dossier source \"{path}\" doit être un chemin réel ({realpath})."
 
-#: src/Job/FileMissing.php:106
+#: src/Job/FileMissing.php:103
 msgid "Source directory \"{path}\" is empty."
 msgstr "Le dossier source \"{path}\" est vide."
 
-#: src/Job/FileMissing.php:118
+#: src/Job/FileMissing.php:115
 msgid "Preparing hashes of {total} files (this may take a long time)."
 msgstr ""
 "Préparation des sommes de contrôle de {total} fichiers (cela peut être long)."
 
-#: src/Job/FileMissing.php:129
+#: src/Job/FileMissing.php:126
 msgid "Source file \"{path}\" is not readable."
 msgstr "Le fichier source \"{path}\" n’est pas lisible."
 
-#: src/Job/FileMissing.php:138
+#: src/Job/FileMissing.php:135
 msgid "{count}/{total} hashes prepared."
 msgstr "{count}/{total} sommes de contrôle préparées."
 
-#: src/Job/FileMissing.php:148
+#: src/Job/FileMissing.php:145
 msgid "The source directory contains {total} readable files."
 msgstr "Le dossier source contient {total} fichiers lisibles."
 
-#: src/Job/FileMissing.php:153
+#: src/Job/FileMissing.php:150
 msgid "The source directory contains {total} duplicate files."
 msgstr "Le dossier source contient {total} fichiers en doublon."
 
-#: src/Job/FileMissing.php:209
+#: src/Job/FileMissing.php:206
 msgid "Checking {total} media with thumbnails."
 msgstr "Vérification de {total} médias avec les vignettes."
 
-#: src/Job/FileMissing.php:292
+#: src/Job/FileMissing.php:289
 msgid ""
 "Job stopped: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
@@ -1542,7 +1490,7 @@ msgstr ""
 "Tâche arrêtée : {processed}/{total} traités, {total_succeed} avec succès, "
 "{total_failed} échecs ({mode})."
 
-#: src/Job/FileMissing.php:426
+#: src/Job/FileMissing.php:423
 msgid ""
 "End of process: {processed}/{total} processed, {total_succeed} succeed, "
 "{total_failed} failed ({mode})."
@@ -1980,11 +1928,11 @@ msgstr ""
 "Erreur lors de l’enregistrement de \"{filename}\" (fichier temporaire : "
 "\"{tempfile}\") : {error}"
 
-#: src/Job/AbstractCheck.php:365 src/Controller/TraitEasyDir.php:86
+#: src/Job/AbstractCheck.php:365 src/Controller/TraitEasyDir.php:136
 msgid "The directory \"{path}\" is not writeable."
 msgstr "Le dossier \"{path}\" n’est pas inscriptible."
 
-#: src/Job/AbstractCheck.php:376 src/Controller/TraitEasyDir.php:97
+#: src/Job/AbstractCheck.php:376 src/Controller/TraitEasyDir.php:147
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr "Le dossier \"{path}\" n’est pas inscriptible : {error}"
 
@@ -2082,6 +2030,10 @@ msgstr "Admin (sauf les administrateurs généraux)"
 #: src/Form/SettingsFieldset.php:150
 msgid "Text to display for maintenance"
 msgstr "Texte à afficher durant la maintenance"
+
+#: src/Form/ConfigForm.php:17
+msgid "Allow to display any folder inside the folder files"
+msgstr "Permettre l’affichage de tous les dossiers dans le dossier files"
 
 #: src/Form/Element/Note.php:116
 #, php-format
@@ -2695,6 +2647,26 @@ msgstr "Sélections préconfigurées de modules et de thèmes"
 msgid "Refresh lists of addons and selections"
 msgstr "Rafraîchir la liste des extensions et des sélections"
 
+#: src/Form/CronForm.php:24
+msgid "Tasks to run once a day"
+msgstr "Tâches à lancer une fois par jour."
+
+#: src/Form/CronForm.php:26
+msgid "Clear sessions older than 2 days"
+msgstr "Effacer les sessions de plus de 2 jours"
+
+#: src/Form/CronForm.php:27
+msgid "Clear sessions older than 8 days"
+msgstr "Effacer les sessions de plus de 8 jours"
+
+#: src/Form/CronForm.php:28
+msgid "Clear sessions older than 40 days"
+msgstr "Effacer les sessions de plus de 40 jours"
+
+#: src/Form/CronForm.php:29
+msgid "Clear sessions older than 100 days"
+msgstr "Effacer les sessions de plus de 100 jours"
+
 #: src/Media/Ingester/BulkUpload.php:55
 msgid "No files were uploaded"
 msgstr "Aucun fichier n’a été téléversé"
@@ -2743,37 +2715,41 @@ msgstr "Le {type} « {name} » est déjà téléchargé."
 msgid "Nothing processed. Please try again."
 msgstr "Aucun traitement effectué. Merci de réessayer."
 
-#: src/Controller/Admin/FileManagerController.php:148
+#: src/Controller/Admin/FileManagerController.php:174
 msgid "file"
 msgstr "fichier"
 
-#: src/Controller/Admin/FileManagerController.php:182
+#: src/Controller/Admin/FileManagerController.php:208
 msgid "You must select at least one file to batch delete."
 msgstr "Vous devez choisir au moins un fichier à supprimer en lot."
 
-#: src/Controller/Admin/FileManagerController.php:198
-#: src/Controller/Admin/FileManagerController.php:241
+#: src/Controller/Admin/FileManagerController.php:224
+#: src/Controller/Admin/FileManagerController.php:267
 msgid "{count} files were removed."
 msgstr "{count} fichiers ont été supprimés."
 
-#: src/Controller/Admin/FileManagerController.php:202
-#: src/Controller/Admin/FileManagerController.php:245
+#: src/Controller/Admin/FileManagerController.php:228
+#: src/Controller/Admin/FileManagerController.php:271
 msgid "No file removed."
 msgstr "Aucun fichier supprimé."
 
-#: src/Controller/Admin/FileManagerController.php:248
+#: src/Controller/Admin/FileManagerController.php:274
 msgid "No local path."
 msgstr "Aucun chemin local."
 
-#: src/Controller/Admin/FileManagerController.php:283
+#: src/Controller/Admin/FileManagerController.php:310
+msgid "It is forbidden to remove a folder."
+msgstr "Il est interdit de supprimer un dossier."
+
+#: src/Controller/Admin/FileManagerController.php:315
 msgid "The file cannot be removed."
 msgstr "Le fichier ne peut pas être supprimé."
 
-#: src/Controller/Admin/FileManagerController.php:289
+#: src/Controller/Admin/FileManagerController.php:321
 msgid "File successfully deleted"
 msgstr "Fichier supprimé avec succès"
 
-#: src/Controller/Admin/FileManagerController.php:293
+#: src/Controller/Admin/FileManagerController.php:325
 msgid "An issue occurred during deletion."
 msgstr "Un problème est survenu pendant la suppression."
 
@@ -2836,31 +2812,39 @@ msgstr "L’extension php « apcu » n’est pas disponible."
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
 
-#: src/Controller/TraitEasyDir.php:14
+#: src/Controller/Admin/CronController.php:48
+msgid "{count} tasks defined to be run automatically once a day."
+msgstr "{count} tâches seront lancées automatiquement une fois par jour."
+
+#: src/Controller/TraitEasyDir.php:40
+msgid "The file is a dir."
+msgstr "Le fichier est un dossier."
+
+#: src/Controller/TraitEasyDir.php:50
 msgid "Filename empty."
 msgstr "Le nom de fichier vide."
 
-#: src/Controller/TraitEasyDir.php:18
+#: src/Controller/TraitEasyDir.php:55
 msgid "Filename too much short or long."
 msgstr "Le nom de fichier est trop court ou trop long."
 
-#: src/Controller/TraitEasyDir.php:26
+#: src/Controller/TraitEasyDir.php:64
 msgid "Filename contains forbidden characters."
 msgstr "Le nom de fichier ne doit pas contenir de caractères illégaux."
 
-#: src/Controller/TraitEasyDir.php:31
+#: src/Controller/TraitEasyDir.php:70
 msgid "Filename has no extension."
 msgstr "Le nom de fichier n’a pas d’extension."
 
-#: src/Controller/TraitEasyDir.php:44
+#: src/Controller/TraitEasyDir.php:80
 msgid "Local path is not configured."
 msgstr "Le dossier local n’est pas configuré."
 
-#: src/Controller/TraitEasyDir.php:52
+#: src/Controller/TraitEasyDir.php:90
 msgid "Local path should be a sub-directory of /files."
 msgstr "Le dossier local doit être un sous-dossier de /files."
 
-#: src/Controller/TraitEasyDir.php:64
+#: src/Controller/TraitEasyDir.php:104
 msgid ""
 "Local path cannot be a directory managed by Omeka and should be inside /"
 "files."
@@ -2868,13 +2852,106 @@ msgstr ""
 "Le chemin local ne doit pas être un dossier géré par Omeka et doit être "
 "dans /files."
 
-#: src/Controller/TraitEasyDir.php:70
+#: src/Controller/TraitEasyDir.php:112
+msgid "Local path cannot be the root directory."
+msgstr "Le dossier local ne peut pas être la racine."
+
+#: src/Controller/TraitEasyDir.php:118
 msgid "Local path is not writeable."
 msgstr "Le dossier local ne peut être écrit."
 
-#: config/module.config.php:151 config/module.config.php:175
+#: config/module.config.php:154 config/module.config.php:184
 msgid "Checks and fixes"
 msgstr "Réparations"
+
+#~ msgid ""
+#~ "Usage: php data/scripts/task.php [arguments]\n"
+#~ "\n"
+#~ "Required arguments:\n"
+#~ "  -t --task [Name]\n"
+#~ "\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
+#~ "\t\tbasename (\"LoopItems\"). You should take care of case\n"
+#~ "\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
+#~ "\n"
+#~ "  -u --user-id [#id]\n"
+#~ "\t\tThe Omeka user id is required, else the job won’t have any\n"
+#~ "\t\trights.\n"
+#~ "\n"
+#~ "Recommended arguments:\n"
+#~ "  -s --server-url [url]\n"
+#~ "\t\tThe url of the server to build resource urls (default:\n"
+#~ "\t\t\"http://localhost\").\n"
+#~ "\n"
+#~ "  -b --base-path [path]\n"
+#~ "\t\tThe path to complete the server url (default: \"/\").\n"
+#~ "\n"
+#~ "Optional arguments:\n"
+#~ "  -a --args [json]\n"
+#~ "\t\tArguments to pass to the task. Arguments are specific to\n"
+#~ "\t\teach job. To find them, check the code, or run a job\n"
+#~ "\t\tmanually then check the job page in admin interface.\n"
+#~ "\n"
+#~ "  -k --as-task\n"
+#~ "\t\tProcess a a simple task and do not create a job. May be\n"
+#~ "\t\tused for tasks that do not need to be checked as a job.\n"
+#~ "\t\tThis is the inverse of the deprecated argument --job.\n"
+#~ "\n"
+#~ "Deprecated arguments:\n"
+#~ "  -j --job\n"
+#~ "\t\tCreate a standard job that will be checkable in admin\n"
+#~ "\t\tinterface. In any case, all logs are available in logs with\n"
+#~ "\t\ta reference code. It allows to process jobs that are not\n"
+#~ "\t\ttaskable.\n"
+#~ "\t\tThis option is now set by default and is useless.\n"
+#~ "\n"
+#~ "Other arguments:\n"
+#~ "  -h --help\n"
+#~ "\t\tThis help."
+#~ msgstr ""
+#~ "Usage : php data/scripts/task.php [arguments]\n"
+#~ "\n"
+#~ "Arguments obligatoires :\n"
+#~ "  -t --task [Nom]\n"
+#~ "\t\tClasse complète de la tâche (« EasyAdmin\\Job\\LoopItems »)\n"
+#~ "\t\tou nom de base (« LoopItems »). Il est recommandé de vérifier\n"
+#~ "\t\tla casse, d’échapper « \\ » ou de mettre entre « ' » les noms sur\n"
+#~ "\t\tl’invite de commande.\n"
+#~ "\n"
+#~ "  -u --user-id [#id]\n"
+#~ "\t\tL’id de l’utilisateur Omeka est obligatoire, sinon la tâche n’aura \n"
+#~ "\t\taucuns droits.\n"
+#~ "\n"
+#~ "Arguments recommandés :\n"
+#~ "  -s --server-url [url]\n"
+#~ "\t\tL’url du serveur pour construire les urls des ressources (défaut :\n"
+#~ "\t\t\"http://localhost\").\n"
+#~ "\n"
+#~ "  -b --base-path [chemin]\n"
+#~ "\t\tLe chemin pour compléter l’url du serveur(défault : « / »).\n"
+#~ "\n"
+#~ "Arguments facultatifs :\n"
+#~ "  -a --args [json]\n"
+#~ "\t\tArguments spécifiques à passer à la tâche. Pour les trouver,\n"
+#~ "\t\tconsultez le code ou lancez une tâche manuellement puis\n"
+#~ "\t\tconsultez la page de la tâche dans l’interface admin.\n"
+#~ "\n"
+#~ "  -k --as-task\n"
+#~ "\t\tLancer la tâche en tant que tâche simple sans la créer dans Omeka.\n"
+#~ "\t\tCela peut être utilisé pour les tâches qui n’ont pas besoin d’être "
+#~ "vérifiés dans Omeka.\n"
+#~ "\t\tC’est l’inverse de l’argument obsolète --job.\n"
+#~ "\n"
+#~ "Arguments obsolètes :\n"
+#~ "  -j --job\n"
+#~ "\t\tCréer une tâche standard qui pourra être vérifiée dans l’interface\n"
+#~ "\t\tadmin. Dans tous les cas, tous les journaux sont consultables avec\n"
+#~ "\t\tle code de référence. Cela permet de lancer des tâches qui ne\n"
+#~ "\t\tpas être lancées en tant que tâches simples.\n"
+#~ "\t\tCette option est désormais activée par défaut est inutile.\n"
+#~ "\n"
+#~ "Autres arguments :\n"
+#~ "  -h --help\n"
+#~ "\t\tCette aide."
 
 #, php-format
 #~ msgid ""
@@ -2883,9 +2960,6 @@ msgstr "Réparations"
 #~ msgstr ""
 #~ "%1$sAttention%2$s : cette action supprimera %3$s fichiers de manière "
 #~ "définitive et ne pourra pas être annulée."
-
-#~ msgid "/bootstrap.php"
-#~ msgstr "/bootstrap.php"
 
 #~ msgid "Select either a module or a theme."
 #~ msgstr "Choisir un module ou un thème."
