@@ -33,7 +33,8 @@ $this->htmlElement('body')->appendAttribute('class', 'easy-admin files browse fi
 
 $userIsAllowedDelete = $formDeleteSelected && $userIsAllowed('EasyAdmin\Controller\Admin\FileManager', 'delete');
 
-$displayDir = !empty($_POST['display_dir']);
+$currentUrl = $url(null, [], true);
+$displayDir = !empty($this->params()->fromQuery('display_dir'));
 ?>
 
 <?= $this->pageTitle($translate('File manager'), 1, $translate('Easy Admin')) ?>
@@ -103,13 +104,6 @@ $displayDir = !empty($_POST['display_dir']);
 
 <?php if ($fileIterator): ?>
 
-<form  id="toggle-display-dir" method="post">
-    <input type="hidden" name="display_dir" id="display_dir" value="<?= (int) !$displayDir ?>"/>
-    <button type="submit" class="button">
-        <?= $displayDir ? $translate('Hide folders') : $translate('Display folders') ?>
-    </button>
-</form>
-
 <form method="post" id="batch-form" class="disable-unsaved-warning"><?php // TODO Use the right right. ?>
 
     <?php if ($isAdminUser && $userIsAllowed(\Omeka\Api\Adapter\ItemAdapter::class, 'batch_update')): ?>
@@ -130,6 +124,10 @@ $displayDir = !empty($_POST['display_dir']);
     </div>
     <?php endif; ?>
 
+    <div class="file-manager-actions">
+        <a href="<?= $currentUrl . '?display_dir=' . (int) !$displayDir ?>" class="button file-manager-button"><?= $displayDir ? $translate('Hide folders') : $translate('Display folders') ?></a>
+    </div>
+
     <table class="tablesaw batch-edit" data-tablesaw-mode="stack">
         <thead>
             <tr>
@@ -147,6 +145,7 @@ $displayDir = !empty($_POST['display_dir']);
             /** @var \SplFileInfo $file */
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $totalFiles = 0;
+            $currentUrl = $url('admin/easy-admin/file-manager', []);
             foreach ($fileIterator as $file):
                 $filename = $file->getFilename();
                 if (!$file->isReadable() || mb_substr($filename, 0, 1) === '.') continue;
@@ -166,7 +165,11 @@ $displayDir = !empty($_POST['display_dir']);
                     <?php if ($isAdminUser): ?>
                     <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"<?= !$isDir && $file->isWritable() ? '' : ' disabled="disabled"' ?>/>
                     <?php endif; ?>
+                    <?php if ($isDir): ?>
+                    <?= $hyperlink($filename, ) ?>
+                    <?php else: ?>
                     <?= $escape($filename) ?>
+                    <?php endif; ?>
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
                         <?php if ($userIsAllowedDelete): ?>
