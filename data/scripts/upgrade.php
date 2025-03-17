@@ -346,7 +346,19 @@ if (version_compare($oldVersion, '3.4.27', '<')) {
 
 if (version_compare($oldVersion, '3.4.28', '<')) {
     $message = new PsrMessage(
-        'To allow to upload files in a specific path outside of directory files/, update the file config.local.php.' // @translate
+        'To allow to upload files in a specific path outside of directory files/, update the file local.config.php.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.29', '<')) {
+    $tasks = $settings->get('easyadmin_cron_tasks');
+    if ($tasks === null) {
+        $settings->set('easyadmin_cron_tasks', ['session_8']);
+    }
+
+    $message = new PsrMessage(
+        'It is now possible to define regular tasks to remove sessions regularly. A first cleaning of old ones is launched.' // @translate
     );
     $messenger->addSuccess($message);
 }
