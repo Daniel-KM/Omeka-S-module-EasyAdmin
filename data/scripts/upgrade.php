@@ -40,7 +40,7 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
 }
 
 if (version_compare($oldVersion, '3.3.2', '<')) {
-    $this->installDir();
+    $this->installDirs();
 }
 
 if (version_compare($oldVersion, '3.3.5', '<')) {

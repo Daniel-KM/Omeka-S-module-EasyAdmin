@@ -129,7 +129,7 @@ class Module extends AbstractModule
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
         }
 
-        $this->installDir();
+        $this->installDirs();
 
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
@@ -147,7 +147,7 @@ class Module extends AbstractModule
         $this->postInstallAuto();
     }
 
-    protected function installDir(): void
+    protected function installDirs(): void
     {
         // Don't use PsrMessage during install.
         $services = $this->getServiceLocator();

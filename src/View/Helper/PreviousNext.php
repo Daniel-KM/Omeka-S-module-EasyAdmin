@@ -21,7 +21,7 @@ class PreviousNext extends AbstractHelper
      *
      * @param array $options
      * - template (string): set specific template (default: common/previous-next)
-     * - back (bool): add back link
+     * - back (bool): add back link (upper page or home page)
      * - source_query (string): "session" (default when no query), "setting" else
      *   passed query.
      * - query (array|string): use a specific query

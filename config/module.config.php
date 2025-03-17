@@ -157,10 +157,10 @@ return [
                         'class' => 'o-icon- fa-wrench',
                     ],
                     [
-                        'label' => 'Install addons', // @translate
+                        'label' => 'Regular tasks', // @translate
                         'route' => 'admin/easy-admin/default',
-                        'controller' => 'addons',
-                        'class' => 'o-icon- fa-puzzle-piece',
+                        'controller' => 'cron',
+                        'class' => 'o-icon- fa-recycle',
                     ],
                     [
                         // Not "Upload" because translation is not good here.
@@ -171,10 +171,10 @@ return [
                         'class' => 'o-icon- fa-folder-open',
                     ],
                     [
-                        'label' => 'Regular tasks', // @translate
+                        'label' => 'Install addons', // @translate
                         'route' => 'admin/easy-admin/default',
-                        'controller' => 'cron',
-                        'class' => 'o-icon- fa-recycle',
+                        'controller' => 'addons',
+                        'class' => 'o-icon- fa-puzzle-piece',
                     ],
                 ],
             ],
@@ -184,11 +184,17 @@ return [
                 'label' => 'Checks and fixes', // @translate
                 'route' => 'admin/easy-admin/default',
                 'controller' => 'check-and-fix',
+                'pages' => [
+                    [
+                        'route' => 'admin/easy-admin',
+                        'visible' => false,
+                    ],
+                ],
             ],
             [
-                'label' => 'Install addons', // @translate
+                'label' => 'Regular tasks', // @translate
                 'route' => 'admin/easy-admin/default',
-                'controller' => 'addons',
+                'controller' => 'cron',
             ],
             [
                 'label' => 'File manager', // @translate
@@ -197,9 +203,9 @@ return [
                 'resource' => 'EasyAdmin\Controller\Admin\FileManager',
             ],
             [
-                'label' => 'Regular tasks', // @translate
+                'label' => 'Install addons', // @translate
                 'route' => 'admin/easy-admin/default',
-                'controller' => 'cron',
+                'controller' => 'addons',
             ],
         ],
     ],
