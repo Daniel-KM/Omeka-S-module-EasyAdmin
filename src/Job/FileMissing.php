@@ -75,10 +75,7 @@ class FileMissing extends AbstractCheckFile
         }
     }
 
-    /**
-     * @return self
-     */
-    protected function prepareSourceDirectory()
+    protected function prepareSourceDirectory(): self
     {
         $dir = rtrim($this->getArg('source_dir'), '/');
         if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
@@ -163,7 +160,7 @@ class FileMissing extends AbstractCheckFile
      * @param array $options
      * @return bool
      */
-    protected function checkMissingFiles($fix = false, array $options)
+    protected function checkMissingFiles($fix = false, array $options = []): bool
     {
         $result = $this->checkMissingFilesForTypes(['original'], $fix);
         if (!$result) {
@@ -181,7 +178,7 @@ class FileMissing extends AbstractCheckFile
      * @param string|bool $fix
      * @return bool
      */
-    protected function checkMissingFilesForTypes(array $types, $fix = false)
+    protected function checkMissingFilesForTypes(array $types, $fix = false): bool
     {
         // In big recoveries, it is recommended to clear the caches.
         $this->entityManager->clear();
