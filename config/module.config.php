@@ -50,6 +50,7 @@ return [
         'factories' => [
             Form\AddonsForm::class => Service\Form\AddonsFormFactory::class,
             Form\CheckAndFixForm::class => Service\Form\CheckAndFixFormFactory::class,
+            Form\CronForm::class => Service\Form\CronFormFactory::class,
             // TODO Remove fix when integrated in Omeka S (fix #2236).
             'Omeka\Form\AssetEditForm' => Service\Form\FormWithEventManagerFactory::class,
         ],
@@ -58,6 +59,7 @@ return [
         'invokables' => [
             'EasyAdmin\Controller\Admin\Addons' => Controller\Admin\AddonsController::class,
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
+            'EasyAdmin\Controller\Admin\Cron' => Controller\Admin\CronController::class,
             'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
         ],
         'factories' => [
@@ -168,6 +170,12 @@ return [
                         'resource' => 'EasyAdmin\Controller\Admin\FileManager',
                         'class' => 'o-icon- fa-folder-open',
                     ],
+                    [
+                        'label' => 'Regular tasks', // @translate
+                        'route' => 'admin/easy-admin/default',
+                        'controller' => 'cron',
+                        'class' => 'o-icon- fa-recycle',
+                    ],
                 ],
             ],
         ],
@@ -188,6 +196,11 @@ return [
                 'action' => 'browse',
                 'resource' => 'EasyAdmin\Controller\Admin\FileManager',
             ],
+            [
+                'label' => 'Regular tasks', // @translate
+                'route' => 'admin/easy-admin/default',
+                'controller' => 'cron',
+            ],
         ],
     ],
     'translator' => [
@@ -203,6 +216,10 @@ return [
     'easyadmin' => [
         'config' => [
             'easyadmin_local_path_any_files' => false,
+            // For Cron. Default is ['session_8'], set during install.
+            'easyadmin_cron_tasks' => [],
+            // Hidden option, storing last processed cron time.
+            'easyadmin_cron_last' => null,
             // This option should be set in local.config.php.
             // For security, it should not be set in production or check rights.
             'easyadmin_local_path_any' => false,

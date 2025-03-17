@@ -138,6 +138,15 @@ class Module extends AbstractModule
         $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
     }
 
+    protected function postInstall(): void
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $settings->set('easyadmin_cron_tasks', ['session_8']);
+
+        $this->postInstallAuto();
+    }
+
     protected function installDir(): void
     {
         // Don't use PsrMessage during install.
@@ -254,6 +263,13 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
+        // TODO What is the better event to handle a cron?
+        $sharedEventManager->attach(
+            '*',
+            'view.layout',
+            [$this, 'handleCron']
+        );
+
         // Manage buttons in admin resources.
         // TODO Use Omeka S v4.1 event "view.show.page_actions".
         $sharedEventManager->attach(
@@ -445,6 +461,49 @@ class Module extends AbstractModule
             'view.details',
             [$this, 'warnUninstall']
         );
+    }
+
+    public function handleCron(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        $tasks = $settings->get('easyadmin_cron_tasks', []);
+        if (!count($tasks)) {
+            return;
+        }
+
+        $lastCron = (int) $settings->get('easyadmin_cron_last');
+        $time = time();
+        if ($lastCron + 86400 > $time) {
+            return;
+        }
+
+        $settings->set('easyadmin_cron_last', $time);
+
+        // Short tasks.
+
+        foreach ($tasks as $task) switch ($task) {
+            case 'session_2':
+            case 'session_8':
+            case 'session_40':
+            case 'session_100':
+                $days = (int) substr($task, 8);
+                $sql = <<<'SQL'
+                    DELETE `session`
+                    FROM `session`
+                    WHERE `modified` < :time;
+                    SQL;
+                $connection = $services->get('Omeka\Connection');
+                $connection->executeStatement(
+                    $sql,
+                    ['time' => $time - $days * 86400],
+                    ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
+                );
+                break;
+            default:
+                break;
+        }
     }
 
     public function handleViewLayoutResource(Event $event): void

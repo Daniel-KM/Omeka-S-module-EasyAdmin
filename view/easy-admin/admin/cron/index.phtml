@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \EasyAdmin\Form\CronForm $form
+ */
+
+$plugins = $this->getHelperPluginManager();
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+
+$form->prepare();
+
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin cron browse');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
+$this->headScript()
+    ->appendFile($assetUrl('js/easy-admin.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
+;
+?>
+
+<?= $this->pageTitle($translate('Regular tasks'), 1, $translate('Easy Admin')) ?>
+
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
+</nav>
+
+<?= $this->form()->openTag($form) ?>
+<div id="page-actions">
+    <button type="submit" class="button"><?= $translate('Submit') ?></button>
+</div>
+<?= $this->formCollection($form) ?>
+<?= $this->form()->closeTag() ?>
