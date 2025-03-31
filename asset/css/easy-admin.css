@@ -5,11 +5,15 @@
     }
     .check-and-fix .subhead::before,
     .check-and-fix .no-resources:before {
-        content:"";
+        content: "";
     }
     .easy-admin-addons .subhead::before,
     .easy-admin-addons .no-resources:before {
-        content:"";
+        content: "";
+    }
+    .easy-admin.cron .subhead::before,
+    .easy-admin.cron .no-resources:before {
+        content: "";
     }
     .file-manager .subhead::before,
     .file-manager .no-resources:before {
