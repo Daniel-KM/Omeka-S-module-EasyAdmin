@@ -250,6 +250,22 @@ class CheckAndFixForm extends Form
                     'placeholder' => 'pdf, jpeg', // @translate
                 ],
             ])
+            ->add([
+                'name' => 'matching',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                'label' => 'Matching mode', // @translate
+                    'value_options' => [
+                        'sha256' => 'Hash sha256 (recommended)', // @translate
+                        'source' => 'Source file path', // @translate
+                        'source_filename' => 'Source file name (warning: they should be unique)', // @translate
+                        'md5' => 'Hash md5 (when stored as sha256; the real sha256 must be set next with another task)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-matching',
+                ],
+            ])
         ;
 
         $fieldset

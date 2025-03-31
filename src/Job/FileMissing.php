@@ -32,6 +32,11 @@ class FileMissing extends AbstractCheckFile
      */
     protected $extensions = [];
 
+    /**
+     * @var string
+     */
+    protected $matchingMode;
+
     public function perform(): void
     {
         parent::perform();
@@ -43,6 +48,23 @@ class FileMissing extends AbstractCheckFile
 
         $this->extensions = $this->getArg('extensions', '');
         $this->extensions = array_unique(array_filter(array_map('trim', explode(',', $this->extensions)), 'strlen'));
+
+        $matchinModes = [
+            'sha256',
+            'md5',
+            'source',
+            'source_filename',
+        ];
+        $this->matchingMode = $this->getArg('matching', 'sha256') ?: 'sha256';
+        if (!in_array($this->matchingMode, $matchinModes)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Matching mode "{mode}" is not supported.', // @translate
+                ['mode' => $this->matchingMode]
+            );
+            $this->finalizeOutput();
+            return;
+        }
 
         if ($process === 'files_missing_fix') {
             $this->prepareSourceDirectory();
@@ -67,6 +89,12 @@ class FileMissing extends AbstractCheckFile
         );
 
         $this->finalizeOutput();
+
+        if ($fix && $this->matchingMode === 'md5') {
+            $this->logger->warn(
+                'The source files are not hashed with sha256, so they must be updated with the right task.' // @translate
+            );
+        }
 
         if ($process === 'files_missing_fix') {
             $this->logger->warn(
@@ -116,21 +144,48 @@ class FileMissing extends AbstractCheckFile
             ['total' => $total]
         );
 
+        // File is a relative path, filepath the absolute one.
+        $result = [];
         $count = 0;
-        foreach ($this->files as $key => $file) {
-            $filepath = $dir . '/' . $file;
+        foreach ($this->files as $file) {
+              $filepath = $dir . '/' . $file;
+            $extension = pathinfo($filepath, PATHINFO_EXTENSION);
+            if (!$extension) {
+                $this->logger->warn(
+                    'Source file "{path}" has no extension.', // @translate
+                    ['path' => $file]
+                );
+            }
             if (is_readable($filepath)) {
-                $this->files[hash_file('sha256', $filepath)] = $file;
+                switch ($this->matchingMode) {
+                    default:
+                    case 'sha256':
+                        $result[hash_file('sha256', $filepath)] = $file;
+                        break;
+                    case 'md5':
+                        $result[md5_file($filepath)] = $file;
+                        break;
+                    case 'source':
+                        $result[$file] = $file;
+                        break;
+                    case 'source_filename':
+                        // Use an array to do a check for duplicates below.
+                        $filename = pathinfo($filepath, PATHINFO_BASENAME);
+                        $result[$filename][] = $file;
+                        break;
+                }
             } else {
                 $this->logger->warn(
                     'Source file "{path}" is not readable.', // @translate
                     ['path' => $file]
                 );
             }
-            unset($this->files[$key]);
 
             ++$count;
-            if ($count % 100 === 0) {
+            if ($count % 100 === 0
+                // The other processes are instant, so no need to log loop.
+                && in_array($this->matchingMode, ['sha256', 'md5'])
+            ) {
                 $this->logger->info(
                     '{count}/{total} hashes prepared.', // @translate
                     [
@@ -140,6 +195,23 @@ class FileMissing extends AbstractCheckFile
                 );
             }
         }
+
+        // Check for duplicates for information.
+        // This check is useful only for source_filename, since for other ones,
+        // it's not an issue.
+        if ($this->matchingMode === 'source_filename') {
+            $duplicates = array_filter(array_map(fn ($v) => count($v) > 1, $result));
+            if (count($duplicates)) {
+                $this->logger->warn(
+                    'This following flles have duplicate names: {json}', // @translate
+                    ['json' => json_encode($duplicates, 448)]
+                );
+            }
+            // Take the first file path.
+            $result = array_map(fn ($v) => reset($v), $result);
+        }
+
+        $this->files = $result;
 
         $this->logger->notice(
             'The source directory contains {total} readable files.', // @translate
@@ -166,10 +238,12 @@ class FileMissing extends AbstractCheckFile
         if (!$result) {
             return false;
         }
+
         // Do not remove media from database if only a derivative is missing!
         if (!$fix && !empty($options['include_derivatives'])) {
             $result = $this->checkMissingFilesForTypes(array_keys($this->config['thumbnails']['types']));
         }
+
         return $result;
     }
 
@@ -352,7 +426,22 @@ class FileMissing extends AbstractCheckFile
                                 $this->writeRow($row);
                                 break;
                             }
-                            $hash = $media->getSha256();
+                            switch ($this->matchingMode) {
+                                default:
+                                case 'sha256':
+                                    $hash = $media->getSha256();
+                                    break;
+                                case 'md5':
+                                    // This is a fake sha256 in the table, so to be updated next.
+                                    $hash = $media->getSha256();
+                                    break;
+                                case 'source':
+                                    $hash = ltrim($media->getSource(), '/');
+                                    break;
+                                case 'source_filename':
+                                    $hash = pathinfo($media->getSource(), PATHINFO_BASENAME);
+                                    break;
+                            }
                             if (isset($this->files[$hash])) {
                                 $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
                                 $src = $this->sourceDir . '/' . $this->files[$hash];
