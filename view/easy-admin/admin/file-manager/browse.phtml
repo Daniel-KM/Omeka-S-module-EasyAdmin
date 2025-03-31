@@ -173,7 +173,7 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
                     <?php endif; ?>
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
-                        <?php if ($localUrl): ?>
+                        <?php if (!$isDir && $localUrl): ?>
                         <li><?= $hyperlink('', $localUrl. '/' . rawurlencode($filename), [
                             'download' => $filename,
                             'target' => '_self',
