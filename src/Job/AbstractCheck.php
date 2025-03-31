@@ -147,10 +147,12 @@ abstract class AbstractCheck extends AbstractJob
         }
 
         $process = $this->getArg('process');
-        $this->logger->notice(
-            'Starting "{process}".', // @translate
-            ['process' => $process]
-        );
+        if ($process) {
+            $this->logger->notice(
+                'Starting "{process}".', // @translate
+                ['process' => $process]
+            );
+        }
     }
 
     /**

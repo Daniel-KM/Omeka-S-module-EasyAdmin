@@ -489,18 +489,23 @@ class Module extends AbstractModule
             case 'session_40':
             case 'session_100':
                 $days = (int) substr($task, 8);
-                $sql = <<<'SQL'
-                    DELETE `session`
-                    FROM `session`
-                    WHERE `modified` < :time;
-                    SQL;
+                // If there is no index, use a job.
+                /** @var \Doctrine\DBAL\Connection $connection */
                 $connection = $services->get('Omeka\Connection');
-                $connection->executeStatement(
-                    $sql,
-                    ['time' => $time - $days * 86400],
-                    ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
-                );
+                $result = $connection->executeQuery('SHOW INDEX FROM `session` WHERE `column_name` = "modified";');
+                if ($result->fetchOne()) {
+                    $sql = 'DELETE `session` FROM `session` WHERE `modified` < :time;';
+                    $connection->executeStatement(
+                        $sql,
+                        ['time' => $time - $days * 86400],
+                        ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
+                    );
+                } else {
+                    $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+                    $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, ['days' => $days, 'quick' => true]);
+                }
                 break;
+
             default:
                 break;
         }

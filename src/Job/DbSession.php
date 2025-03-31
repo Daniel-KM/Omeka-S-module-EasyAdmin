@@ -25,6 +25,14 @@ class DbSession extends AbstractCheck
             return;
         }
 
+        $days = (int) $minimumDays;
+
+        $quick = !empty($this->getArg('quick'));
+        if ($quick) {
+            $this->deleteLastSession($days);
+            return;
+        }
+
         $this->checkDbSession($processFix, (int) $minimumDays, $processRecreate);
 
         $this->logger->notice(
@@ -33,15 +41,50 @@ class DbSession extends AbstractCheck
         );
     }
 
+    protected function deleteLastSession(int $days): void
+    {
+        // No message, except error.
+        $table = 'session';
+        $column = 'modified';
+        $result = $this->connectionDbal->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
+        if (!$result->fetchOne()) {
+            try {
+                $this->connectionDbal->executeStatement("ALTER TABLE `$table` ADD INDEX `$column` (`$column`);");
+            } catch (\Exception $e) {
+                $this->logger->warn(
+                    'Unable to add index "{column}" in table "{table}" to improve performance: {msg}', // @translate
+                    ['column' => $column, 'table' => $table, 'msg' => $e->getMessage()]
+                );
+            }
+        }
+
+        $time = time();
+        $sql = 'DELETE `session` FROM `session` WHERE `modified` < :time;';
+
+        try {
+            $this->connectionDbal->executeStatement(
+                $sql,
+                ['time' => $time - $days * 86400],
+                ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
+            );
+        } catch (\Exception $e) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Unable to delete last sessions: {msg}', // @translate
+                ['msg' => $e->getMessage()]
+            );
+        }
+    }
+
     /**
      * Check the size of the db table "session".
      *
      * @param bool $fix
-     * @param int $minimumDays
+     * @param int $days
      */
-    protected function checkDbSession(bool $fix = false, int $minimumDays = 0, bool $recreate = false): void
+    protected function checkDbSession(bool $fix = false, int $days = 0, bool $recreate = false): void
     {
-        $timestamp = time() - 86400 * $minimumDays;
+        $timestamp = time() - 86400 * $days;
 
         $dbname = $this->connection->getDatabase();
         $sqlSize = <<<SQL
@@ -73,7 +116,7 @@ class DbSession extends AbstractCheck
         $all = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
             'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {days} days.', // @translate
-            ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $minimumDays]
+            ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $days]
         );
 
         if ($fix) {
@@ -85,7 +128,7 @@ class DbSession extends AbstractCheck
             $size = $this->connection->executeQuery($sqlSize)->fetchOne();
             $this->logger->notice(
                 '{count} records older than {days} days were removed. The table "{table}" has a size of {size} MB.', // @translate
-                ['count' => $count, 'days' => $minimumDays, 'size' => $size, 'table' => $this->table]
+                ['count' => $count, 'days' => $days, 'size' => $size, 'table' => $this->table]
             );
         }
     }
