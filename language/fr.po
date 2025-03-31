@@ -2649,7 +2649,7 @@ msgstr "Rafraîchir la liste des extensions et des sélections"
 
 #: src/Form/CronForm.php:24
 msgid "Tasks to run once a day"
-msgstr "Tâches à lancer une fois par jour."
+msgstr "Tâches à lancer une fois par jour"
 
 #: src/Form/CronForm.php:26
 msgid "Clear sessions older than 2 days"
