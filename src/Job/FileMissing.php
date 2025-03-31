@@ -262,8 +262,7 @@ class FileMissing extends AbstractCheckFile
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $expr = $criteria->expr();
 
-        $isOriginalMain = count($types) === 1
-            && reset($types) === 'original';
+        $isOriginalMain = array_values($types) === ['original'];
         if ($isOriginalMain) {
             $criteria->where($expr->eq('hasOriginal', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';

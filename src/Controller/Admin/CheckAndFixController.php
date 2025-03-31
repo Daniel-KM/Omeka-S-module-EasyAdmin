@@ -182,6 +182,7 @@ class CheckAndFixController extends AbstractActionController
                     [
                         'Compilatio' => '3.4.2',
                         'Dante' => '3.4.7',
+                        'DynamicItemSets' => '3.4.2',
                         'Guest' => '3.4.29',
                         'IiifServer' => '3.6.23',
                         'Reference' => '3.4.51',
