@@ -58,7 +58,7 @@ trait TraitEasyDir
 
         $forbiddenCharacters = '/\\?!<>:*%|{}"`&$#;';
         if (mb_substr($filename, 0, 1) === '.'
-            || mb_strpos($filename, '..') !== false
+            || mb_strpos($filename, '../') !== false
             || preg_match('~' . preg_quote($forbiddenCharacters, '~'). '~', $filename)
         ) {
             $errorMessage = 'Filename contains forbidden characters.'; // @translate;
