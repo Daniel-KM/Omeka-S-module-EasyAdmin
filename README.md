@@ -293,6 +293,7 @@ TODO
 - [ ] A main cleaning task.
 - [ ] Add a checkbox in page assets to optimise assets in batch.
 - [ ] Add a deduplicator for assets (and replace assets used as resource thumbnails and in pages).
+- [ ] Dump database: see adminer.
 
 
 Warning
