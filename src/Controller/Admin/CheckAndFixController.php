@@ -82,7 +82,7 @@ class CheckAndFixController extends AbstractActionController
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\FileSize::class, $defaultParams);
                 break;
             case 'files_hash_check':
-            case 'files_hash_check':
+            case 'files_hash_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\FileHash::class, $defaultParams);
                 break;
             case 'files_media_type_check':
