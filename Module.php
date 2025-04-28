@@ -641,7 +641,7 @@ class Module extends AbstractModule
 
         if ($resource instanceof \Omeka\Api\Representation\MediaRepresentation) {
             $view = $event->getTarget();
-            echo $view->partial('admin/media/show-details-renderer', [
+            echo $view->partial('omeka/admin/media/show-details-renderer', [
                 'media' => $resource,
                 'resource' => $resource,
             ]);
