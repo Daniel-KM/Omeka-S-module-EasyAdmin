@@ -26,7 +26,7 @@ class SettingsFieldset extends Fieldset
                 'name' => 'easyadmin_interface',
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
-                    'element_group' => 'easy_admin',
+                    'element_group' => 'display',
                     'label' => 'Elements to display in resources admin pages', // @translate
                     'info' => 'For button "Previous/Next", an issue exists on some versions of mysql database. Mariadb is working fine.', // @translate
                     'value_options' => [
@@ -49,6 +49,25 @@ class SettingsFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_rights_reviewer_delete_all',
+                ],
+            ])
+
+            ->add([
+                'name' => 'easyadmin_quick_template',
+                'type' => CommonElement\OptionalResourceTemplateSelect::class,
+                'options' => [
+                    'element_group' => 'editing',
+                    'label' => 'Add a button to create resources directly from a template', // @translate
+                    'prepend_value_options' => [
+                        'all' => 'All resource templates', // @translate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_quick_template',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select resource templates…', // @translate'
                 ],
             ])
 

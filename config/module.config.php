@@ -231,6 +231,7 @@ return [
             'easyadmin_local_path_any' => false,
         ],
         'settings' => [
+            'easyadmin_quick_template' => [],
             'easyadmin_interface' => [
                 'resource_public_view',
                 // 'resource_previous_next',

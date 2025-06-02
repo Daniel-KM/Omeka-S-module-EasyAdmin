@@ -40,6 +40,7 @@ use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Session\Container;
+use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Module\AbstractModule;
 
@@ -286,7 +287,7 @@ class Module extends AbstractModule
         );
 
         // Manage buttons in admin resources.
-        // TODO Use Omeka S v4.1 event "view.show.page_actions".
+        // TODO Use Omeka S v4.1 event "view.show.page_actions" (but none for browse!).
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.layout',
@@ -301,6 +302,13 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\Media',
             'view.layout',
             [$this, 'handleViewLayoutResource']
+        );
+
+        // Manage resources templates and classes on resource form.
+        $sharedEventManager->attach(
+            \Omeka\Form\ResourceForm::class,
+            'form.add_elements',
+            [$this, 'handleResourceForm']
         );
 
         // Manage default and public site links in right sidebar.
@@ -320,7 +328,7 @@ class Module extends AbstractModule
             [$this, 'handleViewDetailsResource']
         );
 
-        // Manage previous/next resource. Require module EasyAdmin.
+        // Manage previous/next resource on items/browse and AdvancedSearch.
         // TODO Manage item sets and media for search?
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
@@ -464,7 +472,7 @@ class Module extends AbstractModule
         $view = $event->getTarget();
         $params = $view->params()->fromRoute();
         $action = $params['action'] ?? 'browse';
-        if ($action !== 'show') {
+        if ($action !== 'show' && $action !== 'browse') {
             return;
         }
 
@@ -481,18 +489,156 @@ class Module extends AbstractModule
             return;
         }
 
-        // The resource is not available in the main view.
-        $id = isset($params['id']) ? (int) $params['id'] : 0;
-        if (!$id) {
+        if ($action === 'browse') {
+            $this->handleViewLayoutResourceBrowse($view, $controllersToResourceTypes[$controller]);
+        } else {
+            // The resource is not available in the main view.
+            $id = isset($params['id']) ? (int) $params['id'] : 0;
+            if ($id) {
+                $this->handleViewLayoutResourceShow($view, $controllersToResourceTypes[$controller], $id);
+            }
+        }
+    }
+
+    protected function handleViewLayoutResourceBrowse(PhpRenderer $view, string $resourceType): void
+    {
+        /**
+         * @var \Omeka\Api\Manager $api
+         * @var \Omeka\Settings\Settings $settings
+         */
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        $templateIds = $settings->get('easyadmin_quick_template');
+        if (!$templateIds) {
             return;
         }
 
-        $resourceType = $controllersToResourceTypes[$controller];
-        $controller = array_search($controller, $controllersToResourceTypes);
+        $acl = $services->get('Omeka\Acl');
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $adapter = $services->get('Omeka\ApiAdapterManager')->get($resourceType);
+        if (!$user || !$acl->userIsAllowed(get_class($adapter), 'create')) {
+            return;
+        }
 
+        $api = $services->get('Omeka\ApiManager');
+
+        $hasAll = in_array('all', $templateIds);
+        $templateLabels = $api->search('resource_templates', $hasAll ? [] : ['id' => $templateIds], ['returnScalar' => 'label'])->getContent();
+        if (!$templateLabels) {
+            return;
+        }
+
+        // TODO Check if module AdvancedResourceTemplate is active, and filter templates.
+
+        $plugins = $view->getHelperPluginManager();
+        $url = $plugins->get('url');
+        $translate = $plugins->get('translate');
+        $hyperlink = $plugins->get('hyperlink');
+
+        $vars = $view->vars();
+        $html = $vars->offsetGet('content');
+
+        $mainLabels = [
+            'items' => 'Add new item',
+            'item_sets' => 'Add new item set',
+            'media' => 'Add new media',
+        ];
+
+        $buttons = [];
+        $buttons[] = $hyperlink($translate('Any'), $url(null, ['action' => 'add'], true), ['class' => 'link']);
+        foreach ($templateLabels as $id => $label) {
+            $buttons[$id] = $hyperlink($translate($label), $url(null, ['action' => 'add'], ['query' => ['resource_template_id' => $id]], true), ['class' => 'link']);
+        }
+
+        if (count($buttons) > 1) {
+            // TODO Use a real button instead of an anchor.
+            $stringButtons = '<li>' . implode("</li>\n<li>", $buttons) . "</li>\n";
+            $stringExpand = $translate('Expand');
+            $stringAdd = $translate($mainLabels[$resourceType]);
+            // Styles adapted from the module Scripto.
+            $html = preg_replace(
+                '~<div id="page-actions">(.*?)</div>~s',
+                <<<HTML
+                    <style>
+                        #page-action-menu .expand::after {
+                            padding-left: 4px;
+                        }
+                        #page-action-menu {
+                            display:inline-block;
+                            position:relative
+                        }
+                        #page-action-menu ul {
+                            /* display:none; */
+                            list-style:none;
+                            border:1px solid #dfdfdf;
+                            background-color:#fff;
+                            border-radius:3px;
+                            text-align:left;
+                            padding:0;
+                            position:relative;
+                            box-shadow:0 0 5px #dfdfdf;
+                            position:absolute;
+                            right:0;
+                            width:auto;
+                            white-space:nowrap;
+                            margin:12px 0
+                        }
+                        #page-action-menu ul::before {
+                            content:"";
+                            position:absolute;
+                            bottom:calc(100% - 1px);
+                            right:12px;
+                            width:0;
+                            height:0;
+                            border-bottom:12px solid #fff;
+                            border-left:6px solid transparent;
+                            border-right:6px solid transparent
+                        }
+                        #page-action-menu ul::after {
+                            content:"";
+                            position:absolute;
+                            bottom:calc(100% - 1px);
+                            right:11px;
+                            width:0;
+                            height:0;
+                            border-bottom:14px solid #dfdfdf;
+                            border-left:7px solid transparent;
+                            border-right:7px solid transparent;
+                            z-index:-1
+                        }
+                        #page-action-menu ul a,
+                        #page-action-menu ul .inactive {
+                            padding:6px 12px 5px;
+                            display:block;
+                            position:relative
+                        }
+                        #page-action-menu ul .inactive {
+                            color:#dfdfdf
+                        }
+                    </style>
+                    <div id="page-actions">
+                        <div id="page-action-menu">
+                            <a href="#" class="expand button" aria-label="$stringExpand>">$stringAdd</a>
+                            <ul class="collapsible">
+                                $stringButtons
+                            </ul>
+                        </div>
+                    </div>
+                    HTML,
+                $html,
+                1
+            );
+        }
+
+        $vars->offsetSet('content', $html);
+    }
+
+    protected function handleViewLayoutResourceShow(PhpRenderer $view, string $resourceType, int $id): void
+    {
         $services = $this->getServiceLocator();
-
         $settings = $services->get('Omeka\Settings');
+
         $interface = $settings->get('easyadmin_interface') ?: [];
         $buttonPublicView = in_array('resource_public_view', $interface);
         $buttonPreviousNext = in_array('resource_previous_next', $interface);
@@ -692,6 +838,45 @@ class Module extends AbstractModule
         $view->headScript()
             ->appendFile($assetUrl('vendor/flow.js/flow.min.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
             ->appendFile($assetUrl('js/bulk-upload.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+    }
+
+    public function handleResourceForm(Event $event): void
+    {
+        /**
+         * @var \Omeka\Mvc\Status $status
+         * @var \Omeka\Form\ResourceForm $form
+         */
+        $services = $this->getServiceLocator();
+
+        $status = $services->get('Omeka\Status');
+        if (!$status->isAdminRequest()) {
+            return;
+        }
+
+        /**
+         * Set resource template and class ids from query for a new resource.
+         * Else, it will be the user setting one.
+         *
+         * This feature is managed by modules Advanced Resource Template and
+         * Easy Admin, but in a different way (internally or via settings).
+         *
+         * This feature requires to override file appliction/view/common/resource-fields.phtml.
+         *
+         * @see \AdvancedResourceTemplate\Module::handleResourceForm()
+         * @see \EasyAdmin\Module::handleResourceForm()
+         */
+
+        if ($status->getRouteParam('action') === 'add') {
+            $form = $event->getTarget();
+            $resourceTemplateId = $services->get('ControllerPluginManager')->get('Params')->fromQuery('resource_template_id');
+            if ($resourceTemplateId && $form->has('o:resource_template[o:id]')) {
+                /** @var \Omeka\Form\Element\ResourceTemplateSelect $templateSelect */
+                $templateSelect = $form->get('o:resource_template[o:id]');
+                if (in_array($resourceTemplateId, array_keys($templateSelect->getValueOptions()))) {
+                    $templateSelect->setValue($resourceTemplateId);
+                }
+            }
+        }
     }
 
     public function handleItemApiHydratePre(Event $event): void

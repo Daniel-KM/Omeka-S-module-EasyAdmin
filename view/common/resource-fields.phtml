@@ -1,0 +1,66 @@
+<?php
+/**
+ * @var Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Form\ResourceForm $form
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation|null $resource
+ * @var string $action
+ */
+
+$translate = $this->plugin('translate');
+$escapeAttr = $this->plugin('escapeHtmlAttr');
+$resourceTemplateSelect = $form->get('o:resource_template[o:id]');
+$resourceClassSelect = $form->get('o:resource_class[o:id]');
+$thumbnailInput = $form->get('o:thumbnail[o:id]');
+$ownerSelect = $form->get('o:owner[o:id]');
+if (isset($resource)) {
+    if ($resourceTemplate = $resource->resourceTemplate()) {
+        $resourceTemplateSelect->setValue($resourceTemplate->id());
+    }
+    if ($resourceClass = $resource->resourceClass()) {
+        $resourceClassSelect->setValue($resourceClass->id());
+    }
+    if ($thumbnail = $resource->thumbnail()) {
+        $thumbnailInput->setValue($thumbnail->id());
+    }
+    if ($owner = $resource->owner()) {
+        $ownerSelect->setValue($owner->id());
+    }
+} elseif (!$resourceTemplateSelect->getValue()) {
+    // The resource template may be set by a module.
+    // Set the logged in user's default template when adding a resource.
+    $resourceTemplateSelect->setValue($this->userSetting('default_resource_template'));
+}
+?>
+
+<fieldset id="resource-values"
+    class="section active"
+    aria-labelledby="resource-values-label"
+    data-resource-id="<?php echo isset($resource) ? $resource->id() : ''; ?>">
+    <div class="non-properties">
+        <?php if ($resourceTemplateSelect->getValueOptions()): ?>
+        <?php echo $this->formRow($resourceTemplateSelect); ?>
+        <?php endif; ?>
+        <?php echo $this->formRow($resourceClassSelect); ?>
+    </div>
+    <div id="properties"></div>
+    <input type="hidden" name="values_json" id="values-json">
+    <datalist id="value-languages" class="value-languages">
+    <?php foreach ($this->setting('value_languages', []) as $value => $language): ?>
+        <option value="<?php echo $escapeAttr($value) ?>" label="<?php echo $escapeAttr(strlen($language) ? $language : $value); ?>"></option>
+        <?php endforeach; ?>
+    </datalist>
+    <?php echo $this->propertySelector(); ?>
+    <button id="property-selector-button" class="button mobile-only" data-watch-target="#properties"><?php echo $translate('Add property'); ?></button>
+    <?php echo $this->partial('common/value-annotation-sidebar'); ?>
+    <?php echo $this->partial('common/resource-select-sidebar'); ?>
+</fieldset>
+
+<fieldset id="advanced-settings"
+    class="section"
+    aria-labelledby="advanced-settings-label">
+    <?php echo $this->formRow($thumbnailInput); ?>
+    <?php if ($resource && $resource->userIsAllowed('change-owner')): ?>
+    <?php echo $this->formRow($ownerSelect); ?>
+    <?php endif; ?>
+    <?php $this->trigger("view.$action.form.advanced", ['form' => $form]); ?>
+</fieldset>
