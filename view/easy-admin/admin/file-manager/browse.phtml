@@ -174,7 +174,7 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
                     <ul class="actions">
                         <?php // $this->trigger('view.browse.actions', ['resource' => $file]); ?>
                         <?php if (!$isDir && $localUrl): ?>
-                        <li><?= $hyperlink('', $localUrl. '/' . rawurlencode($filename), [
+                        <li><?= $hyperlink('', rtrim($localUrl, '/') . '/' . rawurlencode($filename), [
                             'download' => $filename,
                             'target' => '_self',
                             'class' => 'o-icon- fa-cloud-download-alt download',

@@ -93,7 +93,7 @@ class FileManagerController extends AbstractActionController
             // $this->paginator($fileIterator->getTotalResults());
             // Get the specific part.
             $base = $this->baseUri ? rtrim($this->baseUri, '/') : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
-            $partPath = mb_substr($localPath, mb_strlen(rtrim($this->basePath, '/')) + 1);
+            $partPath = trim(mb_substr($localPath, mb_strlen(rtrim($this->basePath, '/')) + 1), '/');
             $localUrl = $base . '/' . $partPath;
         } else {
             $localUrl = null;
