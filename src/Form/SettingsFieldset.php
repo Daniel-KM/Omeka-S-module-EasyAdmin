@@ -41,6 +41,18 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_rights_reviewer_delete_all',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'editing',
+                    'label' => 'Allow the reviewer to delete any resource', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_rights_reviewer_delete_all',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_local_path',
                 'type' => Element\Text::class,
                 'options' => [
@@ -131,6 +143,7 @@ class SettingsFieldset extends Fieldset
                     'rows' => 12,
                     'placeholder' => 'This site is down for maintenance. Please contact the site administrator for more information.', // @translate
                 ],
-            ]);
+            ])
+        ;
     }
 }

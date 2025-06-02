@@ -235,6 +235,7 @@ return [
                 'resource_public_view',
                 // 'resource_previous_next',
             ],
+            'easyadmin_rights_reviewer_delete_all' => false,
             'easyadmin_local_path' => OMEKA_PATH . '/files/preload',
             'easyadmin_allow_empty_files' => false,
             'easyadmin_addon_notify_version_inactive' => true,

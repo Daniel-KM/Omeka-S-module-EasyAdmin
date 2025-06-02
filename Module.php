@@ -103,6 +103,23 @@ class Module extends AbstractModule
                 ]
             )
         ;
+
+        if ($settings->get('easyadmin_rights_reviewer_delete_all')) {
+            $acl
+                ->allow(
+                    'reviewer',
+                    [
+                        \Omeka\Entity\Item::class,
+                        \Omeka\Entity\ItemSet::class,
+                        \Omeka\Entity\Media::class,
+                        \Omeka\Entity\Asset::class,
+                    ],
+                    [
+                        'delete',
+                    ]
+                )
+            ;
+        }
     }
 
     protected function preInstall(): void
