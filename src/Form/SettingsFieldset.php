@@ -23,6 +23,18 @@ class SettingsFieldset extends Fieldset
             ->setOption('element_groups', $this->elementGroups)
 
             ->add([
+                'name' => 'easyadmin_administrator_name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'general',
+                    'label' => 'Administrator name', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_administrator_name',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_interface',
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [

@@ -231,18 +231,24 @@ return [
             'easyadmin_local_path_any' => false,
         ],
         'settings' => [
-            'easyadmin_quick_template' => [],
-            'easyadmin_quick_class' => [],
+            // General.
+            'easyadmin_administrator_name' => '',
+            // Display.
             'easyadmin_interface' => [
                 'resource_public_view',
                 // 'resource_previous_next',
             ],
+            // Editing.
             'easyadmin_rights_reviewer_delete_all' => false,
+            'easyadmin_quick_template' => [],
+            'easyadmin_quick_class' => [],
+            // Easy admin.
             'easyadmin_local_path' => OMEKA_PATH . '/files/preload',
             'easyadmin_allow_empty_files' => false,
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             'easyadmin_display_exception' => false,
+            // Maintenance
             'easyadmin_maintenance_mode' => '',
             'easyadmin_maintenance_text' => 'This site is down for maintenance. Please contact the site administrator for more information.', // @translate
         ],
