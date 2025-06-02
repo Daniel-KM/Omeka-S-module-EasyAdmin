@@ -6,6 +6,7 @@
 /language/chef.mo
 /node_modules/
 /vendor/
+/.phpunit.cache/
 /.sass-cache/
 /.settings/
 /test/.phpunit.result.cache
