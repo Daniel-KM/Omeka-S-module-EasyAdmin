@@ -404,7 +404,19 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
     $messenger->addSuccess($message);
 
     $message = new PsrMessage(
-        'A new setting allows to add a button to quick create a  resource with a specific template.' // @translate
+        'A new setting allows to add a button to quick create a resource with a specific template.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.32', '<')) {
+    $message = new PsrMessage(
+        'A new setting allows to define the name of the administrator.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new setting allows to define a no-reply email for automatic messages and notifications.' // @translate
     );
     $messenger->addSuccess($message);
 }
