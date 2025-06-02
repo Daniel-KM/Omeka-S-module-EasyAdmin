@@ -59,7 +59,7 @@ class DbContentLock extends AbstractCheck
         }
         if ($userIds) {
             $sql .= ' AND user_id IN (:user_ids)';
-            $bind['user_ids'] = $userIds;
+            $bind['user_ids'] = array_values($userIds);
             $types['user_ids'] = \Doctrine\DBAL\Connection::PARAM_INT_ARRAY;
         }
         $old = $this->connection->executeQuery($sql, $bind, $types)->fetchOne();
