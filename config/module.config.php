@@ -233,6 +233,8 @@ return [
         'settings' => [
             // General.
             'easyadmin_administrator_name' => '',
+            'easyadmin_no_reply_email' => '',
+            'easyadmin_no_reply_name' => '',
             // Display.
             'easyadmin_interface' => [
                 'resource_public_view',

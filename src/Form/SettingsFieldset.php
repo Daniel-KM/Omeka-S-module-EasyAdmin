@@ -35,6 +35,30 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_no_reply_email',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'general',
+                    'label' => 'No reply email for automatic messages and notifications', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_no_reply_email',
+                ],
+            ])
+
+            ->add([
+                'name' => 'easyadmin_no_reply_name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'general',
+                    'label' => 'No reply name', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_no_reply_name',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_interface',
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
