@@ -352,6 +352,7 @@ class Module extends AbstractModule
             'view.edit.before',
             [$this, 'addHeadersAdmin']
         );
+
         // Manage the special media ingester "bulk_upload".
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
@@ -695,6 +696,7 @@ class Module extends AbstractModule
         }
 
         /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+
         // Normally, the current resource should be present in vars.
         $vars = $view->vars();
         if ($vars->offsetExists('resource')) {
@@ -851,7 +853,7 @@ class Module extends AbstractModule
                 <h4>$translatedSites</h4>
                 $htmlSites
             </div>
-           HTML . "\n";
+            HTML . "\n";
         return $html;
     }
 

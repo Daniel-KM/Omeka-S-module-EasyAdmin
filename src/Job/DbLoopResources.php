@@ -83,7 +83,10 @@ class DbLoopResources extends AbstractJob
     protected function processLoop(string $resourceType, array $query): void
     {
         // Don't load entities if the only information needed is total results.
-        $totalToProcess = $this->api->search($resourceType, $query)->getTotalResults();
+        $totalToProcess = $query
+            // Keep limit if there is one.
+            ? $this->api->search($resourceType, $query, ['returnScalar' => 'id'])->getTotalResults()
+            : $this->api->search($resourceType, ['limit' => 0])->getTotalResults();
 
         if (empty($totalToProcess)) {
             $this->logger->info(
