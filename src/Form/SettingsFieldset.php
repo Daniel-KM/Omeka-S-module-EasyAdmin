@@ -72,6 +72,24 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_quick_class',
+                'type' => CommonElement\OptionalResourceClassSelect::class,
+                'options' => [
+                    'element_group' => 'editing',
+                    'label' => 'Add a button to create resources directly from a template specified with a class', // @translate
+                    'query' => ['used' => true],
+                    'empty_option' => '[None]', // @translate
+                    'term_as_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_quick_class',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select resource classes…', // @translate'
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_local_path',
                 'type' => Element\Text::class,
                 'options' => [

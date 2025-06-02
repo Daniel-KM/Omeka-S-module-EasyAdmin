@@ -232,6 +232,7 @@ return [
         ],
         'settings' => [
             'easyadmin_quick_template' => [],
+            'easyadmin_quick_class' => [],
             'easyadmin_interface' => [
                 'resource_public_view',
                 // 'resource_previous_next',

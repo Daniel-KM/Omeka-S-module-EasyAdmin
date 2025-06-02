@@ -505,12 +505,15 @@ class Module extends AbstractModule
         /**
          * @var \Omeka\Api\Manager $api
          * @var \Omeka\Settings\Settings $settings
+         * @var \Common\Stdlib\EasyMeta $easyMeta
+         * @var \Doctrine\DBAL\Connection $connection
          */
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
         $templateIds = $settings->get('easyadmin_quick_template');
-        if (!$templateIds) {
+        $classTerms = $settings->get('easyadmin_quick_class');
+        if (!$templateIds && !$classTerms) {
             return;
         }
 
@@ -522,10 +525,51 @@ class Module extends AbstractModule
         }
 
         $api = $services->get('Omeka\ApiManager');
+        $easyMeta = $services->get('Common\EasyMeta');
 
-        $hasAll = in_array('all', $templateIds);
-        $templateLabels = $api->search('resource_templates', $hasAll ? [] : ['id' => $templateIds], ['returnScalar' => 'label'])->getContent();
-        if (!$templateLabels) {
+        $templateLabels = [];
+        if ($templateIds) {
+            $hasAll = in_array('all', $templateIds);
+            $templateLabels = $easyMeta->resourceTemplateLabels($hasAll ? [] : $templateIds);
+        }
+
+        // Search all templates with specified classes.
+        $classIds = $easyMeta->resourceClassIds($classTerms);
+        $templateClassLabels = [];
+        if ($classIds) {
+            // The api allows to sort by class, but not to search, so
+            // the argument is added via an event.
+            // TODO Resource templates cannot be searched by classes, so use sql.
+            // The module AdvancedResourceTemplate allows to suggest
+            // multiple classes by template.
+            if ($this->isModuleActive('AdvancedResourceTemplate')) {
+                /** @var \AdvancedResourceTemplate\Api\Representation\ResourceTemplateRepresentation[] $templates */
+                $templates = $api->search('resource_templates', [])->getContent();
+                foreach ($templates as $template) {
+                    $useForResources = $template->dataValue('use_for_resources');
+                    if (!$useForResources || in_array($resourceType, $useForResources)) {
+                        $suggestedClasses = $template->dataValue('suggested_resource_class_ids') ?: [];
+                        if ($ids = array_intersect($suggestedClasses, $classIds)) {
+                            $templateClassLabels[$template->id()] = ['label' => $template->label(), 'resource_class_id' => reset($ids)];
+                        }
+                    }
+                }
+            } else {
+                $connection = $services->get('Omeka\Connection');
+                $qb = $connection->createQueryBuilder();
+                $qb
+                    ->select('id', 'label', 'resource_class_id')
+                    ->distinct()
+                    ->from('resource_template', 'resource_template')
+                    ->where('resource_template.`resource_class_id` IN (:ids)')
+                    ->setParameter('ids', $classIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                    ->addOrderBy('resource_template`.`label`', 'asc')
+                ;
+                $templateClassLabels = $qb->execute()->fetchAllAssociative();
+            }
+        }
+
+        if (!$templateLabels && !$templateClassLabels) {
             return;
         }
 
@@ -549,6 +593,10 @@ class Module extends AbstractModule
         $buttons[] = $hyperlink($translate('Any'), $url(null, ['action' => 'add'], true), ['class' => 'link']);
         foreach ($templateLabels as $id => $label) {
             $buttons[$id] = $hyperlink($translate($label), $url(null, ['action' => 'add'], ['query' => ['resource_template_id' => $id]], true), ['class' => 'link']);
+        }
+
+        foreach ($templateClassLabels as $id => $data) {
+            $buttons[$id] = $hyperlink($translate($data['label']), $url(null, ['action' => 'add'], ['query' => ['resource_template_id' => $id, 'resource_class_id' => $data['resource_class_id']]], true), ['class' => 'link']);
         }
 
         if (count($buttons) > 1) {
@@ -868,12 +916,21 @@ class Module extends AbstractModule
 
         if ($status->getRouteParam('action') === 'add') {
             $form = $event->getTarget();
-            $resourceTemplateId = $services->get('ControllerPluginManager')->get('Params')->fromQuery('resource_template_id');
+            $params = $services->get('ControllerPluginManager')->get('Params');
+            $resourceTemplateId = $params->fromQuery('resource_template_id');
             if ($resourceTemplateId && $form->has('o:resource_template[o:id]')) {
                 /** @var \Omeka\Form\Element\ResourceTemplateSelect $templateSelect */
                 $templateSelect = $form->get('o:resource_template[o:id]');
                 if (in_array($resourceTemplateId, array_keys($templateSelect->getValueOptions()))) {
                     $templateSelect->setValue($resourceTemplateId);
+                }
+            }
+            $resourceClassId = $params->fromQuery('resource_class_id');
+            if ($resourceClassId && $form->has('o:resource_class[o:id]')) {
+                /** @var \Omeka\Form\Element\ResourceClassSelect $templateSelect */
+                $classSelect = $form->get('o:resource_class[o:id]');
+                if (in_array($resourceClassId, array_keys($classSelect->getValueOptions()))) {
+                    $classSelect->setValue($resourceClassId);
                 }
             }
         }
