@@ -1,6 +1,6 @@
 {
     "name": "daniel-km/omeka-s-module-easy-admin",
-    "description": "Module for Omeka S that improves admin interface for curators: install modules and themes, check database and files, simplify bulk upload, block concurrent edition, run cron tasks, use json endpoints.",
+    "description": "Module for Omeka S that improves admin interface for curators: install modules and themes, check database and files, simplify bulk upload, run cron tasks, use json endpoints.",
     "type": "library",
     "license": "CECILL-2.1",
     "authors": [

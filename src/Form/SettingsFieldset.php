@@ -88,29 +88,6 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
-                'name' => 'easyadmin_content_lock',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'element_group' => 'easy_admin',
-                    'label' => 'Enable content lock to avoid simultaneous editing', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'easyadmin_content_lock',
-                ],
-            ])
-            ->add([
-                'name' => 'easyadmin_content_lock_duration',
-                'type' => Element\Number::class,
-                'options' => [
-                    'element_group' => 'easy_admin',
-                    'label' => 'Number of seconds before automatic removing of the lock', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'easyadmin_content_lock_duration',
-                ],
-            ])
-
-            ->add([
                 'name' => 'easyadmin_display_exception',
                 'type' => Element\Checkbox::class,
                 'options' => [

@@ -10,7 +10,6 @@ admin interface:
 
 - bulk upload multiple files in item form, bypassing any server post limits
 - buttons to public view and previous/next resources in admin resource show page
-- content lock to avoid concurrent edition
 - install modules and themes
 - install [curated selection of modules]
 - update modules (in a future version)
@@ -52,6 +51,9 @@ Checks and fixes that are doable:
 
 And many more.
 
+The feature "content lock" to avoid concurrent edition was moved to the module
+[Lock Edit] since version 3.4.31.
+
 Modules that add tasks:
 - [Compilatio]
   - Send files to https://compilatio.net, an anti-plagiarism app.
@@ -60,6 +62,8 @@ Modules that add tasks:
   - Reset acceptation of conditions.
 - [Iiif Server]
   - Convert old three-columns table contents to new four columns.
+- [Lock Edit]
+  - Check and reset content locks.
 - [Reference]
   - Reindex references.
 - [Thesaurus]
@@ -169,7 +173,9 @@ Simply select either the desired module or the desired theme and click "upload".
 
 See more details on [modules] and [themes].
 
-### Content lock
+### Content lock (Easy Admin until version 3.4.30)
+
+The feature was moved to the module [Lock Edit] since version 3.4.31.
 
 This feature is inspired by Drupal [Content Lock] mechanism and allows to block
 concurrent editing: when a user is editing a resource, other users cannot edit
@@ -365,6 +371,7 @@ of the [Université des Antilles et de la Guyane].
 [Compilatio]: https://gitlab.com/Daniel-KM/Omeka-S-module-Compilatio
 [Guest]: https://gitlab.com/Daniel-KM/Omeka-S-module-Guest
 [Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
+[Lock Edit]: https://gitlab.com/Daniel-KM/Omeka-S-module-LockEdit
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Thesaurus]: https://gitlab.com/Daniel-KM/Omeka-S-module-Thesaurus
 [Zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Zip

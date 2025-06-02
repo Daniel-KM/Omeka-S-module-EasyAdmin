@@ -127,10 +127,6 @@ class CheckAndFixController extends AbstractActionController
             case 'db_value_annotation_template_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbValueAnnotationTemplate::class, $defaultParams);
                 break;
-            case 'db_content_lock_check':
-            case 'db_content_lock_clean':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbContentLock::class, $defaultParams + $params['database']['db_content_lock']);
-                break;
             case 'db_job_check':
             case 'db_job_fix':
             case 'db_job_fix_all':
