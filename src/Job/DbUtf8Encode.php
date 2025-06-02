@@ -322,10 +322,10 @@ class DbUtf8Encode extends AbstractCheck
             return null;
         }
 
-        // Quick check for ascii encoding.
+        // Quick check for ascii encoding, that is valid utf-8.
         $stringEncoding = mb_detect_encoding($string);
         $isoEncoding = mb_detect_encoding($iso);
-        if (!$stringEncoding === 'ASCII' || $isoEncoding === 'ASCII') {
+        if ($stringEncoding === 'ASCII' || $isoEncoding === 'ASCII') {
             ++$this->totalUtf8;
             return null;
         }

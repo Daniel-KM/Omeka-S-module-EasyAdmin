@@ -363,7 +363,7 @@ abstract class AbstractCheck extends AbstractJob
     {
         if (file_exists($dirPath)) {
             if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
-                $this->getServiceLocator()->get('Omeka\Logger')->err(
+                $this->logger->err(
                     'The directory "{path}" is not writeable.', // @translate
                     ['path' => $dirPath]
                 );
@@ -374,7 +374,7 @@ abstract class AbstractCheck extends AbstractJob
 
         $result = @mkdir($dirPath, 0775, true);
         if (!$result) {
-            $this->getServiceLocator()->get('Omeka\Logger')->err(
+            $this->logger->err(
                 'The directory "{path}" is not writeable: {error}.', // @translate
                 ['path' => $dirPath, 'error' => error_get_last()['message']]
             );

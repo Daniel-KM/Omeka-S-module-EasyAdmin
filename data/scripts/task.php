@@ -292,9 +292,14 @@ $job->setPid(getmypid());
 $referenceId = null;
 
 if ($asTask) {
-    // Since it’s a job not prepared as a job, the logger should be prepared here.
-    /** @var \Omeka\Module\Module $module */
-    $module = $services->get('Omeka\ModuleManager')->getModule('Log');
+    // Since the job is not prepared via the omeka dispatcher, the logger should
+    // be prepared here.
+    /**
+     * @var \Omeka\Module\Manager $moduleManager
+     * @var \Omeka\Module\Module $module
+     */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Log');
     if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
         $referenceId = 'task:' . str_replace(['\\', '/Job/'], ['/', '/'], $taskName) . ':' . (new \DateTime())->format('Ymd-His');
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();

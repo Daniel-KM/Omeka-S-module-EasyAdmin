@@ -188,6 +188,7 @@ class CheckAndFixController extends AbstractActionController
                         'Reference' => '3.4.51',
                         'Statistics' => '3.4.9',
                         'Thesaurus' => '3.4.19',
+                        // And other ones.
                     ];
                     */
                     $eventManager->trigger('easyadmin.job', null, $args);
@@ -216,12 +217,9 @@ class CheckAndFixController extends AbstractActionController
                     ),
                     'job_id' => $job->getId(),
                     'link_end' => '</a>',
-                    'link_log' => sprintf(
-                        '<a href="%s">',
-                        htmlspecialchars(class_exists(\Log\Module::class)
-                            ? $urlPlugin->fromRoute('admin/log/default', [], ['query' => ['job_id' => $job->getId()]])
-                            : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId(), 'action' => 'log']))
-                    ),
+                    'link_log' => class_exists('Log\Module', false)
+                        ? sprintf('<a href="%1$s">', $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
+                        : sprintf('<a href="%1$s" target="_blank">', $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
                 ]
             );
             $message->setEscapeHtml(false);

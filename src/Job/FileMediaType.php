@@ -35,7 +35,7 @@ class FileMediaType extends AbstractCheckFile
     }
 
     /**
-     * Check the hash of the files.
+     * Check the media type of the files.
      *
      * @param bool $fix
      * @return bool

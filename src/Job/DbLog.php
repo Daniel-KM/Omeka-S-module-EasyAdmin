@@ -74,21 +74,17 @@ class DbLog extends AbstractCheck
         $dbname = $this->connection->getDatabase();
         $table = $this->connection->quote($table);
         $sql = <<<SQL
-SELECT *
-FROM information_schema.TABLES
-WHERE table_schema = "$dbname"
-    AND table_name = $table
-LIMIT 1;
-SQL;
+            SELECT *
+            FROM information_schema.TABLES
+            WHERE table_schema = "$dbname"
+                AND table_name = $table
+            LIMIT 1;
+            SQL;
         return (bool) $this->connection->executeQuery($sql)->fetchOne();
     }
 
     /**
      * Check the size of the db table "log".
-     *
-     * @param bool $fix
-     * @param int $minimumDays
-     * @param int $maximumSeverity
      */
     protected function checkDbLog(
         bool $fix = false,

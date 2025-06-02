@@ -3,7 +3,7 @@
 $(document).ready(function() {
 
     const hideTasksWarning = function () {
-        const tasksWarning = $('#form-check-and-fix').data('tasks-warning').split(',');
+        const tasksWarning = $('#check-and-fix-form').data('tasks-warning').split(',');
         $('.check-and-fix .fieldset-process')
             .filter((index, el) =>  tasksWarning.includes($(el).val()))
             .each(function () {

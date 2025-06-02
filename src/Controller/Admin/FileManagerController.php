@@ -2,13 +2,13 @@
 
 namespace EasyAdmin\Controller\Admin;
 
+use Common\Stdlib\PsrMessage;
 use EasyAdmin\Controller\TraitEasyDir;
 use FilesystemIterator;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Permissions\Acl;
-use Common\Stdlib\PsrMessage;
 
 class FileManagerController extends AbstractActionController
 {

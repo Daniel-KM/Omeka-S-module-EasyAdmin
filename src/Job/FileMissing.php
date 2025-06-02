@@ -148,7 +148,7 @@ class FileMissing extends AbstractCheckFile
         $result = [];
         $count = 0;
         foreach ($this->files as $file) {
-              $filepath = $dir . '/' . $file;
+            $filepath = $dir . '/' . $file;
             $extension = pathinfo($filepath, PATHINFO_EXTENSION);
             if (!$extension) {
                 $this->logger->warn(

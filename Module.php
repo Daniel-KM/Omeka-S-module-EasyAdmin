@@ -29,7 +29,7 @@
 
 namespace EasyAdmin;
 
-if (!class_exists(\Common\TraitModule::class)) {
+if (!class_exists('Common\TraitModule', false)) {
     require_once dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
@@ -502,7 +502,10 @@ class Module extends AbstractModule
                     );
                 } else {
                     $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
-                    $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, ['days' => $days, 'quick' => true]);
+                    $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, [
+                        'days' => $days,
+                        'quick' => true,
+                    ]);
                 }
                 break;
 
