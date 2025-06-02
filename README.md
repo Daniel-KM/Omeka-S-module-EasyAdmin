@@ -18,6 +18,7 @@ admin interface:
 - backup install
 - clear php caches
 - launch simple tasks, that can be any job of any module
+- allow (or not) reviewer to delete any resources
 
 Checks and fixes that are doable:
 
@@ -122,6 +123,15 @@ You can find more information on the params in [Laminas help] and [curl].
 
 Usage
 -----
+
+### Various settings
+
+Some options are added in main settings:
+
+- Display previous/next button in resource page.
+- Allow the reviewer to delete any resource.
+- Manage the maintenance.
+- Display a quick button to create a resource template
 
 ### Bulk Upload in item form and in separate form
 
