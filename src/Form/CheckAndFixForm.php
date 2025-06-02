@@ -120,6 +120,10 @@ class CheckAndFixForm extends Form
             ->add([
                 'name' => 'days',
                 'required' => false,
+            ])
+            ->add([
+                'name' => 'length',
+                'required' => false,
             ]);
         $inputFilter->get('database')
             ->get('db_customvocab_missing_itemsets')
@@ -687,6 +691,16 @@ class CheckAndFixForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'db_log-severity',
+                ],
+            ])
+            ->add([
+                'name' => 'length',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum length of message', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'db_log-length',
                 ],
             ]);
 

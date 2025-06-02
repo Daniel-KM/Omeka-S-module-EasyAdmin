@@ -59,7 +59,9 @@ class DbLog extends AbstractCheck
             return;
         }
 
-        $this->checkDbLog($processFix, $days, $severity);
+        $length = (int) $this->getArg('length');
+
+        $this->checkDbLog($processFix, $days, $severity, $length);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -88,27 +90,45 @@ SQL;
      * @param int $minimumDays
      * @param int $maximumSeverity
      */
-    protected function checkDbLog(bool $fix = false, int $minimumDays = 0, int $maximumSeverity = 0): void
-    {
+    protected function checkDbLog(
+        bool $fix = false,
+        int $minimumDays = 0,
+        int $maximumSeverity = 0,
+        int $maximumLength = 0
+    ): void {
         $timestamp = time() - 86400 * $minimumDays;
         $date = date('Y-m-d H:i:s', $timestamp);
 
         $dbname = $this->connection->getDatabase();
         $sqlSize = <<<SQL
-SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
-FROM information_schema.TABLES
-WHERE table_schema = "$dbname"
-    AND table_name = "$this->table";
-SQL;
+            SELECT ROUND((data_length + index_length) / 1024 / 1024, 2)
+            FROM information_schema.TABLES
+            WHERE table_schema = "$dbname"
+                AND table_name = "$this->table";
+            SQL;
         $size = $this->connection->executeQuery($sqlSize)->fetchOne();
 
         $sql = "SELECT COUNT(id) FROM $this->table;";
         $all = $this->connection->executeQuery($sql)->fetchOne();
 
-        $sql = "SELECT COUNT(id) FROM $this->table WHERE created < :date AND severity >= :severity;";
+        $sql = <<<SQL
+            SELECT COUNT(id)
+            FROM $this->table
+            WHERE 1 = 1
+            SQL;
         $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(':date', $date);
-        $stmt->bindValue(':severity', $maximumSeverity);
+        if ($date) {
+            $sql .= ' AND created < :date';
+            $stmt->bindValue(':date', $date);
+        }
+        if ($maximumSeverity) {
+            $sql .= ' AND severity >= :severity';
+            $stmt->bindValue(':severity', $maximumSeverity);
+        }
+        if ($maximumLength) {
+            $sql .= ' AND (LENGTH(message) > :length OR LENGTH(context) > :length)';
+            $stmt->bindValue(':length', $maximumLength);
+        }
         $old = $stmt->executeQuery()->fetchOne();
 
         $this->logger->notice(
@@ -117,10 +137,23 @@ SQL;
         );
 
         if ($fix) {
-            $sql = "DELETE FROM `$this->table` WHERE created < :date AND severity >= :severity;";
+            $sql = <<<SQL
+                DELETE FROM `$this->table`
+                WHERE 1 = 1
+                SQL;
             $stmt = $this->connection->prepare($sql);
-            $stmt->bindValue(':date', $date);
-            $stmt->bindValue(':severity', $maximumSeverity);
+            if ($date) {
+                $sql .= ' AND created < :date';
+                $stmt->bindValue(':date', $date);
+            }
+            if ($maximumSeverity) {
+                $sql .= ' AND severity >= :severity';
+                $stmt->bindValue(':severity', $maximumSeverity);
+            }
+            if ($maximumLength) {
+                $sql .= ' AND (LENGTH(message) > :length OR LENGTH(context) > :length)';
+                $stmt->bindValue(':length', $maximumLength);
+            }
             $stmt->executeStatement();
             $count = $stmt->rowCount();
             $size = $this->connection->executeQuery($sqlSize)->fetchOne();
