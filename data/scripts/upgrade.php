@@ -368,3 +368,43 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.31', '<')) {
+    // If the module Content Lock is installed, do not update settings and do
+    // not remove tables.
+    $hasLockEdit = $this->isModuleVersionAtLeast('LockEdit', '3.4.0');
+    if (!$hasLockEdit) {
+        $settings->set('lockedit_duration', $settings->get('easyadmin_content_lock_duration', 14400));
+        $sql = <<<'SQL'
+            SET foreign_key_checks = 0;
+            DROP TABLE IF EXISTS content_lock;
+            SQL;
+        $connection->executeStatement($sql);
+    } else {
+        // Simplify upgrade or migration.
+        $connection->executeStatement('TRUNCATE TABLE content_lock;');
+    }
+
+    $settings->delete('easyadmin_content_lock');
+    $settings->delete('easyadmin_content_lock_duration');
+
+    $message = new PsrMessage(
+        'The feature to lock concurrent editing was moved to the new module {link}Lock Edit{link_end}. You should install it if you need it.', // @translate
+        [
+            'link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-LockEdit" _target="blank" rel="noopener">',
+            'link_end' => '</a>',
+        ]
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addWarning($message);
+
+    $message = new PsrMessage(
+        'A new setting allows the reviewer to delete any resource.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new setting allows to add a button to quick create a  resource with a specific template.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
