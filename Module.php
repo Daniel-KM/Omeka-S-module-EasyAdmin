@@ -851,7 +851,7 @@ class Module extends AbstractModule
                     ['class' => 'o-icon-external', 'target' => '_blank', 'aria-label' => $externalLinkText, 'title' => $externalLinkText]
                 ),
             ];
-            $htmlSites .= str_replace(array_keys($replace), array_values($replace), $htmlSite);
+            $htmlSites .= strtr($htmlSite, $replace);
         }
 
         // The class item-sites is kept for css.

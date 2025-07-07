@@ -142,7 +142,7 @@ class DbItemNoValue extends AbstractCheckFile
                     }
                 }
             }
-            $row['note'] = str_replace("\n", ' | ', trim($row['note']));
+            $row['note'] = strtr(trim($row['note']), ["\n" => ' | ']);
             $this->writeRow($row);
 
             $this->entityManager->clear();

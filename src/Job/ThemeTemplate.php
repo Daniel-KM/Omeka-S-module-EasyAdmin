@@ -154,11 +154,10 @@ class ThemeTemplate extends AbstractCheck
             ];
 
             $source = $filepath;
-            $destination = str_replace(
-                OMEKA_PATH . "/themes/$theme/view/common/block-layout/",
-                OMEKA_PATH . "/themes/$theme/view/common/block-template/",
-                $filepath
-            );
+            $destination = strtr($filepath, [
+                OMEKA_PATH . "/themes/$theme/view/common/block-layout/"
+                    => OMEKA_PATH . "/themes/$theme/view/common/block-template/",
+            ]);
             $destinationDir = pathinfo($destination, PATHINFO_DIRNAME);
 
             $messages = [];
@@ -207,7 +206,7 @@ class ThemeTemplate extends AbstractCheck
                         $themeConfigUpdated = true;
                     }
                     $basename = pathinfo($filename, PATHINFO_FILENAME);
-                    $label = ucfirst(str_replace(['-', '_'], ' ', $basename));
+                    $label = ucfirst(strtr($basename, ['-' => ' ', '_' => ' ']));
                     $string = "block_templates.reference.$basename = \"$label\"\n";
                     $check = file_put_contents($themeConfigPath, $string, FILE_APPEND);
                     if ($check) {

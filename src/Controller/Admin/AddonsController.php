@@ -101,7 +101,7 @@ class AddonsController extends AbstractActionController
                 $addon = $addons->dataFromUrl($url, $type);
                 if ($addons->dirExists($addon)) {
                     // Hack to get a clean message.
-                    $type = str_replace('omeka', '', $type);
+                    $type = strtr($type, ['omeka' => '']);
                     $messenger->addError(new PsrMessage(
                         'The {type} "{name}" is already downloaded.', // @translate
                         ['type' => $type, 'name' => $addon['name']]

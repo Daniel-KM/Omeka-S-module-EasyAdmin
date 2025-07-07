@@ -403,7 +403,7 @@ class Addons extends AbstractPlugin
             $zip = $data['versions'][$version]['download_url'] ?? $url . '/archive/master.zip';
 
             $addon = [];
-            $addon['type'] = str_replace('omeka', '', $type);
+            $addon['type'] = strtr($type, ['omeka' => '']);
             $addon['server'] = 'omeka.org';
             $addon['name'] = $name;
             $addon['basename'] = $data['dirname'];

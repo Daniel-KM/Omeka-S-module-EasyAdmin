@@ -251,7 +251,7 @@ class DbUtf8Encode extends AbstractCheck
                     default:
                         return false;
                 }
-                $row['content'] = mb_substr(trim(str_replace(["\n", "\r", "\t"], ['  ', '  ', '  '], is_string($string) ? $string : json_encode($string))), 0, 1000);
+                $row['content'] = mb_substr(trim(strtr(is_string($string) ? $string : json_encode($string), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' '])), 0, 1000);
                 $row['fixed'] = $fix ? $yes : '';
 
                 if ($fix) {
@@ -296,11 +296,11 @@ class DbUtf8Encode extends AbstractCheck
             $hasHtml = !empty($string['html']);
             if ($hasHtml) {
                 // Don't convert main xml entities (quotes, > and <).
-                $string['html'] = str_replace(['&_gt_;', '&_lt_;'], ['&gt;', '&lt;'], html_entity_decode(
-                    str_replace(['&gt;', '&lt;'], ['&_gt_;', '&_lt_;'], $string['html']),
+                $string['html'] = strtr(html_entity_decode(
+                    strtr($string['html'], ['&gt;' => '&_gt_;', '&lt;' => '&_lt_;']),
                     ENT_NOQUOTES | ENT_HTML5,
                     'ISO-8859-15'
-                ));
+                ), ['&_gt_;' => '&gt;', '&_lt_;' => '&lt;']);
             }
             // JSON_INVALID_UTF8_IGNORE is only in php 7.2.
             $stringTest = json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);

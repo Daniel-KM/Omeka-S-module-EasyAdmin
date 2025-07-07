@@ -116,7 +116,7 @@ class DbResourceTitle extends AbstractCheck
                     $existingTitle = null;
                     $shortExistingTitle = '';
                 } else {
-                    $shortExistingTitle = str_replace(["\n", "\r", "\v", "\t"], [' ', ' ', ' ', ' '], mb_substr($existingTitle, 0, 1000));
+                    $shortExistingTitle = strtr(mb_substr($existingTitle, 0, 1000), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' ']);
                 }
 
                 // Real title is trimmed too, like in Omeka.
@@ -125,7 +125,7 @@ class DbResourceTitle extends AbstractCheck
                     $shortRealTitle = '';
                 } else {
                     $realTitle = trim($realTitle);
-                    $shortRealTitle = str_replace(["\n", "\r", "\v", "\t"], [' ', ' ', ' ', ' '], mb_substr($realTitle, 0, 1000));
+                    $shortRealTitle = strtr(mb_substr($realTitle, 0, 1000), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' ']);
                 }
 
                 $different = $existingTitle !== $realTitle;

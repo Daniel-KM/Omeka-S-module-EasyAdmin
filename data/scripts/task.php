@@ -301,7 +301,7 @@ if ($asTask) {
     $moduleManager = $services->get('Omeka\ModuleManager');
     $module = $moduleManager->getModule('Log');
     if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
-        $referenceId = 'task:' . str_replace(['\\', '/Job/'], ['/', '/'], $taskName) . ':' . (new \DateTime())->format('Ymd-His');
+        $referenceId = 'task:' . strtr($taskName, ['\\' => '/', '/Job/' => '/']) . ':' . (new \DateTime())->format('Ymd-His');
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
         $referenceIdProcessor->setReferenceId($referenceId);
         $logger->addProcessor($referenceIdProcessor);
