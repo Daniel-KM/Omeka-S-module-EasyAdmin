@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-02 00:00+0000\n"
+"POT-Creation-Date: 2025-07-07 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,44 +28,44 @@ msgid ""
 "remove them first."
 msgstr ""
 
-#: Module.php:262
+#: Module.php:270
 msgid "WARNING:"
 msgstr ""
 
-#: Module.php:274
+#: Module.php:282
 msgid "Remove directory \"files/check\""
 msgstr ""
 
-#: Module.php:594
+#: Module.php:602
 msgid "Any"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:79
+#: src/Controller/Admin/FileManagerController.php:84
 #: src/Media/Ingester/BulkUpload.php:121
 msgid "Pause"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:80
+#: src/Controller/Admin/FileManagerController.php:85
 #: src/Media/Ingester/BulkUpload.php:122
 msgid "Resume"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:81
+#: src/Controller/Admin/FileManagerController.php:86
 #: src/Media/Ingester/BulkUpload.php:123
 msgid "No files currently selected for upload"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:83
+#: src/Controller/Admin/FileManagerController.php:88
 #: src/Media/Ingester/BulkUpload.php:125
 msgid "Not a valid file type or extension. Update your selection."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:84
+#: src/Controller/Admin/FileManagerController.php:89
 #: src/Media/Ingester/BulkUpload.php:126
 msgid "Not a valid file type, extension or size. Update your selection."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:85
+#: src/Controller/Admin/FileManagerController.php:90
 #: src/Media/Ingester/BulkUpload.php:127
 msgid "An issue occurred."
 msgstr ""
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Item not removed: more than one media"
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:205
+#: src/Job/ThemeTemplate.php:204
 #, php-format
 msgid "Automatically appended via module EasyAdmin on %s"
 msgstr ""
@@ -140,17 +140,17 @@ msgid "Upload files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/file-manager/browse.phtml:67
+#: view/easy-admin/admin/file-manager/browse.phtml:85
 msgid "Drag and drop"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/file-manager/browse.phtml:72
+#: view/easy-admin/admin/file-manager/browse.phtml:90
 msgid "Browse files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/file-manager/browse.phtml:77
+#: view/easy-admin/admin/file-manager/browse.phtml:95
 msgid "Select directory"
 msgstr ""
 
@@ -191,7 +191,7 @@ msgid "Alphabetic (with folder)"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/file-manager/browse.phtml:86
+#: view/easy-admin/admin/file-manager/browse.phtml:104
 msgid "Hide uploaded files"
 msgstr ""
 
@@ -226,7 +226,7 @@ msgstr ""
 #: view/easy-admin/admin/addons/index.phtml:20
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
 #: view/easy-admin/admin/cron/index.phtml:22
-#: view/easy-admin/admin/file-manager/browse.phtml:41
+#: view/easy-admin/admin/file-manager/browse.phtml:45
 msgid "Easy Admin"
 msgstr ""
 
@@ -260,11 +260,11 @@ msgstr ""
 msgid "Regular tasks"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:41
+#: view/easy-admin/admin/file-manager/browse.phtml:45
 msgid "File manager"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:49
+#: view/easy-admin/admin/file-manager/browse.phtml:54
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
@@ -273,57 +273,71 @@ msgid ""
 "the configured directory."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:58
+#: view/easy-admin/admin/file-manager/browse.phtml:62
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
 "be overridden."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:96
+#: view/easy-admin/admin/file-manager/browse.phtml:68
+msgid "Current directory:"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/browse.phtml:114
 msgid "Uploading in progress…"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:129
+#: view/easy-admin/admin/file-manager/browse.phtml:148
 msgid "Hide folders"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:129
+#: view/easy-admin/admin/file-manager/browse.phtml:148
 msgid "Display folders"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:167
+#: view/easy-admin/admin/file-manager/browse.phtml:186
 msgid "Select file"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:181
+#: view/easy-admin/admin/file-manager/browse.phtml:200
 msgid "Download"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:224
-#: view/easy-admin/admin/file-manager/browse.phtml:239
+#: view/easy-admin/admin/file-manager/browse.phtml:243
+#: view/easy-admin/admin/file-manager/browse.phtml:258
 msgid "Delete files"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:225
+#: view/easy-admin/admin/file-manager/browse.phtml:244
 msgid "Are you sure you would like to delete the selected files?"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:227
-#: view/easy-admin/admin/file-manager/browse.phtml:242
+#: view/easy-admin/admin/file-manager/browse.phtml:246
+#: view/easy-admin/admin/file-manager/browse.phtml:261
 #, php-format
 msgid ""
 "%1$sWarning%2$s: this action will permanently delete %3$s files and cannot "
 "be undone."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:240
+#: view/easy-admin/admin/file-manager/browse.phtml:259
 msgid ""
 "Are you sure you would like to delete all files on all pages of this result?"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:258
+#: view/easy-admin/admin/file-manager/browse.phtml:277
 msgid "No files."
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/delete-confirm.phtml:32
+#, php-format
+msgid "Directory: %s"
+msgstr ""
+
+#: view/easy-admin/admin/file-manager/delete-confirm.phtml:33
+#, php-format
+msgid "File: %s"
 msgstr ""
 
 #: view/omeka/admin/asset/add-form.phtml:21
@@ -387,7 +401,7 @@ msgid ""
 "page to the public page."
 msgstr ""
 
-#: data/scripts/upgrade.php:210 Module.php:230
+#: data/scripts/upgrade.php:210 Module.php:238
 msgid ""
 "The module \"{module}\" was upgraded by module \"{module_2}\" and "
 "uninstalled."
@@ -411,8 +425,8 @@ msgid ""
 "resources."
 msgstr ""
 
-#: data/scripts/upgrade.php:254 data/scripts/upgrade.php:288 Module.php:190
-#: Module.php:198 Module.php:206
+#: data/scripts/upgrade.php:254 data/scripts/upgrade.php:288 Module.php:198
+#: Module.php:206 Module.php:214
 msgid "The directory \"{dir}\" is not writeable."
 msgstr ""
 
@@ -496,6 +510,11 @@ msgstr ""
 msgid ""
 "A new setting allows to define a no-reply email for automatic messages and "
 "notifications."
+msgstr ""
+
+#: data/scripts/upgrade.php:437
+msgid ""
+"A new setting allows to define a list of directories available for browsing."
 msgstr ""
 
 #: data/scripts/task.php:17
@@ -594,102 +613,102 @@ msgid ""
 "The libraries should be installed. See module’s installation documentation."
 msgstr ""
 
-#: Module.php:182
+#: Module.php:190
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
 msgstr ""
 
-#: Module.php:268
+#: Module.php:276
 msgid ""
 "All stored files from checks and fixes, if any, will be removed from folder "
 "\"{folder}\"."
 msgstr ""
 
-#: Module.php:835
+#: Module.php:843
 msgid "View this {resource_type} in \"{site}\""
 msgstr ""
 
-#: Module.php:839
+#: Module.php:847
 msgid "[not in site]"
 msgstr ""
 
-#: Module.php:978
+#: Module.php:986
 msgid "File successfuly uploaded."
 msgstr ""
 
-#: Module.php:979
+#: Module.php:987
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr ""
 
-#: Module.php:980
+#: Module.php:988
 msgid "The file size exceeds the specified limit."
 msgstr ""
 
-#: Module.php:981
+#: Module.php:989
 msgid "The file was only partially uploaded."
 msgstr ""
 
-#: Module.php:982
+#: Module.php:990
 msgid "No file was uploaded."
 msgstr ""
 
-#: Module.php:983
+#: Module.php:991
 msgid "The temporary folder to store the file is missing."
 msgstr ""
 
-#: Module.php:984
+#: Module.php:992
 msgid "Failed to write file to disk."
 msgstr ""
 
-#: Module.php:985
+#: Module.php:993
 msgid "A PHP extension stopped the file upload."
 msgstr ""
 
-#: Module.php:1000 Module.php:1005
+#: Module.php:1008 Module.php:1013
 msgid "There is no uploaded files."
 msgstr ""
 
-#: Module.php:1024
+#: Module.php:1032
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr ""
 
-#: Module.php:1031
+#: Module.php:1039
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 
-#: Module.php:1038
+#: Module.php:1046
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:1045
+#: Module.php:1053
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 
-#: Module.php:1053
+#: Module.php:1061
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr ""
 
-#: Module.php:1196
+#: Module.php:1204
 msgid ""
 "An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
 "{errors}"
 msgstr ""
 
-#: Module.php:1211
+#: Module.php:1219
 msgid ""
 "An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
 msgstr ""
 
-#: Module.php:1240
+#: Module.php:1248
 msgid ""
 "An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
 msgstr ""
 
-#: Module.php:1277
+#: Module.php:1285
 msgid ""
 "The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
 "by {percent}%, from {size_1} to {size_2} bytes."
@@ -1598,51 +1617,51 @@ msgstr ""
 msgid "The module {module} is not managed."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:169
+#: src/Job/ThemeTemplate.php:168
 msgid "The theme is invalid: no file config/theme.ini."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:171
+#: src/Job/ThemeTemplate.php:170
 msgid "The theme file config/theme.ini is not readable."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:173
+#: src/Job/ThemeTemplate.php:172
 msgid "The theme file config/theme.ini is not writeable."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:179
+#: src/Job/ThemeTemplate.php:178
 msgid "The destination directory is invalid."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:181
+#: src/Job/ThemeTemplate.php:180
 msgid "The destination directory is not writeable."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:183
+#: src/Job/ThemeTemplate.php:182
 msgid "The main destination directory is not writeable."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:187
+#: src/Job/ThemeTemplate.php:186
 msgid "The destination directory cannot be created."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:193
+#: src/Job/ThemeTemplate.php:192
 msgid "Invalid source file path."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:195
+#: src/Job/ThemeTemplate.php:194
 msgid "The destination file exists."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:197
+#: src/Job/ThemeTemplate.php:196
 msgid "The source is not readable."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:216
+#: src/Job/ThemeTemplate.php:215
 msgid "The file was moved, but the config/theme.ini cannot be updated."
 msgstr ""
 
-#: src/Job/ThemeTemplate.php:219
+#: src/Job/ThemeTemplate.php:218
 msgid "The source cannot be moved to destination."
 msgstr ""
 
@@ -1672,11 +1691,11 @@ msgstr ""
 msgid "Error when saving \"{filename}\" (temp file: \"{tempfile}\"): {error}"
 msgstr ""
 
-#: src/Job/AbstractCheck.php:367 src/Controller/TraitEasyDir.php:136
+#: src/Job/AbstractCheck.php:367 src/Controller/TraitEasyDir.php:142
 msgid "The directory \"{path}\" is not writeable."
 msgstr ""
 
-#: src/Job/AbstractCheck.php:378 src/Controller/TraitEasyDir.php:147
+#: src/Job/AbstractCheck.php:378 src/Controller/TraitEasyDir.php:153
 msgid "The directory \"{path}\" is not writeable: {error}."
 msgstr ""
 
@@ -1741,56 +1760,55 @@ msgid "Select resource classes…"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:133
-msgid "Folder for pre-uploaded files"
+msgid "Default folder to upload files"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:134
-msgid ""
-"For security reasons, local files to import should be inside this folder."
+#: src/Form/SettingsFieldset.php:144
+msgid "Allowed folders for browsing"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:145
+#: src/Form/SettingsFieldset.php:155
 msgid "Allow empty files in manual upload"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:146
+#: src/Form/SettingsFieldset.php:156
 msgid ""
 "In rare cases, an admin may want to upload empty files. This option requires "
 "to disable file validation or to add the media type \"application/x-empty\" "
 "in main settings."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:157
+#: src/Form/SettingsFieldset.php:168
 msgid "Notify new versions for inactive modules"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:168
+#: src/Form/SettingsFieldset.php:179
 msgid "Notify development versions of modules"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:180
+#: src/Form/SettingsFieldset.php:191
 msgid "Display error on screen"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:181
+#: src/Form/SettingsFieldset.php:192
 msgid ""
 "This option helps fix issues and should be unset in production. For "
 "development, use the key \"APPLICATION_ENV\" in file .htaccess."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:194
+#: src/Form/SettingsFieldset.php:205
 msgid "Set Omeka under maintenance"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:197
+#: src/Form/SettingsFieldset.php:208
 msgid "Public front-end"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:198
+#: src/Form/SettingsFieldset.php:209
 msgid "Admin (except global admins)"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:212
+#: src/Form/SettingsFieldset.php:223
 msgid "Text to display for maintenance"
 msgstr ""
 
@@ -2414,41 +2432,42 @@ msgstr ""
 msgid "Nothing processed. Please try again."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:174
+#: src/Controller/Admin/FileManagerController.php:185
 msgid "file"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:208
+#: src/Controller/Admin/FileManagerController.php:224
+#: src/Controller/Admin/FileManagerController.php:275
+msgid "You must set a directory to delete files."
+msgstr ""
+
+#: src/Controller/Admin/FileManagerController.php:230
 msgid "You must select at least one file to batch delete."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:224
-#: src/Controller/Admin/FileManagerController.php:267
+#: src/Controller/Admin/FileManagerController.php:246
+#: src/Controller/Admin/FileManagerController.php:298
 msgid "{count} files were removed."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:228
-#: src/Controller/Admin/FileManagerController.php:271
+#: src/Controller/Admin/FileManagerController.php:250
+#: src/Controller/Admin/FileManagerController.php:302
 msgid "No file removed."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:274
-msgid "No local path."
-msgstr ""
-
-#: src/Controller/Admin/FileManagerController.php:310
+#: src/Controller/Admin/FileManagerController.php:337
 msgid "It is forbidden to remove a folder."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:315
+#: src/Controller/Admin/FileManagerController.php:342
 msgid "The file cannot be removed."
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:321
+#: src/Controller/Admin/FileManagerController.php:348
 msgid "File successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/FileManagerController.php:325
+#: src/Controller/Admin/FileManagerController.php:352
 msgid "An issue occurred during deletion."
 msgstr ""
 
@@ -2509,45 +2528,45 @@ msgstr ""
 msgid "{count} tasks defined to be run automatically once a day."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:40
+#: src/Controller/TraitEasyDir.php:45
 msgid "The file is a dir."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:50
+#: src/Controller/TraitEasyDir.php:55
 msgid "Filename empty."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:55
+#: src/Controller/TraitEasyDir.php:61
 msgid "Filename too much short or long."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:64
+#: src/Controller/TraitEasyDir.php:70
 msgid "Filename contains forbidden characters."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:70
+#: src/Controller/TraitEasyDir.php:76
 msgid "Filename has no extension."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:80
+#: src/Controller/TraitEasyDir.php:86
 msgid "Local path is not configured."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:90
+#: src/Controller/TraitEasyDir.php:96
 msgid "Local path should be a sub-directory of /files."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:104
+#: src/Controller/TraitEasyDir.php:110
 msgid ""
 "Local path cannot be a directory managed by Omeka and should be inside /"
 "files."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:112
+#: src/Controller/TraitEasyDir.php:118
 msgid "Local path cannot be the root directory."
 msgstr ""
 
-#: src/Controller/TraitEasyDir.php:118
+#: src/Controller/TraitEasyDir.php:124
 msgid "Local path is not writeable."
 msgstr ""
 
