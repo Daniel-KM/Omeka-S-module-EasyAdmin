@@ -271,22 +271,22 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
 if (version_compare($oldVersion, '3.4.18', '<')) {
     $importLocalPath = $settings->get('bulkimport_local_path');
     if (!$importLocalPath || !file_exists($importLocalPath) || !is_dir($importLocalPath) || !is_writeable($importLocalPath)) {
-        $importLocalPath = $basePath . '/preload';
+        $importLocalPath = $basePath . '/import';
     }
     $settings->set('easyadmin_local_path', $importLocalPath);
-    $preload = $settings->get('easyadmin_local_path');
-    if (!$preload || $preload === $basePath || $preload === $basePath . '/') {
-        $settings->set('easyadmin_local_path', $basePath . '/preload');
-        $preload = $settings->get('easyadmin_local_path');
+    $localPath = $settings->get('easyadmin_local_path');
+    if (!$localPath || $localPath === $basePath || $localPath === $basePath . '/') {
+        $settings->set('easyadmin_local_path', $basePath . '/import');
+        $localPath = $settings->get('easyadmin_local_path');
     }
     $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
     $settings->set('easyadmin_addon_notify_version_inactive', true);
     $settings->set('easyadmin_addon_notify_version_dev', false);
 
-    if (!$this->checkDestinationDir($preload)) {
+    if (!$this->checkDestinationDir($localPath)) {
         $message = new PsrMessage(
             'The directory "{dir}" is not writeable.', // @translate
-            ['dir' => $preload]
+            ['dir' => $localPath]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
@@ -417,6 +417,24 @@ if (version_compare($oldVersion, '3.4.32', '<')) {
 
     $message = new PsrMessage(
         'A new setting allows to define a no-reply email for automatic messages and notifications.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.33', '<')) {
+    $this->installDirs();
+
+    $directories = array_filter(array_unique([
+        $basePath . '/backup',
+        $basePath . '/check',
+        $basePath . '/import',
+        $settings->get('easyadmin_local_path') ?: $basePath . '/import',
+    ]));
+    sort($directories);
+    $settings->set('easyadmin_local_paths', $directories);
+
+    $message = new PsrMessage(
+        'A new setting allows to define a list of directories available for browsing.' // @translate
     );
     $messenger->addSuccess($message);
 }
