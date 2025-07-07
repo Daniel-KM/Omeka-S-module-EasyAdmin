@@ -188,7 +188,7 @@ class DbResourceTitle extends AbstractCheck
                     'total' => $totalToProcess,
                     'total_succeed' => $totalSucceed,
                 ]
-                );
+            );
         } else {
             $this->logger->notice(
                 'End of process: {processed}/{total} processed, {total_succeed} different.', // @translate

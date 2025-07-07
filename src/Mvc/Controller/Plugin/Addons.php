@@ -537,7 +537,7 @@ class Addons extends AbstractPlugin
                         $this->messenger->addError(new PsrMessage(
                             'The module "{name}" requires the dependency "Generic" version "{version}" available first.', // @translate
                             ['name' => $addon['name'], 'version' => '3.4.47']
-                            ));
+                        ));
                         // Remove the folder to avoid a fatal error (Generic is a
                         // required abstract class).
                         $this->rmDir($destination . DIRECTORY_SEPARATOR . $addon['dir']);
