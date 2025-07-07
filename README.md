@@ -146,11 +146,13 @@ extensions are checked according to main settings too.
 To list files in this directory and to delete them, use the file manager, via
 the link Easy admin in the left sidebar, then tab File manager.
 
-The base path can be set in main settings. By default, only paths inside
-directory files/ and that are not managed by Omeka are allowed. To bypass this
-limit, an option in the config form allows to use any path inside files/.
-Another option allows to use any other writeable directory update. For this one,
-update the file local.config.php for key "easyadmin_local_path_any".
+Not all directories can be browsed: only the list of paths set in main settings
+can be browsed. Furthermore, by default, only paths inside directory files/ and
+that are not managed by Omeka are allowed. To bypass this limit, an option in
+the config form allows to use any path inside files/.
+
+Another option allows to use any other writeable directory. For this one, update
+the file local.config.php for key "easyadmin_local_path_any".
 **Warning**: there are security implications with this option, so check access
 rights or use it only temporarily.
 
@@ -302,6 +304,7 @@ TODO
 
 - [ ] Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in
   a table (done for missing file; to do for all processors).
+- [ ] Output results as ods.
 - [ ] Check files with the wrong extension.
 - [ ] Add width/height/duration as data for image/audio/video to avoid to get them
   each time (ready in modules [Iiif Server] and [Image Server]).
