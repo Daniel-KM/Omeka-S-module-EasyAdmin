@@ -245,7 +245,8 @@ return [
             'easyadmin_quick_template' => [],
             'easyadmin_quick_class' => [],
             // Easy admin.
-            'easyadmin_local_path' => OMEKA_PATH . '/files/preload',
+            'easyadmin_local_path' => OMEKA_PATH . '/files/import',
+            'easyadmin_local_paths' => [],
             'easyadmin_allow_empty_files' => false,
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,

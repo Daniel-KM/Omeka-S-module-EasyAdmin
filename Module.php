@@ -150,7 +150,15 @@ class Module extends AbstractModule
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         $settings = $services->get('Omeka\Settings');
-        $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/preload');
+        $settings->set('easyadmin_local_path', $settings->get('bulkimport_local_path') ?: $basePath . '/import');
+        $directories = array_filter(array_unique([
+            $basePath . '/backup',
+            $basePath . '/check',
+            $basePath . '/import',
+            $settings->get('easyadmin_local_path') ?: $basePath . '/import',
+        ]));
+        sort($directories);
+        $settings->set('easyadmin_local_paths', $directories);
         $settings->set('easyadmin_allow_empty_files', (bool) $settings->get('bulkimport_allow_empty_files'));
     }
 

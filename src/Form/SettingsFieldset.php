@@ -130,11 +130,21 @@ class SettingsFieldset extends Fieldset
                 'type' => Element\Text::class,
                 'options' => [
                     'element_group' => 'easy_admin',
-                    'label' => 'Folder for pre-uploaded files', // @translate
-                    'info' => 'For security reasons, local files to import should be inside this folder.', // @translate
+                    'label' => 'Default folder to upload files', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_local_path',
+                ],
+            ])
+            ->add([
+                'name' => 'easyadmin_local_paths',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Allowed folders for browsing', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_local_paths',
                 ],
             ])
             ->add([
@@ -149,6 +159,7 @@ class SettingsFieldset extends Fieldset
                     'id' => 'easyadmin_allow_empty_files',
                 ],
             ])
+
             ->add([
                 'name' => 'easyadmin_addon_notify_version_inactive',
                 'type' => Element\Checkbox::class,

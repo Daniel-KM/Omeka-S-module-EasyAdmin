@@ -55,8 +55,13 @@ class FileManagerController extends AbstractActionController
 
     public function browseAction()
     {
-        // Check omeka setting for files.
+        /**
+         * @var \Omeka\Entity\User $user
+         */
+        $user = $this->identity();
         $settings = $this->settings();
+
+        // Check omeka setting for files.
         if ($settings->get('disable_file_validation', false)) {
             $allowedMediaTypes = '';
             $allowedExtensions = '';
@@ -85,30 +90,23 @@ class FileManagerController extends AbstractActionController
             'data-translate-unknown-error' => $this->translate('An issue occurred.'), // @translate
         ];
 
-        $errorMessage = null;
-        $localPath = $this->getAndCheckLocalPath($errorMessage);
-        if ($localPath) {
-            $fileIterator = new FilesystemIterator($localPath);
-            // TODO Use pagination.
-            // $this->paginator($fileIterator->getTotalResults());
-            // Get the specific part.
-            $base = $this->baseUri ? rtrim($this->baseUri, '/') : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
-            $partPath = trim(mb_substr($localPath, mb_strlen(rtrim($this->basePath, '/')) + 1), '/');
-            $localUrl = $base . '/' . $partPath;
-        } else {
-            $localUrl = null;
-            $fileIterator = null;
-        }
-
-        /** @var \Omeka\Entity\User $user */
-        $user = $this->identity();
-
         $returnQuery = $this->params()->fromQuery();
         unset($returnQuery['page']);
 
         $errorMessage = null;
-        $localPath = $this->getAndCheckLocalPath($errorMessage);
-        if ($localPath) {
+        $currentPath = $this->params()->fromQuery('dir_path');
+        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+
+        if ($dirPath) {
+            $fileIterator = new FilesystemIterator($dirPath);
+            // TODO Use pagination.
+            // $this->paginator($fileIterator->getTotalResults());
+            // Get the specific part.
+            // Note: default base uri and default base path use /files.
+            $base = $this->baseUri ? rtrim($this->baseUri, '/') : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
+            $partPath = trim(mb_substr($dirPath, mb_strlen(rtrim($this->basePath, '/')) + 1), '/');
+            $localUrl = $base . '/' . $partPath;
+
             /** @var \Omeka\Form\ConfirmForm $formDeleteSelected */
             $formDeleteSelected = $this->getForm(ConfirmForm::class);
             $formDeleteSelected
@@ -125,15 +123,23 @@ class FileManagerController extends AbstractActionController
             $formDeleteAll
                 ->get('submit')->setAttribute('disabled', true);
         } else {
+            $localUrl = null;
+            $fileIterator = null;
+
             $this->messenger()->addError($this->translate($errorMessage));
             $formDeleteSelected = null;
             $formDeleteAll = null;
         }
 
+        $dirPaths = array_unique(array_filter(array_merge(array_values($settings->get('easyadmin_local_paths')) ?: [$dirPath], [$dirPath])));
+        $dirPaths = array_combine($dirPaths, $dirPaths);
+
         return (new ViewModel([
+            'basePath' => $this->basePath,
             'localUrl' => $localUrl,
-            'localPath' => $localPath,
-            'isLocalPathValid' => (bool) $localPath,
+            'dirPath' => $dirPath,
+            'dirPaths' => $dirPaths,
+            'isDirPathValid' => (bool) $dirPath,
             'data' => $data,
             'fileIterator' => $fileIterator,
             'formDeleteSelected' => $formDeleteSelected,
@@ -146,21 +152,25 @@ class FileManagerController extends AbstractActionController
     public function deleteConfirmAction()
     {
         $errorMessage = null;
-        $localPath = $this->getAndCheckLocalPath($errorMessage);
-        if (!$localPath) {
+        $currentPath = $this->params()->fromQuery('path');
+        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+        if (!$dirPath) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
         $linkTitle = (bool) $this->params()->fromQuery('link-title', true);
         $filename = $this->params()->fromQuery('filename');
+
         $errorMessage = null;
         $isFilenameValid = $this->checkFilename($filename, $errorMessage);
         if (!$isFilenameValid) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
+        $filepath = rtrim($dirPath, '//') . '/' . $filename;
+
         $errorMessage = null;
-        $isFileValid = $this->checkFile($filename, $errorMessage);
+        $isFileValid = $this->checkFile($filepath, $errorMessage);
         if (!$isFileValid) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
@@ -170,6 +180,7 @@ class FileManagerController extends AbstractActionController
 
         return (new ViewModel([
                 'resource' => $filename,
+                'dirPath' => $dirPath,
                 'file' => $filename,
                 'resourceLabel' => 'file', // @translate
                 'form' => $form,
@@ -187,8 +198,9 @@ class FileManagerController extends AbstractActionController
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
             if ($form->isValid()) {
+                $dirPath = $this->params()->fromQuery('dir_path');
                 $filename = $this->params()->fromQuery('filename');
-                $this->deleteFile($filename);
+                $this->checkAndDeleteFile($dirPath, $filename);
             } else {
                 $this->messenger()->addFormErrors($form);
             }
@@ -198,11 +210,21 @@ class FileManagerController extends AbstractActionController
 
     public function batchDeleteAction()
     {
+        $returnQuery = $this->params()->fromQuery();
+
         if (!$this->getRequest()->isPost()) {
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], true);
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
         }
 
-        $returnQuery = $this->params()->fromQuery();
+        // Use the post value, not the query.
+        $errorMessage = null;
+        $currentPath = $this->params()->fromPost('dir_path');
+        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+        if (!$dirPath) {
+            $this->messenger()->addError('You must set a directory to delete files.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+        }
+
         $filenames = $this->params()->fromPost('filenames', []);
         if (!$filenames) {
             $this->messenger()->addError('You must select at least one file to batch delete.'); // @translate
@@ -214,7 +236,7 @@ class FileManagerController extends AbstractActionController
         if ($form->isValid()) {
             $totalFiles = 0;
             foreach ($filenames as $filename) {
-                $result = $this->deleteFile($filename);
+                $result = $this->checkAndDeleteFile($dirPath, $filename);
                 if ($result) {
                     ++$totalFiles;
                 }
@@ -230,65 +252,70 @@ class FileManagerController extends AbstractActionController
         } else {
             $this->messenger()->addFormErrors($form);
         }
+
         return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
     }
 
     public function batchDeleteAllAction()
     {
+        $returnQuery = $this->params()->fromQuery();
+
         if (!$this->getRequest()->isPost()) {
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], true);
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
         }
 
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
+            // Use the post value, not the query.
             $errorMessage = null;
-            $localPath = $this->getAndCheckLocalPath($errorMessage);
-            if ($localPath) {
-                $fileIterator = new FilesystemIterator($localPath);
-                $totalFiles = 0;
-                foreach ($fileIterator as $file) {
-                    $filename = $file->getFilename();
-                    if (!$file->isFile()
-                        || $file->isDir()
-                        // || $file->isDot()
-                        || !$file->isReadable()
-                        || !$file->isWritable()
-                    ) {
-                        continue;
-                    }
-                    $result = $this->deleteFile($filename);
-                    if ($result) {
-                        ++$totalFiles;
-                    }
+            $currentPath = $this->params()->fromPost('dir_path');
+            $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+            if (!$dirPath) {
+                $this->messenger()->addError($errorMessage ?: 'You must set a directory to delete files.'); // @translate
+                return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+            }
+
+            $fileIterator = new FilesystemIterator($dirPath);
+            $totalFiles = 0;
+            foreach ($fileIterator as $file) {
+                $filename = $file->getFilename();
+                if (!$file->isFile()
+                    || $file->isDir()
+                    // || $file->isDot()
+                    || !$file->isReadable()
+                    || !$file->isWritable()
+                ) {
+                    continue;
                 }
-                if ($totalFiles) {
-                    $this->messenger()->addSuccess(new PsrMessage(
-                        '{count} files were removed.', // @translate
-                        ['count' => $totalFiles]
-                    ));
-                } else {
-                    $this->messenger()->addWarning('No file removed.'); // @translate
+                $result = $this->checkAndDeleteFile($dirPath, $filename);
+                if ($result) {
+                    ++$totalFiles;
                 }
+            }
+            if ($totalFiles) {
+                $this->messenger()->addSuccess(new PsrMessage(
+                    '{count} files were removed.', // @translate
+                    ['count' => $totalFiles]
+                ));
             } else {
-                $this->messenger()->addError($errorMessage ?: 'No local path.'); // @translate
+                $this->messenger()->addWarning('No file removed.'); // @translate
             }
         } else {
             $this->messenger()->addFormErrors($form);
         }
-        return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $this->params()->fromQuery()], true);
+
+        return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
     }
 
     /**
-     * Delete a file in the local path.
-     *
-     * @param string $filename
+     * Check and delete a file in a local path.
      */
-    protected function deleteFile(string $filename): bool
+    protected function checkAndDeleteFile(string $dirPath, string $filename): bool
     {
         $errorMessage = null;
-        $localPath = $this->getAndCheckLocalPath($errorMessage);
-        if (!$localPath) {
+        $dirPath = $this->getAndCheckDirPath($dirPath, $errorMessage);
+        if ($dirPath === null) {
             $this->messenger()->addError($errorMessage);
             return false;
         }
@@ -300,7 +327,7 @@ class FileManagerController extends AbstractActionController
             return false;
         }
 
-        $filepath = rtrim($localPath, '//') . '/' . $filename;
+        $filepath = rtrim($dirPath, '//') . '/' . $filename;
         $fileExists = file_exists($filepath);
         if (!$fileExists) {
             return true;

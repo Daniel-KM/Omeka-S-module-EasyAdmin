@@ -1,9 +1,11 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * $var string $basePath
  * @var string $localUrl
- * @var string $localPath
- * @var bool $isLocalPathValid
+ * @var string $dirPath
+ * @var string[] $dirPaths
+ * @var bool $isDirPathValid
  * @var array $data
  * @var \FilesystemIterator|null $fileIterator
  * @var bool $isAdminUser
@@ -44,23 +46,37 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
     <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
 </nav>
 
-<p>
-    <?= sprintf(
-        $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s, %3$sBulk Import%2$s, or %4$sTimeline%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
-        '<a href="https://omeka.org/s/modules/FileSideload/" target="_blank" rel="noopener">',
-        '</a>',
-        '<a href="https://omeka.org/s/modules/BulkImport" target="_blank" rel="noopener">',
-        '<a href="https://omeka.org/s/modules/Timeline" target="_blank" rel="noopener">'
-    ) ?>
-</p>
+<div class="block">
+    <p>
+        <?= sprintf(
+            $translate('Upload files without size or number limitation and without direct access to server, for example for %1$sFile Sideload%2$s, %3$sBulk Import%2$s, or %4$sTimeline%2$s. All uploaded files will be stored directly at the root of the configured directory.'),
+            '<a href="https://omeka.org/s/modules/FileSideload/" target="_blank" rel="noopener">',
+            '</a>',
+            '<a href="https://omeka.org/s/modules/BulkImport" target="_blank" rel="noopener">',
+            '<a href="https://omeka.org/s/modules/Timeline" target="_blank" rel="noopener">'
+        ) ?>
+    </p>
+    <p>
+        <?= sprintf($translate('%1$sWarning%2$s: existing files with the same name than uploaded files will be overridden.'), '<strong>', '</strong>') ?>
+    </p>
+</div>
 
-<p>
-    <?= sprintf($translate('%1$sWarning%2$s: existing files with the same name than uploaded files will be overridden.'), '<strong>', '</strong>') ?>
-</p>
+<div class="block local-path">
+    <form id="update-path">
+		<label for="current-path"><?= $translate('Current directory:') ?></label>
+        <select id="current-path" data-form-submit="auto" name="dir_path">
+            <?php foreach ($dirPaths as $path):
+                $skipPathLength = mb_strpos($path, OMEKA_PATH) === 0 ? mb_strlen(OMEKA_PATH) : 0;
+                ?>
+            <option value="<?= $escapeAttr($path) ?>"<?= $path === $dirPath ? ' selected="selected"' : '' ?>><?= $escape($skipPathLength ? mb_substr($path, $skipPathLength) : $path) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </form>
+</div>
 
-<?php if (!$isLocalPathValid) return; ?>
+<?php if (!$isDirPathValid) return; ?>
 
-<div id="bulk-upload" class="media-field-wrapper">
+<div id="bulk-upload" class="block media-field-wrapper">
     <div class="field media-bulk-upload" data-main-index="__index__" <?= $htmlAttributes($data) ?>>
         <div class="field field-drag-and-drop">
             <div class="inputs bulk-drop">
@@ -105,7 +121,8 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
 
 <?php if ($fileIterator): ?>
 
-<form method="post" id="batch-form" class="disable-unsaved-warning"><?php // TODO Use the right right. ?>
+<form method="post" id="batch-form" class="block disable-unsaved-warning"><?php // TODO Use the right right. ?>
+	<input type="hidden" name="dir_path" value="<?= $escapeAttr($dirPath) ?>"/>
 
     <?php if ($isAdminUser && $userIsAllowed(\Omeka\Api\Adapter\ItemAdapter::class, 'batch_update')): ?>
     <div class="batch-inputs">
@@ -185,7 +202,7 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
                         <?php if (!$isDir && $file->isWritable()): ?>
                         <li><?= $hyperlink('', '#', [
                             'data-sidebar-selector' => '#sidebar',
-                            'data-sidebar-content-url' => $url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['filename' => $filename]]),
+                            'data-sidebar-content-url' => $url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['dir_path' => $dirPath, 'filename' => $filename]]),
                             'class' => 'o-icon-delete sidebar-content',
                             'title' => $translate('Delete'),
                         ]) ?></li>

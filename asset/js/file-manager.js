@@ -3,6 +3,10 @@
 (function ($) {
     $(document).ready(function() {
 
+        $(document).on('change', 'select[data-form-submit="auto"]', function() {
+            $(this).closest('form').submit();
+        });
+
         // Complete the batch delete form after confirmation.
         $('#confirm-delete-selected, #confirm-delete-all').on('submit', function(e) {
             var confirmForm = $(this);

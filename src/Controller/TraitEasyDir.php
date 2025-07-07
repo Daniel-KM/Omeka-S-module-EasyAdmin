@@ -4,20 +4,25 @@ namespace EasyAdmin\Controller;
 
 trait TraitEasyDir
 {
-    protected function getAndCheckLocalPath(?string &$errorMessage = null): ?string
+    protected function getAndCheckDirPath(?string $dirPath, ?string &$errorMessage = null): ?string
     {
-        $localPath = $this->settings()->get('easyadmin_local_path');
-        $result = $this->checkLocalPath($localPath, $errorMessage);
-        return $result
-            ? $localPath
+        $dirPath = mb_strlen((string) $dirPath)
+            ? $dirPath
+            : $this->settings()->get('easyadmin_local_path');
+        $check = $this->checkDirPath($dirPath, $errorMessage);
+        return $check
+            ? $dirPath
             : null;
     }
 
-    protected function checkFile(?string $filename, ?string &$errorMessage = null): bool
+    protected function checkFile(?string $filepath, ?string &$errorMessage = null): bool
     {
+        $dirPath = pathinfo($filepath, PATHINFO_DIRNAME);
+        $filename = pathinfo($filepath, PATHINFO_BASENAME);
+
         $errorMessage = null;
-        $localPath = $this->getAndCheckLocalPath($errorMessage);
-        if (!$localPath) {
+        $check = $this->checkDirPath($dirPath, $errorMessage);
+        if (!$check) {
             $this->messenger()->addError($errorMessage);
             return false;
         }
@@ -29,7 +34,7 @@ trait TraitEasyDir
             return false;
         }
 
-        $filepath = rtrim($localPath, '//') . '/' . $filename;
+        $filepath = rtrim($dirPath, '//') . '/' . $filename;
         $fileExists = file_exists($filepath);
         if (!$fileExists) {
             $this->messenger()->addError('The file does not exist.'); // @ŧranslate
@@ -46,11 +51,12 @@ trait TraitEasyDir
 
     protected function checkFilename(?string $filename, ?string &$errorMessage = null): bool
     {
-        if (!$filename) {
+        if (!mb_strlen((string) $filename)) {
             $errorMessage = 'Filename empty.'; // @translate
             return false;
         }
 
+        // The file should have an extension, so minimum size is 3.
         if (mb_strlen($filename) < 3 || mb_strlen($filename) > 200) {
             $errorMessage = 'Filename too much short or long.'; // @translate
             return false;
@@ -74,18 +80,18 @@ trait TraitEasyDir
         return true;
     }
 
-    protected function checkLocalPath(?string $localPath, ?string &$errorMessage = null): bool
+    protected function checkDirPath(?string $dirPath, ?string &$errorMessage = null): bool
     {
-        if (!$localPath) {
+        if (!mb_strlen((string) $dirPath)) {
             $errorMessage = 'Local path is not configured.'; // @translate
             return false;
         }
 
-        $localPathDir = rtrim($localPath, '/') . '/';
+        $dirPath = rtrim($dirPath, '/') . '/';
 
         if (empty($this->allowAnyPath)) {
-            if ($localPathDir === $this->basePath
-                || mb_strpos($localPathDir, $this->basePath . '/') !== 0
+            if ($dirPath === $this->basePath
+                || mb_strpos($dirPath, $this->basePath . '/') !== 0
             ) {
                 $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
                 return false;
@@ -100,7 +106,7 @@ trait TraitEasyDir
                     'square',
                 ];
                 foreach ($standardDirectories as $dir) {
-                    if (mb_strpos($localPathDir, $this->basePath . '/' . $dir . '/') === 0) {
+                    if (mb_strpos($dirPath, $this->basePath . '/' . $dir . '/') === 0) {
                         $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
                         return false;
                     }
@@ -108,13 +114,13 @@ trait TraitEasyDir
             }
         }
 
-        if ($localPathDir === '/') {
+        if ($dirPath === '/') {
             $errorMessage = 'Local path cannot be the root directory.'; // @translate
             return false;
         }
 
-        $localPath = $this->checkDestinationDir($localPath);
-        if (!$localPath) {
+        $dirPath = $this->checkDestinationDir($dirPath);
+        if (!$dirPath) {
             $errorMessage = 'Local path is not writeable.'; // @translate
             return false;
         }
@@ -149,6 +155,7 @@ trait TraitEasyDir
             );
             return null;
         }
+
         return $dirPath;
     }
 }

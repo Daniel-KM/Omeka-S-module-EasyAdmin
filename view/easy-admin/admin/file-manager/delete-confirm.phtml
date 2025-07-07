@@ -2,6 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var string $resource
+ * @var string $dirPath
  * @var string $file
  * @var string $resourceLabel
  * @var \Omeka\Form\ConfirmForm $form
@@ -11,8 +12,11 @@
  */
 
 $plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
+
+$skipPathLength = mb_strpos($dirPath, OMEKA_PATH) === 0 ? mb_strlen(OMEKA_PATH) : 0;
 
 $form->setButtonLabel('Confirm delete'); // @translate
 ?>
@@ -24,6 +28,10 @@ $form->setButtonLabel('Confirm delete'); // @translate
     <div id="sidebar-confirm">
         <?php $resourceLabel = $translate($resourceLabel); ?>
         <h3><?= sprintf($translate('Delete %s'), $resourceLabel) ?></h3>
+        <ul>
+            <li><?= $escape(sprintf($translate('Directory: %s'), $skipPathLength ? mb_substr($dirPath, $skipPathLength) : $dirPath)) ?></li>
+            <li><?= $escape(sprintf($translate('File: %s'), $file)) ?></li>
+        </ul>
         <p><?= sprintf($translate('Are you sure you would like to delete this %s?'), $resourceLabel) ?></p>
         <?= $this->form($form) ?>
     </div>

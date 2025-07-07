@@ -212,11 +212,11 @@ class UploadController extends AbstractActionController
         $result = null;
         if ($isBulkUploadForm) {
             $errorMessage = null;
-            $localPath = $this->getAndCheckLocalPath($errorMessage);
-            if (!$localPath) {
+            $dirPath = $this->getAndCheckDirPath(null, $errorMessage);
+            if (!$dirPath) {
                 return $this->jsonError($this->translate($errorMessage), Response::STATUS_CODE_500);
             }
-            $newDestination = rtrim($localPath, '//') . '/' . $filename;
+            $newDestination = rtrim($dirPath, '//') . '/' . $filename;
             $fileExists = file_exists($newDestination);
             if ($fileExists) {
                 if (!is_writeable($newDestination)) {

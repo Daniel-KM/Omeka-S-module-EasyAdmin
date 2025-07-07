@@ -26,4 +26,10 @@
     #toggle-display-dir {
         text-align: right;
     }
+    .file-manager table tbody td:first-child {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
 }
