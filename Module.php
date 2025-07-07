@@ -535,7 +535,7 @@ class Module extends AbstractModule
         }
 
         // Search all templates with specified classes.
-        $classIds = $easyMeta->resourceClassIds($classTerms);
+        $classIds = $classTerms ? $easyMeta->resourceClassIds($classTerms) : [];
         $templateClassLabels = [];
         if ($classIds) {
             // The api allows to sort by class, but not to search, so
