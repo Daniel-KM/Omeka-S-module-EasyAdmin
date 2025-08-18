@@ -262,17 +262,17 @@ class BulkUpload implements IngesterInterface
     }
 
     /**
-     * @todo Keys are not checked, but this is only use internaly.
      * @see \Laminas\View\Helper\HtmlAttributes
      */
     protected function arrayToAttributes(PhpRenderer $view, array $attributes): string
     {
         $escapeAttr = $view->plugin('escapeHtmlAttr');
-        return implode(' ', array_map(function ($key, $value) use ($escapeAttr) {
-            if (is_bool($value)) {
-                return $value ? $key . '="' . $key . '"' : '';
-            }
-            return $key . '="' . $escapeAttr($value) . '"';
-        }, array_keys($attributes), $attributes));
+        return implode(' ', array_map(
+            fn ($key, $value) => is_bool($value)
+                ? ($value ? sprintf('%s="%s"', $escapeAttr($key), $escapeAttr($key)) : '')
+                : sprintf('%s="%s"', $escapeAttr($key), $escapeAttr($value)),
+            array_keys($attributes),
+            array_values($attributes)
+        ));
     }
 }
