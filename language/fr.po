@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-07 00:00+0000\n"
-"PO-Revision-Date: 2025-07-07 00:00+0000\n"
+"POT-Creation-Date: 2025-08-18 00:00+0000\n"
+"PO-Revision-Date: 2025-08-18 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -143,17 +143,17 @@ msgid "Upload files"
 msgstr "Téléverser"
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/file-manager/browse.phtml:85
+#: view/easy-admin/admin/file-manager/browse.phtml:83
 msgid "Drag and drop"
 msgstr "Déposer"
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/file-manager/browse.phtml:90
+#: view/easy-admin/admin/file-manager/browse.phtml:88
 msgid "Browse files"
 msgstr "Parcourir"
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/file-manager/browse.phtml:95
+#: view/easy-admin/admin/file-manager/browse.phtml:93
 msgid "Select directory"
 msgstr "Choisir un dossier"
 
@@ -194,7 +194,7 @@ msgid "Alphabetic (with folder)"
 msgstr "Alphabétique (avec le dossier)"
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/file-manager/browse.phtml:104
+#: view/easy-admin/admin/file-manager/browse.phtml:102
 msgid "Hide uploaded files"
 msgstr "Cacher les fichiers téléchargés"
 
@@ -229,7 +229,7 @@ msgstr "Installer des extensions"
 #: view/easy-admin/admin/addons/index.phtml:20
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
 #: view/easy-admin/admin/cron/index.phtml:22
-#: view/easy-admin/admin/file-manager/browse.phtml:45
+#: view/easy-admin/admin/file-manager/browse.phtml:43
 msgid "Easy Admin"
 msgstr "Easy Admin"
 
@@ -267,11 +267,11 @@ msgstr "Réparation"
 msgid "Regular tasks"
 msgstr "Tâches régulières"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:45
+#: view/easy-admin/admin/file-manager/browse.phtml:43
 msgid "File manager"
 msgstr "Gestionnaire de fichiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:54
+#: view/easy-admin/admin/file-manager/browse.phtml:52
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
@@ -284,7 +284,7 @@ msgstr ""
 "%3$sBulk Import%2$s ou %4$sTimeline%2$s. Tous les fichiers versés seront "
 "enregistrés directement à la racine du dossier configuré."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:62
+#: view/easy-admin/admin/file-manager/browse.phtml:60
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
@@ -293,41 +293,41 @@ msgstr ""
 "%1$sAttention%2$s : les fichiers existants ayant le même nom que les "
 "fichiers téléchargés seront écrasés."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:68
+#: view/easy-admin/admin/file-manager/browse.phtml:66
 msgid "Current directory:"
 msgstr "Dossier en cours :"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:114
+#: view/easy-admin/admin/file-manager/browse.phtml:112
 msgid "Uploading in progress…"
 msgstr "Chargement en cours…"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:148
+#: view/easy-admin/admin/file-manager/browse.phtml:146
 msgid "Hide folders"
 msgstr "Cacher les dossiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:148
+#: view/easy-admin/admin/file-manager/browse.phtml:146
 msgid "Display folders"
 msgstr "Afficher les dossiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:186
+#: view/easy-admin/admin/file-manager/browse.phtml:184
 msgid "Select file"
 msgstr "Choisir un fichier"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:200
+#: view/easy-admin/admin/file-manager/browse.phtml:198
 msgid "Download"
 msgstr "Télécharger"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:243
-#: view/easy-admin/admin/file-manager/browse.phtml:258
+#: view/easy-admin/admin/file-manager/browse.phtml:241
+#: view/easy-admin/admin/file-manager/browse.phtml:256
 msgid "Delete files"
 msgstr "Supprimer les fichiers"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:244
+#: view/easy-admin/admin/file-manager/browse.phtml:242
 msgid "Are you sure you would like to delete the selected files?"
 msgstr "Êtes-vous sûr de vouloir supprimer tous les fichiers sélectionnés ?"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:246
-#: view/easy-admin/admin/file-manager/browse.phtml:261
+#: view/easy-admin/admin/file-manager/browse.phtml:244
+#: view/easy-admin/admin/file-manager/browse.phtml:259
 #, php-format
 msgid ""
 "%1$sWarning%2$s: this action will permanently delete %3$s files and cannot "
@@ -336,14 +336,14 @@ msgstr ""
 "%1$sAttention%2$s : cette action supprimera %3$s fichiers de manière "
 "définitive et ne pourra pas être annulée."
 
-#: view/easy-admin/admin/file-manager/browse.phtml:259
+#: view/easy-admin/admin/file-manager/browse.phtml:257
 msgid ""
 "Are you sure you would like to delete all files on all pages of this result?"
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer tous les fichiers de toutes les pages de "
 "résultat ?"
 
-#: view/easy-admin/admin/file-manager/browse.phtml:277
+#: view/easy-admin/admin/file-manager/browse.phtml:275
 msgid "No files."
 msgstr "Aucun fichier."
 
@@ -589,9 +589,95 @@ msgstr ""
 "Un nouveau paramètre permet de définir une liste de dossiers disponibles "
 "pour la gestion de fichiers."
 
-#: data/scripts/task.php:17
-msgid "/bootstrap.php"
-msgstr "/bootstrap.php"
+#: data/scripts/task.php:21
+msgid ""
+"Usage: php data/scripts/task.php [arguments]\n"
+"\n"
+"Required arguments:\n"
+"  -t --task [Name]\n"
+"\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
+"\t\tbasename (\"LoopItems\"). You should take care of case\n"
+"\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
+"\n"
+"  -u --user-id [#id]\n"
+"\t\tThe Omeka user id is required, else the job won’t have any\n"
+"\t\trights.\n"
+"\n"
+"Recommended arguments:\n"
+"  -s --server-url [url]\n"
+"\t\tThe url of the server to build resource urls (default:\n"
+"\t\t\"http://localhost\").\n"
+"\n"
+"  -b --base-path [path]\n"
+"\t\tThe path to complete the server url (default: \"/\").\n"
+"\n"
+"Optional arguments:\n"
+"  -a --args [json]\n"
+"\t\tArguments to pass to the task. Arguments are specific to\n"
+"\t\teach job. To find them, check the code, or run a job\n"
+"\t\tmanually then check the job page in admin interface.\n"
+"\n"
+"  -k --as-task\n"
+"\t\tProcess a a simple task and do not create a job. May be\n"
+"\t\tused for tasks that do not need to be checked as a job.\n"
+"\t\tThis is the inverse of the deprecated argument --job.\n"
+"\n"
+"Deprecated arguments:\n"
+"  -j --job\n"
+"\t\tCreate a standard job that will be checkable in admin\n"
+"\t\tinterface. In any case, all logs are available in logs with\n"
+"\t\ta reference code. It allows to process jobs that are not\n"
+"\t\ttaskable.\n"
+"\t\tThis option is now set by default and is useless.\n"
+"\n"
+"Other arguments:\n"
+"  -h --help\n"
+"\t\tThis help."
+msgstr ""
+"Usage : php data/scripts/task.php [arguments]\n"
+"\n"
+"Arguments obligatoires :\n"
+"  -t --task [Nom]\n"
+"\t\tClasse complète de la tâche (« EasyAdmin\\Job\\LoopItems »)\n"
+"\t\tou nom de base (« LoopItems »). Il est recommandé de vérifier\n"
+"\t\tla casse, d’échapper « \\ » ou de mettre entre « ' » les noms sur\n"
+"\t\tl’invite de commande.\n"
+"\n"
+"  -u --user-id [#id]\n"
+"\t\tL’id de l’utilisateur Omeka est obligatoire, sinon la tâche n’aura \n"
+"\t\taucuns droits.\n"
+"\n"
+"Arguments recommandés :\n"
+"  -s --server-url [url]\n"
+"\t\tL’url du serveur pour construire les urls des ressources (défaut :\n"
+"\t\t\"http://localhost\").\n"
+"\n"
+"  -b --base-path [chemin]\n"
+"\t\tLe chemin pour compléter l’url du serveur(défault : « / »).\n"
+"\n"
+"Arguments facultatifs :\n"
+"  -a --args [json]\n"
+"\t\tArguments spécifiques à passer à la tâche. Pour les trouver,\n"
+"\t\tconsultez le code ou lancez une tâche manuellement puis\n"
+"\t\tconsultez la page de la tâche dans l’interface admin.\n"
+"\n"
+"  -k --as-task\n"
+"\t\tLancer la tâche en tant que tâche simple sans la créer dans Omeka.\n"
+"\t\tCela peut être utilisé pour les tâches qui n’ont pas besoin d’être "
+"vérifiés dans Omeka.\n"
+"\t\tC’est l’inverse de l’argument obsolète --job.\n"
+"\n"
+"Arguments obsolètes :\n"
+"  -j --job\n"
+"\t\tCréer une tâche standard qui pourra être vérifiée dans l’interface\n"
+"\t\tadmin. Dans tous les cas, tous les journaux sont consultables avec\n"
+"\t\tle code de référence. Cela permet de lancer des tâches qui ne\n"
+"\t\tpas être lancées en tant que tâches simples.\n"
+"\t\tCette option est désormais activée par défaut est inutile.\n"
+"\n"
+"Autres arguments :\n"
+"  -h --help\n"
+"\t\tCette aide."
 
 #: data/scripts/task.php:81
 #, php-format
@@ -2093,7 +2179,7 @@ msgstr "Fichiers"
 #: src/Form/CheckAndFixForm.php:192 src/Form/CheckAndFixForm.php:383
 #: src/Form/CheckAndFixForm.php:432 src/Form/CheckAndFixForm.php:558
 #: src/Form/CheckAndFixForm.php:712 src/Form/CheckAndFixForm.php:810
-#: src/Form/CheckAndFixForm.php:901 src/Form/CheckAndFixForm.php:974
+#: src/Form/CheckAndFixForm.php:901 src/Form/CheckAndFixForm.php:977
 msgid "Tasks"
 msgstr "Tâches"
 
@@ -2609,43 +2695,52 @@ msgstr ""
 "Je confirme que je dispose d’une sauvegarde externe de mes thèmes et fichiers"
 
 #: src/Form/CheckAndFixForm.php:887
-msgid "Cache"
-msgstr "Cache"
+msgid "System"
+msgstr "Système"
 
 #: src/Form/CheckAndFixForm.php:905
-msgid "Check php cache"
-msgstr "Vérifier le cache php"
+msgid "Run installation checks (after a copy of the database on a new server)"
+msgstr ""
+"Lancer les vérifications de l’installation (après une copie de la base de "
+"données sur un nouveau serveur)"
 
 #: src/Form/CheckAndFixForm.php:906
-msgid "Clear php cache (after update or modifications of code)"
-msgstr ""
-"Vider le cache php (après une mise à jour ou des modifications de code)"
+msgid "Check caches"
+msgstr "Vérifier les caches"
 
-#: src/Form/CheckAndFixForm.php:921
+#: src/Form/CheckAndFixForm.php:907
+msgid "Clear caches (after update or modifications of code)"
+msgstr "Vider les caches (après une mise à jour ou des modifications de code)"
+
+#: src/Form/CheckAndFixForm.php:922
 msgid "Options to clear cache"
 msgstr "Options pour effacer le cache"
 
-#: src/Form/CheckAndFixForm.php:932
+#: src/Form/CheckAndFixForm.php:933
 msgid "Types of cache"
 msgstr "Types de cache"
 
-#: src/Form/CheckAndFixForm.php:934
+#: src/Form/CheckAndFixForm.php:935
+msgid "Application (Symfony Doctrine ORM)"
+msgstr "Application (Symfony Doctrine ORM)"
+
+#: src/Form/CheckAndFixForm.php:936
 msgid "Code (opcache)"
 msgstr "Code (opcache)"
 
-#: src/Form/CheckAndFixForm.php:935
+#: src/Form/CheckAndFixForm.php:937
 msgid "Data (apcu)"
 msgstr "Données (apcu)"
 
-#: src/Form/CheckAndFixForm.php:936
+#: src/Form/CheckAndFixForm.php:938
 msgid "Real paths"
 msgstr "Chemins réels"
 
-#: src/Form/CheckAndFixForm.php:960
+#: src/Form/CheckAndFixForm.php:963
 msgid "Module tasks and indexations"
 msgstr "Tâches des modules et indexations"
 
-#: src/Form/CheckAndFixForm.php:978
+#: src/Form/CheckAndFixForm.php:981
 msgid "Omeka: Index full-text search"
 msgstr "Omeka : indexer la recherche plein-texte"
 
@@ -2788,11 +2883,11 @@ msgstr "Un problème est survenu pendant la suppression."
 msgid "No process submitted."
 msgstr "Aucun traitement soumis."
 
-#: src/Controller/Admin/CheckAndFixController.php:198
+#: src/Controller/Admin/CheckAndFixController.php:204
 msgid "Unknown process \"{process}\""
 msgstr "Processus inconnu « {process} »"
 
-#: src/Controller/Admin/CheckAndFixController.php:208
+#: src/Controller/Admin/CheckAndFixController.php:214
 msgid ""
 "Processing checks in background (job {link_job}#{job_id}{link_end}, "
 "{link_log}logs{link_end})."
@@ -2800,11 +2895,28 @@ msgstr ""
 "Traitement en arrière-plan (tâche {link_job}#{job_id}{link_end}, {link_log}"
 "journaux{link_end})."
 
-#: src/Controller/Admin/CheckAndFixController.php:236
+#: src/Controller/Admin/CheckAndFixController.php:243
 msgid "No type of cache selected."
 msgstr "Aucun type de cache n’a été sélectionné."
 
-#: src/Controller/Admin/CheckAndFixController.php:245
+#: src/Controller/Admin/CheckAndFixController.php:255
+msgid "The application cache of Symfony Doctrine is available."
+msgstr "Le cache de l’application Symfony Doctrine est disponible."
+
+#: src/Controller/Admin/CheckAndFixController.php:264
+msgid "The application cache of Symfony Doctrine was reset."
+msgstr "Le cache de l’application Symfony Doctrine a été effacé."
+
+#: src/Controller/Admin/CheckAndFixController.php:266
+msgid "The application cache of Symfony Doctrine cannot be reset."
+msgstr ""
+"Le cache de l’application Symfony Doctrine ne peut pas être réinitialisé."
+
+#: src/Controller/Admin/CheckAndFixController.php:270
+msgid "The application cache of Symfony Doctrine is disabled."
+msgstr "Le cache de l’application Symfony Doctrine est désactivé."
+
+#: src/Controller/Admin/CheckAndFixController.php:279
 msgid ""
 "An issue occurred when checking status of \"opcache\" or the status is not "
 "enabled."
@@ -2812,36 +2924,48 @@ msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « opcache » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:260
+#: src/Controller/Admin/CheckAndFixController.php:294
 msgid "The cache \"opcache\" was reset."
 msgstr "Le cache « opcache » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:262
+#: src/Controller/Admin/CheckAndFixController.php:296
 msgid "The cache \"opcache\" is disabled."
 msgstr "Le cache « opcache » est désactivé."
 
-#: src/Controller/Admin/CheckAndFixController.php:266
+#: src/Controller/Admin/CheckAndFixController.php:300
 msgid "The php extension \"opcache\" is not available."
 msgstr "L’extension php « opcache » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:275
+#: src/Controller/Admin/CheckAndFixController.php:309
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « apcu » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:283
+#: src/Controller/Admin/CheckAndFixController.php:317
 msgid "The cache \"apcu\" was reset."
 msgstr "Le cache « apcu » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:286
+#: src/Controller/Admin/CheckAndFixController.php:320
 msgid "The php extension \"apcu\" is not available."
 msgstr "L’extension php « apcu » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:294
+#: src/Controller/Admin/CheckAndFixController.php:328
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
+
+#: src/Controller/Admin/CheckAndFixController.php:343
+msgid "Install tasks were run without errors."
+msgstr "La vérification de l’installation n’a pas trouvé d’erreur."
+
+#: src/Controller/Admin/CheckAndFixController.php:350
+msgid ""
+"The php extension \"intl\" is not available. It is recommended to install it "
+"to translate dates."
+msgstr ""
+"L’extension php \"intl\" n’est pas disponible. Il est recommandé de "
+"l’installer pour traduire les dates."
 
 #: src/Controller/Admin/CronController.php:48
 msgid "{count} tasks defined to be run automatically once a day."
@@ -2894,6 +3018,12 @@ msgstr "Le dossier local ne peut être écrit."
 #: config/module.config.php:154 config/module.config.php:184
 msgid "Checks and fixes"
 msgstr "Réparations"
+
+#~ msgid "/bootstrap.php"
+#~ msgstr "/bootstrap.php"
+
+#~ msgid "Cache"
+#~ msgstr "Cache"
 
 #~ msgid ""
 #~ "For security reasons, local files to import should be inside this folder."
@@ -3006,95 +3136,6 @@ msgstr "Réparations"
 
 #~ msgid "Belonging to these users"
 #~ msgstr "Appartenant à ces utilisateurs"
-
-#~ msgid ""
-#~ "Usage: php data/scripts/task.php [arguments]\n"
-#~ "\n"
-#~ "Required arguments:\n"
-#~ "  -t --task [Name]\n"
-#~ "\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
-#~ "\t\tbasename (\"LoopItems\"). You should take care of case\n"
-#~ "\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
-#~ "\n"
-#~ "  -u --user-id [#id]\n"
-#~ "\t\tThe Omeka user id is required, else the job won’t have any\n"
-#~ "\t\trights.\n"
-#~ "\n"
-#~ "Recommended arguments:\n"
-#~ "  -s --server-url [url]\n"
-#~ "\t\tThe url of the server to build resource urls (default:\n"
-#~ "\t\t\"http://localhost\").\n"
-#~ "\n"
-#~ "  -b --base-path [path]\n"
-#~ "\t\tThe path to complete the server url (default: \"/\").\n"
-#~ "\n"
-#~ "Optional arguments:\n"
-#~ "  -a --args [json]\n"
-#~ "\t\tArguments to pass to the task. Arguments are specific to\n"
-#~ "\t\teach job. To find them, check the code, or run a job\n"
-#~ "\t\tmanually then check the job page in admin interface.\n"
-#~ "\n"
-#~ "  -k --as-task\n"
-#~ "\t\tProcess a a simple task and do not create a job. May be\n"
-#~ "\t\tused for tasks that do not need to be checked as a job.\n"
-#~ "\t\tThis is the inverse of the deprecated argument --job.\n"
-#~ "\n"
-#~ "Deprecated arguments:\n"
-#~ "  -j --job\n"
-#~ "\t\tCreate a standard job that will be checkable in admin\n"
-#~ "\t\tinterface. In any case, all logs are available in logs with\n"
-#~ "\t\ta reference code. It allows to process jobs that are not\n"
-#~ "\t\ttaskable.\n"
-#~ "\t\tThis option is now set by default and is useless.\n"
-#~ "\n"
-#~ "Other arguments:\n"
-#~ "  -h --help\n"
-#~ "\t\tThis help."
-#~ msgstr ""
-#~ "Usage : php data/scripts/task.php [arguments]\n"
-#~ "\n"
-#~ "Arguments obligatoires :\n"
-#~ "  -t --task [Nom]\n"
-#~ "\t\tClasse complète de la tâche (« EasyAdmin\\Job\\LoopItems »)\n"
-#~ "\t\tou nom de base (« LoopItems »). Il est recommandé de vérifier\n"
-#~ "\t\tla casse, d’échapper « \\ » ou de mettre entre « ' » les noms sur\n"
-#~ "\t\tl’invite de commande.\n"
-#~ "\n"
-#~ "  -u --user-id [#id]\n"
-#~ "\t\tL’id de l’utilisateur Omeka est obligatoire, sinon la tâche n’aura \n"
-#~ "\t\taucuns droits.\n"
-#~ "\n"
-#~ "Arguments recommandés :\n"
-#~ "  -s --server-url [url]\n"
-#~ "\t\tL’url du serveur pour construire les urls des ressources (défaut :\n"
-#~ "\t\t\"http://localhost\").\n"
-#~ "\n"
-#~ "  -b --base-path [chemin]\n"
-#~ "\t\tLe chemin pour compléter l’url du serveur(défault : « / »).\n"
-#~ "\n"
-#~ "Arguments facultatifs :\n"
-#~ "  -a --args [json]\n"
-#~ "\t\tArguments spécifiques à passer à la tâche. Pour les trouver,\n"
-#~ "\t\tconsultez le code ou lancez une tâche manuellement puis\n"
-#~ "\t\tconsultez la page de la tâche dans l’interface admin.\n"
-#~ "\n"
-#~ "  -k --as-task\n"
-#~ "\t\tLancer la tâche en tant que tâche simple sans la créer dans Omeka.\n"
-#~ "\t\tCela peut être utilisé pour les tâches qui n’ont pas besoin d’être "
-#~ "vérifiés dans Omeka.\n"
-#~ "\t\tC’est l’inverse de l’argument obsolète --job.\n"
-#~ "\n"
-#~ "Arguments obsolètes :\n"
-#~ "  -j --job\n"
-#~ "\t\tCréer une tâche standard qui pourra être vérifiée dans l’interface\n"
-#~ "\t\tadmin. Dans tous les cas, tous les journaux sont consultables avec\n"
-#~ "\t\tle code de référence. Cela permet de lancer des tâches qui ne\n"
-#~ "\t\tpas être lancées en tant que tâches simples.\n"
-#~ "\t\tCette option est désormais activée par défaut est inutile.\n"
-#~ "\n"
-#~ "Autres arguments :\n"
-#~ "  -h --help\n"
-#~ "\t\tCette aide."
 
 #, php-format
 #~ msgid ""

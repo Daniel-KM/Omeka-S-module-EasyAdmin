@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-07 00:00+0000\n"
+"POT-Creation-Date: 2025-08-18 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,17 +140,17 @@ msgid "Upload files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:133
-#: view/easy-admin/admin/file-manager/browse.phtml:85
+#: view/easy-admin/admin/file-manager/browse.phtml:83
 msgid "Drag and drop"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:134
-#: view/easy-admin/admin/file-manager/browse.phtml:90
+#: view/easy-admin/admin/file-manager/browse.phtml:88
 msgid "Browse files"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:135
-#: view/easy-admin/admin/file-manager/browse.phtml:95
+#: view/easy-admin/admin/file-manager/browse.phtml:93
 msgid "Select directory"
 msgstr ""
 
@@ -191,7 +191,7 @@ msgid "Alphabetic (with folder)"
 msgstr ""
 
 #: src/Media/Ingester/BulkUpload.php:148
-#: view/easy-admin/admin/file-manager/browse.phtml:104
+#: view/easy-admin/admin/file-manager/browse.phtml:102
 msgid "Hide uploaded files"
 msgstr ""
 
@@ -226,7 +226,7 @@ msgstr ""
 #: view/easy-admin/admin/addons/index.phtml:20
 #: view/easy-admin/admin/check-and-fix/index.phtml:22
 #: view/easy-admin/admin/cron/index.phtml:22
-#: view/easy-admin/admin/file-manager/browse.phtml:45
+#: view/easy-admin/admin/file-manager/browse.phtml:43
 msgid "Easy Admin"
 msgstr ""
 
@@ -260,11 +260,11 @@ msgstr ""
 msgid "Regular tasks"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:45
+#: view/easy-admin/admin/file-manager/browse.phtml:43
 msgid "File manager"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:54
+#: view/easy-admin/admin/file-manager/browse.phtml:52
 #, php-format
 msgid ""
 "Upload files without size or number limitation and without direct access to "
@@ -273,60 +273,60 @@ msgid ""
 "the configured directory."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:62
+#: view/easy-admin/admin/file-manager/browse.phtml:60
 #, php-format
 msgid ""
 "%1$sWarning%2$s: existing files with the same name than uploaded files will "
 "be overridden."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:68
+#: view/easy-admin/admin/file-manager/browse.phtml:66
 msgid "Current directory:"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:114
+#: view/easy-admin/admin/file-manager/browse.phtml:112
 msgid "Uploading in progress…"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:148
+#: view/easy-admin/admin/file-manager/browse.phtml:146
 msgid "Hide folders"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:148
+#: view/easy-admin/admin/file-manager/browse.phtml:146
 msgid "Display folders"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:186
+#: view/easy-admin/admin/file-manager/browse.phtml:184
 msgid "Select file"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:200
+#: view/easy-admin/admin/file-manager/browse.phtml:198
 msgid "Download"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:243
-#: view/easy-admin/admin/file-manager/browse.phtml:258
+#: view/easy-admin/admin/file-manager/browse.phtml:241
+#: view/easy-admin/admin/file-manager/browse.phtml:256
 msgid "Delete files"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:244
+#: view/easy-admin/admin/file-manager/browse.phtml:242
 msgid "Are you sure you would like to delete the selected files?"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:246
-#: view/easy-admin/admin/file-manager/browse.phtml:261
+#: view/easy-admin/admin/file-manager/browse.phtml:244
+#: view/easy-admin/admin/file-manager/browse.phtml:259
 #, php-format
 msgid ""
 "%1$sWarning%2$s: this action will permanently delete %3$s files and cannot "
 "be undone."
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:259
+#: view/easy-admin/admin/file-manager/browse.phtml:257
 msgid ""
 "Are you sure you would like to delete all files on all pages of this result?"
 msgstr ""
 
-#: view/easy-admin/admin/file-manager/browse.phtml:277
+#: view/easy-admin/admin/file-manager/browse.phtml:275
 msgid "No files."
 msgstr ""
 
@@ -517,8 +517,50 @@ msgid ""
 "A new setting allows to define a list of directories available for browsing."
 msgstr ""
 
-#: data/scripts/task.php:17
-msgid "/bootstrap.php"
+#: data/scripts/task.php:21
+msgid ""
+"Usage: php data/scripts/task.php [arguments]\n"
+"\n"
+"Required arguments:\n"
+"  -t --task [Name]\n"
+"\t\tFull class of a job (\"EasyAdmin\\Job\\LoopItems\"). May be its\n"
+"\t\tbasename (\"LoopItems\"). You should take care of case\n"
+"\t\tsensitivity and escaping \"\\\" or quoting name on cli.\n"
+"\n"
+"  -u --user-id [#id]\n"
+"\t\tThe Omeka user id is required, else the job won’t have any\n"
+"\t\trights.\n"
+"\n"
+"Recommended arguments:\n"
+"  -s --server-url [url]\n"
+"\t\tThe url of the server to build resource urls (default:\n"
+"\t\t\"http://localhost\").\n"
+"\n"
+"  -b --base-path [path]\n"
+"\t\tThe path to complete the server url (default: \"/\").\n"
+"\n"
+"Optional arguments:\n"
+"  -a --args [json]\n"
+"\t\tArguments to pass to the task. Arguments are specific to\n"
+"\t\teach job. To find them, check the code, or run a job\n"
+"\t\tmanually then check the job page in admin interface.\n"
+"\n"
+"  -k --as-task\n"
+"\t\tProcess a a simple task and do not create a job. May be\n"
+"\t\tused for tasks that do not need to be checked as a job.\n"
+"\t\tThis is the inverse of the deprecated argument --job.\n"
+"\n"
+"Deprecated arguments:\n"
+"  -j --job\n"
+"\t\tCreate a standard job that will be checkable in admin\n"
+"\t\tinterface. In any case, all logs are available in logs with\n"
+"\t\ta reference code. It allows to process jobs that are not\n"
+"\t\ttaskable.\n"
+"\t\tThis option is now set by default and is useless.\n"
+"\n"
+"Other arguments:\n"
+"  -h --help\n"
+"\t\tThis help."
 msgstr ""
 
 #: data/scripts/task.php:81
@@ -1841,7 +1883,7 @@ msgstr ""
 #: src/Form/CheckAndFixForm.php:192 src/Form/CheckAndFixForm.php:383
 #: src/Form/CheckAndFixForm.php:432 src/Form/CheckAndFixForm.php:558
 #: src/Form/CheckAndFixForm.php:712 src/Form/CheckAndFixForm.php:810
-#: src/Form/CheckAndFixForm.php:901 src/Form/CheckAndFixForm.php:974
+#: src/Form/CheckAndFixForm.php:901 src/Form/CheckAndFixForm.php:977
 msgid "Tasks"
 msgstr ""
 
@@ -2301,42 +2343,50 @@ msgid "I confirm to have an external backup of my themes and files"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:887
-msgid "Cache"
+msgid "System"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:905
-msgid "Check php cache"
+msgid "Run installation checks (after a copy of the database on a new server)"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:906
-msgid "Clear php cache (after update or modifications of code)"
+msgid "Check caches"
 msgstr ""
 
-#: src/Form/CheckAndFixForm.php:921
+#: src/Form/CheckAndFixForm.php:907
+msgid "Clear caches (after update or modifications of code)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:922
 msgid "Options to clear cache"
 msgstr ""
 
-#: src/Form/CheckAndFixForm.php:932
+#: src/Form/CheckAndFixForm.php:933
 msgid "Types of cache"
 msgstr ""
 
-#: src/Form/CheckAndFixForm.php:934
-msgid "Code (opcache)"
-msgstr ""
-
 #: src/Form/CheckAndFixForm.php:935
-msgid "Data (apcu)"
+msgid "Application (Symfony Doctrine ORM)"
 msgstr ""
 
 #: src/Form/CheckAndFixForm.php:936
+msgid "Code (opcache)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:937
+msgid "Data (apcu)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:938
 msgid "Real paths"
 msgstr ""
 
-#: src/Form/CheckAndFixForm.php:960
+#: src/Form/CheckAndFixForm.php:963
 msgid "Module tasks and indexations"
 msgstr ""
 
-#: src/Form/CheckAndFixForm.php:978
+#: src/Form/CheckAndFixForm.php:981
 msgid "Omeka: Index full-text search"
 msgstr ""
 
@@ -2475,53 +2525,79 @@ msgstr ""
 msgid "No process submitted."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:198
+#: src/Controller/Admin/CheckAndFixController.php:204
 msgid "Unknown process \"{process}\""
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:208
+#: src/Controller/Admin/CheckAndFixController.php:214
 msgid ""
 "Processing checks in background (job {link_job}#{job_id}{link_end}, "
 "{link_log}logs{link_end})."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:236
+#: src/Controller/Admin/CheckAndFixController.php:243
 msgid "No type of cache selected."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:245
+#: src/Controller/Admin/CheckAndFixController.php:255
+msgid "The application cache of Symfony Doctrine is available."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:264
+msgid "The application cache of Symfony Doctrine was reset."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:266
+msgid "The application cache of Symfony Doctrine cannot be reset."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:270
+msgid "The application cache of Symfony Doctrine is disabled."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:279
 msgid ""
 "An issue occurred when checking status of \"opcache\" or the status is not "
 "enabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:260
+#: src/Controller/Admin/CheckAndFixController.php:294
 msgid "The cache \"opcache\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:262
+#: src/Controller/Admin/CheckAndFixController.php:296
 msgid "The cache \"opcache\" is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:266
+#: src/Controller/Admin/CheckAndFixController.php:300
 msgid "The php extension \"opcache\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:275
+#: src/Controller/Admin/CheckAndFixController.php:309
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:283
+#: src/Controller/Admin/CheckAndFixController.php:317
 msgid "The cache \"apcu\" was reset."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:286
+#: src/Controller/Admin/CheckAndFixController.php:320
 msgid "The php extension \"apcu\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:294
+#: src/Controller/Admin/CheckAndFixController.php:328
 msgid "The cache of real paths was reset."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:343
+msgid "Install tasks were run without errors."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:350
+msgid ""
+"The php extension \"intl\" is not available. It is recommended to install it "
+"to translate dates."
 msgstr ""
 
 #: src/Controller/Admin/CronController.php:48
