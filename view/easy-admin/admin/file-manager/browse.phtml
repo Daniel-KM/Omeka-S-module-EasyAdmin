@@ -184,7 +184,7 @@ $displayDir = !empty($this->params()->fromQuery('display_dir'));
                     <input type="checkbox" name="filenames[]" value="<?= $escapeAttr($filename) ?>" aria-label="<?= $translate('Select file') ?>"<?= !$isDir && $file->isWritable() ? '' : ' disabled="disabled"' ?>/>
                     <?php endif; ?>
                     <?php if ($isDir): ?>
-                    <?= $hyperlink($filename, ) ?>
+                    <?= $hyperlink($filename, $url(null, [], ['query' => ['display_dir' => true, 'dir_path' => $dirPath . '/' . $filename]], true)) ?>
                     <?php else: ?>
                     <?= $escape($filename) ?>
                     <?php endif; ?>
