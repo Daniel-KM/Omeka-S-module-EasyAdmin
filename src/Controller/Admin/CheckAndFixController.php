@@ -344,5 +344,11 @@ class CheckAndFixController extends AbstractActionController
         } else {
             $messenger->addErrors($installer->getErrors());
         }
+
+        if (!extension_loaded('intl')) {
+            $messenger->addWarning(
+                'The php extension "intl" is not available. It is recommended to install it to translate dates.' // @translate
+            );
+        }
     }
 }
