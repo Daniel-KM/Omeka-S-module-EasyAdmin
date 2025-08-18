@@ -24,7 +24,7 @@ class CheckAndFixForm extends Form
             ->appendFieldsetDatabase()
             ->appendFieldsetBackup()
             ->appendFieldsetThemes()
-            ->appendFieldsetCache()
+            ->appendFieldsetSystem()
             ->appendFieldsetTasks()
         ;
 
@@ -146,13 +146,13 @@ class CheckAndFixForm extends Form
                 'required' => false,
             ]);
 
-        $inputFilter->get('cache')
+        $inputFilter->get('system')
             ->add([
                 'name' => 'process',
                 'required' => false,
             ]);
-        $inputFilter->get('cache')
-            ->get('cache_clear')
+        $inputFilter->get('system')
+            ->get('cache')
             ->add([
                 'name' => 'type',
                 'required' => false,
@@ -877,22 +877,22 @@ class CheckAndFixForm extends Form
         return $this;
     }
 
-    protected function appendFieldsetCache(): self
+    protected function appendFieldsetSystem(): self
     {
         $this
             ->add([
-                'name' => 'cache',
+                'name' => 'system',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Cache', // @translate
+                    'label' => 'System', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'cache',
+                    'id' => 'system',
                     'class' => 'field-container',
                 ],
             ]);
 
-        $fieldset = $this->get('cache');
+        $fieldset = $this->get('system');
         $fieldset
             ->add([
                 'name' => 'process',
@@ -902,12 +902,13 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
+                        'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
                         'cache_check' => 'Check caches', // @translate
                         'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'cache-process',
+                    'id' => 'system-process',
                     'required' => false,
                     'class' => 'fieldset-process',
                 ],
@@ -916,7 +917,7 @@ class CheckAndFixForm extends Form
         $fieldset
             ->add([
                 'type' => Fieldset::class,
-                'name' => 'cache_clear',
+                'name' => 'cache',
                 'options' => [
                     'label' => 'Options to clear cache', // @translate
                 ],
@@ -924,7 +925,7 @@ class CheckAndFixForm extends Form
                     'class' => 'cache_check cache_fix',
                 ],
             ])
-            ->get('cache_clear')
+            ->get('cache')
             ->add([
                 'name' => 'type',
                 'type' => Element\MultiCheckbox::class,
@@ -938,7 +939,7 @@ class CheckAndFixForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'cache_clear-cache',
+                    'id' => 'cache-type',
                     'value' => [
                         'doctrine',
                         'code',

@@ -152,11 +152,17 @@ class CheckAndFixController extends AbstractActionController
             case 'theme_templates_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\ThemeTemplate::class, $defaultParams + $params['themes']['theme_templates'] + $params['themes']['theme_templates_warn']);
                 break;
+            case 'install_check':
+                // TODO Manage instant job via synchronous jobs.
+                // This is not a job, because it is instant.
+                $this->checkInstall();
+                $job = null;
+                break;
             case 'cache_check':
             case 'cache_fix':
                 // TODO Manage instant job via synchronous jobs.
                 // This is not a job, because it is instant.
-                $this->checkCache($params['cache']['cache_clear'], $process === 'cache_fix');
+                $this->checkCache($params['system']['cache'], $process === 'cache_fix');
                 $job = null;
                 break;
             case 'db_fulltext_index':
@@ -232,6 +238,7 @@ class CheckAndFixController extends AbstractActionController
     {
         /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger  */
         $messenger = $this->messenger();
+
         if (empty($options['type'])) {
             $messenger->addWarning('No type of cache selected.'); // @translate
             return;
@@ -319,6 +326,23 @@ class CheckAndFixController extends AbstractActionController
         ) {
             @clearstatcache(true);
             $messenger->addSuccess('The cache of real paths was reset.'); // @translate
+        }
+    }
+
+    protected function checkInstall(): void
+    {
+        /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger  */
+        $messenger = $this->messenger();
+
+        // Get the installer without factory.
+        /** @var \Omeka\Installation\Installer $installer */
+        $services = $this->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
+        $installer = $services->get('Omeka\Installer');
+        $result = $installer->preInstall();
+        if ($result) {
+            $messenger->addSuccess('Install tasks were run without errors.'); // @translate
+        } else {
+            $messenger->addErrors($installer->getErrors());
         }
     }
 }
