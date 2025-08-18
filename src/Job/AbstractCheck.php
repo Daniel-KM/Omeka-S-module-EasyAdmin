@@ -224,7 +224,7 @@ abstract class AbstractCheck extends AbstractJob
             return $this;
         }
 
-        if (is_null($columnKeys)) {
+        if ($columnKeys === null) {
             $columnKeys = array_fill_keys(array_keys($this->columns), null);
         }
 

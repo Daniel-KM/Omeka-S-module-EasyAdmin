@@ -202,7 +202,7 @@ class DbUtf8Encode extends AbstractCheck
 
                 $isPageBlock = $recordData === 'page_block';
                 $iso = $this->convertToUnicode($string, $isPageBlock);
-                if (is_null($iso)) {
+                if ($iso === null) {
                     continue;
                 }
 
@@ -308,7 +308,7 @@ class DbUtf8Encode extends AbstractCheck
                 ? json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS)
                 : $stringTest;
             $iso = $this->convertToUnicode($string);
-            return is_null($iso)
+            return $iso === null
                 ? json_encode($string, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS)
                 : (is_array($iso) ? json_encode($iso, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS) : $iso);
         }

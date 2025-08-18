@@ -168,7 +168,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                         ++$totalSucceed;
                         $row['fixed'] = $yes;
                     } else {
-                        if (is_null($dbValue)) {
+                        if ($dbValue === null) {
                             ++$totalFailed;
                             $this->logger->warn(
                                 'Media #{media_id} ({processed}/{total}): original file "{filename}" has no {type}, but should be {real_value}.', // @translate

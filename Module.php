@@ -1004,7 +1004,7 @@ class Module extends AbstractModule
             }
 
             $index = $dataMedia['file_index'] ?? null;
-            if (is_null($index) || !isset($filesData['file'][$index])) {
+            if ($index === null || !isset($filesData['file'][$index])) {
                 $errorStore->addError('upload', 'There is no uploaded files.'); // @translate
                 continue;
             }

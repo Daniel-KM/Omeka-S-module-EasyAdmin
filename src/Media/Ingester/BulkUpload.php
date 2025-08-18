@@ -64,7 +64,7 @@ class BulkUpload implements IngesterInterface
 
         $fileinfo = new SplFileInfo($filepath);
         $realPath = $this->verifyFile($fileinfo);
-        if (is_null($realPath)) {
+        if ($realPath === null) {
             $errorStore->addError('ingest_file_data', new PsrMessage(
                 'Cannot upload file "{filename}". File does not exist or does not have sufficient permissions', // @translate
                 ['filename' => $filepath]
