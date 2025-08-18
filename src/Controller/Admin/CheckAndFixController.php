@@ -237,6 +237,33 @@ class CheckAndFixController extends AbstractActionController
             return;
         }
 
+        if (in_array('doctrine', $options['type'])) {
+            // Get the entity manager without factory.
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $services = $this->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
+            $entityManager = $services->get('Omeka\EntityManager');
+            $cache = $entityManager->getConfiguration()->getMetadataCache();
+            if ($cache) {
+                if (!$fix) {
+                    $messenger->addNotice('The application cache of Symfony Doctrine is available.'); // @translate
+                } else {
+                    $result = false;
+                    if (method_exists($cache, 'clear')) {
+                        $result = $cache->clear();
+                    } elseif (method_exists('deleteAll')) {
+                        $result = $cache->deleteAll();
+                    }
+                    if ($result) {
+                        $messenger->addSuccess('The application cache of Symfony Doctrine was reset.'); // @translate
+                    } else {
+                        $messenger->addWarning('The application cache of Symfony Doctrine cannot be reset.'); // @translate
+                    }
+                }
+            } else {
+                $messenger->addNotice('The application cache of Symfony Doctrine is disabled.'); // @translate
+            }
+        }
+
         if (in_array('code', $options['type'])) {
             $hasCache = function_exists('opcache_reset');
             if ($hasCache) {

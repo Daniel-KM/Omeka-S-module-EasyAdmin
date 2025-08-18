@@ -902,8 +902,8 @@ class CheckAndFixForm extends Form
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
-                        'cache_check' => 'Check php cache', // @translate
-                        'cache_fix' => 'Clear php cache (after update or modifications of code)', // @translate
+                        'cache_check' => 'Check caches', // @translate
+                        'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -931,6 +931,7 @@ class CheckAndFixForm extends Form
                 'options' => [
                     'label' => 'Types of cache', // @translate
                     'value_options' => [
+                        'doctrine' => 'Application (Symfony Doctrine ORM)', // @translate
                         'code' => 'Code (opcache)', // @translate
                         'data' => 'Data (apcu)', // @translate
                         'path' => 'Real paths', // @translate
@@ -939,6 +940,7 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'cache_clear-cache',
                     'value' => [
+                        'doctrine',
                         'code',
                         'data',
                         'path',
