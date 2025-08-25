@@ -214,7 +214,7 @@ class FileMissing extends AbstractCheckFile
         // This check is useful only for source_filename, since for other ones,
         // it's not an issue.
         if ($this->matchingMode === 'source_filename') {
-            $duplicates = array_filter(array_map(fn ($v) => count($v) > 1, $result));
+            $duplicates = array_filter(array_map(fn ($v) => count($v), $result), fn ($v) => $v > 1);
             if (count($duplicates)) {
                 $this->logger->warn(
                     'This following flles have duplicate names: {json}', // @translate
