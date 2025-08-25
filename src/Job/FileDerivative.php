@@ -59,7 +59,7 @@ class FileDerivative extends AbstractCheck
         // Always true expression to simplify process.
         $criteria->where($expr->gt('id', 0));
 
-        $itemSets = array_values($this->getArg('item_sets', []));
+        $itemSets = array_values($this->getArg('item_sets') ?: []);
         if ($itemSets) {
             // TODO Include dql as a subquery.
             $dql = <<<'DQL'
