@@ -438,3 +438,10 @@ if (version_compare($oldVersion, '3.4.33', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.35', '<')) {
+    $message = new PsrMessage(
+        'A new task allows to clean and to deduplicate resources values.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
