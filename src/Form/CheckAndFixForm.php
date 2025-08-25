@@ -461,6 +461,7 @@ class CheckAndFixForm extends Form
                         'db_item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
                         'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
                         'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
+                        'db_value_clean_fix' => 'Clean and deduplicate values', // @translate
                         'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate
                         'db_resource_title_fix' => 'Update resource titles', // @translate
                         'db_item_primary_media_check' => 'Check if the primary medias are set', // @translate
@@ -547,6 +548,43 @@ class CheckAndFixForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'db_utf8_encode-type_resources',
+                ],
+            ]);
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_value_clean',
+                'options' => [
+                    'label' => 'Options to clean and deduplicate', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'db_value_clean_check db_value_clean_fix',
+                ],
+            ])
+            ->get('db_value_clean')
+            ->add([
+                'name' => 'actions',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'label' => 'Actions to process', // @translate
+                    'value_options' => [
+                        'trim' => 'Trim property values', // @translate
+                        // 'specify_datatype' => 'Specify data type  for linked resources', // @translate
+                        'null_empty_value' => 'Set null for empty values or uris', // @translate
+                        'null_empty_language' => 'Set null when language is empty', // @translate
+                        'deduplicate' => 'Deduplicate property values case insensitively (warning: value annotations are not managed)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_value_clean-actions',
+                    'value' => [
+                        'trim',
+                        // 'specify_datatype',
+                        'null_empty_value',
+                        'null_empty_language',
+                        // 'deduplicate',
+                    ],
                 ],
             ]);
 

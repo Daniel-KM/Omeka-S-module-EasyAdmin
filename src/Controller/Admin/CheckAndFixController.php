@@ -120,6 +120,9 @@ class CheckAndFixController extends AbstractActionController
             case 'db_utf8_encode_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbUtf8Encode::class, $defaultParams + $params['resource_values']['db_utf8_encode']);
                 break;
+            case 'db_value_clean_fix':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbValueClean::class, $defaultParams + $params['resource_values']['db_value_clean']);
+                break;
             case 'db_resource_title_check':
             case 'db_resource_title_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceTitle::class, $defaultParams);
