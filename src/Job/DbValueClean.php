@@ -360,6 +360,10 @@ class DbValueClean extends AbstractCheck
             $sqlWhere2 = '';
         }
 
+        // Get the total count of values.
+        $sqlCount = 'SELECT COUNT(*) FROM `value`';
+        $totalCount = $this->connection->fetchOne($sqlCount);
+
         $sql = <<<SQL
             SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
             DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
@@ -379,8 +383,12 @@ class DbValueClean extends AbstractCheck
             DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
             SQL;
 
-        $count = $this->connection->executeStatement($sql, $bind, $types);
+        $this->connection->executeStatement($sql, $bind, $types);
         $this->connection->executeStatement("SET sql_mode = '$sqlMode';");
+
+        // Output the right number of deduplicated values.
+        $sqlCount = 'SELECT COUNT(*) FROM `value`';
+        $count = $totalCount - (int) $this->connection->fetchOne($sqlCount);
 
         $this->logger->info(
             'Deduplicated {count} values.', // @translate
