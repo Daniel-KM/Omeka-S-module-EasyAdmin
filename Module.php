@@ -572,7 +572,7 @@ class Module extends AbstractModule
                     ->from('resource_template', 'resource_template')
                     ->where('resource_template.`resource_class_id` IN (:ids)')
                     ->setParameter('ids', $classIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
-                    ->addOrderBy('resource_template`.`label`', 'asc')
+                    ->addOrderBy('`resource_template`.`label`', 'asc')
                 ;
                 $templateClassLabels = $qb->execute()->fetchAllAssociative();
             }
