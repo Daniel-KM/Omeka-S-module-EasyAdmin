@@ -13,7 +13,7 @@ abstract class AbstractCheckFile extends AbstractCheck
      */
     protected function checkFileData($column, $fix = false)
     {
-        if (!in_array($column, ['size', 'sha256', 'media_type'])) {
+        if (!in_array($column, ['size', 'sha256', 'media_type', 'storage_id'])) {
             $this->logger->err(
                 'Column {type} does not exist or cannot be checked.', // @translate
                 ['type' => $column]
@@ -116,20 +116,53 @@ abstract class AbstractCheckFile extends AbstractCheck
                     'fixed' => '',
                 ];
 
+                $isFixable = false;
                 if (file_exists($filepath)) {
                     $row['exists'] = $yes;
                     switch ($column) {
                         case 'size':
                             $dbValue = $media->getSize();
                             $realValue = filesize($filepath);
+                            $isFixable = true;
                             break;
                         case 'sha256':
                             $dbValue = $media->getSha256();
                             $realValue = hash_file('sha256', $filepath);
+                            $isFixable = true;
                             break;
                         case 'media_type':
                             $dbValue = $media->getMediaType();
                             $realValue = $specifyMediaType($filepath);
+                            $isFixable = true;
+                            break;
+                        case 'storage_id':
+                            /** @see \Omeka\File\TempFile::getStorageId() */
+                            $dbValue = $media->getStorageId();
+                            $realValue = bin2hex(\Laminas\Math\Rand::getBytes(20));
+                            // No check for existing file, such like TempFile:
+                            // this is a 20 hexa random name.
+                            $isFixable = $dbValue && is_writeable($filepath);
+                            if (!$dbValue) {
+                                $this->logger->warn(
+                                    'Media #{media_id} ({processed}/{total}): original file "{filename}" has no value and cannot be renamed.', // @translate
+                                    [
+                                        'media_id' => $media->getId(),
+                                        'processed' => $offset + $key + 1,
+                                        'total' => $totalToProcess,
+                                        'filename' => $filename,
+                                    ]
+                                );
+                            } elseif (!is_writeable($filepath)) {
+                                $this->logger->warn(
+                                    'Media #{media_id} ({processed}/{total}): original file "{filename}" is write protected and cannot be renamed.', // @translate
+                                    [
+                                        'media_id' => $media->getId(),
+                                        'processed' => $offset + $key + 1,
+                                        'total' => $totalToProcess,
+                                        'filename' => $filename,
+                                    ]
+                                );
+                            }
                             break;
                     }
 
@@ -140,35 +173,82 @@ abstract class AbstractCheckFile extends AbstractCheck
 
                     if ($fix) {
                         if ($isDifferent) {
+                            $isFixed = false;
                             switch ($column) {
                                 case 'size':
                                     $media->setSize($realValue);
+                                    $isFixed = true;
                                     break;
                                 case 'sha256':
                                     $media->setSha256($realValue);
+                                    $isFixed = true;
                                     break;
                                 case 'media_type':
                                     $media->setMediaType($realValue);
+                                    $isFixed = true;
+                                    break;
+                                case 'storage_id':
+                                    if ($isFixable) {
+                                        $extension = $media->getExtension();
+                                        $newFilepath = dirname($filepath) . '/' . $realValue . ($extension !== null && $extension !==  '' ? '.' . $extension : '');
+                                        // TODO Ideally, the rename should occur at the same time than flush.
+                                        // For now, add a real time log to avoid this rare issue.
+                                        $isFixed = rename($filepath, (string) $newFilepath);
+                                        if ($isFixed) {
+                                            $media->setStorageId($realValue);
+                                            $this->logger->notice(
+                                                'Media #{media_id} ({processed}/{total}): original file "{filename}" was renamed "{filename_2}".', // @translate
+                                                [
+                                                    'media_id' => $media->getId(),
+                                                    'processed' => $offset + $key + 1,
+                                                    'total' => $totalToProcess,
+                                                    'filename' => $filename,
+                                                    'filename_2' => basename($newFilepath),
+                                                ]
+                                            );
+                                        } else {
+                                            $this->logger->warn(
+                                                'Media #{media_id} ({processed}/{total}): original file "{filename}" cannot be renamed "{filename_2}".', // @translate
+                                                [
+                                                    'media_id' => $media->getId(),
+                                                    'processed' => $offset + $key + 1,
+                                                    'total' => $totalToProcess,
+                                                    'filename' => $filename,
+                                                    'filename_2' => basename($newFilepath),
+                                                ]
+                                            );
+                                        }
+                                    }
                                     break;
                             }
                             $this->entityManager->persist($media);
-                            $this->logger->notice(
-                                'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value} (was {old_value}).', // @translate
-                                [
-                                    'media_id' => $media->getId(),
-                                    'processed' => $offset + $key + 1,
-                                    'total' => $totalToProcess,
-                                    'filename' => $filename,
-                                    'type' => $column,
-                                    'real_value' => $realValue,
-                                    'old_value' => $dbValue ?: $empty,
-                                ]
-                            );
+                            // Don't repeat log for storage and it may be issue.
+                            if ($column !== 'storage_id') {
+                                $this->logger->notice(
+                                    'Media #{media_id} ({processed}/{total}): original file "{filename}" updated with {type} = {real_value} (was {old_value}).', // @translate
+                                    [
+                                        'media_id' => $media->getId(),
+                                        'processed' => $offset + $key + 1,
+                                        'total' => $totalToProcess,
+                                        'filename' => $filename,
+                                        'type' => $column,
+                                        'real_value' => $realValue,
+                                        'old_value' => $dbValue ?: $empty,
+                                    ]
+                                );
+                            }
+                        } else {
+                            $isFixed = true;
                         }
                         ++$totalSucceed;
-                        $row['fixed'] = $yes;
+                        $row['fixed'] = $isFixed ? $yes : $no;
                     } else {
-                        if ($dbValue === null) {
+                        if ($column === 'storage_id') {
+                            // Messages are set above and the real value is random.
+                            $isFixable
+                                ? ++$totalSucceed
+                                : ++$totalFailed;
+                        } elseif ($dbValue === null) {
                             ++$totalFailed;
                             $this->logger->warn(
                                 'Media #{media_id} ({processed}/{total}): original file "{filename}" has no {type}, but should be {real_value}.', // @translate
