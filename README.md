@@ -30,6 +30,7 @@ Checks and fixes that are doable:
 - copy original files from a directory, for example after a disk crash or an
   inadvertent deletion; files are copied via the hash, and they can be anywhere
   in the directory or in subdirectories of the source path.
+- re-hash storage file names, for example after import or for security.
 - rebuild derivative files
 - remove empty directories in file system (original and thumbnails, mainly for
   module [Archive Repertory])
