@@ -36,11 +36,8 @@ class FileMediaType extends AbstractCheckFile
 
     /**
      * Check the media type of the files.
-     *
-     * @param bool $fix
-     * @return bool
      */
-    protected function checkFileMediaType($fix = false)
+    protected function checkFileMediaType(bool $fix = false): bool
     {
         return $this->checkFileData('media_type', $fix);
     }

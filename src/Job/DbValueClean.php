@@ -233,7 +233,7 @@ class DbValueClean extends AbstractCheck
             ['count' => $count]
         );
 
-        return $trimmed;
+        return (int) $trimmed;
     }
 
     /**
@@ -273,7 +273,7 @@ class DbValueClean extends AbstractCheck
             ['count' => $count]
         );
 
-        return $count;
+        return (int) $count;
     }
 
     /**
@@ -314,7 +314,7 @@ class DbValueClean extends AbstractCheck
             ['count' => $count]
         );
 
-        return $count;
+        return (int) $count;
     }
 
     /**

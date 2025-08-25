@@ -36,11 +36,8 @@ class FileSize extends AbstractCheckFile
 
     /**
      * Check the size of the files.
-     *
-     * @param bool $fix
-     * @return bool
      */
-    protected function checkFilesize($fix = false)
+    protected function checkFilesize(bool $fix = false): bool
     {
         return $this->checkFileData('size', $fix);
     }

@@ -6,12 +6,8 @@ abstract class AbstractCheckFile extends AbstractCheck
 {
     /**
      * Check the size or the hash of the files.
-     *
-     * @param string $column
-     * @param bool $fix
-     * @return bool
      */
-    protected function checkFileData($column, $fix = false)
+    protected function checkFileData(string $column, bool $fix = false): bool
     {
         if (!in_array($column, ['size', 'sha256', 'media_type', 'storage_id'])) {
             $this->logger->err(

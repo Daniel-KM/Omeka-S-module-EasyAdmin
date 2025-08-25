@@ -130,9 +130,6 @@ class DbLoopResources extends AbstractJob
                 $this->api->update($resourceType, $resourceId, [], [], ['isPartial' => true]);
 
                 ++$totalProcessed;
-
-                // Avoid memory issue.
-                unset($resource);
             }
 
             $this->logger->info(

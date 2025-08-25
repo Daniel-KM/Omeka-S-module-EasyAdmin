@@ -36,11 +36,8 @@ class FileHash extends AbstractCheckFile
 
     /**
      * Check the hash of the files.
-     *
-     * @param bool $fix
-     * @return bool
      */
-    protected function checkFilehash($fix = false)
+    protected function checkFilehash(bool $fix = false): bool
     {
         return $this->checkFileData('sha256', $fix);
     }

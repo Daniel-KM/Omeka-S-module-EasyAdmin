@@ -48,8 +48,8 @@ class CheckAndFixController extends AbstractActionController
         }
 
         /** @var \Omeka\Mvc\Controller\Plugin\JobDispatcher $dispatcher */
+        $job = null;
         $dispatcher = $this->jobDispatcher();
-
         $defaultParams = [
             'process' => $process,
         ];
@@ -130,6 +130,7 @@ class CheckAndFixController extends AbstractActionController
             case 'db_item_primary_media_check':
             case 'db_item_primary_media_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbItemPrimaryMedia::class, $defaultParams);
+                break;
             case 'db_value_annotation_template_check':
             case 'db_value_annotation_template_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbValueAnnotationTemplate::class, $defaultParams);
@@ -163,14 +164,12 @@ class CheckAndFixController extends AbstractActionController
                 // TODO Manage instant job via synchronous jobs.
                 // This is not a job, because it is instant.
                 $this->checkInstall();
-                $job = null;
                 break;
             case 'cache_check':
             case 'cache_fix':
                 // TODO Manage instant job via synchronous jobs.
                 // This is not a job, because it is instant.
                 $this->checkCache($params['system']['cache'], $process === 'cache_fix');
-                $job = null;
                 break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
@@ -206,7 +205,6 @@ class CheckAndFixController extends AbstractActionController
                 if ($jobClass) {
                     $job = $dispatcher->dispatch($jobClass, $args['args']);
                 } else {
-                    $job = null;
                     $this->messenger()->addError(new PsrMessage(
                         'Unknown process "{process}"', // @translate
                         ['process' => $process]
