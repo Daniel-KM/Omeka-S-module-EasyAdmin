@@ -219,6 +219,7 @@ class DbValueClean extends AbstractCheck
             WHERE `value_resource_id` IS NULL
                 AND `value` IS NULL
                 AND `uri` IS NULL
+                AND `value_annotation_id` IS NULL
             SQL;
         if ($idsString) {
             $query .= "\n" . <<<SQL
@@ -368,7 +369,7 @@ class DbValueClean extends AbstractCheck
                 FROM `value`
                 WHERE 1 = 1
                     $sqlWhere1
-                GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`;
+                GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`, `value_annotation_id`;
             DELETE `v`
             FROM `value` AS `v`
             LEFT JOIN `value_temporary` AS `value_temporary`

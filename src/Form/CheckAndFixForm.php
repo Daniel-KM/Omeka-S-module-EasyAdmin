@@ -574,7 +574,7 @@ class CheckAndFixForm extends Form
                         // 'specify_datatype' => 'Specify data type  for linked resources', // @translate
                         'null_empty_value' => 'Set null for empty values or uris', // @translate
                         'null_empty_language' => 'Set null when language is empty', // @translate
-                        'deduplicate' => 'Deduplicate property values case insensitively (warning: value annotations are not managed)', // @translate
+                        'deduplicate' => 'Deduplicate property values case insensitively', // @translate
                     ],
                 ],
                 'attributes' => [
