@@ -33,6 +33,11 @@ class FileMissing extends AbstractCheckFile
     protected $extensions = [];
 
     /**
+     * @var array
+     */
+    protected $extensionsExclude = [];
+
+    /**
      * @var string
      */
     protected $matchingMode;
@@ -46,8 +51,17 @@ class FileMissing extends AbstractCheckFile
 
         $process = $this->getArg('process');
 
-        $this->extensions = $this->getArg('extensions', '');
-        $this->extensions = array_unique(array_filter(array_map('trim', explode(',', $this->extensions)), 'strlen'));
+        $this->extensions = $this->getArg('extensions', []);
+        if (!is_array($this->extensions)) {
+            $this->extensions = explode(',', $this->extensions);
+        }
+        $this->extensions = array_unique(array_filter(array_map('trim', $this->extensions), 'strlen'));
+
+        $this->extensionsExclude = $this->getArg('extensions_exclude', []);
+        if (!is_array($this->extensionsExclude)) {
+            $this->extensionsExclude = explode(',', $this->extensionsExclude);
+        }
+        $this->extensionsExclude = array_unique(array_filter(array_map('trim', $this->extensionsExclude), 'strlen'));
 
         $matchinModes = [
             'sha256',
@@ -124,7 +138,7 @@ class FileMissing extends AbstractCheckFile
             return $this;
         }
 
-        $this->files = $this->listFilesInFolder($dir, false, $this->extensions);
+        $this->files = $this->listFilesInFolder($dir, false, $this->extensions, $this->extensionsExclude);
         if (!count($this->files)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
@@ -298,7 +312,7 @@ class FileMissing extends AbstractCheckFile
         foreach (array_keys($types) as $type) {
             $path = $this->basePath . '/' . $type;
             $types[$type] = $type === 'original'
-                ? $this->listFilesInFolder($path, false, $this->extensions)
+                ? $this->listFilesInFolder($path, false, $this->extensions, $this->extensionsExclude)
                 : $this->listFilesInFolder($path);
         }
 

@@ -235,13 +235,30 @@ class CheckAndFixForm extends Form
             ])
             ->add([
                 'name' => 'extensions',
-                'type' => Element\Text::class,
+                'type' => CommonElement\ArrayText::class,
                 'options' => [
                     'label' => 'Limit to extensions', // @translate
+                    'value_separator' => ','
                 ],
                 'attributes' => [
                     'id' => 'files_missing-extensions',
                     'placeholder' => 'pdf, jpeg', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'extensions_exclude',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'label' => 'Exclude extensions', // @translate
+                    'value_separator' => ','
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-extensions_exclude',
+                    'value' => [
+                        'DS_Store',
+                        'db',
+                    ],
+                    'placeholder' => 'DS_Store, db', // @translate
                 ],
             ])
             ->add([
