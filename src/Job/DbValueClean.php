@@ -19,9 +19,91 @@ class DbValueClean extends AbstractCheck
 
     public function perform(): void
     {
+        $availableActions = [
+            'trim',
+            'null_empty_value',
+            'null_empty_language',
+            'deduplicate',
+        ];
+
+        $actions = $this->getArg('actions', []) ?: [];
+        if (!$actions) {
+            $this->logger->warn(
+                'No action defined.' // @translate
+            );
+            return;
+        }
+
+        $actions = array_intersect($availableActions, $actions);
+        if (!$actions) {
+            $this->logger->warn(
+                'No valid action defined.' // @translate
+            );
+            return;
+        }
+
         parent::perform();
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             return;
+        }
+
+        // Allowed resource types or "all".
+        $allowedResourceTypes = [
+            'items',
+            'item_sets',
+            'media',
+            'value_annotations',
+            'annotations',
+        ];
+
+        $resourceTypes = $this->getArg('resource_types') ?: [];
+        if (!$resourceTypes) {
+            $this->logger->warn(
+                'No resource type defined.' // @translate
+            );
+            return;
+        }
+
+        $allResourceTypes = in_array('all', $resourceTypes);
+        if ($allResourceTypes) {
+            $resourceTypes = $allowedResourceTypes;
+        } elseif (count(array_intersect($allowedResourceTypes, $resourceTypes)) !== count($resourceTypes)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'There are invalid resource types to process: {resource_types}.', // @translate
+                ['resource_types' => implode(', ', array_diff($resourceTypes, $allowedResourceTypes))]
+            );
+            return;
+        } else {
+            $resourceTypes = array_intersect($allowedResourceTypes, $resourceTypes);
+            if ($resourceTypes === $allowedResourceTypes) {
+                $allResourceTypes = true;
+            }
+        }
+
+        $query = [];
+        $queryArg = $this->getArg('query');
+        if ($queryArg) {
+            parse_str(ltrim((string) $queryArg, "? \t\n\r\0\x0B"), $query);
+        }
+
+        if ($query && ($allResourceTypes || count($resourceTypes) > 1)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'When a query is set, only one resource type can be processed.', // @translate
+            );
+            return;
+        }
+
+        if ($allResourceTypes) {
+            $this->logger->info(
+                'Resource types to process: all.' // @translate
+            );
+        } else {
+            $this->logger->info(
+                'Resource types to process: {resource_types}.', // @translate
+                ['resource_types' => implode(', ', $resourceTypes)]
+            );
         }
 
         $process = $this->getArg('process');
@@ -29,39 +111,38 @@ class DbValueClean extends AbstractCheck
 
         $this->supportAnyValue = $this->supportAnyValue();
 
-        $actions = $this->getArg('actions', []);
-        if ($actions) {
+        foreach ($allResourceTypes ? [null] : $resourceTypes as $resourceType) {
+            $resourceIds = $resourceType && $query
+                ? $this->api->search($resourceType, $query, ['returnScalar' => 'id'])->getContent()
+                : null;
+
             if (in_array('trim', $actions)) {
                 $this->logger->info(
                     'Processing trimming of values.' // @translate
                 );
-                $this->trimValues();
+                $this->trimValues($resourceIds);
             }
 
             if (in_array('null_empty_value', $actions)) {
                 $this->logger->info(
                     'Processing cleaning empty values.' // @translate
                 );
-                $this->cleanEmptyValues();
+                $this->cleanEmptyValues($resourceIds);
             }
 
             if (in_array('null_empty_language', $actions)) {
                 $this->logger->info(
                     'Processing cleaning empty language.' // @translate
                 );
-                $this->cleanEmptyLanguages();
+                $this->cleanEmptyLanguages($resourceIds);
             }
 
             if (in_array('deduplicate', $actions)) {
                 $this->logger->info(
                     'Processing deduplication of values.' // @translate
                 );
-                $this->deduplicateValues();
+                $this->deduplicateValues($resourceIds);
             }
-        } else {
-            $this->logger->warn(
-                'No action defined.' // @translate
-            );
         }
 
         $this->logger->notice(
@@ -88,10 +169,6 @@ class DbValueClean extends AbstractCheck
             }
         }
 
-        // The entity manager can not be used directly, because it does not
-        // manage regex.
-        $connection = $this->entityManager->getConnection();
-
         $idsString = $resourceIds === null ? '' : implode(',', $resourceIds);
 
         // Sql "trim" is for space " " only, not end of line, new line or tab.
@@ -99,6 +176,8 @@ class DbValueClean extends AbstractCheck
         // mariadb ≥ 10.0.5 and Omeka requires only 5.5.3.
         $db = $this->databaseVersion();
 
+        // The entity manager can not be used directly, because it does not
+        // manage regex.
         if (($db['db'] === 'mariadb' && version_compare($db['version'], '10.0.5', '>='))
             || ($db['db'] === 'mysql' && version_compare($db['version'], '8.0.4', '>='))
         ) {
@@ -127,13 +206,11 @@ class DbValueClean extends AbstractCheck
                 SQL;
         }
 
-        $count = $connection->executeStatement($query);
-        if ($count) {
-            $this->logger->info(
-                'Trimmed {count} values.', // @translate
-                ['count' => $count]
-            );
-        }
+        $count = $this->connection->executeStatement($query);
+        $this->logger->info(
+            'Trimmed {count} values.', // @translate
+            ['count' => $count]
+        );
         $trimmed = $count;
 
         // Remove empty values, even if there is a language.
@@ -149,13 +226,11 @@ class DbValueClean extends AbstractCheck
                 SQL;
         }
 
-        $count = $connection->executeStatement($query);
-        if ($count) {
-            $this->logger->info(
-                'Removed {count} empty string values after trimming.', // @translate
-                ['count' => $count]
-            );
-        }
+        $count = $this->connection->executeStatement($query);
+        $this->logger->info(
+            'Removed {count} empty string values after trimming.', // @translate
+            ['count' => $count]
+        );
 
         return $trimmed;
     }
@@ -177,9 +252,6 @@ class DbValueClean extends AbstractCheck
         }
 
         // The entity manager may be used directly, but it is simpler with sql.
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->entityManager->getConnection();
-
         $sql = <<<'SQL'
             UPDATE `value` AS `v`
             SET
@@ -194,13 +266,11 @@ class DbValueClean extends AbstractCheck
                 SQL;
         }
 
-        $count = $connection->executeStatement($sql);
-        if ($count) {
-            $this->logger->info(
-                'Updated empty values and uris of {count} values.', // @translate
-                ['count' => $count]
-            );
-        }
+        $count = $this->connection->executeStatement($sql);
+        $this->logger->info(
+            'Updated empty values and uris of {count} values.', // @translate
+            ['count' => $count]
+        );
 
         return $count;
     }
@@ -223,7 +293,6 @@ class DbValueClean extends AbstractCheck
 
         // Use a direct query: during a post action, data are already flushed.
         // The entity manager may be used directly, but it is simpler with sql.
-        $connection = $this->entityManager->getConnection();
 
         $sql = <<<'SQL'
             UPDATE `value` AS `v`
@@ -238,13 +307,11 @@ class DbValueClean extends AbstractCheck
                 SQL;
         }
 
-        $count = $connection->executeStatement($sql);
-        if ($count) {
-            $this->logger->info(
-                'Updated empty language of {count} values.', // @translate
-                ['count' => $count]
-            );
-        }
+        $count = $this->connection->executeStatement($sql);
+        $this->logger->info(
+            'Updated empty language of {count} values.', // @translate
+            ['count' => $count]
+        );
 
         return $count;
     }
@@ -259,38 +326,19 @@ class DbValueClean extends AbstractCheck
     protected function deduplicateValues(?array $resourceIds = null): int
     {
         if ($resourceIds !== null) {
-            $resourceIds = array_filter(array_map('intval', $resourceIds));
+            $resourceIds = array_values(array_unique(array_filter(array_map('intval', $resourceIds))));
             if (!count($resourceIds)) {
                 return 0;
             }
         }
 
-        // For large base, a temporary table is prefered to speed process.
-        $connection = $this->entityManager->getConnection();
+        $bind = [];
+        $types = [];
 
         // The query modifies the sql mode, so it should be reset.
-        $sqlMode = $connection->fetchOne('SELECT @@SESSION.sql_mode;');
+        $sqlMode = $this->connection->fetchOne('SELECT @@SESSION.sql_mode;');
 
-        $query = $resourceIds === null
-            ? $this->prepareQuery()
-            : $this->prepareQueryForResourceIds($resourceIds);
-
-        $count = $connection->executeStatement($query);
-
-        $connection->executeStatement("SET sql_mode = '$sqlMode';");
-
-        if ($count) {
-            $this->logger->info(
-                'Deduplicated {count} values.',
-                ['count' => $count]
-            );
-        }
-
-        return $count;
-    }
-
-    protected function prepareQuery()
-    {
+        // For large base, a temporary table is prefered to speed process.
         // TODO Remove "Any_value", but it cannot be replaced by "Min".
         if ($this->supportAnyValue) {
             $prefix = 'ANY_VALUE(';
@@ -298,47 +346,47 @@ class DbValueClean extends AbstractCheck
         } else {
             $prefix = $suffix = '';
         }
-        return <<<SQL
+
+        if ($resourceIds) {
+            // For specified values.
+            $sqlWhere1 = 'AND `resource_id` IN (:resource_ids)';
+            $sqlWhere2 = 'AND `v`.`resource_id` IN (:resource_ids)';
+            $bind['resource_ids'] = $resourceIds;
+            $types['resource_ids'] = \Doctrine\DBAL\Connection::PARAM_INT_ARRAY;
+        } else {
+            // For all values.
+            $sqlWhere1 = '';
+            $sqlWhere2 = '';
+        }
+
+        $sql = <<<SQL
             SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
-            DROP TABLE IF EXISTS `value_temporary`;
+            DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
             CREATE TEMPORARY TABLE `value_temporary` (`id` INT, PRIMARY KEY (`id`))
             AS
                 SELECT $prefix`id`$suffix
                 FROM `value`
+                WHERE 1 = 1
+                    $sqlWhere1
                 GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`;
-            DELETE `v` FROM `value` AS `v`
+            DELETE `v`
+            FROM `value` AS `v`
             LEFT JOIN `value_temporary` AS `value_temporary`
                 ON `value_temporary`.`id` = `v`.`id`
-            WHERE `value_temporary`.`id` IS NULL;
-            DROP TABLE IF EXISTS `value_temporary`;
+            WHERE `value_temporary`.`id` IS NULL
+                $sqlWhere2;
+            DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
             SQL;
-    }
 
-    protected function prepareQueryForResourceIds(array $resourceIds)
-    {
-        if ($this->supportAnyValue) {
-            $prefix = 'ANY_VALUE(';
-            $suffix = ')';
-        } else {
-            $prefix = $suffix = '';
-        }
-        $idsString = implode(',', $resourceIds);
-        return <<<SQL
-            SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
-            DROP TABLE IF EXISTS `value_temporary`;
-            CREATE TEMPORARY TABLE `value_temporary` (`id` INT, PRIMARY KEY (`id`))
-            AS
-                SELECT $prefix`id`$suffix
-                FROM `value`
-                WHERE `resource_id` IN ($idsString)
-                GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`;
-            DELETE `v` FROM `value` AS `v`
-                LEFT JOIN `value_temporary` AS `value_temporary`
-                ON `value_temporary`.`id` = `v`.`id`
-            WHERE `resource_id` IN ($idsString)
-                AND `value_temporary`.`id` IS NULL;
-            DROP TABLE IF EXISTS `value_temporary`;
-            SQL;
+        $count = $this->connection->executeStatement($sql, $bind, $types);
+        $this->connection->executeStatement("SET sql_mode = '$sqlMode';");
+
+        $this->logger->info(
+            'Deduplicated {count} values.', // @translate
+            ['count' => $count]
+        );
+
+        return (int) $count;
     }
 
     /**

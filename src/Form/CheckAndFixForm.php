@@ -495,6 +495,7 @@ class CheckAndFixForm extends Form
                 'options' => [
                     'label' => 'Types of resources to process', // @translate
                     'value_options' => [
+                        'all' => 'All', // @translate
                         'items' => 'Items', // @translate
                         'item_sets' => 'Item sets', // @translate
                         'media' => 'Medias', // @translate
@@ -585,6 +586,39 @@ class CheckAndFixForm extends Form
                         'null_empty_language',
                         // 'deduplicate',
                     ],
+                ],
+            ])
+            ->add([
+                'name' => 'resource_types',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'label' => 'Types of resources to process', // @translate
+                    'value_options' => [
+                        'all' => 'All', // @translate
+                        'items' => 'Items', // @translate
+                        'item_sets' => 'Item sets', // @translate
+                        'media' => 'Medias', // @translate
+                        'value_annotations' => 'Value annotations', // @translate
+                        'annotations' => 'Annotations', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_value_clean-resource_types',
+                    'value' => [
+                        'all',
+                    ],
+                ],
+            ])
+            ->add([
+                'name' => 'query',
+                'type' => OmekaElement\Query::class,
+                'options' => [
+                    'label' => 'Query to limit resources to process', // @translate
+                    'info' => 'It is not recommended to use the query when multiple resource types are selected.', // @translate
+                    'query_resource_type' => null,
+                ],
+                'attributes' => [
+                    'id' => 'db_value_clean-query',
                 ],
             ]);
 
