@@ -453,8 +453,8 @@ class CheckAndFixForm extends Form
                     'label_attributes' => ['style' => 'display: inline-block'],
                     'value_options' => [
                         'db_loop_save' => 'Save all resources, for example to apply new settings via triggers', // @translate
-                        'db_resource_invalid_check' => 'Check if all resources are valid (items as item, etc.)', // @translate
-                        'db_resource_invalid_fix' => 'Fix all resources that are not valid', // @translate
+                        'db_resource_invalid_check' => 'Check if all resource have valid types. (Item, ItemSet, etc)', // @translate
+                        'db_resource_invalid_fix' => 'Fix all resource with invalid types.', // @translate
                         'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
                         'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
                         'db_item_no_value' => 'Check items without value (media values are not checked)', // @translate
