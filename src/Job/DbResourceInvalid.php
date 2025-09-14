@@ -25,9 +25,9 @@ class DbResourceInvalid extends AbstractCheck
     }
 
     /**
-     * Check if all resource are complete (have a specific resource).
+     * Check if all resource types are valid.
      */
-    protected function checkResourceIncomplete(bool $fix): bool
+    protected function checkResourceInvalid(bool $fix): bool
     {
         $sqlCount = <<<'SQL'
             SELECT `resource`.`id`, `resource`.`resource_type`
