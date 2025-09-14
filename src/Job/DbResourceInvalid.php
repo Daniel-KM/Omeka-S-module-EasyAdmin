@@ -36,12 +36,12 @@ class DbResourceInvalid extends AbstractCheck
             LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
             LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
             LEFT JOIN `value_annotation` ON `value_annotation`.`id` = `resource`.`id`
-            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\Item')
-                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\ItemSet')
-                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\Media')
-                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\ValueAnnotation')
+            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Item')
+                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ItemSet')
+                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Media')
+                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ValueAnnotation')
             ;
-            SQL;
+        SQL;
         $result = $this->connection->executeQuery($sqlCount)->fetchAllKeyValue();
 
         if (!$result) {
@@ -71,21 +71,21 @@ class DbResourceInvalid extends AbstractCheck
                 `resource_type` =
                     CASE
                         WHEN `item`.`id` IS NOT NULL
-                            THEN 'Omeka\Entity\Item'
+                            THEN 'Omeka\\Entity\\Item'
                         WHEN `item_set`.`id` IS NOT NULL
-                            THEN 'Omeka\Entity\ItemSet'
+                            THEN 'Omeka\\Entity\\ItemSet'
                         WHEN `media`.`id` IS NOT NULL
-                            THEN 'Omeka\Entity\Media'
+                            THEN 'Omeka\\Entity\\Media'
                         WHEN `value_annotation`.`id` IS NOT NULL
-                            THEN 'Omeka\Entity\ValueAnnotation'
+                            THEN 'Omeka\\Entity\\ValueAnnotation'
                         ELSE `resource_type`
                     END
-            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\Item')
-                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\ItemSet')
-                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\Media')
-                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\Entity\ValueAnnotation')
+            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Item')
+                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ItemSet')
+                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Media')
+                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ValueAnnotation')
             ;
-            SQL;
+        SQL;
         $result = $this->connection->executeStatement($sql);
 
         $newList = $this->connection->executeQuery($sqlCount)->fetchAllKeyValue();
