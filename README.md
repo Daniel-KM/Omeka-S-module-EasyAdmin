@@ -318,6 +318,11 @@ Use it at your own risk.
 It’s always recommended to backup your files and your databases and to check
 your archives regularly so you can roll back if needed.
 
+```sh
+# database dump example
+mysqldump -u root -p Omeka > omeka_backup_$(date +%Y%m%d).sql
+```
+
 ## Troubleshooting
 
 See online issues on the [module issues] page on GitLab.
