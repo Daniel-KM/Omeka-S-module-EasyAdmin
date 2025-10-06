@@ -36,7 +36,7 @@
             "EasyAdminTest\\": "test/EasyAdminTest/"
         }
     },
-   "repositories": [
+    "repositories": [
         {
             "type": "package",
             "package": {
