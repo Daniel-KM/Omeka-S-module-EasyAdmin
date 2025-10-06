@@ -445,3 +445,10 @@ if (version_compare($oldVersion, '3.4.35', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.36', '<')) {
+    $message = new PsrMessage(
+        'A new setting allows to define more media-types for assets.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
