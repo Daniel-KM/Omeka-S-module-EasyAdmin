@@ -97,6 +97,8 @@ class FileDerivative extends AbstractCheck
             }
         }
 
+        $skipExisting = $this->getArg('thumbnails_to_create') === 'missing';
+
         $withoutThumbnails = $this->getArg('original_without_thumbnails');
         if ($withoutThumbnails) {
             $criteria->andWhere($expr->eq('hasThumbnails', 0));
@@ -132,6 +134,7 @@ class FileDerivative extends AbstractCheck
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
+        $skipped = $translator->translate('Skipped'); // @translate
         $notReadable = $translator->translate('Not readable'); // @translate
         $notWriteable = $translator->translate('Not writeable'); // @translate
         $failed = $translator->translate('Failed'); // @translate
@@ -140,6 +143,7 @@ class FileDerivative extends AbstractCheck
         $key = 0;
         $totalProcessed = 0;
         $totalSucceed = 0;
+        $totalExisting = 0;
         $totalFailed = 0;
         $count = 0;
         while (++$count <= $totalToProcess) {
@@ -194,10 +198,15 @@ class FileDerivative extends AbstractCheck
                     continue;
                 }
 
-                // Check the current files.
+                // Check if the current files are writeable.
+                // If one of the thumbnails are missing, recreate all.
+                // If all thumbnails exist and option is to create only missing, skip the media.
+                $missingThumbnail = false;
                 foreach ($types as $type) {
                     $derivativePath = $basePath . '/' . $type . '/' . $filename;
-                    if (file_exists($derivativePath) && !is_writeable($derivativePath)) {
+                    if (!file_exists($derivativePath)) {
+                        $missingThumbnail = true;
+                    } elseif (!is_writeable($derivativePath)) {
                         $this->logger->warn(
                             'Media #{media_id} ({index}/{total}): derivative file "{filename}" is not writeable (type "{type}").', // @translate
                             ['media_id' => $media->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess, 'filename' => $filename, 'type' => $type]
@@ -207,6 +216,16 @@ class FileDerivative extends AbstractCheck
                         $this->writeRow($row);
                         continue 2;
                     }
+                }
+
+                // Skip if all thumbnails exist and we only want to create missing ones.
+                if (!$missingThumbnail && $skipExisting) {
+                    $row['exists'] = $yes;
+                    $row['has_thumbnails'] = $yes;
+                    $row['fixed'] = $skipped;
+                    $this->writeRow($row);
+                    ++$totalExisting;
+                    continue;
                 }
 
                 $this->logger->info(
@@ -276,6 +295,20 @@ class FileDerivative extends AbstractCheck
                 unset($media);
             }
 
+            if ($totalProcessed % 100 === 0) {
+                if ($skipExisting) {
+                    $this->logger->info(
+                        'Progress: {processed}/{total} media processed, {existing} existing, {succeed} succeed, {failed} failed so far.', // @translate
+                        ['processed' => $totalProcessed, 'total' => $totalToProcess, 'existing' => $totalExisting, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
+                    );
+                } else {
+                    $this->logger->info(
+                        'Progress: {processed}/{total} media processed, {succeed} succeed, {failed} failed so far.', // @translate
+                        ['processed' => $totalProcessed, 'total' => $totalToProcess, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
+                    );
+                }
+            }
+
             // Avoid memory issue.
             unset($medias);
             $this->entityManager->flush();
@@ -284,10 +317,17 @@ class FileDerivative extends AbstractCheck
             $offset += self::SQL_LIMIT;
         }
 
-        $this->logger->info(
-            'End of the creation of derivative files: {count}/{total} processed, {skipped} skipped, {succeed} succeed, {failed} failed.', // @translate
-            ['count' => $totalProcessed, 'total' => $totalToProcess, 'skipped' => $totalToProcess - $totalProcessed, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
-        );
+        if ($skipExisting) {
+            $this->logger->info(
+                'End of the creation of derivative files: {count}/{total} processed, {skipped} skipped, {existing} existing,  {succeed} succeed, {failed} failed.', // @translate
+                ['count' => $totalProcessed, 'total' => $totalToProcess, 'skipped' => $totalToProcess - $totalProcessed, 'existing' => $totalExisting, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
+            );
+        } else {
+            $this->logger->info(
+                'End of the creation of derivative files: {count}/{total} processed, {skipped} skipped, {succeed} succeed, {failed} failed.', // @translate
+                ['count' => $totalProcessed, 'total' => $totalToProcess, 'skipped' => $totalToProcess - $totalProcessed, 'succeed' => $totalSucceed, 'failed' => $totalFailed]
+            );
+        }
 
         $this->finalizeOutput();
     }

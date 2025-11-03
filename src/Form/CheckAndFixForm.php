@@ -362,10 +362,25 @@ class CheckAndFixForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'thumbnails_to_create',
+                'type' => Element\Radio::class,
+            'options' => [
+                'label' => 'Thumbnails to create', // @translate
+                    'value_options' => [
+                        'missing' => 'Only missing thumbnails', // @translate
+                        'all' => 'All thumbnails', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative-thumbnails_to_create',
+                    'value' => 'missing',
+                ],
+            ])
+            ->add([
                 'name' => 'original_without_thumbnails',
                 'type' => Element\Checkbox::class,
                 'options' => [
-                    'label' => 'Only originals without thumbnails', // @translate
+                    'label' => 'Only originals marked without thumbnails in database', // @translate
                 ],
                 'attributes' => [
                     'id' => 'files_derivative-original_without_thumbnails',
