@@ -82,6 +82,9 @@ See general end user documentation for [installing a module].
 
 This module requires the module [Common], that should be installed first.
 
+The module uses external libraries, so use the release zip to install it, or use
+and init the source.
+
 - From the zip
 
 Download the last release [EasyAdmin.zip] from the list of releases, and
@@ -90,7 +93,11 @@ uncompress it in the `modules` directory.
 - From the source and for development
 
 If the module was installed from the source, rename the name of the folder of
-the module to `EasyAdmin`.
+the module to `EasyAdmin`, go to the root of the module, and run:
+
+```sh
+composer install --no-dev
+```
 
 Then install it like any other Omeka module and follow the config instructions.
 
@@ -314,6 +321,7 @@ TODO
 - [ ] Add a checkbox in page assets to optimise assets in batch.
 - [ ] Add a deduplicator for assets (and replace assets used as resource thumbnails and in pages).
 - [ ] Dump database: see adminer.
+- [ ] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
 
 Warning
 -------
