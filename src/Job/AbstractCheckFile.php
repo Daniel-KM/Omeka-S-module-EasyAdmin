@@ -186,7 +186,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                                 case 'storage_id':
                                     if ($isFixable) {
                                         $extension = $media->getExtension();
-                                        $newFilepath = dirname($filepath) . '/' . $realValue . ($extension !== null && $extension !==  '' ? '.' . $extension : '');
+                                        $newFilepath = dirname($filepath) . '/' . $realValue . ($extension !== null && $extension !== '' ? '.' . $extension : '');
                                         // TODO Ideally, the rename should occur at the same time than flush.
                                         // For now, add a real time log to avoid this rare issue.
                                         $isFixed = rename($filepath, (string) $newFilepath);

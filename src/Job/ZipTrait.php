@@ -198,6 +198,7 @@ trait ZipTrait
                         $this->logger->notice(
                             'Backup stopped: {total_dirs} dirs, {total_files} files, size: {total_size} bytes prepared.', // @translate
                             [
+                                // Space is a narrow no break space.
                                 'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
                                 'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
                                 'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
@@ -214,9 +215,10 @@ trait ZipTrait
             $this->logger->info(
                 'Backup to process: {total_dirs} dirs, {total_files} files, size: {total_size} bytes.', // @translate
                 [
-                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', "\u{202f}"),
-                    'total_files' => number_format((int) $result['total_files'], 0, ',', "\u{202f}"),
-                    'total_size' => number_format((int) $result['total_size'], 0, ',', "\u{202f}"),
+                    // Space is a narrow no break space.
+                    'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
+                    'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
+                    'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
                 ]
             );
 

@@ -2,8 +2,6 @@
 
 namespace EasyAdmin\Job;
 
-use Doctrine\Common\Collections\Criteria;
-
 class FileDerivativeFileSystem extends AbstractCheck
 {
     /**

@@ -97,6 +97,7 @@ class Backup extends AbstractCheck
                 'The backup is available at {link} (size: {size} bytes).', // @translate
                 [
                     'link' => sprintf('<a href="%1$s" download="%2$s" target="_self">%2$s</a>', $fileUrl, basename($filename)),
+                    // Space is a narrow no break space.
                     'size' => number_format((int) filesize($filepath), 0, ',', ' '),
                 ]
             );
@@ -143,6 +144,7 @@ class Backup extends AbstractCheck
             $this->logger->notice(
                 'Backup successfully created: {total_dirs} dirs, {total_files} files, size: {total_size} bytes, compressed: {size} bytes ({ratio}%).', // @translate
                 [
+                    // Space is a narrow no break space.
                     'total_dirs' => number_format((int) $result['total_dirs'], 0, ',', ' '),
                     'total_files' => number_format((int) $result['total_files'], 0, ',', ' '),
                     'total_size' => number_format((int) $result['total_size'], 0, ',', ' '),
