@@ -94,9 +94,6 @@ class SettingsFieldset extends Fieldset
                 'options' => [
                     'element_group' => 'editing',
                     'label' => 'Add a button to create resources directly from a template', // @translate
-                    'prepend_value_options' => [
-                        'all' => 'All resource templates', // @translate
-                    ],
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -114,7 +111,7 @@ class SettingsFieldset extends Fieldset
                     'element_group' => 'editing',
                     'label' => 'Add a button to create resources directly from a template specified with a class', // @translate
                     'query' => ['used' => true],
-                    'empty_option' => '[None]', // @translate
+                    'empty_option' => '',
                     'term_as_value' => true,
                 ],
                 'attributes' => [
