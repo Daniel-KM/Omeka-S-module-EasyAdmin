@@ -38,6 +38,11 @@ class FileMissing extends AbstractCheckFile
     protected $extensionsExclude = [];
 
     /**
+     * @var array
+     */
+    protected $filenamesEndExclude = [];
+
+    /**
      * @var string
      */
     protected $matchingMode;
@@ -63,14 +68,20 @@ class FileMissing extends AbstractCheckFile
         }
         $this->extensionsExclude = array_unique(array_filter(array_map('trim', $this->extensionsExclude), 'strlen'));
 
-        $matchinModes = [
+        $this->filenamesEndExclude = $this->getArg('filenames_end_exclude', []);
+        if (!is_array($this->filenamesEndExclude)) {
+            $this->filenamesEndExclude = explode(',', $this->filenamesEndExclude);
+        }
+        $this->filenamesEndExclude = array_unique(array_filter(array_map('trim', $this->filenamesEndExclude), 'strlen'));
+
+        $matchingModes = [
             'sha256',
             'md5',
             'source',
             'source_filename',
         ];
         $this->matchingMode = $this->getArg('matching', 'sha256') ?: 'sha256';
-        if (!in_array($this->matchingMode, $matchinModes)) {
+        if (!in_array($this->matchingMode, $matchingModes)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
                 'Matching mode "{mode}" is not supported.', // @translate
@@ -138,7 +149,7 @@ class FileMissing extends AbstractCheckFile
             return $this;
         }
 
-        $this->files = $this->listFilesInFolder($dir, false, $this->extensions, $this->extensionsExclude);
+        $this->files = $this->listFilesInFolder($dir, false, $this->extensions, $this->extensionsExclude, $this->filenamesEndExclude);
         if (!count($this->files)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
@@ -312,6 +323,7 @@ class FileMissing extends AbstractCheckFile
         foreach (array_keys($types) as $type) {
             $path = $this->basePath . '/' . $type;
             $types[$type] = $type === 'original'
+                // Here, it is useless to use the arg to exclude filenames.
                 ? $this->listFilesInFolder($path, false, $this->extensions, $this->extensionsExclude)
                 : $this->listFilesInFolder($path);
         }
