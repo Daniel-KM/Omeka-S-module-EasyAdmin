@@ -262,6 +262,18 @@ class CheckAndFixForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'filenames_end_exclude',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'label' => 'Exclude source files ending with strings', // @translate
+                    'value_separator' => ','
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-filenames_end_exclude',
+                    'placeholder' => '_low, _medium', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'matching',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

@@ -329,7 +329,8 @@ abstract class AbstractCheckFile extends AbstractCheck
         string $dir,
         bool $absolute = false,
         array $extensions = [],
-        array $extensionsExclude = []
+        array $extensionsExclude = [],
+        array $filenamesEndExclude = []
     ): array {
         if (empty($dir) || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
             return [];
@@ -349,6 +350,11 @@ abstract class AbstractCheckFile extends AbstractCheck
 
         $dirLength = mb_strlen($dir) + 1;
 
+        $excludedFilenamesEnd = [];
+        foreach ($filenamesEndExclude ?? [] as $excludeString) {
+            $excludedFilenamesEnd[$excludeString] = mb_strlen($excludeString);
+        }
+
         $files = [];
 
         try {
@@ -357,6 +363,22 @@ abstract class AbstractCheckFile extends AbstractCheck
                 if ($excludedRegex && preg_match($excludedRegex, $filePath)) {
                     continue;
                 }
+
+                // Skip files ending with excluded strings
+                if ($excludedFilenamesEnd) {
+                    $filename = pathinfo($filePath, PATHINFO_FILENAME);
+                    $shouldSkip = false;
+                    foreach ($excludedFilenamesEnd as $excludeString => $length) {
+                        if (mb_substr($filename, -$length) === $excludeString) {
+                            $shouldSkip = true;
+                            break;
+                        }
+                    }
+                    if ($shouldSkip) {
+                        continue;
+                    }
+                }
+
                 $files[] = $absolute ? $filePath : mb_substr($filePath, $dirLength);
             }
         } catch (\Exception $e) {
