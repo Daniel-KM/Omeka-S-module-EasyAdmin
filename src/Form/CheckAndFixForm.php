@@ -201,6 +201,7 @@ class CheckAndFixForm extends Form
                         'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (mainly for module Archive Repertory)', // @translate
                         'files_derivative' => 'Rebuild derivative images (thumbnails)', // @translate
+                        'files_derivative_file_system' => 'Quick rebuild all derivative images (from terminal, 10x times faster)', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -396,6 +397,52 @@ class CheckAndFixForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'files_derivative-original_without_thumbnails',
+                ],
+            ])
+        ;
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'files_derivative_file_system',
+                'options' => [
+                    'label' => 'Options to rebuild derivative files via file system', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'files_derivative_file_system',
+                ],
+            ])
+            ->get('files_derivative_file_system')
+            /* // TODO Implement fast check of extension and media types.
+            ->add([
+                'name' => 'media_types',
+                'type' => CommonElement\MediaTypeSelect::class,
+                'options' => [
+                    'label' => 'Media types to process', // @translate
+                    'empty_option' => 'All media types', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative_file_system-media_types',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'placeholder' => 'Select media types to process', // @ translate
+                    'data-placeholder' => 'Select media types to process', // @ translate
+                ],
+            ])
+            */
+            ->add([
+                'name' => 'thumbnails_to_create',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Thumbnails to create', // @translate
+                    'value_options' => [
+                        'missing' => 'Only missing thumbnails', // @translate
+                        'all' => 'All thumbnails', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'files_derivative_file_system-thumbnails_to_create',
+                    'value' => 'missing',
                 ],
             ])
         ;
