@@ -18,12 +18,6 @@ abstract class AbstractCheck extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
-     * Max number of rows to output in spreadsheet.
-     * @var int
-     */
-    const SPREADSHEET_ROW_LIMIT = 1000000;
-
-    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
@@ -209,19 +203,12 @@ abstract class AbstractCheck extends AbstractJob
     {
         static $columnKeys;
         static $total = 0;
-        static $skipNext = false;
 
         ++$total;
-        if ($total > self::SPREADSHEET_ROW_LIMIT) {
-            if ($skipNext) {
-                return $this;
-            }
-            $skipNext = true;
+        if ($total === 1048577) {
             $this->logger->err(
-                'Trying to output more than %d messages. Next messages are skipped.', // @translate
-                self::SPREADSHEET_ROW_LIMIT
+                'The spreadsheet has more than 1048576 messages, so it will be truncated when opened in LibreOffice or Excel.', // @translate
             );
-            return $this;
         }
 
         if ($columnKeys === null) {

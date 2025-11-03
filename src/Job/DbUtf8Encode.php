@@ -162,7 +162,6 @@ class DbUtf8Encode extends AbstractCheck
         $totalProcessed = 0;
         $this->totalUtf8 = 0;
         $totalSucceed = 0;
-        $maxRows = self::SPREADSHEET_ROW_LIMIT;
         while (true) {
             $criteria = clone $baseCriteria;
             $criteria->setFirstResult($offset);
@@ -264,9 +263,7 @@ class DbUtf8Encode extends AbstractCheck
                     ++$totalSucceed;
                 }
 
-                if (--$maxRows >= 0) {
-                    $this->writeRow($row);
-                }
+                $this->writeRow($row);
             }
 
             $this->entityManager->flush();
