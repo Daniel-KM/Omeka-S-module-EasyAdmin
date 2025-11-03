@@ -164,11 +164,20 @@ class Module extends AbstractModule
 
     protected function postInstall(): void
     {
+        /**
+         * @var \Omeka\Settings\Settings  $settings
+         * @var \Common\Stdlib\EasyMeta $easyMeta
+         */
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $settings->set('easyadmin_cron_tasks', ['session_8']);
 
         $this->postInstallAuto();
+
+        // Install default templates.
+        $easyMeta = $services->get('Common\EasyMeta');
+        $val = array_values($easyMeta->resourceTemplateIds());
+        $settings->set('easyadmin_quick_template', $val);
     }
 
     protected function installDirs(): void
@@ -586,6 +595,7 @@ class Module extends AbstractModule
 
         $plugins = $view->getHelperPluginManager();
         $url = $plugins->get('url');
+        $escape = $plugins->get('escapeHtmlAttr');
         $translate = $plugins->get('translate');
         $hyperlink = $plugins->get('hyperlink');
 
@@ -599,7 +609,6 @@ class Module extends AbstractModule
         ];
 
         $buttons = [];
-        $buttons[] = $hyperlink($translate('Any'), $url(null, ['action' => 'add'], true), ['class' => 'link']);
         foreach ($templateLabels as $id => $label) {
             $buttons[$id] = $hyperlink($translate($label), $url(null, ['action' => 'add'], ['query' => ['resource_template_id' => $id]], true), ['class' => 'link']);
         }
@@ -611,8 +620,9 @@ class Module extends AbstractModule
         if (count($buttons) > 1) {
             // TODO Use a real button instead of an anchor.
             $stringButtons = '<li>' . implode("</li>\n<li>", $buttons) . "</li>\n";
-            $stringExpand = $translate('Expand');
-            $stringAdd = $translate($mainLabels[$resourceType]);
+            $stringExpand = $escape($translate('Expand'));
+            $urlAdd = $url(null, ['action' => 'add'], [], true);
+            $stringAdd = $escape($translate($mainLabels[$resourceType]));
             // Styles adapted from the module Scripto.
             $html = preg_replace(
                 '~<div id="page-actions">(.*?)</div>~s',
@@ -676,7 +686,8 @@ class Module extends AbstractModule
                     </style>
                     <div id="page-actions">
                         <div id="page-action-menu">
-                            <a href="#" class="expand button" aria-label="$stringExpand>">$stringAdd</a>
+                            <a class="button" href="$urlAdd">$stringAdd</a>
+                            <a href="#" class="expand button expand-more" aria-label="$stringExpand>"></a>
                             <ul class="collapsible">
                                 $stringButtons
                             </ul>
