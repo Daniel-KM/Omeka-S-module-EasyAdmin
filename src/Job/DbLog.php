@@ -112,19 +112,27 @@ class DbLog extends AbstractCheck
             FROM $this->table
             WHERE 1 = 1
             SQL;
+        if ($date) {
+            $sql .= "\n" . ' AND created < :date';
+        }
+        if ($maximumSeverity) {
+            $sql .= "\n" . ' AND severity >= :severity';
+        }
+        if ($maximumLength) {
+            $sql .= "\n" . ' AND (LENGTH(message) > :length OR LENGTH(context) > :length)';
+        }
+
         $stmt = $this->connection->prepare($sql);
         if ($date) {
-            $sql .= ' AND created < :date';
             $stmt->bindValue(':date', $date);
         }
         if ($maximumSeverity) {
-            $sql .= ' AND severity >= :severity';
             $stmt->bindValue(':severity', $maximumSeverity);
         }
         if ($maximumLength) {
-            $sql .= ' AND (LENGTH(message) > :length OR LENGTH(context) > :length)';
             $stmt->bindValue(':length', $maximumLength);
         }
+
         $old = $stmt->executeQuery()->fetchOne();
 
         $this->logger->notice(
@@ -137,22 +145,31 @@ class DbLog extends AbstractCheck
                 DELETE FROM `$this->table`
                 WHERE 1 = 1
                 SQL;
-            $stmt = $this->connection->prepare($sql);
             if ($date) {
                 $sql .= ' AND created < :date';
-                $stmt->bindValue(':date', $date);
             }
             if ($maximumSeverity) {
                 $sql .= ' AND severity >= :severity';
-                $stmt->bindValue(':severity', $maximumSeverity);
             }
             if ($maximumLength) {
                 $sql .= ' AND (LENGTH(message) > :length OR LENGTH(context) > :length)';
+            }
+
+            $stmt = $this->connection->prepare($sql);
+            if ($date) {
+                $stmt->bindValue(':date', $date);
+            }
+            if ($maximumSeverity) {
+                $stmt->bindValue(':severity', $maximumSeverity);
+            }
+            if ($maximumLength) {
                 $stmt->bindValue(':length', $maximumLength);
             }
+
             $stmt->executeStatement();
             $count = $stmt->rowCount();
             $size = $this->connection->executeQuery($sqlSize)->fetchOne();
+
             $this->logger->notice(
                 '{count} records older than {days} days with maximum severity "{severity}" were removed. The table "{table}" has a size of {size} MB.', // @translate
                 ['count' => $count, 'days' => $minimumDays, 'size' => $size, 'severity' => $this->severities[$maximumSeverity], 'table' => $this->table]
