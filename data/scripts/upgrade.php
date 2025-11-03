@@ -452,3 +452,37 @@ if (version_compare($oldVersion, '3.4.36', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.37', '<')) {
+    $val = $settings->get('easyadmin_quick_template');
+    if (is_null($val)) {
+        /** @var \Common\Stdlib\EasyMeta $easyMeta */
+        $easyMeta = $services->get('Common\EasyMeta');
+        $val = array_values($easyMeta->resourceTemplateIds());
+    } else {
+        $val = array_diff($val, ['all']);
+    }
+    $settings->set('easyadmin_quick_template', $val);
+
+    // Rename some cron tasks.
+    $cronTasks = $settings->get('easyadmin_cron_tasks', $val);
+    $renameTasks = [
+        'session_1' => 'session_1d',
+        'session_2' => 'session_2d',
+        'session_8' => 'session_8d',
+        'session_40' => 'session_40d',
+        'session_100' => 'session_100d',
+    ];
+    foreach ($renameTasks as $old => $new) {
+        $key = array_search($old, $cronTasks);
+        if ($key !== false) {
+            $cronTasks[$key] = $new;
+        }
+    }
+    $settings->set('easyadmin_cron_tasks', $cronTasks);
+
+    $message = new PsrMessage(
+        'A new setting allows to skip security check csrf when uploading files in order to fix use behind some vpn/proxy.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
