@@ -72,12 +72,13 @@ class FileManagerController extends AbstractActionController
             $allowedExtensions = implode(',', $allowedExtensions);
         }
 
+        $skipCsrf = (bool) $settings->get('easyadmin_disable_csrf', false);
         $allowEmptyFiles = (bool) $settings->get('easyadmin_allow_empty_files', false);
 
         $data = [
             // This option allows to manage resource form and bulk upload form.
             'data-bulk-upload' => true,
-            'data-csrf' => (new \Laminas\Form\Element\Csrf('csrf'))->getValue(),
+            'data-csrf' => $skipCsrf ? '' : (new \Laminas\Form\Element\Csrf('csrf'))->getValue(),
             'data-allowed-media-types' => $allowedMediaTypes,
             'data-allowed-extensions' => $allowedExtensions,
             'data-allow-empty-files' => (int) $allowEmptyFiles,

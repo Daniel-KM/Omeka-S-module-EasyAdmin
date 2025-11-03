@@ -93,13 +93,15 @@ class UploadController extends AbstractActionController
         }
 
         // Check csrf for security.
-        $form = $this->getForm(\Omeka\Form\ResourceForm::class);
-        $form->setData(['csrf' => $headers['X-Csrf'] ?? null]);
-        if (!$form->isValid()) {
-            return $this->jsonError(
-                $this->translate('Expired, invalid or missing CSRF token.'), // @translate
-                Response::STATUS_CODE_403
-            );
+        if (!$this->settings('easyadmin_disable_csrf')) {
+            $form = $this->getForm(\Omeka\Form\ResourceForm::class);
+            $form->setData(['csrf' => $headers['X-Csrf'] ?? null]);
+            if (!$form->isValid()) {
+                return $this->jsonError(
+                    $this->translate('Expired, invalid or missing CSRF token.'), // @translate
+                    Response::STATUS_CODE_403
+                );
+            }
         }
 
         // Processing the chunk.
