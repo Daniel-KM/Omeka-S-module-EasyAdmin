@@ -45,11 +45,11 @@ class CronController extends AbstractActionController
 
         if ($tasks) {
             $msg = new PsrMessage(
-                '{count} tasks defined to be run automatically once a day.',  // @translate
+                '{count} tasks defined to be run regularly.', // @translate
                 ['count' => count($tasks)]
             );
         } else {
-            $msg = new PsrMessage('No task defined to be run automatically once a day.');
+            $msg = new PsrMessage('No task defined to be run regularly.'); // @translate
         }
         $this->messenger()->addSuccess($msg);
 

@@ -19,14 +19,23 @@ class CronForm extends Form
             ->setAttribute('id', 'form-cron')
             ->add([
                 'name' => 'easyadmin_cron_tasks',
+                // TODO Use a full cron config or a single numeric input.
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Tasks to run once a day', // @translate
+                    'label_attributes' => [
+                        'style' => 'display:inline-block',
+                    ],
                     'value_options' => [
-                        'session_2' => 'Clear sessions older than 2 days', // @translate
-                        'session_8' => 'Clear sessions older than 8 days', // @translate
-                        'session_40' => 'Clear sessions older than 40 days', // @translate
-                        'session_100' => 'Clear sessions older than 100 days', // @translate
+                        'session_1h' => 'Clear sessions older than 1 hour', // @translate
+                        'session_2h' => 'Clear sessions older than 2 hours', // @translate
+                        'session_4h' => 'Clear sessions older than 4 hours', // @translate
+                        'session_12h' => 'Clear sessions older than 12 hours', // @translate
+                        'session_1d' => 'Clear sessions older than 1 day', // @translate
+                        'session_2d' => 'Clear sessions older than 2 days', // @translate
+                        'session_8d' => 'Clear sessions older than 8 days', // @translate
+                        'session_40d' => 'Clear sessions older than 40 days', // @translate
+                        'session_100d' => 'Clear sessions older than 100 days', // @translate
                     ],
                 ],
                 'attributes' => [

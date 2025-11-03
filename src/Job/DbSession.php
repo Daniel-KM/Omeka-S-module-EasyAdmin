@@ -17,23 +17,23 @@ class DbSession extends AbstractCheck
         $processFix = $process === 'db_session_clean';
         $processRecreate = $process === 'db_session_recreate';
 
-        $minimumDays = (string) $this->getArg('days');
-        if ($processFix && !is_numeric($minimumDays)) {
+        $minimumSeconds = (string) $this->getArg('seconds');
+        if ($processFix && !is_numeric($minimumSeconds)) {
             $this->logger->warn(
-                'A minimum number of days is needed to clean sessions.' // @translate
+                'A minimum number of seconds is needed to clean sessions.' // @translate
             );
             return;
         }
 
-        $days = (int) $minimumDays;
+        $seconds = (int) $minimumSeconds;
 
         $quick = !empty($this->getArg('quick'));
         if ($quick) {
-            $this->deleteLastSession($days);
+            $this->deleteLastSession($seconds);
             return;
         }
 
-        $this->checkDbSession($processFix, (int) $minimumDays, $processRecreate);
+        $this->checkDbSession($processFix, (int) $minimumSeconds, $processRecreate);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -41,7 +41,7 @@ class DbSession extends AbstractCheck
         );
     }
 
-    protected function deleteLastSession(int $days): void
+    protected function deleteLastSession(int $seconds): void
     {
         // No message, except error.
         $table = 'session';
@@ -64,7 +64,7 @@ class DbSession extends AbstractCheck
         try {
             $this->connectionDbal->executeStatement(
                 $sql,
-                ['time' => $time - $days * 86400],
+                ['time' => $time - $seconds],
                 ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
             );
         } catch (\Exception $e) {
@@ -78,13 +78,10 @@ class DbSession extends AbstractCheck
 
     /**
      * Check the size of the db table "session".
-     *
-     * @param bool $fix
-     * @param int $days
      */
-    protected function checkDbSession(bool $fix = false, int $days = 0, bool $recreate = false): void
+    protected function checkDbSession(bool $fix = false, int $seconds = 0, bool $recreate = false): void
     {
-        $timestamp = time() - 86400 * $days;
+        $timestamp = time() - $seconds;
 
         $dbname = $this->connection->getDatabase();
         $sqlSize = <<<SQL
@@ -115,8 +112,8 @@ class DbSession extends AbstractCheck
         $sql = "SELECT COUNT(id) FROM $this->table;";
         $all = $this->connection->executeQuery($sql)->fetchOne();
         $this->logger->notice(
-            'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {days} days.', // @translate
-            ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'days' => $days]
+            'The table "{table}" has a size of {size} MB. {old}/{all} records are older than {total} seconds.', // @translate
+            ['table' => $this->table,'size' => $size, 'old' => $old, 'all' => $all, 'total' => $seconds]
         );
 
         if ($fix) {
@@ -127,8 +124,8 @@ class DbSession extends AbstractCheck
             $count = $stmt->rowCount();
             $size = $this->connection->executeQuery($sqlSize)->fetchOne();
             $this->logger->notice(
-                '{count} records older than {days} days were removed. The table "{table}" has a size of {size} MB.', // @translate
-                ['count' => $count, 'days' => $days, 'size' => $size, 'table' => $this->table]
+                '{count} records older than {seconds} seconds were removed. The table "{table}" has a size of {size} MB.', // @translate
+                ['count' => $count, 'seconds' => $seconds, 'size' => $size, 'table' => $this->table]
             );
         }
     }

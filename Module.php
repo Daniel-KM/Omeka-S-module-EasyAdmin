@@ -443,22 +443,52 @@ class Module extends AbstractModule
             return;
         }
 
+        // One check each hour.
+        // TODO Create a new way to check cron each minute?
         $lastCron = (int) $settings->get('easyadmin_cron_last');
         $time = time();
-        if ($lastCron + 86400 > $time) {
+        if ($lastCron + 3600 > $time) {
             return;
         }
-
         $settings->set('easyadmin_cron_last', $time);
 
         // Short tasks.
 
+        $valueToSeconds = [
+            '1h' => 3600,
+            '2h' => 7200,
+            '4h' => 14400,
+            '12h' => 43200,
+            '1d' => 86400,
+            '2d' => 172800,
+            '8d' => 691200,
+            '40d' => 3456000,
+            '100d' => 8640000,
+            // Deprecated.
+            '1' => 86400,
+            '2' => 172800,
+            '8' => 691200,
+            '40' => 3456000,
+            '100' => 8640000,
+        ];
+
         foreach ($tasks as $task) switch ($task) {
+            case 'session_1h':
+            case 'session_2h':
+            case 'session_4h':
+            case 'session_12h':
+            case 'session_1d':
+            case 'session_2d':
+            case 'session_8d':
+            case 'session_40d':
+            case 'session_100d':
+            // Deprecated.
+            case 'session_1':
             case 'session_2':
             case 'session_8':
             case 'session_40':
             case 'session_100':
-                $days = (int) substr($task, 8);
+                $seconds = $valueToSeconds[substr($task, 8)];
                 // If there is no index, use a job.
                 /** @var \Doctrine\DBAL\Connection $connection */
                 $connection = $services->get('Omeka\Connection');
@@ -467,13 +497,13 @@ class Module extends AbstractModule
                     $sql = 'DELETE `session` FROM `session` WHERE `modified` < :time;';
                     $connection->executeStatement(
                         $sql,
-                        ['time' => $time - $days * 86400],
+                        ['time' => $time - $seconds],
                         ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
                     );
                 } else {
                     $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
                     $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, [
-                        'days' => $days,
+                        'seconds' => $seconds,
                         'quick' => true,
                     ]);
                 }
