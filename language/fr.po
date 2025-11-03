@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-29 00:00+0000\n"
-"PO-Revision-Date: 2025-09-29 00:00+0000\n"
+"POT-Creation-Date: 2025-11-03 00:00+0000\n"
+"PO-Revision-Date: 2025-11-03 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -1068,7 +1068,7 @@ msgid ""
 "marked \"error\" on a total of {count_jobs}."
 msgstr ""
 "Les tâches abandonnées ont été nettoyées : {count_stopped} ont été marquées "
-"\"arrétées\" et {count_error} ont été marquées \"erreurr\" sur un total de "
+"\"arrétées\" et {count_error} ont été marquées \"erreur\" sur un total de "
 "{count_jobs}."
 
 #: src/Job/DbJob.php:89
@@ -2390,7 +2390,7 @@ msgstr "Chemin du fichier source"
 
 #: src/Form/CheckAndFixForm.php:272
 msgid "Source file name (warning: they should be unique)"
-msgstr "Nom du fichier source (attention : ils doivent être unique)"
+msgstr "Nom du fichier source (attention : ils doivent être uniques)"
 
 #: src/Form/CheckAndFixForm.php:273
 msgid ""
