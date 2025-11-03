@@ -145,6 +145,17 @@ class SettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'easyadmin_disable_csrf',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Disable security check of csrf to upload files (required with some vpn/proxy)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_disable_csrf',
+                ],
+            ])
+            ->add([
                 'name' => 'easyadmin_allow_empty_files',
                 'type' => Element\Checkbox::class,
                 'options' => [
