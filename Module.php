@@ -296,7 +296,7 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        // TODO What is the better event to handle a cron?
+        // TODO What is the better event to handle a cron? None: use server cron or systemd timer or webcron.
         $sharedEventManager->attach(
             '*',
             'view.layout',
@@ -438,6 +438,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
+        // Check if there are tasks.
         $tasks = $settings->get('easyadmin_cron_tasks', []);
         if (!count($tasks)) {
             return;
