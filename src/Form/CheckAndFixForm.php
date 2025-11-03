@@ -239,7 +239,7 @@ class CheckAndFixForm extends Form
                 'type' => CommonElement\ArrayText::class,
                 'options' => [
                     'label' => 'Limit to extensions', // @translate
-                    'value_separator' => ','
+                    'value_separator' => ',',
                 ],
                 'attributes' => [
                     'id' => 'files_missing-extensions',
@@ -251,7 +251,7 @@ class CheckAndFixForm extends Form
                 'type' => CommonElement\ArrayText::class,
                 'options' => [
                     'label' => 'Exclude extensions', // @translate
-                    'value_separator' => ','
+                    'value_separator' => ',',
                 ],
                 'attributes' => [
                     'id' => 'files_missing-extensions_exclude',
@@ -267,7 +267,7 @@ class CheckAndFixForm extends Form
                 'type' => CommonElement\ArrayText::class,
                 'options' => [
                     'label' => 'Exclude source files ending with strings', // @translate
-                    'value_separator' => ','
+                    'value_separator' => ',',
                 ],
                 'attributes' => [
                     'id' => 'files_missing-filenames_end_exclude',
