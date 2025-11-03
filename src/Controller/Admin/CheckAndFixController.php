@@ -70,6 +70,9 @@ class CheckAndFixController extends AbstractActionController
             case 'files_derivative':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDerivative::class, $defaultParams + $params['files_checkfix']['files_derivative']);
                 break;
+            case 'files_derivative_file_system':
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\FileDerivativeFileSystem::class, $defaultParams + $params['files_checkfix']['files_derivative_file_system']);
+                break;
             case 'files_media_no_original':
             case 'files_media_no_original_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\FileMediaNoOriginal::class, $defaultParams);
