@@ -164,10 +164,17 @@ class FileMissing extends AbstractCheckFile
         $total = count($this->files);
 
         // Prepare a list of hash of all files one time.
-        $this->logger->info(
-            'Preparing hashes of {total} files (this may take a long time).', // @translate
-            ['total' => $total]
-        );
+        if (in_array($this->matchingMode, ['sha256', 'md5'] )) {
+            $this->logger->info(
+                'Preparing hashes of {total} files (this may take a long time).', // @translate
+                ['total' => $total]
+            );
+        } else {
+            $this->logger->info(
+                'Preparing list of {total} files.', // @translate
+                ['total' => $total]
+            );
+        }
 
         // File is a relative path, filepath the absolute one.
         $result = [];
@@ -207,16 +214,18 @@ class FileMissing extends AbstractCheckFile
             }
 
             ++$count;
+            // Log every 100 for slow processes.
             if ($count % 100 === 0
-                // The other processes are instant, so no need to log loop.
                 && in_array($this->matchingMode, ['sha256', 'md5'])
             ) {
                 $this->logger->info(
                     '{count}/{total} hashes prepared.', // @translate
-                    [
-                        'count' => $count,
-                        'total' => $total,
-                    ]
+                    ['count' => $count,'total' => $total]
+                );
+            } elseif ($count % 10000 === 0) {
+                $this->logger->info(
+                    '{count}/{total} elements prepared.', // @translate
+                    ['count' => $count, 'total' => $total]
                 );
             }
         }

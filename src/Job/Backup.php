@@ -96,7 +96,7 @@ class Backup extends AbstractCheck
             $this->logger->notice(
                 'The backup is available at {link} (size: {size} bytes).', // @translate
                 [
-                    'link' => sprintf('<a href="%1$s" download="%2$s" target="_self">%2$s</a>', $fileUrl, basename($filename)),
+                    'link' => sprintf('<a href="%1$s" download="%2$s" target="_self">%2$s</a>', $fileUrl, basename($filepath)),
                     // Space is a narrow no break space.
                     'size' => number_format((int) filesize($filepath), 0, ',', ' '),
                 ]
