@@ -200,8 +200,11 @@ trait PreviousNextResourceTrait
         $entityClass = $this->resourceAdapter->getEntityClass();
 
         // $adapter->index = 0;
-        $qb = $this->resourceAdapter->getEntityManager()
-            ->createQueryBuilder()
+        $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.2.0', '<');
+        $qb = $isOldOmeka
+            ? $this->resourceAdapter->getEntityManager()->createQueryBuilder()
+            : $this->resourceAdapter->createQueryBuilder();
+        $qb
             ->select('omeka_root')
             ->from($entityClass, 'omeka_root');
         $this->resourceAdapter->buildBaseQuery($qb, $query);
