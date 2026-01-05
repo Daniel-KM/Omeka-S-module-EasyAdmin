@@ -67,8 +67,6 @@ class UploadController extends AbstractActionController
      */
     public function indexAction()
     {
-        // TODO Fix issue with session warning appended to json (currently fixed via js): Warning: session_write_close(): Failed to write session data using user defined save handler.
-
         // Some security checks.
 
         $user = $this->identity();
@@ -77,6 +75,15 @@ class UploadController extends AbstractActionController
                 $this->translate('User not authenticated.'), // @translate
                 Response::STATUS_CODE_403
             );
+        }
+
+        // In previous version, there was a session warning appended to json
+        // that was fixed via js:
+        // Warning: session_write_close(): Failed to write session data using user defined save handler.
+        // The following code closes session earlier to prevent warning.
+        // The session is no longer needed after authentication check.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
         }
 
         /** @var \Laminas\Http\Request $request */
