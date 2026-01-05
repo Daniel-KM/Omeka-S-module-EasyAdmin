@@ -400,6 +400,7 @@ class FileMissing extends AbstractCheckFile
         $no = $translator->translate('No'); // @translate
         $noSource = $translator->translate('No source'); // @translate
         $copyIssue = $translator->translate('Copy issue'); // @translate
+        $alreadyExists = $translator->translate('Already exists'); // @translate
 
         // Use larger batch for scalar queries (no entity overhead).
         $batchSize = self::SQL_LIMIT_LARGE;
@@ -414,9 +415,21 @@ class FileMissing extends AbstractCheckFile
         $totalProcessed = 0;
         $totalSucceed = 0;
         $totalFailed = 0;
+        $totalSkipped = 0;
+
+        // Cache for created directories to avoid repeated file_exists() calls.
+        $createdDirs = [];
+
+        // Check if source and destination are on same filesystem for hardlink.
+        $canHardlink = $fix && $this->sourceDir
+            && $this->canUseHardlink($this->sourceDir, $this->basePath);
 
         while (true) {
-            $rows = $this->connection->executeQuery($sqlBase, [$batchSize, $offset])->fetchAllAssociative();
+            $rows = $this->connection->executeQuery(
+                $sqlBase,
+                [$batchSize, $offset],
+                [\PDO::PARAM_INT, \PDO::PARAM_INT]
+            )->fetchAllAssociative();
             if (!count($rows) || $totalProcessed >= $totalToProcess) {
                 break;
             }
@@ -458,6 +471,26 @@ class FileMissing extends AbstractCheckFile
                     $filename = $isOriginal
                         ? ($extension ? $storageId . '.' . $extension : $storageId)
                         : ($storageId . '.jpg');
+
+                    // File exists in destination.
+                    if (isset($files[$filename])) {
+                        ++$totalSucceed;
+                        $this->writeRow([
+                            'item' => $itemId,
+                            'media' => $mediaId,
+                            'filename' => $filename,
+                            'extension' => $isOriginal ? $extension : 'jpg',
+                            'hash' => $sha256,
+                            'type' => $type,
+                            'exists' => $yes,
+                            'source' => '',
+                            'fixed' => '',
+                            'message' => '',
+                        ]);
+                        continue;
+                    }
+
+                    // File missing: need to fix or report.
                     $row = [
                         'item' => $itemId,
                         'media' => $mediaId,
@@ -465,73 +498,96 @@ class FileMissing extends AbstractCheckFile
                         'extension' => $isOriginal ? $extension : 'jpg',
                         'hash' => $sha256,
                         'type' => $type,
-                        'exists' => '',
+                        'exists' => $no,
                         'source' => '',
                         'fixed' => '',
                         'message' => '',
                     ];
-                    if (isset($files[$filename])) {
-                        $row['exists'] = $yes;
-                        ++$totalSucceed;
-                    } elseif ($fix) {
-                        $row['exists'] = $no;
-                        if (!$isOriginal) {
-                            $row['fixed'] = $no;
-                            $this->writeRow($row);
+
+                    if (!$fix) {
+                        $row['fixed'] = $noSource;
+                        ++$totalFailed;
+                        $this->writeRow($row);
+                        continue;
+                    }
+
+                    // Fix mode: try to restore the file.
+                    if (!$isOriginal) {
+                        $row['fixed'] = $no;
+                        $this->writeRow($row);
+                        break;
+                    }
+
+                    switch ($this->matchingMode) {
+                        default:
+                        case 'sha256':
+                            $hash = $sha256;
                             break;
-                        }
-                        switch ($this->matchingMode) {
-                            default:
-                            case 'sha256':
-                                $hash = $sha256;
-                                break;
-                            case 'md5':
-                                // Fake sha256, to be updated.
-                                $hash = $sha256;
-                                break;
-                            case 'source':
-                                $hash = ltrim($source, '/');
-                                break;
-                            case 'source_filename':
-                                // Use md5 binary hash to match the index.
-                                $hash = md5(pathinfo($source, PATHINFO_BASENAME), true);
-                                break;
-                        }
-                        if (isset($this->files[$hash])) {
-                            $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
-                            $src = $this->sourceDir . '/' . $this->files[$hash];
-                            $dest = $this->basePath . '/original/' . $filename;
-                            $hasCopyError = false;
-                            if (!file_exists(dirname($dest))) {
-                                // Create folder for Archive Repertory.
-                                $result = mkdir(dirname($dest), 0755, true);
-                                if (!$result) {
-                                    $row['fixed'] = $copyIssue;
-                                    $row['message'] = error_get_last()['message'];
-                                    ++$totalFailed;
-                                    $hasCopyError = true;
-                                }
-                            }
-                            if (!$hasCopyError) {
-                                $result = copy($src, $dest);
-                                if ($result) {
-                                    $row['fixed'] = $yes;
-                                    ++$totalSucceed;
-                                } else {
-                                    $row['fixed'] = $copyIssue;
-                                    $row['message'] = error_get_last()['message'];
-                                    ++$totalFailed;
-                                }
-                            }
-                        } else {
-                            $row['source'] = $no;
-                            $row['fixed'] = $noSource;
-                            ++$totalFailed;
-                        }
-                    } else {
-                        $row['exists'] = $no;
+                        case 'md5':
+                            // Fake sha256, to be updated.
+                            $hash = $sha256;
+                            break;
+                        case 'source':
+                            $hash = ltrim($source, '/');
+                            break;
+                        case 'source_filename':
+                            // Use md5 binary hash to match the index.
+                            $hash = md5(pathinfo($source, PATHINFO_BASENAME), true);
+                            break;
+                    }
+
+                    if (!isset($this->files[$hash])) {
                         $row['source'] = $no;
                         $row['fixed'] = $noSource;
+                        ++$totalFailed;
+                        $this->writeRow($row);
+                        continue;
+                    }
+
+                    $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
+                    $src = $this->sourceDir . '/' . $this->files[$hash];
+                    $dest = $this->basePath . '/original/' . $filename;
+
+                    // Skip if destination already exists (resume support).
+                    if (file_exists($dest)) {
+                        $row['fixed'] = $alreadyExists;
+                        ++$totalSkipped;
+                        $this->writeRow($row);
+                        continue;
+                    }
+
+                    // Create directory if needed (with cache).
+                    $destDir = dirname($dest);
+                    if (!isset($createdDirs[$destDir])) {
+                        if (!file_exists($destDir)) {
+                            $result = @mkdir($destDir, 0755, true);
+                            if (!$result) {
+                                $row['fixed'] = $copyIssue;
+                                $row['message'] = error_get_last()['message'] ?? '';
+                                ++$totalFailed;
+                                $this->writeRow($row);
+                                continue;
+                            }
+                        }
+                        $createdDirs[$destDir] = true;
+                    }
+
+                    // Try hardlink first (fast), fallback to copy.
+                    if ($canHardlink) {
+                        $result = @link($src, $dest);
+                    } else {
+                        $result = false;
+                    }
+                    if (!$result) {
+                        $result = @copy($src, $dest);
+                    }
+
+                    if ($result) {
+                        $row['fixed'] = $yes;
+                        ++$totalSucceed;
+                    } else {
+                        $row['fixed'] = $copyIssue;
+                        $row['message'] = error_get_last()['message'] ?? '';
                         ++$totalFailed;
                     }
                     $this->writeRow($row);
@@ -544,18 +600,34 @@ class FileMissing extends AbstractCheckFile
             $offset += $batchSize;
         }
 
-        $this->logger->notice(
-            'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
-            [
-                'processed' => $totalProcessed,
-                'total' => $totalToProcess,
-                'total_succeed' => $totalSucceed,
-                'total_failed' => $totalFailed,
-                'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
-            ]
-        );
+        $message = $totalSkipped
+            ? 'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_skipped} skipped ({mode}).' // @translate
+            : 'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).'; // @translate
+        $this->logger->notice($message, [
+            'processed' => $totalProcessed,
+            'total' => $totalToProcess,
+            'total_succeed' => $totalSucceed,
+            'total_failed' => $totalFailed,
+            'total_skipped' => $totalSkipped,
+            'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
+        ]);
 
         return true;
+    }
+
+    /**
+     * Check if hardlink can be used between source and destination.
+     */
+    protected function canUseHardlink(string $src, string $dest): bool
+    {
+        // Hardlinks only work on same filesystem.
+        // Compare device IDs of source and destination directories.
+        $srcStat = @stat($src);
+        $destStat = @stat($dest);
+        if (!$srcStat || !$destStat) {
+            return false;
+        }
+        return $srcStat['dev'] === $destStat['dev'];
     }
 
     /**
