@@ -738,6 +738,35 @@ class CheckAndFixForm extends Form
                 ],
             ]);
 
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'db_resource_title',
+                'options' => [
+                    'label' => 'Options for resource titles', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'db_resource_title_check db_resource_title_fix',
+                ],
+            ])
+            ->get('db_resource_title')
+            ->add([
+                'name' => 'report_type',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Report type', // @translate
+                    'info' => 'Full report: all resources are listed (slower). Partial report: only resources with different titles are listed (faster, recommended for large collections).', // @translate
+                    'value_options' => [
+                        'partial' => 'Partial: only different titles (faster)', // @translate
+                        'full' => 'Full: all resources (slower)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_resource_title-report_type',
+                    'value' => 'partial',
+                ],
+            ]);
+
         return $this;
     }
 
