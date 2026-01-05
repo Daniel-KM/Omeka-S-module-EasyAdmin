@@ -10,6 +10,19 @@ class CronController extends AbstractActionController
 {
     public function indexAction()
     {
+        $services = $this->getServiceLocator();
+
+        // Check if Cron module is active - if so, it handles the cron page.
+        // The route is handled by Cron module, so we only reach here if Cron is not installed.
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $cronModule = $moduleManager->getModule('Cron');
+        $hasCronModule = $cronModule && $cronModule->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+
+        // This controller is only used when Cron module is not installed.
+        // When Cron is installed, its route takes precedence.
+
+        // Cron module not installed - show legacy form with warning.
         $settings = $this->settings();
 
         /** @var \EasyAdmin\Form\CronForm $form */
@@ -32,6 +45,7 @@ class CronController extends AbstractActionController
             'lastRun' => $lastRun,
             'cronCommand' => $cronCommand,
             'registeredTasks' => $form->getRegisteredTasks(),
+            'cronModuleMissing' => true,
         ]);
 
         $request = $this->getRequest();
@@ -60,7 +74,6 @@ class CronController extends AbstractActionController
         $settings->set('easyadmin_cron', $newSettings);
 
         // Keep backward compatibility with old setting name during transition.
-        // TODO Remove in a future version.
         $oldTasks = [];
         foreach ($newSettings['tasks'] ?? [] as $taskId => $taskSettings) {
             if (!empty($taskSettings['enabled'])) {
@@ -86,7 +99,7 @@ class CronController extends AbstractActionController
     }
 
     /**
-     * Run all enabled tasks immediately.
+     * Run all enabled tasks immediately (legacy mode).
      */
     protected function runNow()
     {
@@ -108,35 +121,53 @@ class CronController extends AbstractActionController
             return $this->redirect()->toRoute('admin/easy-admin/cron', [], true);
         }
 
-        // Dispatch the cron job to run all tasks.
-        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
-        $job = $dispatcher->dispatch(\EasyAdmin\Job\CronTasks::class, [
-            'tasks' => $enabledTasks,
-            'manual' => true,
-        ]);
+        // Execute legacy session cleanup directly.
+        $this->executeSessionCleanupLegacy($enabledTasks);
 
         // Update last run time.
         $settings->set('easyadmin_cron_last', time());
 
-        $urlPlugin = $this->url();
-        $message = new PsrMessage(
-            'Processing cron tasks in background (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end}).', // @translate
-            [
-                'link_job' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))
-                ),
-                'job_id' => $job->getId(),
-                'link_end' => '</a>',
-                'link_log' => class_exists('Log\Module', false)
-                    ? sprintf('<a href="%1$s">', $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
-                    : sprintf('<a href="%1$s" target="_blank">', $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
-            ]
-        );
-        $message->setEscapeHtml(false);
-        $this->messenger()->addSuccess($message);
+        $this->messenger()->addSuccess(new PsrMessage(
+            'Cron tasks executed.' // @translate
+        ));
 
         return $this->redirect()->toRoute('admin/easy-admin/cron', [], true);
+    }
+
+    /**
+     * Legacy session cleanup (when Cron module not installed).
+     */
+    protected function executeSessionCleanupLegacy(array $enabledTasks): void
+    {
+        $sessionSecondsMap = [
+            'session_1h' => 3600,
+            'session_2h' => 7200,
+            'session_4h' => 14400,
+            'session_12h' => 43200,
+            'session_1d' => 86400,
+            'session_2d' => 172800,
+            'session_8d' => 691200,
+            'session_30d' => 2592000,
+        ];
+
+        $services = $this->getServiceLocator();
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $services->get('Omeka\Connection');
+        $time = time();
+
+        foreach ($enabledTasks as $taskId => $taskSettings) {
+            $seconds = $sessionSecondsMap[$taskId] ?? null;
+            if ($seconds === null) {
+                continue;
+            }
+
+            $sql = 'DELETE FROM `session` WHERE `modified` < :time;';
+            $connection->executeStatement(
+                $sql,
+                ['time' => $time - $seconds],
+                ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
+            );
+        }
     }
 
     /**
@@ -148,15 +179,22 @@ class CronController extends AbstractActionController
         $serverUrl = $this->viewHelpers()->get('ServerUrl');
         $basePath = $this->viewHelpers()->get('BasePath');
 
-        $baseUrl = rtrim($serverUrl(), '/') . $basePath();
         $scriptPath = realpath(OMEKA_PATH . '/modules/EasyAdmin/data/scripts/task.php');
 
         // Suggest daily execution by default.
         return sprintf(
-            '0 0 * * * php %s --task="EasyAdmin\\Job\\CronTasks" --user-id=1 --server-url="%s" --base-path="%s"',
+            '0 0 * * * php %s --task="EasyAdmin\\Job\\DbSession" --user-id=1 --server-url="%s" --base-path="%s" -a \'{"process":"db_session_clean","seconds":691200}\'',
             $scriptPath,
             rtrim($serverUrl(), '/'),
             $basePath()
         );
+    }
+
+    /**
+     * Helper to get service locator.
+     */
+    protected function getServiceLocator()
+    {
+        return $this->getEvent()->getApplication()->getServiceManager();
     }
 }

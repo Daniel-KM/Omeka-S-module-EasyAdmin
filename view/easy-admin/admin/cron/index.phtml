@@ -5,6 +5,7 @@
  * @var int|null $lastRun
  * @var string $cronCommand
  * @var array $registeredTasks
+ * @var bool $cronModuleMissing
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -29,6 +30,23 @@ $this->headScript()
 <nav class="section-nav">
     <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
 </nav>
+
+<?php if (!empty($cronModuleMissing)): ?>
+<div class="messages">
+    <div class="warning">
+        <p>
+            <?= sprintf(
+                $translate('For advanced cron features, install the %sCron module%s.'), // @translate
+                '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Cron" target="_blank">',
+                '</a>'
+            ) ?>
+        </p>
+        <p>
+            <?= $translate('This page provides basic session cleanup functionality only.') ?>
+        </p>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="cron-info">
     <h2><?= $translate('Status') ?></h2>
