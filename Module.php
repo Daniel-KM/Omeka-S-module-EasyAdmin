@@ -434,17 +434,39 @@ class Module extends AbstractModule
     }
 
     /**
-     * Handle session cleanup task execution from Cron module.
+     * Handle task execution from Cron module.
      */
     public function handleCronExecute(Event $event): void
     {
         $taskId = $event->getParam('task_id');
 
-        // Only handle session_* tasks.
-        if (strpos($taskId, 'session_') !== 0) {
+        // Handle session cleanup tasks.
+        if (strpos($taskId, 'session_') === 0) {
+            $this->executeSessionCleanup($taskId);
+            $event->setParam('handled', true);
             return;
         }
 
+        // Handle database backup tasks.
+        if (strpos($taskId, 'backup_db_') === 0) {
+            $this->executeBackupDatabase($taskId);
+            $event->setParam('handled', true);
+            return;
+        }
+
+        // Handle files backup tasks.
+        if (strpos($taskId, 'backup_files_') === 0) {
+            $this->executeBackupFiles($taskId);
+            $event->setParam('handled', true);
+            return;
+        }
+    }
+
+    /**
+     * Execute session cleanup.
+     */
+    protected function executeSessionCleanup(string $taskId): void
+    {
         $sessionSecondsMap = [
             'session_1h' => 3600,
             'session_2h' => 7200,
@@ -487,9 +509,43 @@ class Module extends AbstractModule
                 'quick' => true,
             ]);
         }
+    }
 
-        // Mark the task as handled.
-        $event->setParam('handled', true);
+    /**
+     * Execute database backup via Cron.
+     */
+    protected function executeBackupDatabase(string $taskId): void
+    {
+        $services = $this->getServiceLocator();
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+
+        $compress = ($taskId === 'backup_db_compressed');
+
+        $dispatcher->dispatch(\EasyAdmin\Job\DatabaseBackup::class, [
+            'compress' => $compress,
+        ]);
+    }
+
+    /**
+     * Execute files backup via Cron.
+     */
+    protected function executeBackupFiles(string $taskId): void
+    {
+        $services = $this->getServiceLocator();
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+
+        if ($taskId === 'backup_files_full') {
+            $include = ['core', 'modules', 'themes', 'local_config', 'database_ini', 'htaccess'];
+        } else {
+            // Config only.
+            $include = ['local_config', 'database_ini', 'htaccess'];
+        }
+
+        $dispatcher->dispatch(\EasyAdmin\Job\Backup::class, [
+            'process' => 'backup_install',
+            'include' => $include,
+            'compression' => 6,
+        ]);
     }
 
     public function handleViewLayoutResource(Event $event): void

@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $resource
+ * @var string $resourceLabel
+ * @var \Omeka\Form\ConfirmForm $form
+ * @var string|null $partialPath
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+
+$form->setButtonLabel('Confirm delete'); // @translate
+?>
+
+<div id="sidebar-confirm">
+    <?php $resourceLabel = $translate($resourceLabel); ?>
+    <h3><?= sprintf($translate('Delete %s'), $resourceLabel) ?></h3>
+    <p><?= $escape($resource) ?></p>
+    <p><?= sprintf($translate('Are you sure you would like to delete this %s?'), $resourceLabel) ?></p>
+    <?= $this->form($form) ?>
+</div>
