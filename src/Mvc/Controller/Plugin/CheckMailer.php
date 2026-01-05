@@ -52,19 +52,37 @@ class CheckMailer extends AbstractPlugin
         $configSummary = [];
 
         $senderEmail = $this->getSenderEmail();
-        $configSummary[] = new PsrMessage(
-            'Sender email: {email}', // @translate
-            ['email' => $senderEmail]
-        );
+        if ($senderEmail) {
+            $configSummary[] = new PsrMessage(
+                'Sender email: {email}', // @translate
+                ['email' => $senderEmail]
+            );
+        } else {
+            $configSummary[] = new PsrMessage(
+                'Sender email: Not configured (will use server default)' // @translate
+            );
+        }
 
         $mailConfig = $this->config['mail'] ?? [];
         $transportConfig = $mailConfig['transport'] ?? [];
         $transportType = $transportConfig['type'] ?? 'sendmail';
 
-        $configSummary[] = new PsrMessage(
-            'Transport type: {value}', // @translate
-            ['value' => $transportType]
-        );
+        // Check if this is default (no explicit config) vs explicit sendmail.
+        $isDefaultConfig = empty($mailConfig) || empty($transportConfig);
+
+        if ($isDefaultConfig) {
+            $configSummary[] = new PsrMessage(
+                'Transport type: sendmail (default - no explicit configuration)' // @translate
+            );
+            $configSummary[] = new PsrMessage(
+                'Note: Using local sendmail requires proper DNS records (SPF, DKIM, DMARC, PTR) for good deliverability. Consider using SMTP relay instead.' // @translate
+            );
+        } else {
+            $configSummary[] = new PsrMessage(
+                'Transport type: {value}', // @translate
+                ['value' => $transportType]
+            );
+        }
 
         if ($transportType === 'smtp') {
             $transportOptions = $transportConfig['options'] ?? [];
@@ -221,10 +239,15 @@ class CheckMailer extends AbstractPlugin
     {
         $results = [
             'domain' => null,
+            'mx' => ['valid' => false, 'records' => [], 'primary' => null],
             'spf' => ['valid' => false, 'record' => null, 'recommendation' => null],
             'dkim' => ['valid' => false, 'record' => null, 'recommendation' => null, 'selector' => null],
             'dmarc' => ['valid' => false, 'record' => null, 'recommendation' => null],
             'ptr' => ['valid' => false, 'hostname' => null, 'matches_domain' => false],
+            'smtp' => ['reachable' => false, 'port' => null, 'ssl_valid' => null, 'ssl_info' => null],
+            'blacklist' => ['clean' => true, 'listed' => []],
+            'sender' => ['valid' => true, 'email' => null, 'domain_match' => true],
+            'score' => ['passed' => 0, 'total' => 0, 'percentage' => 0],
         ];
 
         // Determine the domain to check.
@@ -251,6 +274,24 @@ class CheckMailer extends AbstractPlugin
 
         $dkimSelector = trim($options['dkim_selector'] ?? '') ?: 'mail';
         $adminEmail = 'admin@' . $domain;
+
+        // Check MX record.
+        $mxRecords = @dns_get_record($domain, DNS_MX);
+        if (!$mxRecords) {
+            // Try parent domain for subdomains.
+            $parts = explode('.', $domain);
+            if (count($parts) > 2) {
+                array_shift($parts);
+                $parentDomain = implode('.', $parts);
+                $mxRecords = @dns_get_record($parentDomain, DNS_MX);
+            }
+        }
+        if ($mxRecords) {
+            usort($mxRecords, fn($a, $b) => ($a['pri'] ?? 99) <=> ($b['pri'] ?? 99));
+            $results['mx']['valid'] = true;
+            $results['mx']['records'] = $mxRecords;
+            $results['mx']['primary'] = rtrim($mxRecords[0]['target'] ?? '', '.');
+        }
 
         // Check SPF record.
         $spfRecords = $this->getDnsTxtRecords($domain);
@@ -305,13 +346,205 @@ class CheckMailer extends AbstractPlugin
                 $results['ptr']['valid'] = true;
                 $results['ptr']['hostname'] = $reverseDns;
                 $results['ptr']['matches_domain'] = strpos($reverseDns, $domain) !== false;
-                // Detect hosting provider.
                 $results['ptr']['provider'] = $this->detectHostingProvider($reverseDns);
             }
             $results['ptr']['ip'] = $ipAddress;
+
+            // Check blacklists.
+            $results['blacklist'] = $this->checkBlacklists($ipAddress);
         }
 
+        // Check SMTP connection and SSL.
+        $mailHost = $this->detectMailHost($domain);
+        $results['smtp'] = $this->checkSmtpConnection($mailHost);
+        $results['smtp']['host'] = $mailHost;
+
+        // Check sender email domain.
+        $senderEmail = $this->getSenderEmail();
+        $results['sender']['email'] = $senderEmail;
+        if ($senderEmail && filter_var($senderEmail, FILTER_VALIDATE_EMAIL)) {
+            $senderDomain = substr(strrchr($senderEmail, '@'), 1);
+            // Check if sender domain matches or is related to the site domain.
+            $results['sender']['domain'] = $senderDomain;
+            $results['sender']['domain_match'] = $senderDomain === $domain
+                || strpos($domain, $senderDomain) !== false
+                || strpos($senderDomain, $domain) !== false;
+        }
+
+        // Calculate score.
+        $results['score'] = $this->calculateScore($results);
+
         return $results;
+    }
+
+    /**
+     * Check if IP is on common email blacklists.
+     */
+    protected function checkBlacklists(string $ip): array
+    {
+        $result = ['clean' => true, 'listed' => [], 'checked' => []];
+
+        // Common DNS-based blacklists.
+        $blacklists = [
+            'zen.spamhaus.org' => 'Spamhaus',
+            'bl.spamcop.net' => 'SpamCop',
+            'b.barracudacentral.org' => 'Barracuda',
+            'dnsbl.sorbs.net' => 'SORBS',
+        ];
+
+        // Reverse IP for DNSBL query.
+        $reversedIp = implode('.', array_reverse(explode('.', $ip)));
+
+        foreach ($blacklists as $bl => $name) {
+            $lookup = "$reversedIp.$bl";
+            $result['checked'][] = $name;
+
+            // DNS query - if it resolves, IP is listed.
+            $response = @gethostbyname($lookup);
+            if ($response !== $lookup && strpos($response, '127.') === 0) {
+                $result['clean'] = false;
+                $result['listed'][] = $name;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check SMTP connection and SSL certificate.
+     */
+    protected function checkSmtpConnection(string $host): array
+    {
+        $result = [
+            'reachable' => false,
+            'port' => null,
+            'ssl_valid' => null,
+            'ssl_info' => null,
+            'error' => null,
+        ];
+
+        // Try common SMTP ports.
+        $ports = [587, 465, 25];
+        foreach ($ports as $port) {
+            $errno = 0;
+            $errstr = '';
+            $context = stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'capture_peer_cert' => true,
+                ],
+            ]);
+
+            $timeout = 5;
+            $socket = @stream_socket_client(
+                "tcp://$host:$port",
+                $errno,
+                $errstr,
+                $timeout,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
+
+            if ($socket) {
+                $result['reachable'] = true;
+                $result['port'] = $port;
+                fclose($socket);
+
+                // Try SSL connection for certificate check.
+                if ($port === 465) {
+                    $sslSocket = @stream_socket_client(
+                        "ssl://$host:$port",
+                        $errno,
+                        $errstr,
+                        $timeout,
+                        STREAM_CLIENT_CONNECT,
+                        $context
+                    );
+                } else {
+                    // For STARTTLS ports, we need to do the handshake.
+                    $sslSocket = @stream_socket_client(
+                        "tcp://$host:$port",
+                        $errno,
+                        $errstr,
+                        $timeout,
+                        STREAM_CLIENT_CONNECT,
+                        $context
+                    );
+                    if ($sslSocket) {
+                        // Read greeting.
+                        @fgets($sslSocket, 512);
+                        // Send EHLO.
+                        @fwrite($sslSocket, "EHLO localhost\r\n");
+                        @fgets($sslSocket, 512);
+                        // Send STARTTLS.
+                        @fwrite($sslSocket, "STARTTLS\r\n");
+                        $response = @fgets($sslSocket, 512);
+                        if (strpos($response, '220') === 0) {
+                            @stream_socket_enable_crypto($sslSocket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                        }
+                    }
+                }
+
+                if ($sslSocket) {
+                    $params = @stream_context_get_params($sslSocket);
+                    if (!empty($params['options']['ssl']['peer_certificate'])) {
+                        $cert = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
+                        if ($cert) {
+                            $result['ssl_valid'] = true;
+                            $result['ssl_info'] = [
+                                'subject' => $cert['subject']['CN'] ?? 'Unknown',
+                                'issuer' => $cert['issuer']['CN'] ?? $cert['issuer']['O'] ?? 'Unknown',
+                                'valid_from' => date('Y-m-d', $cert['validFrom_time_t'] ?? 0),
+                                'valid_to' => date('Y-m-d', $cert['validTo_time_t'] ?? 0),
+                                'expired' => ($cert['validTo_time_t'] ?? 0) < time(),
+                            ];
+                            if ($result['ssl_info']['expired']) {
+                                $result['ssl_valid'] = false;
+                            }
+                        }
+                    }
+                    fclose($sslSocket);
+                }
+
+                break;
+            }
+        }
+
+        if (!$result['reachable']) {
+            $result['error'] = 'Could not connect to SMTP server on any port (587, 465, 25).';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Calculate deliverability score.
+     */
+    protected function calculateScore(array $results): array
+    {
+        $checks = [
+            'mx' => $results['mx']['valid'] ?? false,
+            'spf' => $results['spf']['valid'] ?? false,
+            'dkim' => $results['dkim']['valid'] ?? false,
+            'dmarc' => $results['dmarc']['valid'] ?? false,
+            'ptr' => ($results['ptr']['valid'] ?? false) && ($results['ptr']['matches_domain'] ?? false),
+            'smtp' => $results['smtp']['reachable'] ?? false,
+            'ssl' => $results['smtp']['ssl_valid'] ?? false,
+            'blacklist' => $results['blacklist']['clean'] ?? true,
+            'sender' => $results['sender']['domain_match'] ?? true,
+        ];
+
+        $passed = count(array_filter($checks));
+        $total = count($checks);
+        $percentage = $total > 0 ? round(($passed / $total) * 100) : 0;
+
+        return [
+            'passed' => $passed,
+            'total' => $total,
+            'percentage' => $percentage,
+            'checks' => $checks,
+        ];
     }
 
     /**
@@ -460,6 +693,52 @@ class CheckMailer extends AbstractPlugin
         $registrar = $this->detectDomainRegistrar($domain);
         $registrarText = $registrar ?: 'unknown';
 
+        // Display score summary first.
+        $score = $results['score'];
+        $scoreLevel = $score['percentage'] >= 80 ? 'success' : ($score['percentage'] >= 50 ? 'warning' : 'error');
+        $scoreMessage = new PsrMessage(
+            'Email deliverability score: {passed}/{total} checks passed ({percentage}%)', // @translate
+            [
+                'passed' => $score['passed'],
+                'total' => $score['total'],
+                'percentage' => $score['percentage'],
+            ]
+        );
+        if ($scoreLevel === 'success') {
+            $this->messenger->addSuccess($scoreMessage);
+        } elseif ($scoreLevel === 'warning') {
+            $this->messenger->addWarning($scoreMessage);
+        } else {
+            $this->messenger->addError($scoreMessage);
+        }
+
+        // Detect recommended mail host.
+        $recommendedHost = $this->detectMailHost($domain);
+        $currentTransport = $this->getTransportType();
+        $currentHost = $this->getSmtpHost();
+
+        if ($currentTransport === 'sendmail') {
+            $this->messenger->addNotice(new PsrMessage(
+                'Recommended: Switch to SMTP transport using "{host}" for better deliverability.', // @translate
+                ['host' => $recommendedHost]
+            ));
+        } elseif ($currentTransport === 'smtp' && $currentHost) {
+            // Check if current host matches recommended.
+            $currentIp = @gethostbyname($currentHost);
+            $recommendedIp = @gethostbyname($recommendedHost);
+            if ($currentIp && $recommendedIp && $currentIp !== $currentHost && $currentIp === $recommendedIp) {
+                $this->messenger->addSuccess(new PsrMessage(
+                    'Config: Your SMTP host "{current}" is correctly configured (matches recommended "{recommended}").', // @translate
+                    ['current' => $currentHost, 'recommended' => $recommendedHost]
+                ));
+            } elseif ($currentHost !== $recommendedHost && $currentIp !== $recommendedIp) {
+                $this->messenger->addNotice(new PsrMessage(
+                    'Note: Your SMTP host "{current}" differs from detected mail server "{recommended}". This may be intentional if using a different mail provider.', // @translate
+                    ['current' => $currentHost, 'recommended' => $recommendedHost]
+                ));
+            }
+        }
+
         if ($ipAddress) {
             $this->messenger->addNotice(new PsrMessage(
                 'Checking DNS records for domain: {domain} (server IP: {ip})', // @translate
@@ -474,6 +753,26 @@ class CheckMailer extends AbstractPlugin
 
         // Collect actions needed for summary.
         $actionsNeeded = [];
+
+        // MX results.
+        if ($results['mx']['valid']) {
+            $primary = $results['mx']['primary'];
+            $mailProvider = $this->detectMailProvider($primary);
+            $providerInfo = $mailProvider ? " ($mailProvider)" : '';
+            $this->messenger->addSuccess(new PsrMessage(
+                'MX: OK — Primary: {primary}{provider}', // @translate
+                ['primary' => $primary, 'provider' => $providerInfo]
+            ));
+        } else {
+            $this->messenger->addError(new PsrMessage(
+                'MX: MISSING — No mail server configured for {domain}', // @translate
+                ['domain' => $domain]
+            ));
+            $actionsNeeded[] = new PsrMessage(
+                'MX: Add MX record for "{domain}" pointing to your mail server.', // @translate
+                ['domain' => $domain]
+            );
+        }
 
         // SPF results.
         if ($results['spf']['valid']) {
@@ -635,10 +934,97 @@ class CheckMailer extends AbstractPlugin
             }
         }
 
+        // SMTP connection results.
+        $smtp = $results['smtp'];
+        if ($smtp['reachable']) {
+            $sslInfo = '';
+            if ($smtp['ssl_valid'] === true) {
+                $sslInfo = new PsrMessage(
+                    ' (SSL OK: {subject}, expires {expires})', // @translate
+                    [
+                        'subject' => $smtp['ssl_info']['subject'] ?? 'Unknown',
+                        'expires' => $smtp['ssl_info']['valid_to'] ?? 'Unknown',
+                    ]
+                );
+            } elseif ($smtp['ssl_valid'] === false) {
+                $sslInfo = ' (SSL ERROR)';
+            }
+            $this->messenger->addSuccess(new PsrMessage(
+                'SMTP: OK — Connected to {host} on port {port}{ssl}', // @translate
+                [
+                    'host' => $smtp['host'] ?? 'Unknown',
+                    'port' => $smtp['port'],
+                    'ssl' => $sslInfo,
+                ]
+            ));
+        } else {
+            $this->messenger->addWarning(new PsrMessage(
+                'SMTP: UNREACHABLE — Cannot connect to {host}', // @translate
+                ['host' => $smtp['host'] ?? 'Unknown']
+            ));
+        }
+
+        // SSL certificate results (if SSL was tested).
+        if ($smtp['ssl_valid'] === false && !empty($smtp['ssl_info'])) {
+            $sslInfo = $smtp['ssl_info'];
+            if (!empty($sslInfo['expired'])) {
+                $this->messenger->addError(new PsrMessage(
+                    'SSL: EXPIRED — Certificate for {subject} expired on {date}', // @translate
+                    [
+                        'subject' => $sslInfo['subject'],
+                        'date' => $sslInfo['valid_to'],
+                    ]
+                ));
+                $actionsNeeded[] = new PsrMessage(
+                    'SSL: Renew the SSL certificate for the mail server. Current certificate expired on {date}.', // @translate
+                    ['date' => $sslInfo['valid_to']]
+                );
+            }
+        }
+
+        // Blacklist results.
+        $blacklist = $results['blacklist'];
+        if ($blacklist['clean']) {
+            $this->messenger->addSuccess(new PsrMessage(
+                'Blacklist: CLEAN — IP not listed on {count} checked blacklists', // @translate
+                ['count' => count($blacklist['checked'] ?? [])]
+            ));
+        } else {
+            $this->messenger->addError(new PsrMessage(
+                'Blacklist: LISTED — IP found on: {lists}', // @translate
+                ['lists' => implode(', ', $blacklist['listed'])]
+            ));
+            $actionsNeeded[] = new PsrMessage(
+                'Blacklist: Your IP is listed on {lists}. Request delisting from these blacklists, or use an SMTP relay to send emails.', // @translate
+                ['lists' => implode(', ', $blacklist['listed'])]
+            );
+        }
+
+        // Sender domain check.
+        $sender = $results['sender'];
+        if (!$sender['domain_match']) {
+            $this->messenger->addWarning(new PsrMessage(
+                'Sender: MISMATCH — Email "{email}" domain does not match site domain "{domain}"', // @translate
+                [
+                    'email' => $sender['email'],
+                    'domain' => $domain,
+                ]
+            ));
+            $actionsNeeded[] = new PsrMessage(
+                'Sender: Consider using an email address from the domain "{domain}" to improve deliverability.', // @translate
+                ['domain' => $domain]
+            );
+        } elseif (!empty($sender['email'])) {
+            $this->messenger->addSuccess(new PsrMessage(
+                'Sender: OK — Email "{email}" matches site domain', // @translate
+                ['email' => $sender['email']]
+            ));
+        }
+
         // Summary with actions.
         if (empty($actionsNeeded)) {
             $this->messenger->addSuccess(
-                'All DNS records (SPF, DKIM, DMARC, PTR) are properly configured!' // @translate
+                'All checks passed! Your email configuration is properly set up.' // @translate
             );
         } else {
             $actionsList = '<ul><li>' . implode('</li><li>', array_map('strval', $actionsNeeded)) . '</li></ul>';
