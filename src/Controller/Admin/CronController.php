@@ -12,15 +12,26 @@ class CronController extends AbstractActionController
     {
         $services = $this->getServiceLocator();
 
-        // Check if Cron module is active - if so, it handles the cron page.
-        // The route is handled by Cron module, so we only reach here if Cron is not installed.
+        // Check if Cron module is active - if so, forward to its controller.
         /** @var \Omeka\Module\Manager $moduleManager */
         $moduleManager = $services->get('Omeka\ModuleManager');
         $cronModule = $moduleManager->getModule('Cron');
         $hasCronModule = $cronModule && $cronModule->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
 
-        // This controller is only used when Cron module is not installed.
-        // When Cron is installed, its route takes precedence.
+        if ($hasCronModule) {
+            // Forward to Cron module's controller.
+            // Must pass controller param explicitly to ensure RouteMatch has it
+            // for the view.layout event trigger.
+            return $this->forward()->dispatch(
+                \Cron\Controller\Admin\CronController::class,
+                [
+                    'action' => 'index',
+                    'controller' => \Cron\Controller\Admin\CronController::class,
+                ]
+            );
+        }
+
+        // Fallback: Cron module is not installed (upgrade scenario).
 
         // Cron module not installed - show legacy form with warning.
         $settings = $this->settings();

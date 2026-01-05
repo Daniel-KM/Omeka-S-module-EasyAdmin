@@ -319,5 +319,29 @@ return [
             ],
             'default_option' => 'session_8d',
         ],
+        'backup_database' => [
+            'label' => 'Backup database', // @translate
+            'module' => 'EasyAdmin',
+            'task_type' => 'job',
+            'frequencies' => ['daily', 'weekly', 'monthly'],
+            'default_frequency' => 'weekly',
+            'options' => [
+                'backup_db_compressed' => 'Compressed (gzip)', // @translate
+                'backup_db_plain' => 'Plain SQL', // @translate
+            ],
+            'default_option' => 'backup_db_compressed',
+        ],
+        'backup_files' => [
+            'label' => 'Backup files (modules, themes, config)', // @translate
+            'module' => 'EasyAdmin',
+            'task_type' => 'job',
+            'frequencies' => ['weekly', 'monthly'],
+            'default_frequency' => 'weekly',
+            'options' => [
+                'backup_files_full' => 'Full backup (core, modules, themes, config)', // @translate
+                'backup_files_config' => 'Configuration only', // @translate
+            ],
+            'default_option' => 'backup_files_full',
+        ],
     ],
 ];
