@@ -10,7 +10,11 @@ class PreviousResource extends AbstractHelper
     use PreviousNextResourceTrait;
 
     /**
-     * Get the public resource immediately before the current one.
+     * Get the resource immediately before the current one.
+     *
+     * Visibility is handled automatically:
+     * - On public site: only public resources (or owned by current user) are shown
+     * - On admin: all resources are shown (respecting acl permissions)
      *
      * @param string $sourceQuery "session" (default when no query), "setting"
      *   else passed query.
@@ -20,8 +24,7 @@ class PreviousResource extends AbstractHelper
     {
         $resourceName = $resource->resourceName();
 
-        // TODO Manage query for media.
-        // TODO Manage different queries by resource type.
+        // Media navigation is within an item (prev/next media of same item).
         if ($resourceName === 'media') {
             return $this->previousMedia($resource);
         }

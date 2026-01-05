@@ -30,16 +30,9 @@ class LastBrowsePage extends AbstractHelper
                 ? $plugins->get('searchingUrl')(false, $session->lastQuery[$ui]['items'] ?? [])
                 : $view->url($isAdmin ? 'admin/default' : 'site/resource', ['action' => ''], [], true);
         }
-        $query = $session->lastBrowsePage[$ui]['items'];
-        // Remove any csrf key, useless for a search page.
-        // TODO Check if it is still needed to remove the csrf from the stored browse page.
-        /* // Require parsing.
-        foreach (array_keys($query) as $key) {
-            if (substr($key, -4) === 'csrf') {
-                unset($query[$key]);
-            }
-        }
-        */
-        return $query;
+        // The stored url may contain expired csrf tokens, but this is harmless
+        // for navigation purposes: forms will regenerate new tokens as needed.
+        // So, to remove any csrf key is useless for a search page.
+        return $session->lastBrowsePage[$ui]['items'];
     }
 }

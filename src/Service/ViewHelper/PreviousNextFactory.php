@@ -13,7 +13,9 @@ class PreviousNextFactory implements FactoryInterface
         $plugins = $services->get('ControllerPluginManager');
         $currentSite = $services->get('ViewHelperManager')->get('currentSite');
         return new PreviousNext(
+            $services->get('Omeka\Acl'),
             $services->get('Omeka\ApiAdapterManager'),
+            $services->get('Omeka\AuthenticationService'),
             $services->get('Omeka\Connection'),
             $services->get('Omeka\EntityManager'),
             $plugins->has('searchResources') ? $plugins->get('searchResources') : null,
