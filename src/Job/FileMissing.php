@@ -49,9 +49,9 @@ class FileMissing extends AbstractCheckFile
 
     public function perform(): void
     {
-        // Increase memory for large file sets (4M+ files need ~1.5GB).
-        // This can be removed or adjusted once the job completes.
-        ini_set('memory_limit', '3G');
+        // Memory optimization: yield + md5 binary keys reduce memory usage.
+        // Uncomment if needed for very large file sets (4M+ files).
+        // ini_set('memory_limit', '3G');
 
         parent::perform();
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
@@ -165,45 +165,34 @@ class FileMissing extends AbstractCheckFile
             return $this;
         }
 
-        $this->files = $this->listFilesInFolder($dir, false, $this->extensions, $this->extensionsExclude, $this->filenamesEndExclude);
-        if (!count($this->files)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
-                'Source directory "{path}" is empty.', // @translate
-                ['path' => $dir]
-            );
-            return $this;
-        }
-
         $this->sourceDir = $dir;
 
-        $total = count($this->files);
-
         // Prepare a list of hash of all files one time.
-        if (in_array($this->matchingMode, ['sha256', 'md5'] )) {
+        // Use generator (yield) to avoid loading all files in memory.
+        if (in_array($this->matchingMode, ['sha256', 'md5'])) {
             $this->logger->info(
-                'Preparing hashes of {total} files (this may take a long time).', // @translate
-                ['total' => $total]
+                'Preparing hashes of files (this may take a long time).' // @translate
             );
         } else {
             $this->logger->info(
-                'Preparing list of {total} files.', // @translate
-                ['total' => $total]
+                'Preparing list of files.' // @translate
             );
         }
 
         // File is a relative path, filepath the absolute one.
-        // Memory optimization: process files and free memory progressively.
-        // For source_filename mode, we need to track duplicates, so use a
-        // two-pass approach to minimize peak memory usage.
+        // Memory optimization: use generator to iterate files without
+        // loading all in memory.
+        $filesIterator = $this->iterateFilesInFolder($dir, false, $this->extensions, $this->extensionsExclude, $this->filenamesEndExclude);
+
         if ($this->matchingMode === 'source_filename') {
-            // First pass: build index by filename, tracking duplicates.
-            // Use a simple array with filename as key and first file path as value.
-            // Track duplicates separately to report them without storing all paths.
+            // Build index by filename using md5 binary hash as key
+            // (16 bytes vs ~50 chars).
+            // Track duplicates separately to report them without storing
+            // all paths.
             $result = [];
             $duplicates = [];
             $count = 0;
-            foreach ($this->files as $key => $file) {
+            foreach ($filesIterator as $file) {
                 $filepath = $dir . '/' . $file;
                 $extension = pathinfo($filepath, PATHINFO_EXTENSION);
                 if (!$extension) {
@@ -214,11 +203,12 @@ class FileMissing extends AbstractCheckFile
                 }
                 if (is_readable($filepath)) {
                     $filename = pathinfo($filepath, PATHINFO_BASENAME);
-                    if (isset($result[$filename])) {
-                        // Track duplicate count, not all paths (memory optimization).
+                    $filenameHash = md5($filename, true);
+                    if (isset($result[$filenameHash])) {
+                        // Track duplicate count, not all paths.
                         $duplicates[$filename] = ($duplicates[$filename] ?? 1) + 1;
                     } else {
-                        $result[$filename] = $file;
+                        $result[$filenameHash] = $file;
                     }
                 } else {
                     $this->logger->warn(
@@ -226,14 +216,12 @@ class FileMissing extends AbstractCheckFile
                         ['path' => $file]
                     );
                 }
-                // Free memory progressively.
-                unset($this->files[$key]);
 
                 ++$count;
                 if ($count % 10000 === 0) {
                     $this->logger->info(
-                        '{count}/{total} elements prepared.', // @translate
-                        ['count' => $count, 'total' => $total]
+                        '{count} elements prepared.', // @translate
+                        ['count' => $count]
                     );
                 }
             }
@@ -249,10 +237,10 @@ class FileMissing extends AbstractCheckFile
             $this->files = $result;
             unset($result, $duplicates);
         } else {
-            // For sha256, md5, source modes: use original memory-efficient approach.
+            // For sha256, md5, source modes.
             $result = [];
             $count = 0;
-            foreach ($this->files as $key => $file) {
+            foreach ($filesIterator as $file) {
                 $filepath = $dir . '/' . $file;
                 $extension = pathinfo($filepath, PATHINFO_EXTENSION);
                 if (!$extension) {
@@ -280,22 +268,20 @@ class FileMissing extends AbstractCheckFile
                         ['path' => $file]
                     );
                 }
-                // Free memory progressively.
-                unset($this->files[$key]);
 
                 ++$count;
-                // Log every 100 for slow processes.
+                // Log every 100 for slow hash processes.
                 if ($count % 100 === 0
                     && in_array($this->matchingMode, ['sha256', 'md5'])
                 ) {
                     $this->logger->info(
-                        '{count}/{total} hashes prepared.', // @translate
-                        ['count' => $count, 'total' => $total]
+                        '{count} hashes prepared.', // @translate
+                        ['count' => $count]
                     );
                 } elseif ($count % 10000 === 0) {
                     $this->logger->info(
-                        '{count}/{total} elements prepared.', // @translate
-                        ['count' => $count, 'total' => $total]
+                        '{count} elements prepared.', // @translate
+                        ['count' => $count]
                     );
                 }
             }
@@ -304,14 +290,23 @@ class FileMissing extends AbstractCheckFile
             unset($result);
         }
 
+        if (!count($this->files)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Source directory "{path}" is empty.', // @translate
+                ['path' => $dir]
+            );
+            return $this;
+        }
+
         $this->logger->notice(
             'The source directory contains {total} readable files.', // @translate
             ['total' => count($this->files)]
         );
-        if ($total !== count($this->files)) {
+        if ($count !== count($this->files)) {
             $this->logger->notice(
                 'The source directory contains {total} duplicate files.', // @translate
-                ['total' => $total - count($this->files)]
+                ['total' => $count - count($this->files)]
             );
         }
 
@@ -384,14 +379,17 @@ class FileMissing extends AbstractCheckFile
             ->setFirstResult(null)
             ->setMaxResults(self::SQL_LIMIT);
 
-        // First, list files.
+        // First, list files indexed by filename for O(1) lookup.
         $types = array_flip($types);
         foreach (array_keys($types) as $type) {
             $path = $this->basePath . '/' . $type;
-            $types[$type] = $type === 'original'
+            $files = $type === 'original'
                 // Here, it is useless to use the arg to exclude filenames.
                 ? $this->listFilesInFolder($path, false, $this->extensions, $this->extensionsExclude)
                 : $this->listFilesInFolder($path);
+            // Use filename as key for O(1) isset() instead of O(n) in_array().
+            $types[$type] = array_flip($files);
+            unset($files);
         }
 
         $fixDb = $fix === 'files_missing_fix_db';
@@ -496,7 +494,7 @@ class FileMissing extends AbstractCheckFile
                         'fixed' => '',
                         'message' => '',
                     ];
-                    if (in_array($filename, $files)) {
+                    if (isset($files[$filename])) {
                         $row['exists'] = $yes;
                         ++$totalSucceed;
                     } elseif ($fix) {
@@ -526,14 +524,15 @@ class FileMissing extends AbstractCheckFile
                                     $hash = $media->getSha256();
                                     break;
                                 case 'md5':
-                                    // This is a fake sha256 in the table, so to be updated next.
+                                    // Fake sha256, to be updated.
                                     $hash = $media->getSha256();
                                     break;
                                 case 'source':
                                     $hash = ltrim($media->getSource(), '/');
                                     break;
                                 case 'source_filename':
-                                    $hash = pathinfo($media->getSource(), PATHINFO_BASENAME);
+                                    // Use md5 binary hash to match the index.
+                                    $hash = md5(pathinfo($media->getSource(), PATHINFO_BASENAME), true);
                                     break;
                             }
                             if (isset($this->files[$hash])) {

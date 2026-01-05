@@ -336,6 +336,30 @@ abstract class AbstractCheckFile extends AbstractCheck
             return [];
         }
 
+        $files = iterator_to_array($this->iterateFilesInFolder($dir, $absolute, $extensions, $extensionsExclude, $filenamesEndExclude));
+        sort($files);
+        return $files;
+    }
+
+    /**
+     * Iterate files inside a directory filtered by extensions recursively.
+     *
+     * Memory-efficient generator version of listFilesInFolder().
+     * Use this for very large directories (millions of files).
+     *
+     * @return \Generator<string>
+     */
+    protected function iterateFilesInFolder(
+        string $dir,
+        bool $absolute = false,
+        array $extensions = [],
+        array $extensionsExclude = [],
+        array $filenamesEndExclude = []
+    ): \Generator {
+        if (empty($dir) || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
+            return;
+        }
+
         $regex = empty($extensions)
             ? '/^.+$/i'
             : '/^.+\.(' . implode('|', $extensions) . ')$/i';
@@ -346,7 +370,7 @@ abstract class AbstractCheckFile extends AbstractCheck
 
         $directory = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
         $iterator = new \RecursiveIteratorIterator($directory);
-        $regex = new \RegexIterator($iterator, $regex, \RecursiveRegexIterator::GET_MATCH);
+        $regexIterator = new \RegexIterator($iterator, $regex, \RecursiveRegexIterator::GET_MATCH);
 
         $dirLength = mb_strlen($dir) + 1;
 
@@ -355,10 +379,8 @@ abstract class AbstractCheckFile extends AbstractCheck
             $excludedFilenamesEnd[$excludeString] = mb_strlen($excludeString);
         }
 
-        $files = [];
-
         try {
-            foreach ($regex as $file) {
+            foreach ($regexIterator as $file) {
                 $filePath = reset($file);
                 if ($excludedRegex && preg_match($excludedRegex, $filePath)) {
                     continue;
@@ -379,7 +401,7 @@ abstract class AbstractCheckFile extends AbstractCheck
                     }
                 }
 
-                $files[] = $absolute ? $filePath : mb_substr($filePath, $dirLength);
+                yield $absolute ? $filePath : mb_substr($filePath, $dirLength);
             }
         } catch (\Exception $e) {
             $this->logger->err(
@@ -388,8 +410,5 @@ abstract class AbstractCheckFile extends AbstractCheck
             );
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
         }
-
-        sort($files);
-        return $files;
     }
 }
