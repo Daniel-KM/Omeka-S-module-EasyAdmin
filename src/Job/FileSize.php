@@ -4,6 +4,10 @@ namespace EasyAdmin\Job;
 
 class FileSize extends AbstractCheckFile
 {
+    protected $checkColumn = 'size';
+
+    protected $fixProcessName = 'files_size_fix';
+
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
@@ -17,28 +21,6 @@ class FileSize extends AbstractCheckFile
 
     public function perform(): void
     {
-        parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
-
-        $process = $this->getArg('process');
-
-        $this->checkFilesize($process === 'files_size_fix');
-
-        $this->logger->notice(
-            'Process "{process}" completed.', // @translate
-            ['process' => $process]
-        );
-
-        $this->finalizeOutput();
-    }
-
-    /**
-     * Check the size of the files.
-     */
-    protected function checkFilesize(bool $fix = false): bool
-    {
-        return $this->checkFileData('size', $fix);
+        $this->performFileDataCheck();
     }
 }

@@ -4,6 +4,10 @@ namespace EasyAdmin\Job;
 
 class FileHash extends AbstractCheckFile
 {
+    protected $checkColumn = 'sha256';
+
+    protected $fixProcessName = 'files_hash_fix';
+
     protected $columns = [
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
@@ -17,28 +21,6 @@ class FileHash extends AbstractCheckFile
 
     public function perform(): void
     {
-        parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
-
-        $process = $this->getArg('process');
-
-        $this->checkFilehash($process === 'files_hash_fix');
-
-        $this->logger->notice(
-            'Process "{process}" completed.', // @translate
-            ['process' => $process]
-        );
-
-        $this->finalizeOutput();
-    }
-
-    /**
-     * Check the hash of the files.
-     */
-    protected function checkFilehash(bool $fix = false): bool
-    {
-        return $this->checkFileData('sha256', $fix);
+        $this->performFileDataCheck();
     }
 }
