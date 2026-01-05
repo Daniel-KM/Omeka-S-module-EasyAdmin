@@ -5,6 +5,46 @@ namespace EasyAdmin\Job;
 abstract class AbstractCheckFile extends AbstractCheck
 {
     /**
+     * The column to check (size, sha256, media_type, storage_id).
+     * Subclasses should override this property.
+     *
+     * @var string
+     */
+    protected $checkColumn = '';
+
+    /**
+     * The process name suffix for the fix action (e.g., 'files_size_fix').
+     * Subclasses should override this property.
+     *
+     * @var string
+     */
+    protected $fixProcessName = '';
+
+    /**
+     * Common perform logic for file data check jobs.
+     * Subclasses can call this method or override perform() entirely.
+     */
+    protected function performFileDataCheck(): void
+    {
+        parent::perform();
+        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
+            return;
+        }
+
+        $process = $this->getArg('process');
+        $fix = $this->fixProcessName && $process === $this->fixProcessName;
+
+        $this->checkFileData($this->checkColumn, $fix);
+
+        $this->logger->notice(
+            'Process "{process}" completed.', // @translate
+            ['process' => $process]
+        );
+
+        $this->finalizeOutput();
+    }
+
+    /**
      * Check the size or the hash of the files.
      */
     protected function checkFileData(string $column, bool $fix = false): bool
