@@ -157,6 +157,32 @@ class CheckAndFixForm extends Form
                 'name' => 'type',
                 'required' => false,
             ]);
+        $inputFilter->get('system')
+            ->get('mail')
+            ->add([
+                'name' => 'recipient',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'check_dns',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'domain',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'ip_address',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'dkim_selector',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'generate_dkim',
+                'required' => false,
+            ]);
 
         $inputFilter->get('module_tasks')
             ->add([
@@ -1070,6 +1096,7 @@ class CheckAndFixForm extends Form
                         'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
                         'cache_check' => 'Check caches', // @translate
                         'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate
+                        'mail_check' => 'Check email configuration and send test email', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -1111,6 +1138,89 @@ class CheckAndFixForm extends Form
                         'data',
                         'path',
                     ],
+                ],
+            ])
+        ;
+
+        $fieldset
+            ->add([
+                'type' => Fieldset::class,
+                'name' => 'mail',
+                'options' => [
+                    'label' => 'Options for email check', // @translate
+                ],
+                'attributes' => [
+                    'class' => 'mail_check',
+                ],
+            ])
+            ->get('mail')
+            ->add([
+                'name' => 'recipient',
+                'type' => Element\Email::class,
+                'options' => [
+                    'label' => 'Recipient email for test', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-recipient',
+                    'placeholder' => 'test@example.org', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'check_dns',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Check DNS records (SPF, DKIM, DMARC)', // @translate
+                    'info' => 'Check the DNS records of the mail domain to help configure your registrar and mail server.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-check-dns',
+                ],
+            ])
+            ->add([
+                'name' => 'domain',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Domain (optional)', // @translate
+                    'info' => 'The domain to check DNS records for. If not provided, it will be extracted from the sender email.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-domain',
+                    'placeholder' => 'example.org',
+                ],
+            ])
+            ->add([
+                'name' => 'ip_address',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Mail server IP address (optional, auto-detected)', // @translate
+                    'info' => 'The IP address of your mail server. If empty, it will be auto-detected from SMTP config, server IP, or domain A record.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-ip-address',
+                    'placeholder' => '192.0.2.1',
+                ],
+            ])
+            ->add([
+                'name' => 'dkim_selector',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'DKIM selector (optional)', // @translate
+                    'info' => 'The DKIM selector used in your DNS records (e.g., "mail", "default", "selector1"). Default is "mail".', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-dkim-selector',
+                    'placeholder' => 'mail',
+                ],
+            ])
+            ->add([
+                'name' => 'generate_dkim',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Generate DKIM key if missing', // @translate
+                    'info' => 'Generate a new DKIM key pair using OpenSSL. The public key will be shown for DNS configuration.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'mail-generate-dkim',
                 ],
             ])
         ;

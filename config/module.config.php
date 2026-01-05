@@ -71,6 +71,7 @@ return [
     ],
     'controller_plugins' => [
         'factories' => [
+            'checkMailer' => Service\ControllerPlugin\CheckMailerFactory::class,
             'easyAdminAddons' => Service\ControllerPlugin\AddonsFactory::class,
         ],
     ],
