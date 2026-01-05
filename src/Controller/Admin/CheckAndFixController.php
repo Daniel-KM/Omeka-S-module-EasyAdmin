@@ -128,7 +128,7 @@ class CheckAndFixController extends AbstractActionController
                 break;
             case 'db_resource_title_check':
             case 'db_resource_title_fix':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceTitle::class, $defaultParams);
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbResourceTitle::class, $defaultParams + $params['resource_values']['db_resource_title']);
                 break;
             case 'db_item_primary_media_check':
             case 'db_item_primary_media_fix':

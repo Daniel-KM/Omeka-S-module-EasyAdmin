@@ -417,7 +417,7 @@ class FileMissing extends AbstractCheckFile
         $sqlBase = 'SELECT m.id, m.item_id, m.storage_id, m.extension, m.sha256, m.source
             FROM media m WHERE ';
         $sqlBase .= $isOriginalMain ? 'm.has_original = 1' : 'm.has_thumbnails = 1';
-        $sqlBase .= ' ORDER BY m.id ASC LIMIT ? OFFSET ?';
+        $sqlBase .= ' ORDER BY m.id ASC LIMIT :limit OFFSET :offset';
 
         $offset = 0;
         $totalProcessed = 0;
@@ -435,8 +435,8 @@ class FileMissing extends AbstractCheckFile
         while (true) {
             $rows = $this->connection->executeQuery(
                 $sqlBase,
-                [$batchSize, $offset],
-                [\PDO::PARAM_INT, \PDO::PARAM_INT]
+                ['limit' => (int) $batchSize, 'offset' => (int) $offset],
+                ['limit' => \PDO::PARAM_INT, 'offset' => \PDO::PARAM_INT]
             )->fetchAllAssociative();
             if (!count($rows) || $totalProcessed >= $totalToProcess) {
                 break;
