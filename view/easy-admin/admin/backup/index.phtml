@@ -227,8 +227,7 @@ $formatSize = function ($bytes) {
                 <td><?= date('Y-m-d H:i:s', $backup['mtime']) ?></td>
                 <td><?= $formatSize($backup['size']) ?></td>
                 <td class="actions">
-                    <a href="<?= $escapeAttr($url('top') . '/files/backup/' . rawurlencode($backup['name'])) ?>"
-                       download="<?= $escapeAttr($backup['name']) ?>"
+                    <a href="<?= $escapeAttr($url(null, ['action' => 'download'], ['query' => ['file' => $backup['name']]], true)) ?>"
                        class="o-icon-download" title="<?= $translate('Download') ?>"></a>
                     <a href="#" class="o-icon-delete delete-backup"
                        data-sidebar-content-url="<?= $url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true) ?>"

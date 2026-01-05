@@ -196,6 +196,64 @@ class BackupController extends AbstractActionController
     }
 
     /**
+     * Download a backup file securely.
+     *
+     * Backup files contain sensitive data (database credentials, API keys,
+     * user passwords) and must only be accessible to administrators.
+     *
+     * Uses SendFile plugin for streaming large files without memory issues,
+     * and supports HTTP range requests for resumable downloads.
+     */
+    public function downloadAction()
+    {
+        $filename = $this->params()->fromQuery('file');
+        if (!$filename) {
+            $this->messenger()->addError('No file specified.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'index'], true);
+        }
+
+        // Security: use basename to prevent directory traversal.
+        $safeFilename = basename($filename);
+        $backupDir = $this->basePath . '/backup';
+        $filepath = $backupDir . '/' . $safeFilename;
+
+        // Verify the file is actually in the backup directory (paranoid check).
+        $realBackupDir = realpath($backupDir);
+        $realFilepath = realpath($filepath);
+        if ($realBackupDir === false || $realFilepath === false
+            || strpos($realFilepath, $realBackupDir . DIRECTORY_SEPARATOR) !== 0
+        ) {
+            $this->messenger()->addError('Invalid file path.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'index'], true);
+        }
+
+        // Determine content type based on extension.
+        $extension = strtolower(pathinfo($safeFilename, PATHINFO_EXTENSION));
+        $contentTypes = [
+            'sql' => 'application/sql',
+            'gz' => 'application/gzip',
+            'zip' => 'application/zip',
+            'tar' => 'application/x-tar',
+            'bz2' => 'application/x-bzip2',
+        ];
+
+        // Use SendFile plugin for streaming large files.
+        $response = $this->sendFile($filepath, [
+            'content_type' => $contentTypes[$extension] ?? null,
+            'filename' => $safeFilename,
+            'disposition_mode' => 'attachment',
+            'cache' => false,
+        ]);
+
+        if (!$response) {
+            $this->messenger()->addError('File not found.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'index'], true);
+        }
+
+        return $response;
+    }
+
+    /**
      * Get list of backup files.
      */
     protected function getBackupList(string $backupDir): array
