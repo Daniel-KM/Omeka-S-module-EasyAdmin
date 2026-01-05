@@ -268,7 +268,7 @@ class CheckAndFixController extends AbstractActionController
                     $result = false;
                     if (method_exists($cache, 'clear')) {
                         $result = $cache->clear();
-                    } elseif (method_exists('deleteAll')) {
+                    } elseif (method_exists($cache, 'deleteAll')) {
                         $result = $cache->deleteAll();
                     }
                     if ($result) {
