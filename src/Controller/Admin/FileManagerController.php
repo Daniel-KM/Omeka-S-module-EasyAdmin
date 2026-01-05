@@ -223,7 +223,7 @@ class FileManagerController extends AbstractActionController
                 'name' => $entry['name'],
                 'path' => $entry['path'],
                 'isDir' => $entry['isDir'],
-                'isWritable' => is_writable($entry['path']),
+                'isWritable' => is_writeable($entry['path']),
             ];
 
             if (!$entry['isDir']) {
@@ -444,7 +444,7 @@ class FileManagerController extends AbstractActionController
             return false;
         }
 
-        if (!is_file($filepath) || !is_writable($filepath)) {
+        if (!is_file($filepath) || !is_writeable($filepath)) {
             if ($showMessages) {
                 $this->messenger()->addError('The file cannot be deleted.'); // @translate
             }

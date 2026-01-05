@@ -753,7 +753,7 @@ class DatabaseBackup extends AbstractJob
     protected function checkDestinationDir(string $dirPath): bool
     {
         if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_writable($dirPath)) {
+            if (!is_dir($dirPath) || !is_writeable($dirPath)) {
                 $this->logger->err(
                     'The backup directory is not writable: {path}', // @translate
                     ['path' => $dirPath]

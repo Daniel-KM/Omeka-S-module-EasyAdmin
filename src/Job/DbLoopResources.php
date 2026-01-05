@@ -133,8 +133,8 @@ class DbLoopResources extends AbstractJob
             }
 
             $this->logger->info(
-                'The job "{name}" was stopped.', // @translate
-                ['name' => 'Loop resources']
+                '{processed}/{total} resources processed.', // @translate
+                ['processed' => $totalProcessed, 'total' => $totalToProcess]
             );
 
             // Avoid memory issue.

@@ -100,10 +100,10 @@ abstract class AbstractCheckFile extends AbstractCheck
             return true;
         }
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
-        $yes = $translator->translate('Yes'); // @translate
-        $no = $translator->translate('No'); // @translate
-        $empty = $translator->translate('[empty]'); // @translate
+        $yesNo = $this->getYesNo();
+        $yes = $yesNo['yes'];
+        $no = $yesNo['no'];
+        $empty = $this->translator->translate('[empty]'); // @translate
 
         $specifyMediaType = $this->getServiceLocator()->get('ControllerPluginManager')->get('specifyMediaType');
 
@@ -227,8 +227,11 @@ abstract class AbstractCheckFile extends AbstractCheck
                                     if ($isFixable) {
                                         $extension = $media->getExtension();
                                         $newFilepath = dirname($filepath) . '/' . $realValue . ($extension !== null && $extension !== '' ? '.' . $extension : '');
-                                        // TODO Ideally, the rename should occur at the same time than flush.
-                                        // For now, add a real time log to avoid this rare issue.
+                                        // Ideally, the rename should occur at
+                                        // the same time than flush, but this
+                                        // it is a rare issue and logging is
+                                        // enough. Anyway, file rename and db
+                                        // flush cannot be atomic.
                                         $isFixed = rename($filepath, (string) $newFilepath);
                                         if ($isFixed) {
                                             $media->setStorageId($realValue);

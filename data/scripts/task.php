@@ -152,7 +152,9 @@ if (empty($taskName)) {
     exit();
 }
 
-// TODO Use the plugin manager.
+// Manually scan modules directory instead of using plugin manager because this
+// script may be called before the service manager is fully initialized.
+// This approach works reliably for execution of jobs via cli.
 $omekaModulesPath = OMEKA_PATH . '/modules';
 $modulePaths = array_values(array_filter(array_diff(scandir($omekaModulesPath), ['.', '..']), fn ($file) => is_dir($omekaModulesPath . '/' . $file)));
 // Short task name.
@@ -278,8 +280,11 @@ $services->get('Router')->setBaseUrl($basePath);
 
 $services->get('Omeka\AuthenticationService')->getStorage()->write($user);
 
-// TODO Log fatal errors.
-// @see \Omeka\Job\DispatchStrategy::handleFatalError();
+// Fatal errors are displayed on stdout/stderr for CLI scripts.
+// Unlike Omeka's DispatchStrategy::handleFatalError(), register_shutdown_function
+// is not used: the job is not persisted; the logger may not be available at
+// shutdown; cli output is sufficient.
+// @see \Omeka\Job\DispatchStrategy\Synchronous::handleFatalError()
 // @link https://stackoverflow.com/questions/1900208/php-custom-error-handler-handling-parse-fatal-errors#7313887
 
 // Finalize the preparation of the job / task.
@@ -309,11 +314,13 @@ if ($asTask) {
         $logger->addProcessor($userIdProcessor);
         unset($module);
     }
-    // Since there is no job id, the job should not require it.
-    // For example, the `shouldStop()` should not be called.
-    // Using a dynamic super-class bypasses this issue in most of the real life
-    // cases.
-    // @todo Fix \Omeka\Job\AbstractJob::shouldStop().
+    // Since there is no job id (not persisted), shouldStop() would fail because
+    // it queries the database for the job status. This dynamic subclass overrides
+    // shouldStop() to return false when there's no job id, allowing CLI tasks
+    // to run without database persistence.
+    // Note: This is a workaround for Omeka core issue - AbstractJob::shouldStop()
+    // assumes a persisted job entity.
+    // TODO Fix \Omeka\Job\AbstractJob::shouldStop().
     class_alias($taskClass, 'RealTask');
     class Task extends \RealTask
     {

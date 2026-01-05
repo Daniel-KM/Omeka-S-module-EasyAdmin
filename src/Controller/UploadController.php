@@ -193,8 +193,8 @@ class UploadController extends AbstractActionController
         $tempFile->setSourceName($filename);
         $tempFile->setTempPath($filepath);
 
-        $validateFile = (bool) $this->settings()->get('disable_file_validation', false);
-        if ($validateFile) {
+        $disableFileValidation = (bool) $this->settings()->get('disable_file_validation', false);
+        if (!$disableFileValidation) {
             $errorStore = new ErrorStore();
             if (!$this->validator->validate($tempFile, $errorStore)) {
                 @unlink($filepath);
@@ -208,15 +208,6 @@ class UploadController extends AbstractActionController
             }
         }
 
-        $errorMessage = null;
-        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
-        if (!$isFilenameValid) {
-            return $this->jsonError(
-                $this->translate($errorMessage),
-                Response::STATUS_CODE_415
-            );
-        }
-
         $isBulkUploadForm = !empty($headers['X-Is-Bulk-Upload-Form']);
         $result = null;
         if ($isBulkUploadForm) {
@@ -225,7 +216,7 @@ class UploadController extends AbstractActionController
             if (!$dirPath) {
                 return $this->jsonError($this->translate($errorMessage), Response::STATUS_CODE_500);
             }
-            $newDestination = rtrim($dirPath, '//') . '/' . $filename;
+            $newDestination = rtrim($dirPath, '/') . '/' . $filename;
             $fileExists = file_exists($newDestination);
             if ($fileExists) {
                 if (!is_writeable($newDestination)) {

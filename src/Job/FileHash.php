@@ -12,7 +12,7 @@ class FileHash extends AbstractCheckFile
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
         'filename' => 'Filename', // @translate
-        'extension' => 'Extension', // @translate,
+        'extension' => 'Extension', // @translate
         'exists' => 'Exists', // @translate
         'sha256' => 'Database hash', // @translate
         'real_sha256' => 'Real hash', // @translate

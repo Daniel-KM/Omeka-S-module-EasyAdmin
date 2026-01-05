@@ -332,6 +332,19 @@ abstract class AbstractCheck extends AbstractJob
     }
 
     /**
+     * Get translated Yes/No strings.
+     *
+     * @return array ['yes' => string, 'no' => string]
+     */
+    protected function getYesNo(): array
+    {
+        return [
+            'yes' => $this->translator->translate('Yes'), // @translate
+            'no' => $this->translator->translate('No'), // @translate
+        ];
+    }
+
+    /**
      * Check if a module is active.
      *
      * @param string $module

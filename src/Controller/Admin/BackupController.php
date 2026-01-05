@@ -147,7 +147,7 @@ class BackupController extends AbstractActionController
             return $this->redirect()->toRoute(null, ['action' => 'index'], true);
         }
 
-        if (!is_file($filepath) || !is_writable($filepath)) {
+        if (!is_file($filepath) || !is_writeable($filepath)) {
             $this->messenger()->addError('Cannot delete this file.'); // @translate
             return $this->redirect()->toRoute(null, ['action' => 'index'], true);
         }

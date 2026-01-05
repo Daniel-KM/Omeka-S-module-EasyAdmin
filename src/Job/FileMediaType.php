@@ -12,7 +12,7 @@ class FileMediaType extends AbstractCheckFile
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
         'filename' => 'Filename', // @translate
-        'extension' => 'Extension', // @translate,
+        'extension' => 'Extension', // @translate
         'exists' => 'Exists', // @translate
         'media_type' => 'Database media-type', // @translate
         'real_media_type' => 'Real media type', // @translate

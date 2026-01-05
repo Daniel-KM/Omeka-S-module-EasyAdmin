@@ -342,8 +342,8 @@ class DbValueClean extends AbstractCheck
         // The query modifies the sql mode, so it should be reset.
         $sqlMode = $this->connection->fetchOne('SELECT @@SESSION.sql_mode;');
 
-        // For large base, a temporary table is prefered to speed process.
-        // TODO Remove "Any_value", but it cannot be replaced by "Min".
+        // For large base, a temporary table is preferred to speed process.
+        // ANY_VALUE is needed for MySQL's ONLY_FULL_GROUP_BY mode (MIN/MAX won't work here).
         if ($this->supportAnyValue) {
             $prefix = 'ANY_VALUE(';
             $suffix = ')';

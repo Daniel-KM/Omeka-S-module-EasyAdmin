@@ -62,8 +62,8 @@ class ManageAddons extends AbstractJob
             }
         }
 
-        // Convert messsages from addons into logs.
-        // TODO Use Messages->log() (Common 3.4.65).
+        // Convert messages from addons into logs.
+        // TODO Use Common\View\Helper\Messages->log() for simpler code (Common 3.4.65+).
         $typesToLogPriorities = [
             Messenger::ERROR => Logger::ERR,
             Messenger::SUCCESS => Logger::NOTICE,

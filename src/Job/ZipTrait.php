@@ -97,8 +97,8 @@ trait ZipTrait
             $skipZip = in_array('*.zip', $exclude);
             $sourceLength = mb_strlen($source);
 
-            // TODO Find a better way to set the compression level for ZipArchive.
-            // In fact, "default" is "deflate".
+            // Compression configuration is commented; deflate used by default.
+            // ZipArchive::setCompressionIndex() may be used per-file if needed.
             /*
             $compressions = [
                 -1 => ZipArchive::CM_DEFAULT,

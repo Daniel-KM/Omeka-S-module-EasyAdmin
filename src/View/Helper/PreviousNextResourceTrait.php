@@ -106,7 +106,6 @@ trait PreviousNextResourceTrait
                     return $this->site
                         ? $view->siteSetting('blockplus_prevnext_items_query', [])
                         : $view->setting('easyadmin_prevnext_items_query', []);
-                    break;
                 case 'item_sets':
                     return $this->site
                         ? $view->siteSetting('blockplus_prevnext_item_sets_query', [])
@@ -195,7 +194,9 @@ trait PreviousNextResourceTrait
     /**
      * Copy of \Omeka\Api\Adapter\AbstractEntityAdapter::search() to get a prepared query builder.
      *
-     * @todo Trigger all api manager events (api.execute.pre, etc.).
+     * Only event `api.search.query` is triggered to manage arguments added by
+     * modules, other events are useless here (only ids are needed).
+     *
      * @see \Omeka\Api\Adapter\AbstractEntityAdapter::search()
      */
     protected function prepareSearch($resourceName, array $query): QueryBuilder
