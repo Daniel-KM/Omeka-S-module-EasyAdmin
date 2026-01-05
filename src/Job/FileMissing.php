@@ -347,7 +347,7 @@ class FileMissing extends AbstractCheckFile
         $noSource = $translator->translate('No source'); // @translate
         $copyIssue = $translator->translate('Copy issue'); // @translate
         $itemRemoved = $translator->translate('Item removed'); // @translate
-        $itemNotRemoved = $translator->translate('Item not removed: more than one media'); // @translate
+        $mediaRemoved = $translator->translate('Media removed'); // @translate
 
         // Since the fixed medias are no more available in the database, the
         // loop should take care of them, so a check is done on it.
@@ -445,15 +445,18 @@ class FileMissing extends AbstractCheckFile
                     } elseif ($fix) {
                         $row['exists'] = $no;
                         if ($fixDb) {
-                            // TODO Fix items with more than one missing file.
+                            // Remove item if it has only one media, otherwise
+                            // remove just the media.
                             if ($item->getMedia()->count() === 1) {
                                 $this->entityManager->remove($item);
                                 $this->entityManager->flush();
                                 $row['fixed'] = $itemRemoved;
-                                ++$totalFixed;
                             } else {
-                                $row['fixed'] = $itemNotRemoved;
+                                $this->entityManager->remove($media);
+                                $this->entityManager->flush();
+                                $row['fixed'] = $mediaRemoved;
                             }
+                            ++$totalFixed;
                         } else {
                             if (!$isOriginal) {
                                 $row['fixed'] = $no;
