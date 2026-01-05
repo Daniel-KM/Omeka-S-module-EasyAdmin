@@ -80,7 +80,8 @@ Installation
 
 See general end user documentation for [installing a module].
 
-This module requires the module [Common], that should be installed first.
+This module requires the modules [Common] and [Cron], that should be installed
+first.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -100,6 +101,17 @@ composer install --no-dev
 ```
 
 Then install it like any other Omeka module and follow the config instructions.
+
+- For test
+
+The module includes a comprehensive test suite with unit and functional tests.
+Run them from the root of Omeka:
+
+```sh
+vendor/bin/phpunit -c modules/EasyAdmin/test/phpunit.xml --testdox
+```
+
+- Proxy issue
 
 In some cases, in particular when the server is behind a proxy, a firewall or a
 specific infrastructure, your may need to add credentials in your config (omeka
@@ -201,6 +213,9 @@ concurrent editing: when a user is editing a resource, other users cannot edit
 it until submission.
 
 ### Tasks and cron tasks
+
+Cron tasks are now managed via module [Cron]. Nevertheless, it is still possible
+to run any tasks (jobs) from this module.
 
 A script allows to run any job of any module from the command line, even if they
 are not initialized in the admin interface. It’s useful to run one time tasks or
@@ -315,13 +330,13 @@ TODO
 - [ ] Output results as tsv (`/files/check/tsv_date_time.tsv`) as BulkExport or in a table (done for missing file; to do for all processors).
 - [ ] Output results as ods.
 - [ ] Check files with the wrong extension.
-- [ ] Add width/height/duration as data for image/audio/video to avoid to get them each time (ready in modules [Iiif Server] and [Image Server]).
-- [ ] Remove old logs.
+- [x] Add width/height/duration as data for image/audio/video to avoid to get them each time (ready in modules [Iiif Server] and [Image Server]).
+- [x] Remove old logs.
 - [ ] A main cleaning task.
 - [ ] Add a checkbox in page assets to optimise assets in batch.
 - [ ] Add a deduplicator for assets (and replace assets used as resource thumbnails and in pages).
-- [ ] Dump database: see adminer.
-- [ ] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
+- [x] Dump database: see adminer.
+- [x] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
 
 Warning
 -------
@@ -397,6 +412,7 @@ of the [Université des Antilles et de la Guyane].
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Thesaurus]: https://gitlab.com/Daniel-KM/Omeka-S-module-Thesaurus
 [Zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Zip
+[Cron]: https://gitlab.com/Daniel-KM/Omeka-S-module-Cron
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [EasyAdmin.zip]: https://github.com/Daniel-KM/Omeka-S-module-EasyAdmin/releases
 [size or number of files]: https://github.com/omeka/omeka-s/issues/1785
