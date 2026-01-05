@@ -30,6 +30,17 @@ class DbResourceTitle extends AbstractCheck
      */
     protected $templateTitleTerms = [];
 
+    /**
+     * Fallback property ids per template (from AdvancedResourceTemplate).
+     * @var array
+     */
+    protected $templateFallbackTerms = [];
+
+    /**
+     * @var bool
+     */
+    protected $hasAdvancedResourceTemplate = false;
+
     public function perform(): void
     {
         parent::perform();
@@ -83,12 +94,66 @@ class DbResourceTitle extends AbstractCheck
             SQL;
         $this->templateTitleTerms = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
+        // Check for AdvancedResourceTemplate fallback properties.
+        $this->prepareAdvancedResourceTemplateFallbacks();
+
         // Use SQL for check mode (faster), entities for fix mode (need persist).
         if ($fix) {
             return $this->checkDbResourceTitleWithEntities($totalToProcess);
         }
 
         return $this->checkDbResourceTitleWithSql($totalToProcess);
+    }
+
+    /**
+     * Prepare fallback properties from AdvancedResourceTemplate if available.
+     */
+    protected function prepareAdvancedResourceTemplateFallbacks(): void
+    {
+        $services = $this->getServiceLocator();
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule('AdvancedResourceTemplate');
+        $this->hasAdvancedResourceTemplate = $module
+            && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+
+        if (!$this->hasAdvancedResourceTemplate) {
+            return;
+        }
+
+        // Get fallback properties from resource_template_data table.
+        $sql = <<<'SQL'
+            SELECT resource_template_id, data
+            FROM resource_template_data
+            SQL;
+        $rows = $this->connection->executeQuery($sql)->fetchAllAssociative();
+
+        $easyMeta = $services->get('Common\EasyMeta');
+
+        foreach ($rows as $row) {
+            $templateId = (int) $row['resource_template_id'];
+            $data = json_decode($row['data'], true);
+            if (!$data || empty($data['title_fallback_properties'])) {
+                continue;
+            }
+            // Convert property terms to ids.
+            $fallbackIds = [];
+            foreach ($data['title_fallback_properties'] as $term) {
+                $propId = $easyMeta->propertyId($term);
+                if ($propId) {
+                    $fallbackIds[] = $propId;
+                }
+            }
+            if ($fallbackIds) {
+                $this->templateFallbackTerms[$templateId] = $fallbackIds;
+            }
+        }
+
+        if (count($this->templateFallbackTerms)) {
+            $this->logger->info(
+                '{count} templates have fallback title properties.', // @translate
+                ['count' => count($this->templateFallbackTerms)]
+            );
+        }
     }
 
     /**
@@ -159,6 +224,7 @@ class DbResourceTitle extends AbstractCheck
                     'type' => $row['resource_type'],
                     'title' => $row['title'],
                     'title_prop_id' => $titlePropId,
+                    'template_id' => $templateId,
                 ];
             }
 
@@ -177,6 +243,11 @@ class DbResourceTitle extends AbstractCheck
                         $computedTitles[$resId] = $valueRow['computed_title'];
                     }
                 }
+            }
+
+            // Handle fallback properties from AdvancedResourceTemplate.
+            if ($this->hasAdvancedResourceTemplate) {
+                $this->applyFallbackTitles($resourceData, $computedTitles, $sqlValues);
             }
 
             // Compare titles.
@@ -286,6 +357,21 @@ class DbResourceTitle extends AbstractCheck
                 $existingTitle = $resource->getTitle();
                 $realTitle = $this->getValueFromResource($resource, $titleTermId);
 
+                // Try fallback properties if title is empty and AdvancedResourceTemplate is active.
+                if (($realTitle === null || $realTitle === '')
+                    && $this->hasAdvancedResourceTemplate
+                    && $template
+                    && isset($this->templateFallbackTerms[$template->getId()])
+                ) {
+                    foreach ($this->templateFallbackTerms[$template->getId()] as $fallbackPropId) {
+                        $fallbackTitle = $this->getValueFromResource($resource, $fallbackPropId);
+                        if ($fallbackTitle !== null && $fallbackTitle !== '') {
+                            $realTitle = $fallbackTitle;
+                            break;
+                        }
+                    }
+                }
+
                 if ($existingTitle === '' || $existingTitle === null) {
                     $existingTitle = null;
                     $shortExistingTitle = '';
@@ -387,5 +473,65 @@ class DbResourceTitle extends AbstractCheck
         }
 
         return $this->getValueFromResource($valueResource, $termId, ++$loop);
+    }
+
+    /**
+     * Apply fallback title properties from AdvancedResourceTemplate.
+     *
+     * For resources with empty computed titles, check fallback properties in order.
+     */
+    protected function applyFallbackTitles(array $resourceData, array &$computedTitles, string $sqlValues): void
+    {
+        // Find resources with empty titles that have fallback properties configured.
+        $resourcesNeedingFallback = [];
+        foreach ($resourceData as $resourceId => $data) {
+            $templateId = $data['template_id'];
+            if ($templateId
+                && isset($this->templateFallbackTerms[$templateId])
+                && (!isset($computedTitles[$resourceId]) || $computedTitles[$resourceId] === null || $computedTitles[$resourceId] === '')
+            ) {
+                $resourcesNeedingFallback[$resourceId] = $templateId;
+            }
+        }
+
+        if (!count($resourcesNeedingFallback)) {
+            return;
+        }
+
+        // Group resources by template to batch queries.
+        $byTemplate = [];
+        foreach ($resourcesNeedingFallback as $resourceId => $templateId) {
+            $byTemplate[$templateId][] = $resourceId;
+        }
+
+        // For each template, try fallback properties in order.
+        foreach ($byTemplate as $templateId => $resourceIds) {
+            $fallbackProps = $this->templateFallbackTerms[$templateId];
+
+            // Try each fallback property in order.
+            foreach ($fallbackProps as $propId) {
+                // Find resources still needing a title.
+                $stillNeeding = array_filter($resourceIds, fn ($id) => !isset($computedTitles[$id]) || $computedTitles[$id] === null || $computedTitles[$id] === '');
+                if (!count($stillNeeding)) {
+                    break;
+                }
+
+                // Query values for this fallback property.
+                $result = $this->connection->executeQuery(
+                    $sqlValues,
+                    ['ids' => array_values($stillNeeding), 'prop' => $propId],
+                    ['ids' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY, 'prop' => \PDO::PARAM_INT]
+                )->fetchAllAssociative();
+
+                // Apply first non-empty value per resource.
+                foreach ($result as $valueRow) {
+                    $resId = (int) $valueRow['resource_id'];
+                    $val = $valueRow['computed_title'];
+                    if ($val !== null && $val !== '' && (!isset($computedTitles[$resId]) || $computedTitles[$resId] === null || $computedTitles[$resId] === '')) {
+                        $computedTitles[$resId] = $val;
+                    }
+                }
+            }
+        }
     }
 }
