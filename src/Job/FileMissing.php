@@ -49,6 +49,10 @@ class FileMissing extends AbstractCheckFile
 
     public function perform(): void
     {
+        // Increase memory for large file sets (4M+ files need ~1.5GB).
+        // This can be removed or adjusted once the job completes.
+        ini_set('memory_limit', '3G');
+
         parent::perform();
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             return;
@@ -177,75 +181,116 @@ class FileMissing extends AbstractCheckFile
         }
 
         // File is a relative path, filepath the absolute one.
-        $result = [];
-        $count = 0;
-        foreach ($this->files as $file) {
-            $filepath = $dir . '/' . $file;
-            $extension = pathinfo($filepath, PATHINFO_EXTENSION);
-            if (!$extension) {
-                $this->logger->warn(
-                    'Source file "{path}" has no extension.', // @translate
-                    ['path' => $file]
-                );
-            }
-            if (is_readable($filepath)) {
-                switch ($this->matchingMode) {
-                    default:
-                    case 'sha256':
-                        $result[hash_file('sha256', $filepath)] = $file;
-                        break;
-                    case 'md5':
-                        $result[md5_file($filepath)] = $file;
-                        break;
-                    case 'source':
-                        $result[$file] = $file;
-                        break;
-                    case 'source_filename':
-                        // Use an array to do a check for duplicates below.
-                        $filename = pathinfo($filepath, PATHINFO_BASENAME);
-                        $result[$filename][] = $file;
-                        break;
-                }
-            } else {
-                $this->logger->warn(
-                    'Source file "{path}" is not readable.', // @translate
-                    ['path' => $file]
-                );
-            }
-
-            ++$count;
-            // Log every 100 for slow processes.
-            if ($count % 100 === 0
-                && in_array($this->matchingMode, ['sha256', 'md5'])
-            ) {
-                $this->logger->info(
-                    '{count}/{total} hashes prepared.', // @translate
-                    ['count' => $count,'total' => $total]
-                );
-            } elseif ($count % 10000 === 0) {
-                $this->logger->info(
-                    '{count}/{total} elements prepared.', // @translate
-                    ['count' => $count, 'total' => $total]
-                );
-            }
-        }
-
-        // Check for duplicates for information.
-        // This check is useful only for source_filename, since for other ones,
-        // it's not an issue.
+        // Memory optimization: process files and free memory progressively.
+        // For source_filename mode, we need to track duplicates, so use a
+        // two-pass approach to minimize peak memory usage.
         if ($this->matchingMode === 'source_filename') {
-            $duplicates = array_filter(array_map(fn ($v) => count($v), $result), fn ($v) => $v > 1);
+            // First pass: build index by filename, tracking duplicates.
+            // Use a simple array with filename as key and first file path as value.
+            // Track duplicates separately to report them without storing all paths.
+            $result = [];
+            $duplicates = [];
+            $count = 0;
+            foreach ($this->files as $key => $file) {
+                $filepath = $dir . '/' . $file;
+                $extension = pathinfo($filepath, PATHINFO_EXTENSION);
+                if (!$extension) {
+                    $this->logger->warn(
+                        'Source file "{path}" has no extension.', // @translate
+                        ['path' => $file]
+                    );
+                }
+                if (is_readable($filepath)) {
+                    $filename = pathinfo($filepath, PATHINFO_BASENAME);
+                    if (isset($result[$filename])) {
+                        // Track duplicate count, not all paths (memory optimization).
+                        $duplicates[$filename] = ($duplicates[$filename] ?? 1) + 1;
+                    } else {
+                        $result[$filename] = $file;
+                    }
+                } else {
+                    $this->logger->warn(
+                        'Source file "{path}" is not readable.', // @translate
+                        ['path' => $file]
+                    );
+                }
+                // Free memory progressively.
+                unset($this->files[$key]);
+
+                ++$count;
+                if ($count % 10000 === 0) {
+                    $this->logger->info(
+                        '{count}/{total} elements prepared.', // @translate
+                        ['count' => $count, 'total' => $total]
+                    );
+                }
+            }
+
+            // Report duplicates.
             if (count($duplicates)) {
                 $this->logger->warn(
                     'This following flles have duplicate names: {json}', // @translate
                     ['json' => json_encode($duplicates, 448)]
                 );
             }
-            // Take the first file path.
-            $result = array_map(fn ($v) => reset($v), $result);
-        }
 
-        $this->files = $result;
+            $this->files = $result;
+            unset($result, $duplicates);
+        } else {
+            // For sha256, md5, source modes: use original memory-efficient approach.
+            $result = [];
+            $count = 0;
+            foreach ($this->files as $key => $file) {
+                $filepath = $dir . '/' . $file;
+                $extension = pathinfo($filepath, PATHINFO_EXTENSION);
+                if (!$extension) {
+                    $this->logger->warn(
+                        'Source file "{path}" has no extension.', // @translate
+                        ['path' => $file]
+                    );
+                }
+                if (is_readable($filepath)) {
+                    switch ($this->matchingMode) {
+                        default:
+                        case 'sha256':
+                            $result[hash_file('sha256', $filepath)] = $file;
+                            break;
+                        case 'md5':
+                            $result[md5_file($filepath)] = $file;
+                            break;
+                        case 'source':
+                            $result[$file] = $file;
+                            break;
+                    }
+                } else {
+                    $this->logger->warn(
+                        'Source file "{path}" is not readable.', // @translate
+                        ['path' => $file]
+                    );
+                }
+                // Free memory progressively.
+                unset($this->files[$key]);
+
+                ++$count;
+                // Log every 100 for slow processes.
+                if ($count % 100 === 0
+                    && in_array($this->matchingMode, ['sha256', 'md5'])
+                ) {
+                    $this->logger->info(
+                        '{count}/{total} hashes prepared.', // @translate
+                        ['count' => $count, 'total' => $total]
+                    );
+                } elseif ($count % 10000 === 0) {
+                    $this->logger->info(
+                        '{count}/{total} elements prepared.', // @translate
+                        ['count' => $count, 'total' => $total]
+                    );
+                }
+            }
+
+            $this->files = $result;
+            unset($result);
+        }
 
         $this->logger->notice(
             'The source directory contains {total} readable files.', // @translate
