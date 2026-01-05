@@ -821,11 +821,16 @@ class Module extends AbstractModule
         $interface = $settings->get('easyadmin_interface') ?: [];
         $buttonPublicView = in_array('resource_public_view', $interface);
         if ($buttonPublicView) {
-            // TODO Fix for item sets.
-            $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.1', '<');
-            $skip = !$isOldOmeka
-                && $resource->resourceName() === 'items'
-                && count($resource->sites());
+            // Omeka shows public view links natively for resources with sites:
+            // - Items: since omeka s v4.1
+            // - Item sets: since omeka s v4.2
+            $resourceName = $resource->resourceName();
+            $skip = false;
+            if ($resourceName === 'items' && count($resource->sites())) {
+                $skip = version_compare(\Omeka\Module::VERSION, '4.1', '>=');
+            } elseif ($resourceName === 'item_sets' && count($resource->sites())) {
+                $skip = version_compare(\Omeka\Module::VERSION, '4.2', '>=');
+            }
             if (!$skip) {
                 $htmlSites = $this->prepareSitesResource($resource);
                 echo $htmlSites;
