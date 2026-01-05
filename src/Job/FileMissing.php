@@ -47,6 +47,11 @@ class FileMissing extends AbstractCheckFile
      */
     protected $matchingMode;
 
+    /**
+     * @var bool
+     */
+    protected $reportFull = false;
+
     public function perform(): void
     {
         // Memory optimization: yield + md5 binary keys reduce memory usage.
@@ -106,6 +111,9 @@ class FileMissing extends AbstractCheckFile
             $this->finalizeOutput();
             return;
         }
+
+        // Report type: 'full' lists all files, 'partial' lists only missing.
+        $this->reportFull = $this->getArg('report_type') === 'full';
 
         if ($process === 'files_missing_fix') {
             $this->prepareSourceDirectory();
@@ -472,21 +480,24 @@ class FileMissing extends AbstractCheckFile
                         ? ($extension ? $storageId . '.' . $extension : $storageId)
                         : ($storageId . '.jpg');
 
-                    // File exists in destination.
+                    // File exists in destination: skip writing unless full report.
                     if (isset($files[$filename])) {
                         ++$totalSucceed;
-                        $this->writeRow([
-                            'item' => $itemId,
-                            'media' => $mediaId,
-                            'filename' => $filename,
-                            'extension' => $isOriginal ? $extension : 'jpg',
-                            'hash' => $sha256,
-                            'type' => $type,
-                            'exists' => $yes,
-                            'source' => '',
-                            'fixed' => '',
-                            'message' => '',
-                        ]);
+                        // Write row only for full report mode.
+                        if ($this->reportFull) {
+                            $this->writeRow([
+                                'item' => $itemId,
+                                'media' => $mediaId,
+                                'filename' => $filename,
+                                'extension' => $isOriginal ? $extension : 'jpg',
+                                'hash' => $sha256,
+                                'type' => $type,
+                                'exists' => $yes,
+                                'source' => '',
+                                'fixed' => '',
+                                'message' => '',
+                            ]);
+                        }
                         continue;
                     }
 
