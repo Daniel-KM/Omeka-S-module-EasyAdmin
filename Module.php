@@ -1176,10 +1176,11 @@ class Module extends AbstractModule
             'ingester' => 'bulk_upload',
             'only_missing' => true,
         ];
-        // Of course, it is useless for a background job.
-        // FIXME Use a plugin, not a fake job. Or strategy "sync", but there is a doctrine exception on owner of the job.
-        // $strategy = $this->isBackgroundProcess() ? $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class) : null;
-        $strategy = null;
+        // When already in a background process (in particular bulk import), run
+        // synchronously without dispatching a new job. Using synchronous
+        // strategy causes Doctrine cascade issues with job owner, so create
+        // a "fake job" (not persisted).
+        // @todo Refactor to use a dedicated service class instead of fake job.
         if ($this->isBackgroundProcess()) {
             $job = new \Omeka\Entity\Job();
             $job->setPid(null);
@@ -1191,6 +1192,8 @@ class Module extends AbstractModule
             $jobClass = new \EasyAdmin\Job\FileDerivativeBulkUpload($job, $services);
             $jobClass->perform();
         } else {
+            // Dispatch as background job for web requests to avoid timeout.
+            $strategy = null;
             /** @var \Omeka\Job\Dispatcher $dispatcher */
             $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
             $dispatcher->dispatch(\EasyAdmin\Job\FileDerivativeBulkUpload::class, $args, $strategy);
