@@ -1333,12 +1333,11 @@ class Module extends AbstractModule
             );
             $logger->err($message->getMessage(), $message->getContext());
             $messenger->addError($message);
-            $tempFile->delete();
+            @unlink($newFilePath);
             return;
         }
 
-        // Delete the temporary new file.
-        $tempFile->delete();
+        // The temporary new file is moved by store(), so no cleanup needed.
 
         // Remove the original file if the extension was different.
         if ($asset->getExtension() !== 'jpg') {
@@ -1453,7 +1452,9 @@ class Module extends AbstractModule
     {
         $names = $event->getParam('registered_names');
         $key = array_search('bulk_uploaded', $names);
-        unset($names[$key]);
-        $event->setParam('registered_names', $names);
+        if ($key !== false) {
+            unset($names[$key]);
+            $event->setParam('registered_names', $names);
+        }
     }
 }
