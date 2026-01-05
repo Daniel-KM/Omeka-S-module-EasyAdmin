@@ -17,7 +17,9 @@ class PreviousNext extends AbstractHelper
     /**
      * Output the links to previous, next and back of a resource.
      *
-     * @todo Check visibility for public front-end.
+     * Visibility is handled automatically:
+     * - On public site: only public resources (or owned by current user) are shown
+     * - On admin: all resources are shown (respecting acl permissions)
      *
      * @param array $options
      * - template (string): set specific template (default: common/previous-next)
@@ -50,9 +52,8 @@ class PreviousNext extends AbstractHelper
             $lastBrowseUrl = $options['back'] || $asArray ? $view->url($this->site ? 'site/resource' : 'admin/default', ['action' => ''], [], true) : null;
         }
 
-        // TODO Manage query for media.
-        // TODO Manage different queries by resource type.
-        $resourceName = $resource->resourceName();
+        // Media navigation is within an item (prev/next media of same item).
+        // Custom queries for media filtering could be added if needed.
         if ($resourceName === 'media') {
             $previous = $this->previousMedia($resource);
             $next = $this->nextMedia($resource);
