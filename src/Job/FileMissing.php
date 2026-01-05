@@ -84,7 +84,19 @@ class FileMissing extends AbstractCheckFile
             'source',
             'source_filename',
         ];
-        $this->matchingMode = $this->getArg('matching', 'sha256') ?: 'sha256';
+        $this->matchingMode = $this->getArg('matching') ?: null;
+
+        // Require matching mode for all files_missing processes.
+        if (empty($this->matchingMode)) {
+            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
+            $this->logger->err(
+                'Matching mode is required for process "{process}".', // @translate
+                ['process' => $process]
+            );
+            $this->finalizeOutput();
+            return;
+        }
+
         if (!in_array($this->matchingMode, $matchingModes)) {
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             $this->logger->err(
