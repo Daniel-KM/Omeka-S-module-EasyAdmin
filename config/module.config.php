@@ -65,6 +65,7 @@ return [
         'factories' => [
             // Class is not used as key, since it's set dynamically by sub-route
             // and it should be available in acl (so alias is mapped later).
+            'EasyAdmin\Controller\Admin\Backup' => Service\Controller\BackupControllerFactory::class,
             'EasyAdmin\Controller\Admin\FileManager' => Service\Controller\FileManagerControllerFactory::class,
             'EasyAdmin\Controller\Upload' => Service\Controller\UploadControllerFactory::class,
         ],
@@ -103,6 +104,20 @@ return [
                                     ],
                                     'defaults' => [
                                         'controller' => 'CheckAndFix',
+                                        'action' => 'index',
+                                    ],
+                                ],
+                            ],
+                            'backup' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/backup[/:action]',
+                                    'constraints' => [
+                                        'action' => '[a-zA-Z-]+',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
+                                        'controller' => 'Backup',
                                         'action' => 'index',
                                     ],
                                 ],
@@ -185,6 +200,13 @@ return [
                         'class' => 'o-icon- fa-folder-open',
                     ],
                     [
+                        'label' => 'Backup', // @translate
+                        'route' => 'admin/easy-admin/backup',
+                        'action' => 'index',
+                        'resource' => 'EasyAdmin\Controller\Admin\Backup',
+                        'class' => 'o-icon- fa-archive',
+                    ],
+                    [
                         'label' => 'Install addons', // @translate
                         'route' => 'admin/easy-admin/default',
                         'controller' => 'addons',
@@ -215,6 +237,12 @@ return [
                 'route' => 'admin/easy-admin/file-manager',
                 'action' => 'browse',
                 'resource' => 'EasyAdmin\Controller\Admin\FileManager',
+            ],
+            [
+                'label' => 'Backup', // @translate
+                'route' => 'admin/easy-admin/backup',
+                'action' => 'index',
+                'resource' => 'EasyAdmin\Controller\Admin\Backup',
             ],
             [
                 'label' => 'Install addons', // @translate

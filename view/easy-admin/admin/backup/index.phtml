@@ -1,0 +1,173 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $backups
+ * @var string $backupDir
+ * @var \Omeka\Form\ConfirmForm $formDelete
+ */
+
+$plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+$assetUrl = $plugins->get('assetUrl');
+
+$this->headLink()->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
+$this->headScript()->appendFile($assetUrl('js/backup.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+$this->htmlElement('body')->appendAttribute('class', 'easy-admin backup');
+
+$formatSize = function ($bytes) {
+    if ($bytes < 1024) return $bytes . ' B';
+    if ($bytes < 1048576) return round($bytes / 1024, 1) . ' KB';
+    if ($bytes < 1073741824) return round($bytes / 1048576, 1) . ' MB';
+    return round($bytes / 1073741824, 2) . ' GB';
+};
+?>
+
+<?= $this->pageTitle($translate('Backup'), 1, $translate('Easy Admin')) ?>
+
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\EasyAdmin')->menu() ?>
+</nav>
+
+<div id="page-actions">
+    <a href="#backup-database" class="button"><?= $translate('Backup database') ?></a>
+    <a href="#backup-files" class="button"><?= $translate('Backup files') ?></a>
+</div>
+
+<?php // Database backup form ?>
+<div id="backup-database" class="block">
+    <h2><?= $translate('Database backup') ?></h2>
+    <p><?= $translate('Create a backup of the database (sql dump).') ?></p>
+
+    <form method="post" action="<?= $url(null, ['action' => 'backup-database'], true) ?>">
+        <div class="field">
+            <label>
+                <input type="checkbox" name="compress" value="1" checked>
+                <?= $translate('Compress with gzip') ?>
+            </label>
+        </div>
+        <button type="submit" class="button"><?= $translate('Start database backup') ?></button>
+    </form>
+</div>
+
+<?php // Files backup form ?>
+<div id="backup-files" class="block">
+    <h2><?= $translate('Files backup') ?></h2>
+    <p><?= $translate('Create a backup of Omeka files (modules, themes, configuration). The /files directory is not included due to its potential size.') ?></p>
+
+    <form method="post" action="<?= $url(null, ['action' => 'backup-files'], true) ?>">
+        <fieldset>
+            <legend><?= $translate('Include in backup') ?></legend>
+
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="core" checked>
+                    <?= $translate('Omeka core') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="modules" checked>
+                    <?= $translate('Modules') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="themes" checked>
+                    <?= $translate('Themes') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="local_config" checked>
+                    <?= $translate('Local configuration (local.config.php)') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="database_ini" checked>
+                    <?= $translate('Database configuration (database.ini)') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="logs">
+                    <?= $translate('Logs') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="htaccess">
+                    <?= $translate('.htaccess') ?>
+                </label>
+            </div>
+        </fieldset>
+
+        <div class="field">
+            <label for="compression"><?= $translate('Compression level') ?></label>
+            <select name="compression" id="compression">
+                <option value="0"><?= $translate('None (faster)') ?></option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="6" selected>6 (<?= $translate('default') ?>)</option>
+                <option value="9">9 (<?= $translate('maximum') ?>)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="button"><?= $translate('Start files backup') ?></button>
+    </form>
+</div>
+
+<?php // Existing backups list ?>
+<div id="backup-list" class="block">
+    <h2><?= $translate('Existing backups') ?></h2>
+
+    <?php if ($backups): ?>
+    <table class="tablesaw" data-tablesaw-mode="stack">
+        <thead>
+            <tr>
+                <th><?= $translate('Filename') ?></th>
+                <th><?= $translate('Type') ?></th>
+                <th><?= $translate('Date') ?></th>
+                <th><?= $translate('Size') ?></th>
+                <th><?= $translate('Actions') ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($backups as $backup): ?>
+            <tr>
+                <td><?= $escape($backup['name']) ?></td>
+                <td>
+                    <?php if ($backup['type'] === 'database'): ?>
+                    <span class="backup-type database"><?= $translate('Database') ?></span>
+                    <?php else: ?>
+                    <span class="backup-type files"><?= $translate('Files') ?></span>
+                    <?php endif; ?>
+                </td>
+                <td><?= date('Y-m-d H:i:s', $backup['mtime']) ?></td>
+                <td><?= $formatSize($backup['size']) ?></td>
+                <td class="actions">
+                    <a href="<?= $escapeAttr($url('top') . '/files/backup/' . rawurlencode($backup['name'])) ?>"
+                       download="<?= $escapeAttr($backup['name']) ?>"
+                       class="o-icon-download" title="<?= $translate('Download') ?>"></a>
+                    <a href="#" class="o-icon-delete delete-backup"
+                       data-sidebar-content-url="<?= $url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true) ?>"
+                       title="<?= $translate('Delete') ?>"></a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p class="no-backups"><?= $translate('No backups found.') ?></p>
+    <?php endif; ?>
+</div>
+
+<?php // Delete confirmation sidebar ?>
+<div id="sidebar" class="sidebar">
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <div class="sidebar-content"></div>
+</div>
