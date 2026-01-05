@@ -224,7 +224,7 @@ class CheckAndFixForm extends Form
                         'files_missing_check' => 'List files that are present in database, not in "/files/" (original only)', // @translate
                         'files_missing_check_full' => 'List files that are present in database, not in "/files/" (include derivatives)', // @translate
                         'files_missing_fix' => 'Copy missing original files from the source directory below (recover a disaster)', // @translate
-                        'files_missing_fix_db' => 'Remove items with one file that is missing (WARNING: export your items first)', // @translate
+                        'files_missing_fix_db' => 'Remove items with one file that is missing and missing medias (WARNING: export your items first)', // @translate
                         'dirs_excess' => 'Remove empty directories in "/files/" (mainly for module Archive Repertory)', // @translate
                         'files_derivative' => 'Rebuild derivative images (thumbnails)', // @translate
                         'files_derivative_file_system' => 'Quick rebuild all derivative images (from terminal, 10x times faster)', // @translate
