@@ -343,14 +343,8 @@ class FileMissing extends AbstractCheckFile
         // In big recoveries, it is recommended to clear the caches.
         $this->entityManager->clear();
 
-        // Entity are used, because it's not possible to get the value
-        // "has_original" or "has_thumbnails" via api.
-        $criteria = new \Doctrine\Common\Collections\Criteria();
-        $expr = $criteria->expr();
-
         $isOriginalMain = array_values($types) === ['original'];
         if ($isOriginalMain) {
-            $criteria->where($expr->eq('hasOriginal', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_original = 1';
             $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
             $this->logger->notice(
@@ -358,7 +352,6 @@ class FileMissing extends AbstractCheckFile
                 ['total' => $totalToProcess]
             );
         } else {
-            $criteria->where($expr->eq('hasThumbnails', 1));
             $sql = 'SELECT COUNT(id) FROM media WHERE has_thumbnails = 1';
             $totalToProcess = $this->connection->executeQuery($sql)->fetchOne();
             $this->logger->notice(
@@ -373,11 +366,6 @@ class FileMissing extends AbstractCheckFile
             );
             return true;
         }
-
-        $criteria
-            ->orderBy(['id' => 'ASC'])
-            ->setFirstResult(null)
-            ->setMaxResults(self::SQL_LIMIT);
 
         // First, list files indexed by filename for O(1) lookup.
         $types = array_flip($types);
@@ -394,13 +382,207 @@ class FileMissing extends AbstractCheckFile
 
         $fixDb = $fix === 'files_missing_fix_db';
 
+        // Use entities only for fixDb (need to delete), else use faster SQL.
+        if ($fixDb) {
+            return $this->checkMissingFilesWithEntities($types, $totalToProcess, $isOriginalMain);
+        }
+
+        return $this->checkMissingFilesWithSql($types, $fix, $totalToProcess, $isOriginalMain);
+    }
+
+    /**
+     * Check missing files using raw SQL (faster, for check and fix files).
+     */
+    protected function checkMissingFilesWithSql(array $types, $fix, int $totalToProcess, bool $isOriginalMain): bool
+    {
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+        $no = $translator->translate('No'); // @translate
+        $noSource = $translator->translate('No source'); // @translate
+        $copyIssue = $translator->translate('Copy issue'); // @translate
+
+        // Use larger batch for scalar queries (no entity overhead).
+        $batchSize = self::SQL_LIMIT_LARGE;
+
+        // Build SQL query for required columns only.
+        $sqlBase = 'SELECT m.id, m.item_id, m.storage_id, m.extension, m.sha256, m.source
+            FROM media m WHERE ';
+        $sqlBase .= $isOriginalMain ? 'm.has_original = 1' : 'm.has_thumbnails = 1';
+        $sqlBase .= ' ORDER BY m.id ASC LIMIT ? OFFSET ?';
+
+        $offset = 0;
+        $totalProcessed = 0;
+        $totalSucceed = 0;
+        $totalFailed = 0;
+
+        while (true) {
+            $rows = $this->connection->executeQuery($sqlBase, [$batchSize, $offset])->fetchAllAssociative();
+            if (!count($rows) || $totalProcessed >= $totalToProcess) {
+                break;
+            }
+
+            if ($this->shouldStop()) {
+                $this->logger->notice(
+                    'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
+                    [
+                        'processed' => $totalProcessed,
+                        'total' => $totalToProcess,
+                        'total_succeed' => $totalSucceed,
+                        'total_failed' => $totalFailed,
+                        'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
+                    ]
+                );
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return false;
+            }
+
+            if ($totalProcessed) {
+                $this->logger->info(
+                    '{processed}/{total} media processed.', // @translate
+                    ['processed' => $totalProcessed, 'total' => $totalToProcess]
+                );
+            }
+
+            foreach ($rows as $mediaRow) {
+                $mediaId = (int) $mediaRow['id'];
+                $itemId = (int) $mediaRow['item_id'];
+                $storageId = $mediaRow['storage_id'];
+                $extension = $mediaRow['extension'];
+                $sha256 = $mediaRow['sha256'];
+                $source = $mediaRow['source'];
+
+                foreach ($types as $type => $files) {
+                    $isOriginal = $type === 'original';
+                    $filename = $isOriginal
+                        ? ($extension ? $storageId . '.' . $extension : $storageId)
+                        : ($storageId . '.jpg');
+                    $row = [
+                        'item' => $itemId,
+                        'media' => $mediaId,
+                        'filename' => $filename,
+                        'extension' => $isOriginal ? $extension : 'jpg',
+                        'hash' => $sha256,
+                        'type' => $type,
+                        'exists' => '',
+                        'source' => '',
+                        'fixed' => '',
+                        'message' => '',
+                    ];
+                    if (isset($files[$filename])) {
+                        $row['exists'] = $yes;
+                        ++$totalSucceed;
+                    } elseif ($fix) {
+                        $row['exists'] = $no;
+                        if (!$isOriginal) {
+                            $row['fixed'] = $no;
+                            $this->writeRow($row);
+                            break;
+                        }
+                        switch ($this->matchingMode) {
+                            default:
+                            case 'sha256':
+                                $hash = $sha256;
+                                break;
+                            case 'md5':
+                                // Fake sha256, to be updated.
+                                $hash = $sha256;
+                                break;
+                            case 'source':
+                                $hash = ltrim($source, '/');
+                                break;
+                            case 'source_filename':
+                                // Use md5 binary hash to match the index.
+                                $hash = md5(pathinfo($source, PATHINFO_BASENAME), true);
+                                break;
+                        }
+                        if (isset($this->files[$hash])) {
+                            $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
+                            $src = $this->sourceDir . '/' . $this->files[$hash];
+                            $dest = $this->basePath . '/original/' . $filename;
+                            $hasCopyError = false;
+                            if (!file_exists(dirname($dest))) {
+                                // Create folder for Archive Repertory.
+                                $result = mkdir(dirname($dest), 0755, true);
+                                if (!$result) {
+                                    $row['fixed'] = $copyIssue;
+                                    $row['message'] = error_get_last()['message'];
+                                    ++$totalFailed;
+                                    $hasCopyError = true;
+                                }
+                            }
+                            if (!$hasCopyError) {
+                                $result = copy($src, $dest);
+                                if ($result) {
+                                    $row['fixed'] = $yes;
+                                    ++$totalSucceed;
+                                } else {
+                                    $row['fixed'] = $copyIssue;
+                                    $row['message'] = error_get_last()['message'];
+                                    ++$totalFailed;
+                                }
+                            }
+                        } else {
+                            $row['source'] = $no;
+                            $row['fixed'] = $noSource;
+                            ++$totalFailed;
+                        }
+                    } else {
+                        $row['exists'] = $no;
+                        $row['source'] = $no;
+                        $row['fixed'] = $noSource;
+                        ++$totalFailed;
+                    }
+                    $this->writeRow($row);
+                }
+
+                ++$totalProcessed;
+            }
+
+            unset($rows);
+            $offset += $batchSize;
+        }
+
+        $this->logger->notice(
+            'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
+            [
+                'processed' => $totalProcessed,
+                'total' => $totalToProcess,
+                'total_succeed' => $totalSucceed,
+                'total_failed' => $totalFailed,
+                'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Check missing files using Doctrine entities (for fixDb mode).
+     */
+    protected function checkMissingFilesWithEntities(array $types, int $totalToProcess, bool $isOriginalMain): bool
+    {
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $expr = $criteria->expr();
+
+        if ($isOriginalMain) {
+            $criteria->where($expr->eq('hasOriginal', 1));
+        } else {
+            $criteria->where($expr->eq('hasThumbnails', 1));
+        }
+
+        $criteria
+            ->orderBy(['id' => 'ASC'])
+            ->setFirstResult(null)
+            ->setMaxResults(self::SQL_LIMIT);
+
         $baseCriteria = $criteria;
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
         $noSource = $translator->translate('No source'); // @translate
-        $copyIssue = $translator->translate('Copy issue'); // @translate
         $itemRemoved = $translator->translate('Item removed'); // @translate
         $mediaRemoved = $translator->translate('Media removed'); // @translate
 
@@ -408,57 +590,31 @@ class FileMissing extends AbstractCheckFile
         // loop should take care of them, so a check is done on it.
         $lastId = 0;
 
-        // Second, loop all media data.
         $offset = 0;
         $totalProcessed = 0;
         $totalSucceed = 0;
         $totalFailed = 0;
         $totalFixed = 0;
+
         while (true) {
             $criteria = clone $baseCriteria;
-            if ($fixDb) {
-                $criteria
-                    // Don't use offset, since last id is used, because some ids
-                    // may have been removed.
-                    ->andWhere($expr->gt('id', $lastId));
-                $medias = $this->mediaRepository->matching($criteria);
-                if (!$medias->count() || $offset >= $totalToProcess || $totalProcessed >= $totalToProcess) {
-                    break;
-                }
-            } else {
-                $criteria
-                    ->setFirstResult($offset);
-                $medias = $this->mediaRepository->matching($criteria);
-                // if (!$medias->count()) {
-                if (!$medias->count() || $totalProcessed >= $totalToProcess) {
-                    break;
-                }
+            $criteria->andWhere($expr->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($criteria);
+            if (!$medias->count() || $offset >= $totalToProcess || $totalProcessed >= $totalToProcess) {
+                break;
             }
 
             if ($this->shouldStop()) {
-                if ($fixDb) {
-                    $this->logger->notice(
-                        'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
-                        [
-                            'processed' => $totalProcessed,
-                            'total' => $totalToProcess,
-                            'total_succeed' => $totalSucceed,
-                            'total_failed' => $totalFailed,
-                            'total_fixed' => $totalFixed,
-                        ]
-                    );
-                } else {
-                    $this->logger->notice(
-                        'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
-                        [
-                            'processed' => $totalProcessed,
-                            'total' => $totalToProcess,
-                            'total_succeed' => $totalSucceed,
-                            'total_failed' => $totalFailed,
-                            'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
-                        ]
-                    );
-                }
+                $this->logger->notice(
+                    'Job stopped: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
+                    [
+                        'processed' => $totalProcessed,
+                        'total' => $totalToProcess,
+                        'total_succeed' => $totalSucceed,
+                        'total_failed' => $totalFailed,
+                        'total_fixed' => $totalFixed,
+                    ]
+                );
                 $this->logger->warn(
                     'The job was stopped.' // @translate
                 );
@@ -497,80 +653,20 @@ class FileMissing extends AbstractCheckFile
                     if (isset($files[$filename])) {
                         $row['exists'] = $yes;
                         ++$totalSucceed;
-                    } elseif ($fix) {
-                        $row['exists'] = $no;
-                        if ($fixDb) {
-                            // Remove item if it has only one media, otherwise
-                            // remove just the media.
-                            if ($item->getMedia()->count() === 1) {
-                                $this->entityManager->remove($item);
-                                $this->entityManager->flush();
-                                $row['fixed'] = $itemRemoved;
-                            } else {
-                                $this->entityManager->remove($media);
-                                $this->entityManager->flush();
-                                $row['fixed'] = $mediaRemoved;
-                            }
-                            ++$totalFixed;
-                        } else {
-                            if (!$isOriginal) {
-                                $row['fixed'] = $no;
-                                $this->writeRow($row);
-                                break;
-                            }
-                            switch ($this->matchingMode) {
-                                default:
-                                case 'sha256':
-                                    $hash = $media->getSha256();
-                                    break;
-                                case 'md5':
-                                    // Fake sha256, to be updated.
-                                    $hash = $media->getSha256();
-                                    break;
-                                case 'source':
-                                    $hash = ltrim($media->getSource(), '/');
-                                    break;
-                                case 'source_filename':
-                                    // Use md5 binary hash to match the index.
-                                    $hash = md5(pathinfo($media->getSource(), PATHINFO_BASENAME), true);
-                                    break;
-                            }
-                            if (isset($this->files[$hash])) {
-                                $row['source'] = $this->sourceDir . '/' . $this->files[$hash];
-                                $src = $this->sourceDir . '/' . $this->files[$hash];
-                                $dest = $this->basePath . '/original/' . $filename;
-                                $hasCopyError = false;
-                                if (!file_exists(dirname($dest))) {
-                                    // Create folder for Archive Repertory.
-                                    $result = mkdir(dirname($dest), 0755, true);
-                                    if (!$result) {
-                                        $row['fixed'] = $copyIssue;
-                                        $row['message'] = error_get_last()['message'];
-                                        ++$totalFailed;
-                                        $hasCopyError = true;
-                                    }
-                                }
-                                if (!$hasCopyError) {
-                                    $result = copy($src, $dest);
-                                    if ($result) {
-                                        $row['fixed'] = $yes;
-                                        ++$totalSucceed;
-                                    } else {
-                                        $row['fixed'] = $copyIssue;
-                                        $row['message'] = error_get_last()['message'];
-                                        ++$totalFailed;
-                                    }
-                                }
-                            } else {
-                                $row['source'] = $no;
-                                $row['fixed'] = $noSource;
-                                ++$totalFailed;
-                            }
-                        }
                     } else {
                         $row['exists'] = $no;
-                        $row['source'] = $no;
-                        $row['fixed'] = $noSource;
+                        // Remove item if it has only one media, otherwise
+                        // remove just the media.
+                        if ($item->getMedia()->count() === 1) {
+                            $this->entityManager->remove($item);
+                            $this->entityManager->flush();
+                            $row['fixed'] = $itemRemoved;
+                        } else {
+                            $this->entityManager->remove($media);
+                            $this->entityManager->flush();
+                            $row['fixed'] = $mediaRemoved;
+                        }
+                        ++$totalFixed;
                         ++$totalFailed;
                     }
                     $this->writeRow($row);
@@ -589,29 +685,16 @@ class FileMissing extends AbstractCheckFile
             $offset += self::SQL_LIMIT;
         }
 
-        if ($fixDb) {
-            $this->logger->notice(
-                'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
-                [
-                    'processed' => $totalProcessed,
-                    'total' => $totalToProcess,
-                    'total_succeed' => $totalSucceed,
-                    'total_failed' => $totalFailed,
-                    'total_fixed' => $totalFixed,
-                ]
-            );
-        } else {
-            $this->logger->notice(
-                'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed ({mode}).', // @translate
-                [
-                    'processed' => $totalProcessed,
-                    'total' => $totalToProcess,
-                    'total_succeed' => $totalSucceed,
-                    'total_failed' => $totalFailed,
-                    'mode' => $isOriginalMain ? 'original' : sprintf('%d thumbnails', count($types)),
-                ]
-            );
-        }
+        $this->logger->notice(
+            'End of process: {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed, {total_fixed} fixed.', // @translate
+            [
+                'processed' => $totalProcessed,
+                'total' => $totalToProcess,
+                'total_succeed' => $totalSucceed,
+                'total_failed' => $totalFailed,
+                'total_fixed' => $totalFixed,
+            ]
+        );
 
         return true;
     }

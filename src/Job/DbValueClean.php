@@ -143,6 +143,9 @@ class DbValueClean extends AbstractCheck
                 );
                 $this->deduplicateValues($resourceIds);
             }
+
+            // Free memory.
+            unset($resourceIds);
         }
 
         $this->logger->notice(

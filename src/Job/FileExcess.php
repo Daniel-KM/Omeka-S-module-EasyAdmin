@@ -93,27 +93,27 @@ class FileExcess extends AbstractCheckFile
             $this->createDir(dirname($movePath));
         }
 
-        $files = $this->listFilesInFolder($path);
+        // Use generator to avoid loading all files in memory.
+        $filesIterator = $this->iterateFilesInFolder($path);
 
-        $total = count($files);
         $totalSuccess = 0;
         $totalExcess = 0;
+        $totalProcessed = 0;
 
         $translator = $this->getServiceLocator()->get('MvcTranslator');
         $yes = $translator->translate('Yes'); // @translate
         $no = $translator->translate('No'); // @translate
 
         $this->logger->notice(
-            'Starting check of {total} files for type {type}.', // @translate
-            ['total' => $total, 'type' => $type]
+            'Starting check of files for type {type}.', // @translate
+            ['type' => $type]
         );
 
-        $i = 0;
-        foreach ($files as $filename) {
-            if (($i % 100 === 0) && $i) {
+        foreach ($filesIterator as $filename) {
+            if (($totalProcessed % 100 === 0) && $totalProcessed) {
                 $this->logger->info(
-                    '{processed}/{total} files processed.', // @translate
-                    ['processed' => $i, 'total' => $total]
+                    '{processed} files processed.', // @translate
+                    ['processed' => $totalProcessed]
                 );
                 if ($this->shouldStop()) {
                     $this->logger->warn(
@@ -122,7 +122,7 @@ class FileExcess extends AbstractCheckFile
                     return false;
                 }
             }
-            ++$i;
+            ++$totalProcessed;
 
             if ($isOriginal) {
                 $extension = pathinfo($filename, PATHINFO_EXTENSION);
@@ -185,22 +185,22 @@ class FileExcess extends AbstractCheckFile
                 if ($result) {
                     $row['fixed'] = $yes;
                     $this->logger->warn(
-                        'File "{filename}" ("{type}", {processed}/{total}) doesn’t exist in database and was moved.', // @translate
-                        ['filename' => $filename, 'type' => $type, 'processed' => $i, 'total' => $total]
+                        "File \"{filename}\" (\"{type}\", #{processed}) doesn't exist in database and was moved.", // @translate
+                        ['filename' => $filename, 'type' => $type, 'processed' => $totalProcessed]
                     );
                 } else {
                     $row['fixed'] = $no;
                     $this->writeRow($row);
                     $this->logger->err(
-                        'File "{filename}" (type "{type}") doesn’t exist in database, and cannot be moved.', // @translate
+                        "File \"{filename}\" (type \"{type}\") doesn't exist in database, and cannot be moved.", // @translate
                         ['filename' => $filename, 'type' => $type]
                     );
                     return false;
                 }
             } else {
                 $this->logger->warn(
-                    'File "{filename}" ("{type}", {processed}/{total}) doesn’t exist in database.', // @translate
-                    ['filename' => $filename, 'type' => $type, 'processed' => $i, 'total' => $total]
+                    "File \"{filename}\" (\"{type}\", #{processed}) doesn't exist in database.", // @translate
+                    ['filename' => $filename, 'type' => $type, 'processed' => $totalProcessed]
                 );
             }
 
@@ -213,12 +213,12 @@ class FileExcess extends AbstractCheckFile
         if ($move) {
             $this->logger->notice(
                 'End check of {total} files for type {type}: {total_excess} files in excess moved.', // @translate
-                ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
+                ['total' => $totalProcessed, 'type' => $type, 'total_excess' => $totalExcess]
             );
         } else {
             $this->logger->notice(
                 'End check of {total} files for type {type}: {total_excess} files in excess.', // @translate
-                ['total' => count($files), 'type' => $type, 'total_excess' => $totalExcess]
+                ['total' => $totalProcessed, 'type' => $type, 'total_excess' => $totalExcess]
             );
         }
 

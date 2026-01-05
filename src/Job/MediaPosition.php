@@ -113,8 +113,7 @@ class MediaPosition extends AbstractCheck
             }
 
             // Avoid memory issue.
-            unset($item);
-            unset($media);
+            unset($items, $item, $media, $result);
             $this->entityManager->clear();
 
             $offset += self::SQL_LIMIT;

@@ -221,6 +221,7 @@ class DbResourceTitle extends AbstractCheck
 
         /** @var \Omeka\Entity\Value $value */
         $value = reset($values);
+        unset($values);
         $val = (string) $value->getValue();
         if ($val !== '') {
             return $val;

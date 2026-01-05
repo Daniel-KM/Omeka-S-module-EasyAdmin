@@ -138,6 +138,7 @@ class DbLoopResources extends AbstractJob
             );
 
             // Avoid memory issue.
+            unset($resourceIds);
             $this->entityManager->clear();
 
             $offset += self::BULK_LIMIT;
