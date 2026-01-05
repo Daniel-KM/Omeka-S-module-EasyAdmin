@@ -93,6 +93,16 @@ class CheckAndFixForm extends Form
                 'name' => 'type_resources',
                 'required' => false,
             ]);
+        $inputFilter->get('resource_values')
+            ->get('db_resource_title')
+            ->add([
+                'name' => 'report_type',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'mode',
+                'required' => false,
+            ]);
 
         $inputFilter->get('database')
             ->add([
@@ -764,6 +774,23 @@ class CheckAndFixForm extends Form
                 'attributes' => [
                     'id' => 'db_resource_title-report_type',
                     'value' => 'partial',
+                ],
+            ])
+            ->add([
+                'name' => 'mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Update mode (fix only)', // @translate
+                    'info' => 'Direct mode: fast update via database, but does not trigger Omeka events (modules like AdvancedResourceTemplate will not update titles). API mode: slower but triggers all events and modules, ensuring full consistency.', // @translate
+                    'value_options' => [
+                        'direct' => 'Direct (fast, no events)', // @translate
+                        'api' => 'API (slower, triggers all events and modules)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'db_resource_title-mode',
+                    'value' => 'direct',
+                    'class' => 'db_resource_title_fix',
                 ],
             ]);
 
