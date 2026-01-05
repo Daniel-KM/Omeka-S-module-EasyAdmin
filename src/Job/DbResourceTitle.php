@@ -97,8 +97,15 @@ class DbResourceTitle extends AbstractCheck
         // Check for AdvancedResourceTemplate fallback properties.
         $this->prepareAdvancedResourceTemplateFallbacks();
 
-        // Use SQL for check mode (faster), entities for fix mode (need persist).
+        // Use SQL for check mode (faster), entities or API for fix mode.
         if ($fix) {
+            $mode = $this->getArg('mode', 'direct');
+            if ($mode === 'api') {
+                $this->logger->info(
+                    'Using API mode: triggers all Omeka events and modules.' // @translate
+                );
+                return $this->checkDbResourceTitleWithApi($totalToProcess);
+            }
             return $this->checkDbResourceTitleWithEntities($totalToProcess);
         }
 
@@ -437,6 +444,147 @@ class DbResourceTitle extends AbstractCheck
         );
 
         return true;
+    }
+
+    /**
+     * Fix titles using Omeka API (triggers all events and modules).
+     *
+     * This mode is slower but ensures full consistency by triggering all Omeka
+     * events, including modules like AdvancedResourceTemplate.
+     */
+    protected function checkDbResourceTitleWithApi(int $totalToProcess): bool
+    {
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+        $yes = $translator->translate('Yes'); // @translate
+
+        // Get all resource ids grouped by type.
+        $sqlIds = <<<'SQL'
+            SELECT id, resource_type, title
+            FROM resource
+            ORDER BY id ASC
+            SQL;
+
+        $offset = 0;
+        $totalProcessed = 0;
+        $totalSucceed = 0;
+        $batchSize = self::SQL_LIMIT;
+
+        while (true) {
+            $sql = $sqlIds . ' LIMIT ' . (int) $batchSize . ' OFFSET ' . (int) $offset;
+            $rows = $this->connection->executeQuery($sql)->fetchAllAssociative();
+            if (!count($rows)) {
+                break;
+            }
+
+            if ($this->shouldStop()) {
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return false;
+            }
+
+            if ($offset) {
+                $this->logger->info(
+                    '{processed}/{total} resources processed.', // @translate
+                    ['processed' => $offset, 'total' => $totalToProcess]
+                );
+            }
+
+            foreach ($rows as $row) {
+                $resourceId = (int) $row['id'];
+                $resourceType = $row['resource_type'];
+                $existingTitle = $row['title'];
+
+                // Map resource_type to API resource name.
+                $resourceName = $this->mapResourceTypeToName($resourceType);
+                if (!$resourceName) {
+                    ++$totalProcessed;
+                    continue;
+                }
+
+                try {
+                    // Partial update triggers all events without changing data.
+                    $this->api->update($resourceName, $resourceId, [], ['isPartial' => true]);
+
+                    // Re-read the resource to get the new title.
+                    $newTitle = $this->connection->executeQuery(
+                        'SELECT title FROM resource WHERE id = ?',
+                        [$resourceId]
+                    )->fetchOne();
+
+                    $different = $existingTitle !== $newTitle;
+
+                    if ($different) {
+                        ++$totalSucceed;
+                        $shortExistingTitle = $existingTitle !== null && $existingTitle !== ''
+                            ? strtr(mb_substr($existingTitle, 0, 1000), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' '])
+                            : '';
+                        $shortNewTitle = $newTitle !== null && $newTitle !== ''
+                            ? strtr(mb_substr($newTitle, 0, 1000), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' '])
+                            : '';
+                        $row = [
+                            'type' => $resourceType,
+                            'resource' => $resourceId,
+                            'existing' => $shortExistingTitle,
+                            'real' => $shortNewTitle,
+                            'different' => $yes,
+                            'fixed' => $yes,
+                        ];
+                        $this->writeRow($row);
+                    } elseif ($this->reportFull) {
+                        $shortTitle = $existingTitle !== null && $existingTitle !== ''
+                            ? strtr(mb_substr($existingTitle, 0, 1000), ["\n" => ' ', "\r" => ' ', "\v" => ' ', "\t" => ' '])
+                            : '';
+                        $row = [
+                            'type' => $resourceType,
+                            'resource' => $resourceId,
+                            'existing' => $shortTitle,
+                            'real' => $shortTitle,
+                            'different' => '',
+                            'fixed' => '',
+                        ];
+                        $this->writeRow($row);
+                    }
+                } catch (\Exception $e) {
+                    $this->logger->err(
+                        'Error updating resource #{resource_id}: {error}', // @translate
+                        ['resource_id' => $resourceId, 'error' => $e->getMessage()]
+                    );
+                }
+
+                ++$totalProcessed;
+            }
+
+            // Clear entity manager to free memory.
+            $this->entityManager->clear();
+            $offset += $batchSize;
+        }
+
+        $this->logger->notice(
+            'End of process: {processed}/{total} processed, {total_succeed} updated via API.', // @translate
+            [
+                'processed' => $totalProcessed,
+                'total' => $totalToProcess,
+                'total_succeed' => $totalSucceed,
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Map resource_type column to API resource name.
+     */
+    protected function mapResourceTypeToName(string $resourceType): ?string
+    {
+        $map = [
+            'Omeka\Entity\Item' => 'items',
+            'Omeka\Entity\ItemSet' => 'item_sets',
+            'Omeka\Entity\Media' => 'media',
+            // Annotation module.
+            'Annotate\Entity\Annotation' => 'annotations',
+        ];
+        return $map[$resourceType] ?? null;
     }
 
     /**
