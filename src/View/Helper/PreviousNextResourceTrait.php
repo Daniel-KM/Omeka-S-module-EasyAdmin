@@ -323,11 +323,11 @@ trait PreviousNextResourceTrait
         // TODO Use a better way to get the previous media. Use positions?
         $previous = null;
         $mediaId = $media->id();
-        foreach ($media->item()->media() as $media) {
-            if ($media->id() === $mediaId) {
+        foreach ($media->item()->media() as $itemMedia) {
+            if ($itemMedia->id() === $mediaId) {
                 return $previous;
             }
-            $previous = $media;
+            $previous = $itemMedia;
         }
         return null;
     }
@@ -354,11 +354,11 @@ trait PreviousNextResourceTrait
         // TODO Use a better way to get the next media. Use positions?
         $next = false;
         $mediaId = $media->id();
-        foreach ($media->item()->media() as $media) {
+        foreach ($media->item()->media() as $itemMedia) {
             if ($next) {
-                return $media;
+                return $itemMedia;
             }
-            if ($media->id() === $mediaId) {
+            if ($itemMedia->id() === $mediaId) {
                 $next = true;
             }
         }
