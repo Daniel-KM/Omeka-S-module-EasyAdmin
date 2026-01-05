@@ -18,6 +18,13 @@ abstract class AbstractCheck extends AbstractJob
     const SQL_LIMIT = 100;
 
     /**
+     * Higher limit for read-only operations (no entity modifications).
+     *
+     * @var int
+     */
+    const SQL_LIMIT_LARGE = 1000;
+
+    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
