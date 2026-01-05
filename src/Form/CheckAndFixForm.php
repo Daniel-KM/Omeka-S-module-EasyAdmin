@@ -316,6 +316,22 @@ class CheckAndFixForm extends Form
                     'id' => 'files_missing-matching',
                 ],
             ])
+            ->add([
+                'name' => 'report_type',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Report type', // @translate
+                    'info' => 'Full report: all files are listed (slower). Partial report: only missing and restored files are listed (faster, recommended for large collections).', // @translate
+                    'value_options' => [
+                        'partial' => 'Partial: only missing/restored files (faster)', // @translate
+                        'full' => 'Full: all files including existing ones (slower)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'files_missing-report_type',
+                    'value' => 'partial',
+                ],
+            ])
         ;
 
         $fieldset
