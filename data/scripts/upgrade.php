@@ -45,6 +45,19 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
 
+// Cron module is now a required dependency.
+/** @var \Omeka\Module\Manager $moduleManager */
+$moduleManager = $services->get('Omeka\ModuleManager');
+$cronModule = $moduleManager->getModule('Cron');
+$hasCronModule = $cronModule && $cronModule->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+if (!$hasCronModule) {
+    $message = new \Omeka\Stdlib\Message(
+        $translate('The module %1$s requires the module %2$s. Install and enable it first.'), // @translate
+        'Easy Admin', 'Cron'
+    );
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+}
+
 if (version_compare($oldVersion, '3.3.2', '<')) {
     $this->installDirs();
 }
@@ -483,6 +496,46 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
 
     $message = new PsrMessage(
         'A new setting allows to skip security check csrf when uploading files in order to fix use behind some vpn/proxy.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.38', '<')) {
+    // Migrate cron settings to new Cron module format.
+
+    // Convert old settings to new format.
+    $oldCronTasks = $settings->get('easyadmin_cron_tasks', []);
+    $oldCronSettings = $settings->get('easyadmin_cron', []);
+
+    // Prepare new settings structure.
+    $newCronSettings = [
+        'tasks' => [],
+        'global_frequency' => $oldCronSettings['global_frequency'] ?? 'daily',
+    ];
+
+    // Convert from old format (simple array of task ids).
+    if (!empty($oldCronTasks) && empty($oldCronSettings['tasks'])) {
+        foreach ($oldCronTasks as $taskId) {
+            $newCronSettings['tasks'][$taskId] = [
+                'enabled' => true,
+                'frequency' => 'daily',
+            ];
+        }
+    }
+    // Convert from intermediate format.
+    elseif (!empty($oldCronSettings['tasks'])) {
+        $newCronSettings['tasks'] = $oldCronSettings['tasks'];
+    }
+
+    // Save to EasyAdmin settings (for backward compatibility).
+    $settings->set('easyadmin_cron', $newCronSettings);
+
+    // Migrate settings to Cron module.
+    $settings->set('cron', $newCronSettings);
+    $settings->set('cron_last', $settings->get('easyadmin_cron_last'));
+
+    $message = new PsrMessage(
+        'Cron settings have been migrated to the Cron module.' // @translate
     );
     $messenger->addSuccess($message);
 }

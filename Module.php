@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright 2017-2025 Daniel Berthereau
+ * Copyright 2017-2026 Daniel Berthereau
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/or
@@ -47,7 +47,7 @@ use Omeka\Module\AbstractModule;
 /**
  * Easy Admin.
  *
- * @copyright Daniel Berthereau, 2017-2025
+ * @copyright Daniel Berthereau, 2017-2026
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  */
 class Module extends AbstractModule
