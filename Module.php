@@ -433,19 +433,30 @@ class Module extends AbstractModule
         );
     }
 
+    /**
+     * Handle cron tasks on page load (fallback for users without server cron).
+     *
+     * This method runs at most once per hour when page is loaded.
+     * For better reliability, configure a real server cron job or web cron.
+     *
+     * Tasks are configured via admin/easy-admin/cron and stored in settings:
+     * - easyadmin_cron: ['tasks' => [xxx], 'global_frequency' => 'daily']
+     * - easyadmin_cron_tasks: simple array of task ids for backward
+     *   compatibility (deprecated).
+     */
     public function handleCron(Event $event): void
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
 
-        // Check if there are tasks.
-        $tasks = $settings->get('easyadmin_cron_tasks', []);
-        if (!count($tasks)) {
+        // Get enabled tasks from new or old settings format.
+        $enabledTasks = $this->getEnabledCronTasks($settings);
+        if (!count($enabledTasks)) {
             return;
         }
 
-        // One check each hour.
-        // TODO Create a new way to check cron each minute?
+        // Check frequency: at most once per hour.
+        // For more precise scheduling, use a real server cron.
         $lastCron = (int) $settings->get('easyadmin_cron_last');
         $time = time();
         if ($lastCron + 3600 > $time) {
@@ -453,66 +464,52 @@ class Module extends AbstractModule
         }
         $settings->set('easyadmin_cron_last', $time);
 
-        // Short tasks.
+        // Dispatch all tasks to the CronTasks job.
+        // This runs synchronously for quick tasks, or as a background job for
+        // longer ones.
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+        $dispatcher->dispatch(\EasyAdmin\Job\CronTasks::class, [
+            'tasks' => $enabledTasks,
+            'manual' => false,
+        ]);
+    }
 
-        $valueToSeconds = [
-            '1h' => 3600,
-            '2h' => 7200,
-            '4h' => 14400,
-            '12h' => 43200,
-            '1d' => 86400,
-            '2d' => 172800,
-            '8d' => 691200,
-            '40d' => 3456000,
-            '100d' => 8640000,
-            // Deprecated.
-            '1' => 86400,
-            '2' => 172800,
-            '8' => 691200,
-            '40' => 3456000,
-            '100' => 8640000,
-        ];
-
-        foreach ($tasks as $task) switch ($task) {
-            case 'session_1h':
-            case 'session_2h':
-            case 'session_4h':
-            case 'session_12h':
-            case 'session_1d':
-            case 'session_2d':
-            case 'session_8d':
-            case 'session_40d':
-            case 'session_100d':
-            // Deprecated.
-            case 'session_1':
-            case 'session_2':
-            case 'session_8':
-            case 'session_40':
-            case 'session_100':
-                $seconds = $valueToSeconds[substr($task, 8)];
-                // If there is no index, use a job.
-                /** @var \Doctrine\DBAL\Connection $connection */
-                $connection = $services->get('Omeka\Connection');
-                $result = $connection->executeQuery('SHOW INDEX FROM `session` WHERE `column_name` = "modified";');
-                if ($result->fetchOne()) {
-                    $sql = 'DELETE `session` FROM `session` WHERE `modified` < :time;';
-                    $connection->executeStatement(
-                        $sql,
-                        ['time' => $time - $seconds],
-                        ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
-                    );
-                } else {
-                    $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
-                    $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, [
-                        'seconds' => $seconds,
-                        'quick' => true,
-                    ]);
+    /**
+     * Get enabled cron tasks from settings.
+     *
+     * Supports both old and new structure for backward compatibility.
+     *
+     * @return array Array of taskId and taskSettings.
+     */
+    protected function getEnabledCronTasks(\Omeka\Settings\Settings $settings): array
+    {
+        // Try new structure first.
+        $cronSettings = $settings->get('easyadmin_cron', []);
+        if (!empty($cronSettings['tasks'])) {
+            $enabledTasks = [];
+            foreach ($cronSettings['tasks'] as $taskId => $taskSettings) {
+                if (!empty($taskSettings['enabled'])) {
+                    $enabledTasks[$taskId] = $taskSettings;
                 }
-                break;
-
-            default:
-                break;
+            }
+            return $enabledTasks;
         }
+
+        // Fallback to deprecated format.
+        $oldTasks = $settings->get('easyadmin_cron_tasks', []);
+        if (!count($oldTasks)) {
+            return [];
+        }
+
+        // Convert old format to new structure.
+        $enabledTasks = [];
+        foreach ($oldTasks as $taskId) {
+            $enabledTasks[$taskId] = [
+                'enabled' => true,
+                'frequency' => 'hourly',
+            ];
+        }
+        return $enabledTasks;
     }
 
     public function handleViewLayoutResource(Event $event): void
