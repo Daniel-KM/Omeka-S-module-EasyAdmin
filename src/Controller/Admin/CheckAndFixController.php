@@ -164,17 +164,15 @@ class CheckAndFixController extends AbstractActionController
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\ThemeTemplate::class, $defaultParams + $params['themes']['theme_templates'] + $params['themes']['theme_templates_warn']);
                 break;
             case 'install_check':
-                // TODO Manage instant jobs via synchronous jobs.
-                // This is not a job, because it is instant.
+                // TODO Improve the form to identify instant process, that are executed directly, not as jobs (quick, instant feedback).
+                // TODO Make theses tasks available separately, in particular for a whole check.
                 $this->checkInstall();
                 break;
             case 'cache_check':
             case 'cache_fix':
-                // This is not a job, because it is instant.
                 $this->checkCache($params['system']['cache'], $process === 'cache_fix');
                 break;
             case 'mail_check':
-                // This is not a job, because it is instant.
                 $this->checkMail($params['system']['mail'] ?? []);
                 break;
             case 'db_fulltext_index':
@@ -190,24 +188,6 @@ class CheckAndFixController extends AbstractActionController
                 ]);
                 $eventManager->trigger('easyadmin.job', $this, $args);
                 $jobClass = $args['job'];
-                // TODO Remove this fix when it will be pushed for all known modules.
-                if (!$jobClass) {
-                    /*
-                    [
-                        'Compilatio' => '3.4.2',
-                        'Dante' => '3.4.7',
-                        'DynamicItemSets' => '3.4.2',
-                        'Guest' => '3.4.29',
-                        'IiifServer' => '3.6.23',
-                        'Reference' => '3.4.51',
-                        'Statistics' => '3.4.9',
-                        'Thesaurus' => '3.4.19',
-                        // And other ones.
-                    ];
-                    */
-                    $eventManager->trigger('easyadmin.job', null, $args);
-                    $jobClass = $args['job'];
-                }
                 if ($jobClass) {
                     $job = $dispatcher->dispatch($jobClass, $args['args']);
                 } else {

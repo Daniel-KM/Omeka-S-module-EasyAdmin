@@ -65,6 +65,16 @@ class Module extends AbstractModule
         require_once __DIR__ . '/vendor/autoload.php';
     }
 
+    public function getConfig()
+    {
+        $config = include __DIR__ . '/config/module.config.php';
+        // Fix #2236 is integrated in 4.2, so remove it for newer versions.
+        if (version_compare(\Omeka\Module::VERSION, '4.2', '>=')) {
+            unset($config['form_elements']['factories']['Omeka\Form\AssetEditForm']);
+        }
+        return $config;
+    }
+
     public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
@@ -304,7 +314,8 @@ class Module extends AbstractModule
         );
 
         // Manage buttons in admin resources.
-        // TODO Use Omeka S v4.1 event "view.show.page_actions" (but none for browse!).
+        // Uses view.layout instead of Omeka 4.1 view.show.page_actions because
+        // page_actions does not exist for browse pages.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
             'view.layout',
@@ -346,6 +357,7 @@ class Module extends AbstractModule
         );
 
         // Manage previous/next resource on items/browse and AdvancedSearch.
+        // Item sets and media browse are not handled (less common use case).
         // TODO Manage item sets and media for search?
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Item',
@@ -619,11 +631,11 @@ class Module extends AbstractModule
         $classIds = $classTerms ? $easyMeta->resourceClassIds($classTerms) : [];
         $templateClassLabels = [];
         if ($classIds) {
-            // The api allows to sort by class, but not to search, so
-            // the argument is added via an event.
-            // TODO Resource templates cannot be searched by classes, so use sql.
-            // The module AdvancedResourceTemplate allows to suggest
-            // multiple classes by template.
+            // Omeka doesn't support searching resource templates by class,
+            // so sql is used.
+            // TODO Use api search when Omeka allows searching resource templates by class.
+            // The module AdvancedResourceTemplate allows to suggest multiple
+            // classes by template.
             if ($this->isModuleActive('AdvancedResourceTemplate')) {
                 /** @var \AdvancedResourceTemplate\Api\Representation\ResourceTemplateRepresentation[] $templates */
                 $templates = $api->search('resource_templates', [])->getContent();
@@ -647,7 +659,7 @@ class Module extends AbstractModule
                     ->setParameter('ids', $classIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
                     ->addOrderBy('`resource_template`.`label`', 'asc')
                 ;
-                $templateClassLabels = $qb->execute()->fetchAllAssociative();
+                $templateClassLabels = $qb->executeQuery()->fetchAllAssociative();
             }
         }
 
@@ -655,7 +667,8 @@ class Module extends AbstractModule
             return;
         }
 
-        // TODO Check if module AdvancedResourceTemplate is active, and filter templates.
+        // Templates are already filtered by AdvancedResourceTemplate above
+        // (use_for_resources).
 
         $plugins = $view->getHelperPluginManager();
         $url = $plugins->get('url');
@@ -682,7 +695,8 @@ class Module extends AbstractModule
         }
 
         if (count($buttons) > 1) {
-            // TODO Use a real button instead of an anchor.
+            // Uses anchor links (styled as buttons) for simplicity for now.
+            // TODO Use a real button instead of an anchor for actions for accessibility.
             $stringButtons = '<li>' . implode("</li>\n<li>", $buttons) . "</li>\n";
             $stringExpand = $escape($translate('Expand'));
             $urlAdd = $url(null, ['action' => 'add'], [], true);
@@ -1059,7 +1073,7 @@ class Module extends AbstractModule
         $settings = $services->get('Omeka\Settings');
         $validator = $services->get(\Omeka\File\Validator::class);
         $tempFileFactory = $services->get(\Omeka\File\TempFileFactory::class);
-        $validateFile = (bool) $settings->get('disable_file_validation', false);
+        $disableFileValidation = (bool) $settings->get('disable_file_validation', false);
         $allowEmptyFiles = (bool) $settings->get('easyadmin_allow_empty_files', false);
 
         $uploadErrorCodes = [
@@ -1136,7 +1150,7 @@ class Module extends AbstractModule
                     $hasError = true;
                     continue;
                 } elseif (empty($fileData['size'])) {
-                    if ($validateFile && !$allowEmptyFiles) {
+                    if (!$disableFileValidation && !$allowEmptyFiles) {
                         $errorStore->addError('upload', new PsrMessage(
                             'File #{index} "{filename}" is an empty file.', // @translate
                             ['index' => ++$subIndex, 'filename' => $fileData['name']]

@@ -12,7 +12,7 @@ class FileStorage extends AbstractCheckFile
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
         'filename' => 'Filename', // @translate
-        'extension' => 'Extension', // @translate,
+        'extension' => 'Extension', // @translate
         'exists' => 'Exists', // @translate
         'storage_id' => 'Storage name', // @translate
         'real_storage_id' => 'New random storage name', // @translate

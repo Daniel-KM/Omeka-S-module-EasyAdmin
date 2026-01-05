@@ -56,8 +56,8 @@ class FileDimension extends AbstractCheckFile
         $criteria = new \Doctrine\Common\Collections\Criteria();
         $expr = $criteria->expr();
 
-        // TODO Manage creation of thumbnails for media without original (youtube…).
         // Check only media with an original file.
+        // TODO Manage dimensions for media without original (youtube…) via omeka ingesters.
         $criteria
             ->where($expr->andX(
                 $expr->orX(

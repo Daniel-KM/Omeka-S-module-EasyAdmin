@@ -46,8 +46,8 @@ class DbJob extends AbstractCheck
         $result = $this->connection->executeQuery($sql, ['jobid' => $this->job->getId()])->fetchAllAssociative();
 
         // Unselect processes with an existing pid.
+        // Uses /proc filesystem (Linux only; most Omeka S installations are Linux-based).
         foreach ($result as $id => $row) {
-            // TODO The check of the pid works only with Linux.
             if ($row['pid'] && file_exists('/proc/' . $row['pid'])) {
                 unset($result[$id]);
             }

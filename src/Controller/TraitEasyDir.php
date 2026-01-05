@@ -74,10 +74,10 @@ trait TraitEasyDir
             return false;
         }
 
-        $filepath = rtrim($dirPath, '//') . '/' . $filename;
+        $filepath = rtrim($dirPath, '/') . '/' . $filename;
         $fileExists = file_exists($filepath);
         if (!$fileExists) {
-            $this->messenger()->addError('The file does not exist.'); // @ŧranslate
+            $this->messenger()->addError('The file does not exist.'); // @translate
             return false;
         }
 

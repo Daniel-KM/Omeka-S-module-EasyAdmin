@@ -48,7 +48,7 @@ class DbValueAnnotationTemplate extends AbstractCheck
     protected function checkDbValueAnnotationTemplate(bool $fix): bool
     {
         // Add the resource template and resource class to value annotations.
-        // TODO Use a single query instead of four requests (or use a temp view).
+        // Uses multiple queries for simplicity and because process is rare.
 
         // Get the default template id for all templates.
         $sql = <<<'SQL'

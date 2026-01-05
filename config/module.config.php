@@ -51,7 +51,7 @@ return [
             Form\AddonsForm::class => Service\Form\AddonsFormFactory::class,
             Form\CheckAndFixForm::class => Service\Form\CheckAndFixFormFactory::class,
             Form\CronForm::class => Service\Form\CronFormFactory::class,
-            // TODO Remove fix when integrated in Omeka S (fix #2236).
+            // Fix #2236 for Omeka < 4.2 (removed dynamically in Module::getConfig() for 4.2+).
             'Omeka\Form\AssetEditForm' => Service\Form\FormWithEventManagerFactory::class,
         ],
     ],
@@ -76,7 +76,8 @@ return [
             'easyAdminAddons' => Service\ControllerPlugin\AddonsFactory::class,
         ],
     ],
-    // TODO Remove these routes and use main admin/default.
+    // Custom routes for /admin/easy-admin/*.
+    // Refactoring to admin/default would break urls.
     'router' => [
         'routes' => [
             'admin' => [

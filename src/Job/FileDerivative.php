@@ -5,7 +5,12 @@ namespace EasyAdmin\Job;
 use Doctrine\Common\Collections\Criteria;
 
 /**
- * @todo Merge with FileDerivativeBulkUpload?
+ * Create thumbnails/derivatives for media files.
+ *
+ * This is a general-purpose job for creating derivatives. For bulk upload
+ * specific handling, see FileDerivativeBulkUpload which can run as a "fake job"
+ * (not persisted) during background imports.
+ *
  * @see \EasyAdmin\Job\FileDerivativeBulkUpload
  */
 class FileDerivative extends AbstractCheck
@@ -21,7 +26,7 @@ class FileDerivative extends AbstractCheck
         'item' => 'Item', // @translate
         'media' => 'Media', // @translate
         'filename' => 'Filename', // @translate
-        'extension' => 'Extension', // @translate,
+        'extension' => 'Extension', // @translate
         'exists' => 'Exists', // @translate
         'has_thumbnails' => 'Has thumbnails', // @translate
         'fixed' => 'Fixed', // @translate
@@ -106,8 +111,8 @@ class FileDerivative extends AbstractCheck
 
         $totalResources = $this->api->search('media', ['limit' => 0])->getTotalResults();
 
-        // TODO Manage creation of thumbnails for media without original (youtube…).
-        // Check only media with an original file.
+        // Only process media with original files.
+        // TODO Manage creation of thumbnails for media without original (youtube…) via omeka ingesters.
         $criteria
             ->andWhere($expr->eq('hasOriginal', 1))
             ->orderBy(['id' => 'ASC'])
