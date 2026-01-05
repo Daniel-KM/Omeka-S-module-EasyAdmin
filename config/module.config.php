@@ -112,12 +112,12 @@ return [
                                 'options' => [
                                     'route' => '/file-manager[/:action]',
                                     'constraints' => [
-                                        'action' => 'browse',
+                                        'action' => '[a-zA-Z-]+',
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
                                         'controller' => 'FileManager',
-                                        'action' => 'browse|delete-confirm|delete',
+                                        'action' => 'browse',
                                     ],
                                 ],
                             ],

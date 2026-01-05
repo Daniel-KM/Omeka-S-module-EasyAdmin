@@ -1,35 +1,188 @@
 @media all {
+    /* Download icon (not in Omeka core) */
+    .o-icon-download::before {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f019";
+    }
+
+    /* Easy Admin general styles */
     .easy-admin .subhead::before,
-    .easy-admin-addons .no-resources:before {
-        content: "";
-    }
+    .easy-admin-addons .no-resources:before,
     .check-and-fix .subhead::before,
-    .check-and-fix .no-resources:before {
-        content: "";
-    }
+    .check-and-fix .no-resources:before,
     .easy-admin-addons .subhead::before,
-    .easy-admin-addons .no-resources:before {
-        content: "";
-    }
     .easy-admin.cron .subhead::before,
-    .easy-admin.cron .no-resources:before {
-        content: "";
-    }
+    .easy-admin.cron .no-resources:before,
     .file-manager .subhead::before,
     .file-manager .no-resources:before {
-        content:"";
+        content: "";
     }
+
     .easy-admin-addons .chosen-container .chosen-results {
         max-height: 50vh;
     }
 
-    #toggle-display-dir {
+    /* File Manager styles */
+
+    /* Directory selector */
+    #dir-select-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    #dir-select-form label {
+        font-weight: bold;
+    }
+
+    #dir-select-form select {
+        min-width: 300px;
+        max-width: 500px;
+    }
+
+    .display-dir-label {
+        font-weight: normal !important;
+        margin-left: 10px;
+    }
+
+    /* Info notice for protected directories */
+    .info-notice {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin: 0;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        border: 2px dashed #ccc;
+        border-radius: 4px;
+        background: #fafafa;
+    }
+
+    .upload-zone:hover {
+        border-color: #999;
+    }
+
+    .bulk-drop {
+        flex: 1;
+        text-align: center;
+        color: #666;
+        padding: 20px;
+    }
+
+    .upload-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .upload-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .upload-progress.empty {
+        display: none;
+    }
+
+    .progress-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .upload-list ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    /* Batch actions */
+    .batch-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .selected-count {
+        color: #666;
+        font-size: 0.9em;
+    }
+
+    /* Pagination */
+    .pagination-info {
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .pagination .page-info {
+        color: #666;
+    }
+
+    /* File table */
+    .file-manager table {
+        width: 100%;
+    }
+
+    .file-manager .col-date {
+        width: 140px;
+    }
+
+    .file-manager .col-size {
+        width: 100px;
         text-align: right;
     }
-    .file-manager table tbody td:first-child {
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+
+    .file-manager td:first-child {
         word-break: break-word;
+    }
+
+    .file-manager .is-dir td:first-child a {
+        font-weight: bold;
+    }
+
+    .file-manager .is-dir td:first-child a::before {
+        content: "\f07b";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-right: 5px;
+    }
+
+    .file-manager .file-name {
+        display: inline;
+    }
+
+    /* No files message */
+    .no-files {
+        color: #666;
+        text-align: center;
+        padding: 40px;
+        background: #f9f9f9;
+        border-radius: 4px;
+    }
+
+    /* Sidebar improvements */
+    .sidebar .error {
+        color: #c62828;
     }
 }
