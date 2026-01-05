@@ -5,7 +5,13 @@ namespace EasyAdmin\Job;
 use Omeka\Job\AbstractJob;
 
 /**
- * FIXME Warning: don't use shouldStop(), since it may be a fake job (see Module).
+ * Create thumbnails for media ingested via bulk_upload.
+ *
+ * Warning: This job may be instantiated as a "fake job" (not persisted to DB)
+ * when called from a background process (see Module::handleAfterSaveItem).
+ * In this case:
+ * - $this->job->getId() returns null
+ * - shouldStop() should NOT be used as there's no DB record to check
  *
  * @todo Merge with FileDerivative?
  * @see \EasyAdmin\Job\FileDerivative
@@ -24,8 +30,10 @@ class FileDerivativeBulkUpload extends AbstractJob
         $services = $this->getServiceLocator();
 
         // Log is a dependency of the module, so add some data.
+        // Note: job->getId() may be null if this is a fake job (not persisted).
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-        $referenceIdProcessor->setReferenceId('bulk/upload/job_' . $this->job->getId());
+        $jobId = $this->job->getId() ?? ('fake_' . getmypid() . '_' . time());
+        $referenceIdProcessor->setReferenceId('bulk/upload/job_' . $jobId);
 
         $logger = $services->get('Omeka\Logger');
         $logger->addProcessor($referenceIdProcessor);
