@@ -164,15 +164,18 @@ class CheckAndFixController extends AbstractActionController
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\ThemeTemplate::class, $defaultParams + $params['themes']['theme_templates'] + $params['themes']['theme_templates_warn']);
                 break;
             case 'install_check':
-                // TODO Manage instant job via synchronous jobs.
+                // TODO Manage instant jobs via synchronous jobs.
                 // This is not a job, because it is instant.
                 $this->checkInstall();
                 break;
             case 'cache_check':
             case 'cache_fix':
-                // TODO Manage instant job via synchronous jobs.
                 // This is not a job, because it is instant.
                 $this->checkCache($params['system']['cache'], $process === 'cache_fix');
+                break;
+            case 'mail_check':
+                // This is not a job, because it is instant.
+                $this->checkMail($params['system']['mail'] ?? []);
                 break;
             case 'db_fulltext_index':
                 $job = $dispatcher->dispatch(\Omeka\Job\IndexFulltextSearch::class);
@@ -357,6 +360,83 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addWarning(
                 'The php extension "intl" is not available. It is recommended to install it to translate dates.' // @translate
             );
+        }
+    }
+
+    protected function checkMail(array $options): void
+    {
+        /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger */
+        $messenger = $this->messenger();
+
+        /** @var \EasyAdmin\Mvc\Controller\Plugin\CheckMailer $checkMailer */
+        $checkMailer = $this->checkMailer();
+
+        // Get the services (needed for mailer).
+        $services = $this->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        // Get and display configuration summary.
+        $configSummary = $checkMailer->getConfigSummary();
+        $configHtml = implode('<br/>', array_map('strval', $configSummary));
+        $message = new PsrMessage(
+            "Current email configuration:\n{config}", // @translate
+            ['config' => '<br/>' . $configHtml]
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addSuccess($message);
+
+        // Check dns records if requested.
+        $checkDns = !empty($options['check_dns']);
+        if ($checkDns) {
+            $checkMailer->checkDnsWithMessages($options);
+        }
+
+        // Send test email if recipient is provided.
+        $recipient = trim($options['recipient'] ?? '');
+        if (empty($recipient)) {
+            $messenger->addNotice('No recipient email provided. Test email was not sent.'); // @translate
+            return;
+        }
+
+        if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            $messenger->addError(new PsrMessage(
+                'Invalid recipient email address: {email}', // @translate
+                ['email' => $recipient]
+            ));
+            return;
+        }
+
+        // Send test email.
+        try {
+            /** @var \Omeka\Stdlib\Mailer $mailer */
+            $mailer = $services->get('Omeka\Mailer');
+            $installationTitle = $settings->get('installation_title', 'Omeka S');
+
+            $subject = new PsrMessage(
+                '[{title}] Test email', // @translate
+                ['title' => $installationTitle]
+            );
+            $body = new PsrMessage(
+                "This is a test email from {title}.\n\nEmail configuration:\n{config}\n\nSent at: {datetime}", // @translate
+                ['title' => $installationTitle, 'config' => implode("\n", $configSummary), 'datetime' => date('Y-m-d H:i:s T')]
+            );
+
+            $message = $mailer->createMessage();
+            $message->addTo($recipient)
+                ->setSubject($subject->setTranslator($this->translator()))
+                ->setBody($body->setTranslator($this->translator()));
+
+            $mailer->send($message);
+
+            $messenger->addSuccess(new PsrMessage(
+                'Test email successfully sent to {email}.', // @translate
+                ['email' => $recipient]
+            ));
+        } catch (\Exception $e) {
+            $messenger->addError(new PsrMessage(
+                'Failed to send test email: {error}', // @translate
+                ['error' => $e->getMessage()]
+            ));
         }
     }
 }
