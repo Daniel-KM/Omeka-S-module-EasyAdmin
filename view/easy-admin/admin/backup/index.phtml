@@ -42,7 +42,7 @@ $formatSize = function ($bytes) {
     <h2><?= $translate('Database backup') ?></h2>
     <p><?= $translate('Create a backup of the database (sql dump).') ?></p>
 
-    <form method="post" action="<?= $url(null, ['action' => 'backup-database'], true) ?>">
+    <form method="post" action="<?= $escapeAttr($url(null, ['action' => 'backup-database'], true)) ?>">
         <fieldset>
             <legend><?= $translate('Content') ?></legend>
             <div class="field">
@@ -135,7 +135,7 @@ $formatSize = function ($bytes) {
     <h2><?= $translate('Files backup') ?></h2>
     <p><?= $translate('Create a backup of Omeka files (modules, themes, configuration). The /files directory is not included due to its potential size.') ?></p>
 
-    <form method="post" action="<?= $url(null, ['action' => 'backup-files'], true) ?>">
+    <form method="post" action="<?= $escapeAttr($url(null, ['action' => 'backup-files'], true)) ?>">
         <fieldset>
             <legend><?= $translate('Include in backup') ?></legend>
 
@@ -230,7 +230,7 @@ $formatSize = function ($bytes) {
                     <a href="<?= $escapeAttr($url(null, ['action' => 'download'], ['query' => ['file' => $backup['name']]], true)) ?>"
                        class="o-icon-download" title="<?= $translate('Download') ?>"></a>
                     <a href="#" class="o-icon-delete delete-backup"
-                       data-sidebar-content-url="<?= $url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true) ?>"
+                       data-url-sidebar-content="<?= $escapeAttr($url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true)) ?>"
                        title="<?= $translate('Delete') ?>"></a>
                 </td>
             </tr>
