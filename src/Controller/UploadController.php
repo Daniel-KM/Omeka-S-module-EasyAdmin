@@ -93,7 +93,7 @@ class UploadController extends AbstractActionController
         }
 
         // Check csrf for security.
-        if (!$this->settings('easyadmin_disable_csrf')) {
+        if (!$this->settings()->get('easyadmin_disable_csrf')) {
             $form = $this->getForm(\Omeka\Form\ResourceForm::class);
             $form->setData(['csrf' => $headers['X-Csrf'] ?? null]);
             if (!$form->isValid()) {
