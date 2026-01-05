@@ -13,7 +13,7 @@
         document.querySelectorAll('.delete-backup').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                var url = this.dataset.sidebarContentUrl;
+                var url = this.dataset.urlSidebarContent;
                 var sidebar = document.getElementById('sidebar');
                 var content = sidebar.querySelector('.sidebar-content');
 

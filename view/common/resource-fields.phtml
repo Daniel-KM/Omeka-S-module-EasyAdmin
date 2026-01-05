@@ -35,7 +35,7 @@ if (isset($resource)) {
 <fieldset id="resource-values"
     class="section active"
     aria-labelledby="resource-values-label"
-    data-resource-id="<?php echo isset($resource) ? $resource->id() : ''; ?>">
+    data-resource-id="<?= $escapeAttr(isset($resource) ? $resource->id() : '') ?>">
     <div class="non-properties">
         <?php if ($resourceTemplateSelect->getValueOptions()): ?>
         <?php echo $this->formRow($resourceTemplateSelect); ?>
