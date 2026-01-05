@@ -107,6 +107,7 @@
                 listItem.id = file.uniqueIdentifier;
                 listItem.setAttribute('data-filename', file.name);
                 listItem.setAttribute('data-filepath', file.relativePath);
+                listItem.setAttribute('data-filetype', fileFile.type || '');
                 listItem.setAttribute('data-is-valid', listItemIsValid ? '1' : '0');
                 listItem.setAttribute('data-is-uploaded', '0');
                 const dv = document.createElement('div');
@@ -268,6 +269,22 @@
                     ? 0
                     : x.path.localeCompare(y.path);
             };
+            var sortFunctionMediaType = function (x, y) {
+                if (x === null && y === null) {
+                    return 0;
+                }
+                if (x === null) {
+                    return -1;
+                }
+                if (y === null) {
+                    return 1;
+                }
+                const xType = x.type || '';
+                const yType = y.type || '';
+                return xType === yType
+                    ? 0
+                    : xType > yType ? 1 : -1;
+            };
 
             var sortFunction;
             if (sortType === 'ascii') {
@@ -318,6 +335,26 @@
                     var result = sortFunctionAlphaPath(x, y);
                     return result ? result : sortFunctionExtension(x, y);
                 }
+            } else if (sortType === 'mediatype-ascii') {
+                sortFunction = function (x, y) {
+                    var result = sortFunctionMediaType(x, y);
+                    return result ? result : sortFunctionAscii(x, y);
+                }
+            } else if (sortType === 'mediatype-alpha') {
+                sortFunction = function (x, y) {
+                    var result = sortFunctionMediaType(x, y);
+                    return result ? result : sortFunctionAlpha(x, y);
+                }
+            } else if (sortType === 'mediatype-ascii-path') {
+                sortFunction = function (x, y) {
+                    var result = sortFunctionMediaType(x, y);
+                    return result ? result : sortFunctionAsciiPath(x, y);
+                }
+            } else if (sortType === 'mediatype-alpha-path') {
+                sortFunction = function (x, y) {
+                    var result = sortFunctionMediaType(x, y);
+                    return result ? result : sortFunctionAlphaPath(x, y);
+                }
             } else {
                 return;
             }
@@ -335,6 +372,7 @@
                     li: this,
                     name: $(this).data('filename'),
                     path: $(this).data('filepath'),
+                    type: $(this).data('filetype'),
                 });
             });
             listNames.sort(sortFunction);

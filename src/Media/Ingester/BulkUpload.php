@@ -140,6 +140,7 @@ class BulkUpload implements IngesterInterface
         $sortByName = $translate('By file name'); // @translate
         $sortByExtensionFirst = $translate('By extension first'); // @translate
         $sortByExtensionLast = $translate('By extension last'); // @translate
+        $sortByMediaType = $translate('By media type'); // @translate
         // $sortDefault = $translate('Default'); // @translate
         $sortAscii = $translate('Simple'); // @translate
         $sortAlpha = $translate('Alphabetic'); // @translate
@@ -147,8 +148,6 @@ class BulkUpload implements IngesterInterface
         $sortAlphaPath = $translate('Alphabetic (with folder)'); // @translate
         $hideUploaded = $translate('Hide uploaded files'); // @translate
         $submitPartial = $translate('Allow to submit before full upload'); // @translate
-
-        // TODO Sort by media-type.
 
         return <<<HTML
             <div class="field media-bulk-upload" data-main-index="__index__" $dataAttributes>
@@ -209,6 +208,12 @@ class BulkUpload implements IngesterInterface
                             <option value="alpha-extension">$sortAlpha</option>
                             <option value="ascii-path-extension">$sortAsciiPath</option>
                             <option value="alpha-path-extension">$sortAlphaPath</option>
+                        </optgroup>
+                        <optgroup label="$sortByMediaType">
+                            <option value="mediatype-ascii">$sortAscii</option>
+                            <option value="mediatype-alpha">$sortAlpha</option>
+                            <option value="mediatype-ascii-path">$sortAsciiPath</option>
+                            <option value="mediatype-alpha-path">$sortAlphaPath</option>
                         </optgroup>
                     </select>
                 </div>
