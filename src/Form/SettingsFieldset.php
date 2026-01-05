@@ -127,10 +127,12 @@ class SettingsFieldset extends Fieldset
                 'type' => Element\Text::class,
                 'options' => [
                     'element_group' => 'easy_admin',
-                    'label' => 'Default folder to upload files', // @translate
+                    'label' => 'Default upload folder', // @translate
+                    'info' => 'Default folder for file uploads. Must be inside /files but not in protected directories (original, asset, large, medium, square).', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_local_path',
+                    'placeholder' => '/var/www/html/files/upload', // @translate
                 ],
             ])
             ->add([
@@ -138,10 +140,12 @@ class SettingsFieldset extends Fieldset
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'easy_admin',
-                    'label' => 'Allowed folders for browsing', // @translate
+                    'label' => 'Additional folders', // @translate
+                    'info' => 'Additional folders available in the file manager. One path per line. Protected Omeka directories (original, asset, derivatives) are always available for browsing but are read-only.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_local_paths',
+                    'rows' => 3,
                 ],
             ])
             ->add([
@@ -149,7 +153,8 @@ class SettingsFieldset extends Fieldset
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'element_group' => 'easy_admin',
-                    'label' => 'Disable security check of csrf to upload files (required with some vpn/proxy)', // @translate
+                    'label' => 'Disable CSRF check for uploads', // @translate
+                    'info' => 'May be required with some VPN/proxy configurations.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_disable_csrf',
@@ -160,8 +165,8 @@ class SettingsFieldset extends Fieldset
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'element_group' => 'easy_admin',
-                    'label' => 'Allow empty files in manual upload', // @translate
-                    'info' => 'In rare cases, an admin may want to upload empty files. This option requires to disable file validation or to add the media type "application/x-empty" in main settings.', // @translate
+                    'label' => 'Allow empty files', // @translate
+                    'info' => 'Allow uploading empty files. Requires disabling file validation or adding media type "application/x-empty" in main settings.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_allow_empty_files',

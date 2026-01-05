@@ -4,6 +4,20 @@ namespace EasyAdmin\Controller;
 
 trait TraitEasyDir
 {
+    /**
+     * Directories managed by Omeka that should never be modified.
+     *
+     * These directories contain original files and derivatives and can have
+     * 100,000+ files. They are read-only: browsing allowed, but no upload/delete.
+     */
+    protected const PROTECTED_DIRECTORIES = [
+        'asset',
+        'large',
+        'medium',
+        'original',
+        'square',
+    ];
+
     protected function getAndCheckDirPath(?string $dirPath, ?string &$errorMessage = null): ?string
     {
         $dirPath = mb_strlen((string) $dirPath)
@@ -13,6 +27,32 @@ trait TraitEasyDir
         return $check
             ? $dirPath
             : null;
+    }
+
+    /**
+     * Check if a directory is protected (read-only, managed by Omeka).
+     *
+     * Protected directories include files/original, files/asset, and derivative
+     * directories (large, medium, square). These can contain 100k+ files.
+     */
+    protected function isProtectedDirectory(?string $dirPath): bool
+    {
+        if (!mb_strlen((string) $dirPath)) {
+            return false;
+        }
+
+        $dirPath = rtrim($dirPath, '/') . '/';
+        $basePath = rtrim($this->basePath, '/') . '/';
+
+        foreach (self::PROTECTED_DIRECTORIES as $dir) {
+            if (mb_strpos($dirPath, $basePath . $dir . '/') === 0
+                || $dirPath === $basePath . $dir . '/'
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function checkFile(?string $filepath, ?string &$errorMessage = null): bool
@@ -80,7 +120,15 @@ trait TraitEasyDir
         return true;
     }
 
-    protected function checkDirPath(?string $dirPath, ?string &$errorMessage = null): bool
+    /**
+     * Check if a directory path is valid for browsing.
+     *
+     * Protected directories (original, asset, derivatives) are allowed for
+     * browsing but are read-only.
+     *
+     * @param bool $forWriting If true, protected directories will be rejected.
+     */
+    protected function checkDirPath(?string $dirPath, ?string &$errorMessage = null, bool $forWriting = false): bool
     {
         if (!mb_strlen((string) $dirPath)) {
             $errorMessage = 'Local path is not configured.'; // @translate
@@ -89,36 +137,40 @@ trait TraitEasyDir
 
         $dirPath = rtrim($dirPath, '/') . '/';
 
-        if (empty($this->allowAnyPath)) {
-            if ($dirPath === $this->basePath
-                || mb_strpos($dirPath, $this->basePath . '/') !== 0
-            ) {
-                $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
-                return false;
-            }
-
-            if (!$this->settings()->get('easyadmin_local_path_any_files')) {
-                $standardDirectories = [
-                    'asset',
-                    'large',
-                    'medium',
-                    'original',
-                    'square',
-                ];
-                foreach ($standardDirectories as $dir) {
-                    if (mb_strpos($dirPath, $this->basePath . '/' . $dir . '/') === 0) {
-                        $errorMessage = 'Local path cannot be a directory managed by Omeka and should be inside /files.'; // @translate
-                        return false;
-                    }
-                }
-            }
-        }
-
         if ($dirPath === '/') {
             $errorMessage = 'Local path cannot be the root directory.'; // @translate
             return false;
         }
 
+        if (empty($this->allowAnyPath)) {
+            $basePath = rtrim($this->basePath, '/') . '/';
+            if ($dirPath === $basePath
+                || mb_strpos($dirPath, $basePath) !== 0
+            ) {
+                $errorMessage = 'Local path should be a sub-directory of /files.'; // @translate
+                return false;
+            }
+        }
+
+        // Check if it's a protected directory.
+        $isProtected = $this->isProtectedDirectory($dirPath);
+
+        // Protected directories cannot be written to.
+        if ($forWriting && $isProtected) {
+            $errorMessage = 'This directory is managed by Omeka and is read-only.'; // @translate
+            return false;
+        }
+
+        // For protected directories, just check if readable (no write check).
+        if ($isProtected) {
+            if (!file_exists($dirPath) || !is_dir($dirPath) || !is_readable($dirPath)) {
+                $errorMessage = 'Local path is not readable.'; // @translate
+                return false;
+            }
+            return true;
+        }
+
+        // For non-protected directories, check writability.
         $dirPath = $this->checkDestinationDir($dirPath);
         if (!$dirPath) {
             $errorMessage = 'Local path is not writeable.'; // @translate

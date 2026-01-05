@@ -4,7 +4,6 @@ namespace EasyAdmin\Controller\Admin;
 
 use Common\Stdlib\PsrMessage;
 use EasyAdmin\Controller\TraitEasyDir;
-use FilesystemIterator;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
@@ -13,6 +12,11 @@ use Omeka\Permissions\Acl;
 class FileManagerController extends AbstractActionController
 {
     use TraitEasyDir;
+
+    /**
+     * Default number of files per page.
+     */
+    protected const PER_PAGE = 100;
 
     /**
      * @var \Omeka\Permissions\Acl
@@ -55,28 +59,96 @@ class FileManagerController extends AbstractActionController
 
     public function browseAction()
     {
-        /**
-         * @var \Omeka\Entity\User $user
-         */
         $user = $this->identity();
         $settings = $this->settings();
 
-        // Check omeka setting for files.
+        $errorMessage = null;
+        $currentPath = $this->params()->fromQuery('dir_path');
+        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+
+        // Check if directory is protected (read-only).
+        $isProtected = $dirPath ? $this->isProtectedDirectory($dirPath) : false;
+
+        // Pagination parameters.
+        $page = (int) $this->params()->fromQuery('page', 1);
+        $perPage = self::PER_PAGE;
+
+        // Upload configuration (only for non-protected directories).
+        $uploadData = null;
+        if ($dirPath && !$isProtected) {
+            $uploadData = $this->prepareUploadData($settings);
+        }
+
+        // File listing with pagination.
+        $files = [];
+        $totalFiles = 0;
+        $totalPages = 1;
+        $localUrl = null;
+        $formDelete = null;
+
+        if ($dirPath) {
+            $base = $this->baseUri
+                ? rtrim($this->baseUri, '/')
+                : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
+            $partPath = trim(mb_substr($dirPath, mb_strlen(rtrim($this->basePath, '/')) + 1), '/');
+            $localUrl = $base . '/' . $partPath;
+
+            // Get paginated files.
+            $displayDir = (bool) $this->params()->fromQuery('display_dir');
+            $result = $this->getPaginatedFiles($dirPath, $page, $perPage, $displayDir);
+            $files = $result['files'];
+            $totalFiles = $result['total'];
+            $totalPages = (int) ceil($totalFiles / $perPage);
+
+            // Delete form (only for non-protected directories).
+            if (!$isProtected) {
+                $formDelete = $this->getForm(ConfirmForm::class);
+                $formDelete
+                    ->setAttribute('action', $this->url()->fromRoute(null, ['action' => 'batch-delete'], true))
+                    ->setAttribute('id', 'confirm-delete')
+                    ->setButtonLabel('Confirm delete'); // @translate
+            }
+        } else {
+            $this->messenger()->addError($this->translate($errorMessage));
+        }
+
+        // Directory list for dropdown.
+        $dirPaths = $this->getAvailableDirectories($settings, $dirPath);
+
+        return new ViewModel([
+            'basePath' => $this->basePath,
+            'localUrl' => $localUrl,
+            'dirPath' => $dirPath,
+            'dirPaths' => $dirPaths,
+            'isProtected' => $isProtected,
+            'uploadData' => $uploadData,
+            'files' => $files,
+            'totalFiles' => $totalFiles,
+            'page' => $page,
+            'perPage' => $perPage,
+            'totalPages' => $totalPages,
+            'formDelete' => $formDelete,
+            'isAdmin' => $user ? $this->acl->isAdminRole($user->getRole()) : false,
+        ]);
+    }
+
+    /**
+     * Prepare upload configuration data.
+     */
+    protected function prepareUploadData($settings): array
+    {
         if ($settings->get('disable_file_validation', false)) {
             $allowedMediaTypes = '';
             $allowedExtensions = '';
         } else {
-            $allowedMediaTypes = $settings->get('media_type_whitelist', []);
-            $allowedExtensions = $settings->get('extension_whitelist', []);
-            $allowedMediaTypes = implode(',', $allowedMediaTypes);
-            $allowedExtensions = implode(',', $allowedExtensions);
+            $allowedMediaTypes = implode(',', $settings->get('media_type_whitelist', []));
+            $allowedExtensions = implode(',', $settings->get('extension_whitelist', []));
         }
 
         $skipCsrf = (bool) $settings->get('easyadmin_disable_csrf', false);
         $allowEmptyFiles = (bool) $settings->get('easyadmin_allow_empty_files', false);
 
-        $data = [
-            // This option allows to manage resource form and bulk upload form.
+        return [
             'data-bulk-upload' => true,
             'data-csrf' => $skipCsrf ? '' : (new \Laminas\Form\Element\Csrf('csrf'))->getValue(),
             'data-allowed-media-types' => $allowedMediaTypes,
@@ -90,267 +162,305 @@ class FileManagerController extends AbstractActionController
                 : $this->translate('Not a valid file type, extension or size. Update your selection.'), // @translate
             'data-translate-unknown-error' => $this->translate('An issue occurred.'), // @translate
         ];
+    }
 
-        $returnQuery = $this->params()->fromQuery();
-        unset($returnQuery['page']);
-
-        $errorMessage = null;
-        $currentPath = $this->params()->fromQuery('dir_path');
-        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
-
-        if ($dirPath) {
-            $fileIterator = new FilesystemIterator($dirPath);
-            // TODO Use pagination.
-            // $this->paginator($fileIterator->getTotalResults());
-            // Get the specific part.
-            // Note: default base uri and default base path use /files.
-            $base = $this->baseUri ? rtrim($this->baseUri, '/') : rtrim($this->url()->fromRoute('top', []), '/') . '/files';
-            $partPath = trim(mb_substr($dirPath, mb_strlen(rtrim($this->basePath, '/')) + 1), '/');
-            $localUrl = $base . '/' . $partPath;
-
-            /** @var \Omeka\Form\ConfirmForm $formDeleteSelected */
-            $formDeleteSelected = $this->getForm(ConfirmForm::class);
-            $formDeleteSelected
-                ->setAttribute('action', $this->url()->fromRoute(null, ['action' => 'batch-delete'], ['query' => $returnQuery], true))
-                ->setAttribute('id', 'confirm-delete-selected')
-                ->setButtonLabel('Confirm Delete'); // @translate
-
-            /** @var \Omeka\Form\ConfirmForm $formDeleteAll */
-            $formDeleteAll = $this->getForm(ConfirmForm::class);
-            $formDeleteAll
-                ->setAttribute('action', $this->url()->fromRoute(null, ['action' => 'batch-delete-all'], ['query' => $returnQuery], true))
-                ->setAttribute('id', 'confirm-delete-all')
-                ->setButtonLabel('Confirm Delete'); // @translate
-            $formDeleteAll
-                ->get('submit')->setAttribute('disabled', true);
-        } else {
-            $localUrl = null;
-            $fileIterator = null;
-
-            $this->messenger()->addError($this->translate($errorMessage));
-            $formDeleteSelected = null;
-            $formDeleteAll = null;
+    /**
+     * Get paginated list of files from directory.
+     *
+     * Uses scandir for better performance with large directories (100k+ files).
+     */
+    protected function getPaginatedFiles(string $dirPath, int $page, int $perPage, bool $includeDirectories = false): array
+    {
+        $allEntries = @scandir($dirPath);
+        if ($allEntries === false) {
+            return ['files' => [], 'total' => 0];
         }
 
-        $dirPaths = array_unique(array_filter(array_merge(array_values($settings->get('easyadmin_local_paths')) ?: [$dirPath], [$dirPath])));
-        $dirPaths = array_combine($dirPaths, $dirPaths);
+        // Filter entries.
+        $entries = [];
+        foreach ($allEntries as $entry) {
+            // Skip hidden files and special entries.
+            if ($entry === '.' || $entry === '..' || mb_substr($entry, 0, 1) === '.') {
+                continue;
+            }
 
-        return (new ViewModel([
-            'basePath' => $this->basePath,
-            'localUrl' => $localUrl,
-            'dirPath' => $dirPath,
-            'dirPaths' => $dirPaths,
-            'isDirPathValid' => (bool) $dirPath,
-            'data' => $data,
-            'fileIterator' => $fileIterator,
-            'formDeleteSelected' => $formDeleteSelected,
-            'formDeleteAll' => $formDeleteAll,
-            'isAdminUser' => $user ? $this->acl->isAdminRole($user->getRole()) : false,
-            'returnQuery' => $returnQuery,
-        ]));
+            $fullPath = $dirPath . '/' . $entry;
+            $isDir = is_dir($fullPath);
+
+            if ($isDir && !$includeDirectories) {
+                continue;
+            }
+
+            if (!is_readable($fullPath)) {
+                continue;
+            }
+
+            $entries[] = [
+                'name' => $entry,
+                'path' => $fullPath,
+                'isDir' => $isDir,
+            ];
+        }
+
+        $total = count($entries);
+
+        // Sort: directories first, then files alphabetically.
+        usort($entries, function ($a, $b) {
+            if ($a['isDir'] !== $b['isDir']) {
+                return $a['isDir'] ? -1 : 1;
+            }
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        // Paginate.
+        $offset = ($page - 1) * $perPage;
+        $pagedEntries = array_slice($entries, $offset, $perPage);
+
+        // Enrich with file info.
+        $files = [];
+        foreach ($pagedEntries as $entry) {
+            $file = [
+                'name' => $entry['name'],
+                'path' => $entry['path'],
+                'isDir' => $entry['isDir'],
+                'isWritable' => is_writable($entry['path']),
+            ];
+
+            if (!$entry['isDir']) {
+                $file['size'] = filesize($entry['path']);
+                $file['mtime'] = filemtime($entry['path']);
+            }
+
+            $files[] = $file;
+        }
+
+        return ['files' => $files, 'total' => $total];
+    }
+
+    /**
+     * Get available directories for the dropdown.
+     */
+    protected function getAvailableDirectories($settings, ?string $currentPath): array
+    {
+        $paths = $settings->get('easyadmin_local_paths', []);
+        if (!is_array($paths)) {
+            $paths = [];
+        }
+
+        // Add default path.
+        $defaultPath = $settings->get('easyadmin_local_path');
+        if ($defaultPath) {
+            array_unshift($paths, $defaultPath);
+        }
+
+        // Add current path if valid.
+        if ($currentPath) {
+            $paths[] = $currentPath;
+        }
+
+        // Add protected directories for browsing.
+        $basePath = rtrim($this->basePath, '/');
+        foreach (self::PROTECTED_DIRECTORIES as $dir) {
+            $protectedPath = $basePath . '/' . $dir;
+            if (is_dir($protectedPath) && is_readable($protectedPath)) {
+                $paths[] = $protectedPath;
+            }
+        }
+
+        $paths = array_unique(array_filter($paths));
+        sort($paths);
+
+        return array_combine($paths, $paths);
     }
 
     public function deleteConfirmAction()
     {
         $errorMessage = null;
-        $currentPath = $this->params()->fromQuery('path');
+        $currentPath = $this->params()->fromQuery('dir_path');
         $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
         if (!$dirPath) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
-        $linkTitle = (bool) $this->params()->fromQuery('link-title', true);
-        $filename = $this->params()->fromQuery('filename');
+        // Protected directories cannot be modified.
+        if ($this->isProtectedDirectory($dirPath)) {
+            throw new \Laminas\Mvc\Exception\RuntimeException(
+                $this->translate('This directory is managed by Omeka and is read-only.') // @translate
+            );
+        }
 
+        $filename = $this->params()->fromQuery('filename');
         $errorMessage = null;
-        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
-        if (!$isFilenameValid) {
+        if (!$this->checkFilename($filename, $errorMessage)) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
-        $filepath = rtrim($dirPath, '//') . '/' . $filename;
-
+        $filepath = rtrim($dirPath, '/') . '/' . $filename;
         $errorMessage = null;
-        $isFileValid = $this->checkFile($filepath, $errorMessage);
-        if (!$isFileValid) {
+        if (!$this->checkFile($filepath, $errorMessage)) {
             throw new \Laminas\Mvc\Exception\RuntimeException($this->translate($errorMessage));
         }
 
         $form = $this->getForm(ConfirmForm::class);
-        $form->setAttribute('action', $this->url()->fromRoute('admin/easy-admin/file-manager', ['action' => 'delete'], ['query' => ['filename' => $filename]], true));
+        $form->setAttribute('action', $this->url()->fromRoute(
+            'admin/easy-admin/file-manager',
+            ['action' => 'delete'],
+            ['query' => ['dir_path' => $dirPath, 'filename' => $filename]],
+            true
+        ));
 
         return (new ViewModel([
-                'resource' => $filename,
-                'dirPath' => $dirPath,
-                'file' => $filename,
-                'resourceLabel' => 'file', // @translate
-                'form' => $form,
-                // 'partialPath' => 'easy-admin/admin/file-manager/show-details',
-                'partialPath' => null,
-                'linkTitle' => $linkTitle,
-                'wrapSidebar' => false,
-            ]))
-            ->setTerminal(true);
+            'resource' => $filename,
+            'dirPath' => $dirPath,
+            'file' => $filename,
+            'resourceLabel' => 'file', // @translate
+            'form' => $form,
+            'partialPath' => null,
+            'linkTitle' => true,
+            'wrapSidebar' => false,
+        ]))->setTerminal(true);
     }
 
     public function deleteAction()
     {
+        $dirPath = $this->params()->fromQuery('dir_path');
+
         if ($this->getRequest()->isPost()) {
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
             if ($form->isValid()) {
-                $dirPath = $this->params()->fromQuery('dir_path');
                 $filename = $this->params()->fromQuery('filename');
-                $this->checkAndDeleteFile($dirPath, $filename);
+                $this->deleteFile($dirPath, $filename);
             } else {
                 $this->messenger()->addFormErrors($form);
             }
         }
-        return $this->redirect()->toRoute('admin/easy-admin/file-manager', ['action' => 'browse'], true);
+
+        return $this->redirect()->toRoute(
+            'admin/easy-admin/file-manager',
+            ['action' => 'browse'],
+            ['query' => ['dir_path' => $dirPath]],
+            true
+        );
     }
 
     public function batchDeleteAction()
     {
-        $returnQuery = $this->params()->fromQuery();
+        $dirPath = $this->params()->fromPost('dir_path');
+        $query = ['dir_path' => $dirPath];
 
         if (!$this->getRequest()->isPost()) {
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $query], true);
         }
 
-        // Use the post value, not the query.
+        // Validate directory.
         $errorMessage = null;
-        $currentPath = $this->params()->fromPost('dir_path');
-        $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
+        $dirPath = $this->getAndCheckDirPath($dirPath, $errorMessage, true);
         if (!$dirPath) {
-            $this->messenger()->addError('You must set a directory to delete files.'); // @translate
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+            $this->messenger()->addError($errorMessage ?: 'You must set a writable directory to delete files.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $query], true);
+        }
+
+        // Protected directories cannot be modified.
+        if ($this->isProtectedDirectory($dirPath)) {
+            $this->messenger()->addError('This directory is managed by Omeka and is read-only.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $query], true);
         }
 
         $filenames = $this->params()->fromPost('filenames', []);
         if (!$filenames) {
-            $this->messenger()->addError('You must select at least one file to batch delete.'); // @translate
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+            $this->messenger()->addError('You must select at least one file to delete.'); // @translate
+            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $query], true);
         }
 
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
-            $totalFiles = 0;
+            $deleted = 0;
             foreach ($filenames as $filename) {
-                $result = $this->checkAndDeleteFile($dirPath, $filename);
-                if ($result) {
-                    ++$totalFiles;
+                if ($this->deleteFile($dirPath, $filename, false)) {
+                    ++$deleted;
                 }
             }
-            if ($totalFiles) {
+            if ($deleted) {
                 $this->messenger()->addSuccess(new PsrMessage(
-                    '{count} files were removed.', // @translate
-                    ['count' => $totalFiles]
+                    '{count} file(s) deleted.', // @translate
+                    ['count' => $deleted]
                 ));
             } else {
-                $this->messenger()->addWarning('No file removed.'); // @translate
+                $this->messenger()->addWarning('No file deleted.'); // @translate
             }
         } else {
             $this->messenger()->addFormErrors($form);
         }
 
-        return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
-    }
-
-    public function batchDeleteAllAction()
-    {
-        $returnQuery = $this->params()->fromQuery();
-
-        if (!$this->getRequest()->isPost()) {
-            return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
-        }
-
-        $form = $this->getForm(ConfirmForm::class);
-        $form->setData($this->getRequest()->getPost());
-        if ($form->isValid()) {
-            // Use the post value, not the query.
-            $errorMessage = null;
-            $currentPath = $this->params()->fromPost('dir_path');
-            $dirPath = $this->getAndCheckDirPath($currentPath, $errorMessage);
-            if (!$dirPath) {
-                $this->messenger()->addError($errorMessage ?: 'You must set a directory to delete files.'); // @translate
-                return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
-            }
-
-            $fileIterator = new FilesystemIterator($dirPath);
-            $totalFiles = 0;
-            foreach ($fileIterator as $file) {
-                $filename = $file->getFilename();
-                if (!$file->isFile()
-                    || $file->isDir()
-                    // || $file->isDot()
-                    || !$file->isReadable()
-                    || !$file->isWritable()
-                ) {
-                    continue;
-                }
-                $result = $this->checkAndDeleteFile($dirPath, $filename);
-                if ($result) {
-                    ++$totalFiles;
-                }
-            }
-            if ($totalFiles) {
-                $this->messenger()->addSuccess(new PsrMessage(
-                    '{count} files were removed.', // @translate
-                    ['count' => $totalFiles]
-                ));
-            } else {
-                $this->messenger()->addWarning('No file removed.'); // @translate
-            }
-        } else {
-            $this->messenger()->addFormErrors($form);
-        }
-
-        return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $returnQuery], true);
+        return $this->redirect()->toRoute(null, ['action' => 'browse'], ['query' => $query], true);
     }
 
     /**
-     * Check and delete a file in a local path.
+     * Delete a single file.
+     *
+     * @param bool $showMessages Whether to show success/error messages.
      */
-    protected function checkAndDeleteFile(string $dirPath, string $filename): bool
+    protected function deleteFile(string $dirPath, string $filename, bool $showMessages = true): bool
     {
+        // Validate directory for writing.
         $errorMessage = null;
-        $dirPath = $this->getAndCheckDirPath($dirPath, $errorMessage);
-        if ($dirPath === null) {
-            $this->messenger()->addError($errorMessage);
+        $dirPath = $this->getAndCheckDirPath($dirPath, $errorMessage, true);
+        if (!$dirPath) {
+            if ($showMessages) {
+                $this->messenger()->addError($errorMessage);
+            }
             return false;
         }
 
-        $errorMessage = null;
-        $isFilenameValid = $this->checkFilename($filename, $errorMessage);
-        if (!$isFilenameValid) {
-            $this->messenger()->addError($errorMessage);
+        // Protected directories cannot be modified.
+        if ($this->isProtectedDirectory($dirPath)) {
+            if ($showMessages) {
+                $this->messenger()->addError('This directory is managed by Omeka and is read-only.'); // @translate
+            }
             return false;
         }
 
-        $filepath = rtrim($dirPath, '//') . '/' . $filename;
-        $fileExists = file_exists($filepath);
-        if (!$fileExists) {
-            return true;
+        // Validate filename.
+        $errorMessage = null;
+        if (!$this->checkFilename($filename, $errorMessage)) {
+            if ($showMessages) {
+                $this->messenger()->addError($errorMessage);
+            }
+            return false;
+        }
+
+        $filepath = rtrim($dirPath, '/') . '/' . $filename;
+
+        if (!file_exists($filepath)) {
+            return true; // Already deleted.
         }
 
         if (is_dir($filepath)) {
-            $this->messenger()->addError('It is forbidden to remove a folder.'); // @translate
+            if ($showMessages) {
+                $this->messenger()->addError('Cannot delete a folder.'); // @translate
+            }
             return false;
         }
 
-        if (!is_writeable($filepath) || !is_file($filepath)) {
-            $this->messenger()->addError('The file cannot be removed.'); // @translate
+        if (!is_file($filepath) || !is_writable($filepath)) {
+            if ($showMessages) {
+                $this->messenger()->addError('The file cannot be deleted.'); // @translate
+            }
             return false;
         }
 
-        $result = unlink($filepath);
-        if ($result) {
-            $this->messenger()->addSuccess('File successfully deleted'); // @translate
+        if (@unlink($filepath)) {
+            if ($showMessages) {
+                $this->messenger()->addSuccess('File deleted.'); // @translate
+            }
             return true;
         }
 
-        $this->messenger()->addError('An issue occurred during deletion.'); // @translate
+        if ($showMessages) {
+            $this->messenger()->addError('An error occurred during deletion.'); // @translate
+        }
         return false;
     }
 }
