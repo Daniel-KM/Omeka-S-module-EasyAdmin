@@ -28,8 +28,10 @@
         "flowjs/flow.js": "^2.14",
         "oomphinc/composer-installers-extender": "^2.0"
     },
-    "require-dev": {
-        "biblibre/omeka-s-test-helper": "dev-master"
+    "autoload": {
+        "psr-4": {
+            "EasyAdmin\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -50,16 +52,6 @@
             }
         }
     ],
-    "extra": {
-        "installer-types": [
-            "omeka-addon-asset"
-        ],
-        "installer-paths": {
-            "asset/vendor/{$name}/": [
-                "type:omeka-addon-asset"
-            ]
-        }
-    },
     "config": {
         "platform": {
             "php": "7.4"
@@ -68,5 +60,16 @@
             "composer/installers": true,
             "oomphinc/composer-installers-extender": true
         }
+    },
+    "extra": {
+        "installer-types": [
+            "omeka-addon-asset"
+        ],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        },
+        "installer-name" : "EasyAdmin"
     }
 }
