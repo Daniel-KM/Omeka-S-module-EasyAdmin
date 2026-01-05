@@ -296,11 +296,11 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        // TODO What is the better event to handle a cron? None: use server cron or systemd timer or webcron.
+        // Handle session cleanup when triggered by Cron module.
         $sharedEventManager->attach(
-            '*',
-            'view.layout',
-            [$this, 'handleCron']
+            \Cron\Job\CronTasks::class,
+            'cron.execute',
+            [$this, 'handleCronExecute']
         );
 
         // Manage buttons in admin resources.
@@ -434,82 +434,62 @@ class Module extends AbstractModule
     }
 
     /**
-     * Handle cron tasks on page load (fallback for users without server cron).
-     *
-     * This method runs at most once per hour when page is loaded.
-     * For better reliability, configure a real server cron job or web cron.
-     *
-     * Tasks are configured via admin/easy-admin/cron and stored in settings:
-     * - easyadmin_cron: ['tasks' => [xxx], 'global_frequency' => 'daily']
-     * - easyadmin_cron_tasks: simple array of task ids for backward
-     *   compatibility (deprecated).
+     * Handle session cleanup task execution from Cron module.
      */
-    public function handleCron(Event $event): void
+    public function handleCronExecute(Event $event): void
     {
+        $taskId = $event->getParam('task_id');
+
+        // Only handle session_* tasks.
+        if (strpos($taskId, 'session_') !== 0) {
+            return;
+        }
+
+        $sessionSecondsMap = [
+            'session_1h' => 3600,
+            'session_2h' => 7200,
+            'session_4h' => 14400,
+            'session_12h' => 43200,
+            'session_1d' => 86400,
+            'session_2d' => 172800,
+            'session_8d' => 691200,
+            'session_30d' => 2592000,
+        ];
+
+        $seconds = $sessionSecondsMap[$taskId] ?? null;
+        if ($seconds === null) {
+            return;
+        }
+
         $services = $this->getServiceLocator();
-        $settings = $services->get('Omeka\Settings');
-
-        // Get enabled tasks from new or old settings format.
-        $enabledTasks = $this->getEnabledCronTasks($settings);
-        if (!count($enabledTasks)) {
-            return;
-        }
-
-        // Check frequency: at most once per hour.
-        // For more precise scheduling, use a real server cron.
-        $lastCron = (int) $settings->get('easyadmin_cron_last');
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $services->get('Omeka\Connection');
         $time = time();
-        if ($lastCron + 3600 > $time) {
-            return;
-        }
-        $settings->set('easyadmin_cron_last', $time);
 
-        // Dispatch all tasks to the CronTasks job.
-        // This runs synchronously for quick tasks, or as a background job for
-        // longer ones.
-        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
-        $dispatcher->dispatch(\EasyAdmin\Job\CronTasks::class, [
-            'tasks' => $enabledTasks,
-            'manual' => false,
-        ]);
-    }
+        // Check if index exists for performance.
+        $result = $connection->executeQuery(
+            'SHOW INDEX FROM `session` WHERE `column_name` = "modified";'
+        );
 
-    /**
-     * Get enabled cron tasks from settings.
-     *
-     * Supports both old and new structure for backward compatibility.
-     *
-     * @return array Array of taskId and taskSettings.
-     */
-    protected function getEnabledCronTasks(\Omeka\Settings\Settings $settings): array
-    {
-        // Try new structure first.
-        $cronSettings = $settings->get('easyadmin_cron', []);
-        if (!empty($cronSettings['tasks'])) {
-            $enabledTasks = [];
-            foreach ($cronSettings['tasks'] as $taskId => $taskSettings) {
-                if (!empty($taskSettings['enabled'])) {
-                    $enabledTasks[$taskId] = $taskSettings;
-                }
-            }
-            return $enabledTasks;
+        if ($result->fetchOne()) {
+            // Direct delete with index.
+            $sql = 'DELETE FROM `session` WHERE `modified` < :time;';
+            $connection->executeStatement(
+                $sql,
+                ['time' => $time - $seconds],
+                ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
+            );
+        } else {
+            // Dispatch as background job for tables without index.
+            $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+            $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, [
+                'seconds' => $seconds,
+                'quick' => true,
+            ]);
         }
 
-        // Fallback to deprecated format.
-        $oldTasks = $settings->get('easyadmin_cron_tasks', []);
-        if (!count($oldTasks)) {
-            return [];
-        }
-
-        // Convert old format to new structure.
-        $enabledTasks = [];
-        foreach ($oldTasks as $taskId) {
-            $enabledTasks[$taskId] = [
-                'enabled' => true,
-                'frequency' => 'hourly',
-            ];
-        }
-        return $enabledTasks;
+        // Mark the task as handled.
+        $event->setParam('handled', true);
     }
 
     public function handleViewLayoutResource(Event $event): void

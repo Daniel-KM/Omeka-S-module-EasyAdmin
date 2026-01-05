@@ -135,6 +135,19 @@ return [
                                     ],
                                 ],
                             ],
+                            // Cron route - EasyAdmin's controller checks if Cron module
+                            // is installed and forwards appropriately.
+                            'cron' => [
+                                'type' => \Laminas\Router\Http\Literal::class,
+                                'options' => [
+                                    'route' => '/cron',
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'EasyAdmin\Controller\Admin',
+                                        'controller' => 'Cron',
+                                        'action' => 'index',
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -159,8 +172,8 @@ return [
                     ],
                     [
                         'label' => 'Regular tasks', // @translate
-                        'route' => 'admin/easy-admin/default',
-                        'controller' => 'cron',
+                        'route' => 'admin/easy-admin/cron',
+                        'resource' => 'EasyAdmin\Controller\Admin\Cron',
                         'class' => 'o-icon- fa-recycle',
                     ],
                     [
@@ -194,8 +207,8 @@ return [
             ],
             [
                 'label' => 'Regular tasks', // @translate
-                'route' => 'admin/easy-admin/default',
-                'controller' => 'cron',
+                'route' => 'admin/easy-admin/cron',
+                'resource' => 'EasyAdmin\Controller\Admin\Cron',
             ],
             [
                 'label' => 'File manager', // @translate
@@ -256,6 +269,27 @@ return [
             // Maintenance
             'easyadmin_maintenance_mode' => '',
             'easyadmin_maintenance_text' => 'This site is down for maintenance. Please contact the site administrator for more information.', // @translate
+        ],
+    ],
+    // Cron tasks registered with the Cron module.
+    'cron_tasks' => [
+        'session' => [
+            'label' => 'Clear old sessions', // @translate
+            'module' => 'EasyAdmin',
+            'task_type' => 'builtin',
+            'frequencies' => ['hourly', 'daily', 'weekly'],
+            'default_frequency' => 'daily',
+            'options' => [
+                'session_1h' => 'older than 1 hour', // @translate
+                'session_2h' => 'older than 2 hours', // @translate
+                'session_4h' => 'older than 4 hours', // @translate
+                'session_12h' => 'older than 12 hours', // @translate
+                'session_1d' => 'older than 1 day', // @translate
+                'session_2d' => 'older than 2 days', // @translate
+                'session_8d' => 'older than 8 days', // @translate
+                'session_30d' => 'older than 30 days', // @translate
+            ],
+            'default_option' => 'session_8d',
         ],
     ],
 ];
