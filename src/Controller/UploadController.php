@@ -252,6 +252,7 @@ class UploadController extends AbstractActionController
                     // Don't send the full path for security.
                     'tmp_name' => basename($filepath),
                     'size' => $filesize,
+                    'type' => $tempFile->getMediaType(),
                 ],
             ],
         ];
