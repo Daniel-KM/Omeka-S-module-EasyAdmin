@@ -44,11 +44,32 @@ class BackupController extends AbstractActionController
             return $this->redirect()->toRoute(null, ['action' => 'index'], true);
         }
 
+        // Get backup options.
         $compress = (bool) $this->params()->fromPost('compress', true);
+        $includeStructure = (bool) $this->params()->fromPost('include_structure', true);
+        $includeData = (bool) $this->params()->fromPost('include_data', true);
+        $includeViews = (bool) $this->params()->fromPost('include_views', true);
+        $includeRoutines = (bool) $this->params()->fromPost('include_routines', true);
+        $includeTriggers = (bool) $this->params()->fromPost('include_triggers', true);
+        $skipDataTables = $this->params()->fromPost('skip_data_tables', []);
+
+        // Validate options.
+        if (!$includeStructure && !$includeData) {
+            $this->messenger()->addError(
+                'At least one of "Structure" or "Data" must be selected.' // @translate
+            );
+            return $this->redirect()->toRoute(null, ['action' => 'index'], true);
+        }
 
         $dispatcher = $this->jobDispatcher();
         $job = $dispatcher->dispatch(DatabaseBackup::class, [
             'compress' => $compress,
+            'include_structure' => $includeStructure,
+            'include_data' => $includeData,
+            'include_views' => $includeViews,
+            'include_routines' => $includeRoutines,
+            'include_triggers' => $includeTriggers,
+            'skip_data_tables' => is_array($skipDataTables) ? $skipDataTables : [],
         ]);
 
         $this->messenger()->addSuccess(

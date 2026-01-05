@@ -43,12 +43,89 @@ $formatSize = function ($bytes) {
     <p><?= $translate('Create a backup of the database (sql dump).') ?></p>
 
     <form method="post" action="<?= $url(null, ['action' => 'backup-database'], true) ?>">
-        <div class="field">
-            <label>
-                <input type="checkbox" name="compress" value="1" checked>
-                <?= $translate('Compress with gzip') ?>
-            </label>
-        </div>
+        <fieldset>
+            <legend><?= $translate('Content') ?></legend>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include_structure" value="1" checked>
+                    <?= $translate('Structure of tables') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include_data" value="1" checked>
+                    <?= $translate('Data') ?>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><?= $translate('Include') ?></legend>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include_views" value="1" checked>
+                    <?= $translate('Views') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include_routines" value="1" checked>
+                    <?= $translate('Routines (procedures and functions)') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include_triggers" value="1" checked>
+                    <?= $translate('Triggers') ?>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><?= $translate('Skip data for tables (structure only)') ?></legend>
+            <p class="explanation"><?= $translate('These tables can be very large. Only their structure will be exported, not data.') ?></p>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="skip_data_tables[]" value="session" checked>
+                    session
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="skip_data_tables[]" value="fulltext_search" checked>
+                    fulltext_search
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="skip_data_tables[]" value="job">
+                    job
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="skip_data_tables[]" value="log">
+                    log
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="skip_data_tables[]" value="triplestore_*" checked>
+                    triplestore_* <?= $translate('(all triplestore tables)') ?>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend><?= $translate('Options') ?></legend>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="compress" value="1" checked>
+                    <?= $translate('Compress with gzip') ?>
+                </label>
+            </div>
+        </fieldset>
+
         <button type="submit" class="button"><?= $translate('Start database backup') ?></button>
     </form>
 </div>

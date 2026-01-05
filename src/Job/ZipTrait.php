@@ -193,7 +193,7 @@ trait ZipTrait
                 ++$result['total'];
                 // It is useless to log info, because the zip is created during
                 // call to close().
-                if (($result['total'] % 10000) === 0) {
+                if (($result['total'] % 1000) === 0) {
                     if ($this->shouldStop()) {
                         $this->logger->notice(
                             'Backup stopped: {total_dirs} dirs, {total_files} files, size: {total_size} bytes prepared.', // @translate
@@ -206,7 +206,7 @@ trait ZipTrait
                         );
                         $zip->close();
                         @unlink($destination);
-                        $result['size'] = null;
+                        $result['error'] = true;
                         return $result;
                     }
                 }
@@ -248,6 +248,13 @@ trait ZipTrait
         }
 
         // Via zip on cli.
+        // Check for stop signal before starting CLI zip (cannot be stopped once running).
+        if ($this->shouldStop()) {
+            $this->logger->warn('Backup stopped by user.'); // @translate
+            $result['error'] = true;
+            return $result;
+        }
+
         $excludedDirs = [];
         $excludedFiles = [];
         foreach ($exclude as $excluded) {
