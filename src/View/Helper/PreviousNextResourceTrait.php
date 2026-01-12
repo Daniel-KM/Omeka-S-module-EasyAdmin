@@ -387,7 +387,17 @@ trait PreviousNextResourceTrait
     protected function getAdjacentMediaId(MediaRepresentation $media, string $direction): ?int
     {
         $itemId = $media->item()->id();
-        $position = $media->position();
+        $mediaId = $media->id();
+
+        // Get position from database since MediaRepresentation doesn't expose it.
+        $position = $this->connection->executeQuery(
+            'SELECT position FROM media WHERE id = :id',
+            ['id' => $mediaId]
+        )->fetchOne();
+
+        if ($position === false) {
+            return null;
+        }
 
         $qb = $this->connection->createQueryBuilder()
             ->select('media.id')
