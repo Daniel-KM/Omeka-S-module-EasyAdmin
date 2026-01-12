@@ -401,6 +401,13 @@ class Module extends AbstractModule
             -10
         );
 
+        // Add search by name for assets (issue Common #3).
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\AssetAdapter::class,
+            'api.search.query',
+            [$this, 'handleAssetSearchQuery']
+        );
+
         // Optimize asset.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\AssetAdapter::class,
@@ -1383,6 +1390,34 @@ class Module extends AbstractModule
         );
         $logger->notice($message->getMessage(), $message->getContext());
         $messenger->addSuccess($message);
+    }
+
+    /**
+     * Add search by asset name (issue Common #3).
+     *
+     * @see https://github.com/Daniel-KM/Omeka-S-module-Common/issues/3
+     */
+    public function handleAssetSearchQuery(Event $event): void
+    {
+        $query = $event->getParam('request')->getContent();
+
+        if (empty($query['search'])) {
+            return;
+        }
+
+        $search = trim((string) $query['search']);
+        if ($search === '') {
+            return;
+        }
+
+        /** @var \Doctrine\ORM\QueryBuilder $qb */
+        $qb = $event->getParam('queryBuilder');
+        $expr = $qb->expr();
+
+        $qb->andWhere($expr->like(
+            'omeka_root.name',
+            $qb->createNamedParameter('%' . addcslashes($search, '%_') . '%')
+        ));
     }
 
     public function handleFormAsset(Event $event): void

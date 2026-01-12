@@ -1,0 +1,75 @@
+<?php
+/**
+ * Override of the core asset sidebar-select template to add search by name.
+ *
+ * @see \EasyAdmin\Module::handleAssetSearchQuery()
+ * @see https://github.com/Daniel-KM/Omeka-S-module-Common/issues/3
+ */
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+$hyperlink = $this->plugin('hyperlink');
+$thumbnail = $this->plugin('thumbnail');
+
+// Get current search term from query.
+$search = $this->params()->fromQuery('search', '');
+$ownerId = $this->params()->fromQuery('owner_id');
+?>
+
+<a href="#" class="sidebar-close o-icon-close"><span class="screen-reader-text"><?php echo $translate('Close'); ?></span></a>
+
+<?php
+if ($this->userIsAllowed('Omeka\Api\Adapter\AssetAdapter', 'create')):
+    echo $this->partial('omeka/admin/asset/add-form');
+endif;
+?>
+
+<h3><?php echo $translate('Select asset'); ?></h3>
+
+<div class="asset-filters">
+    <?php
+    echo $this->userSelect([
+        'name' => 'owner_id',
+        'options' => [
+            'empty_option' => '',
+            'prepend_value_options' => [
+                '0' => sprintf('[%s]', $translate('No owner')),
+            ],
+        ],
+        'attributes' => [
+            'id' => 'filter-owner',
+            'class' => 'chosen-select',
+            'value' => $ownerId,
+            'data-placeholder' => $translate('Filter by owner'),
+        ],
+    ]);
+    ?>
+    <input type="text" name="search" id="filter-search" value="<?php echo $escape($search); ?>" placeholder="<?php echo $escape($translate('Search by filename…')); ?>" aria-label="<?php echo $escape($translate('Search assets by filename')); ?>">
+</div>
+
+<?php if (count($assets) > 0): ?>
+<?php echo $this->pagination('common/sidebar-pagination.phtml'); ?>
+<div class="asset-list">
+<?php foreach ($assets as $asset): ?>
+    <div class="asset" data-asset-id='<?php echo $escape($asset->id()); ?>'>
+        <?php
+        echo $hyperlink->raw(
+            sprintf('%s <span class="asset-name">%s</span>',
+                $thumbnail($asset, 'medium'),
+                $escape($asset->name())
+            ),
+            '#',
+            ['class' => 'select-asset asset-entry', 'data-asset-id' => $asset->id(), 'data-asset-url' => $asset->assetUrl()]
+        );
+        ?>
+    </div>
+<?php endforeach; ?>
+<?php else: ?>
+<span class="no-resources"><?php echo $translate('Omeka could not find any assets.'); ?></span>
+<?php endif; ?>
+</div>
+
+<script>
+$(document).ready(function () {
+    $('#filter-owner').chosen(chosenOptions);
+});
+</script>
