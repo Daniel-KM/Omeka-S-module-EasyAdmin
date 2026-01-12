@@ -1,0 +1,25 @@
+/**
+ * Asset search styles.
+ *
+ * @see https://github.com/Daniel-KM/Omeka-S-module-Common/issues/3
+ */
+
+.asset-filters #filter-search {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #dfdfdf;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.asset-filters #filter-search:focus {
+    border-color: #4d8ac0;
+    outline: none;
+}
+
+.asset-filters #filter-search::placeholder {
+    color: #999;
+    font-style: italic;
+}
