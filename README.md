@@ -75,13 +75,16 @@ Modules that add tasks:
 - [Zip]
   - Create zips.
 
+
 Installation
 ------------
 
 See general end user documentation for [installing a module].
 
-This module requires the modules [Common] and [Cron], that should be installed
-first.
+This module requires the module [Common], that should be installed first.
+
+The module [Cron] is recommended for advanced scheduling, but not required: the
+module can clean sessions and run scheduled tasks independently via page loads.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
@@ -140,6 +143,7 @@ In some cases, the path should be relative:
 ```
 
 You can find more information on the params in [Laminas help] and [curl].
+
 
 Usage
 -----
@@ -312,6 +316,7 @@ time only:
 php '/path/to/omeka/application/data/scripts/perform-job.php' --job-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
+
 Development
 -----------
 
@@ -323,6 +328,7 @@ To append a new task:
   class `\EasyAdmin\Controller\JobController`.
 
 See an example in [Compilatio], [Reference], [Thesaurus], etc.
+
 
 TODO
 ----
@@ -338,6 +344,7 @@ TODO
 - [x] Dump database: see adminer.
 - [x] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
 
+
 Warning
 -------
 
@@ -351,10 +358,12 @@ your archives regularly so you can roll back if needed.
 mysqldump -u omeka -p omeka | gzip > "omeka.$(date +%Y%m%d_%H%M%S).sql.gz"
 ```
 
+
 Troubleshooting
 ---------------
 
 See online issues on the [module issues] page on GitLab.
+
 
 License
 -------
@@ -385,6 +394,7 @@ conditions as regards security.
 The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
+
 Copyright
 ---------
 
@@ -396,6 +406,7 @@ the plugin [Escher] for [Omeka Classic].
 
 The curated selections of modules was implemented for the [digital library Manioc]
 of the [Université des Antilles et de la Guyane].
+
 
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
 [Omeka S]: https://omeka.org/s
