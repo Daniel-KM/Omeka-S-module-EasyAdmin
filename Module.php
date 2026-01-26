@@ -1262,18 +1262,21 @@ class Module extends AbstractModule
          */
         $request = $event->getParam('request');
 
-        $optimize = $request->getValue('optimize');
-        if (!$optimize) {
+        $asset = $event->getParam('response')->getContent();
+        if (!$asset) {
             return;
         }
 
         $fileData = $request->getFileData();
-        if (!empty($fileData['file']['error'])) {
-            return;
+        $hasFileError = !empty($fileData['file']['error']);
+
+        $storeOriginalName = $request->getValue('store_original_name');
+        if ($storeOriginalName && !$hasFileError) {
+            $this->storeAssetWithOriginalName($asset);
         }
 
-        $asset = $event->getParam('response')->getContent();
-        if (!$asset) {
+        $optimize = $request->getValue('optimize');
+        if (!$optimize || $hasFileError) {
             return;
         }
 
@@ -1393,6 +1396,89 @@ class Module extends AbstractModule
     }
 
     /**
+     * Rename the stored asset file to use the original name instead of hash.
+     *
+     * If the name already exists in the store, a numeric suffix is appended.
+     */
+    protected function storeAssetWithOriginalName(\Omeka\Entity\Asset $asset): void
+    {
+        $services = $this->getServiceLocator();
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $assetDir = $basePath . '/asset';
+
+        $originalName = $asset->getName();
+        if (!$originalName) {
+            return;
+        }
+
+        // Sanitize the name for safe filesystem usage: keep only basename.
+        $originalName = basename($originalName);
+        // Remove characters that are problematic on filesystems.
+        $originalName = preg_replace('/[^\w.\-]/', '_', $originalName);
+        if (!strlen($originalName) || $originalName === '.' || $originalName === '..') {
+            return;
+        }
+
+        $extension = $asset->getExtension();
+        $currentFilename = $asset->getStorageId()
+            . ($extension ? '.' . $extension : '');
+        $currentPath = $assetDir . '/' . $currentFilename;
+        if (!file_exists($currentPath)) {
+            return;
+        }
+
+        // Build the new storage id from the original name without extension.
+        $nameInfo = pathinfo($originalName);
+        $baseName = $nameInfo['filename'];
+        $nameExt = isset($nameInfo['extension']) ? $nameInfo['extension'] : $extension;
+
+        // Limit to 190 characters for database storage_id column.
+        $maxLength = 190;
+        if (mb_strlen($baseName) > $maxLength) {
+            $baseName = mb_substr($baseName, 0, $maxLength);
+        }
+
+        // Check uniqueness: if the file already exists, append _1, _2, etc.
+        $newStorageId = $baseName;
+        $newFilename = $newStorageId . ($nameExt ? '.' . $nameExt : '');
+        $newPath = $assetDir . '/' . $newFilename;
+        $index = 0;
+        while (file_exists($newPath) && $newPath !== $currentPath) {
+            $index++;
+            $suffix = '_' . $index;
+            // Truncate base name to leave room for suffix.
+            $truncatedBase = mb_substr($baseName, 0, $maxLength - mb_strlen($suffix));
+            $newStorageId = $truncatedBase . $suffix;
+            $newFilename = $newStorageId . ($nameExt ? '.' . $nameExt : '');
+            $newPath = $assetDir . '/' . $newFilename;
+        }
+
+        // Nothing to do if it already has the right name.
+        if ($newPath === $currentPath) {
+            return;
+        }
+
+        if (!rename($currentPath, $newPath)) {
+            $logger = $services->get('Omeka\Logger');
+            $logger->err(new PsrMessage(
+                'Unable to rename asset file from "{old}" to "{new}".', // @translate
+                ['old' => $currentFilename, 'new' => $newFilename]
+            ));
+            return;
+        }
+
+        // Update the entity with the new storage id and extension.
+        $asset->setStorageId($newStorageId);
+        if ($nameExt && $nameExt !== $extension) {
+            $asset->setExtension($nameExt);
+        }
+        $entityManager = $services->get('Omeka\EntityManager');
+        $entityManager->persist($asset);
+        $entityManager->flush();
+    }
+
+    /**
      * Add search by asset name (issue Common #3).
      *
      * @see https://github.com/Daniel-KM/Omeka-S-module-Common/issues/3
@@ -1428,6 +1514,12 @@ class Module extends AbstractModule
         $element
             ->setName('optimize')
             ->setLabel('Optimize size for web (may degrade quality)'); // @translate
+        $form->add($element);
+
+        $element = new \Laminas\Form\Element\Checkbox();
+        $element
+            ->setName('store_original_name')
+            ->setLabel('Store with original name'); // @translate
         $form->add($element);
     }
 

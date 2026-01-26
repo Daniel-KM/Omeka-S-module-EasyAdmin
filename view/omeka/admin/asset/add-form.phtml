@@ -20,6 +20,10 @@ $uploadLimit = $plugins->get('uploadLimit');
         <input type="checkbox" name="optimize" id="optimize" value="1"/>
         <?= $translate('Optimize size for web (may degrade quality)') ?>
     </label>
+    <label for="store_original_name">
+        <input type="checkbox" name="store_original_name" id="store_original_name" value="1"/>
+        <?= $translate('Store with original name') ?>
+    </label>
     <button type="submit" class="button"><?= $translate('Upload') ?></button>
     <ul class="errors"></ul>
 </form>
