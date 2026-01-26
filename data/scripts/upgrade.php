@@ -45,19 +45,6 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
 
-// Cron module is now a required dependency.
-/** @var \Omeka\Module\Manager $moduleManager */
-$moduleManager = $services->get('Omeka\ModuleManager');
-$cronModule = $moduleManager->getModule('Cron');
-$hasCronModule = $cronModule && $cronModule->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
-if (!$hasCronModule) {
-    $message = new \Omeka\Stdlib\Message(
-        $translate('The module %1$s requires the module %2$s. Install and enable it first.'), // @translate
-        'Easy Admin', 'Cron'
-    );
-    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
-}
-
 if (version_compare($oldVersion, '3.3.2', '<')) {
     $this->installDirs();
 }
@@ -501,7 +488,7 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.38', '<')) {
-    // Migrate cron settings to new Cron module format.
+    // Copy cron settings to new Cron module format.
 
     // Convert old settings to new format.
     $oldCronTasks = $settings->get('easyadmin_cron_tasks', []);
@@ -533,9 +520,4 @@ if (version_compare($oldVersion, '3.4.38', '<')) {
     // Migrate settings to Cron module.
     $settings->set('cron', $newCronSettings);
     $settings->set('cron_last', $settings->get('easyadmin_cron_last'));
-
-    $message = new PsrMessage(
-        'Cron settings have been migrated to the Cron module.' // @translate
-    );
-    $messenger->addSuccess($message);
 }
