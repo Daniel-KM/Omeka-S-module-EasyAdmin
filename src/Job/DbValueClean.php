@@ -12,10 +12,6 @@ namespace EasyAdmin\Job;
  */
 class DbValueClean extends AbstractCheck
 {
-    /**
-     * @var bool
-     */
-    protected $supportAnyValue = false;
 
     public function perform(): void
     {
@@ -108,8 +104,6 @@ class DbValueClean extends AbstractCheck
 
         $process = $this->getArg('process');
         // $processFix = $process === 'db_value_clean_fix';
-
-        $this->supportAnyValue = $this->supportAnyValue();
 
         foreach ($allResourceTypes ? [null] : $resourceTypes as $resourceType) {
             $resourceIds = $resourceType && $query
@@ -339,22 +333,10 @@ class DbValueClean extends AbstractCheck
         $bind = [];
         $types = [];
 
-        // The query modifies the sql mode, so it should be reset.
-        $sqlMode = $this->connection->fetchOne('SELECT @@SESSION.sql_mode;');
-
-        // For large base, a temporary table is preferred to speed process.
-        // ANY_VALUE is needed for MySQL's ONLY_FULL_GROUP_BY mode (MIN/MAX won't work here).
-        if ($this->supportAnyValue) {
-            $prefix = 'ANY_VALUE(';
-            $suffix = ')';
-        } else {
-            $prefix = $suffix = '';
-        }
-
         if ($resourceIds) {
             // For specified values.
-            $sqlWhere1 = 'AND `resource_id` IN (:resource_ids)';
-            $sqlWhere2 = 'AND `v`.`resource_id` IN (:resource_ids)';
+            $sqlWhere1 = 'WHERE `resource_id` IN (:resource_ids)';
+            $sqlWhere2 = 'AND `resource_id` IN (:resource_ids)';
             $bind['resource_ids'] = $resourceIds;
             $types['resource_ids'] = \Doctrine\DBAL\Connection::PARAM_INT_ARRAY;
         } else {
@@ -363,40 +345,46 @@ class DbValueClean extends AbstractCheck
             $sqlWhere2 = '';
         }
 
-        // Get the total count of values.
-        $sqlCount = 'SELECT COUNT(*) FROM `value`';
-        $totalCount = $this->connection->fetchOne($sqlCount);
+        // Use MIN(id) to get one ID per group of duplicates.
+        // This is standard SQL that works with ONLY_FULL_GROUP_BY enabled,
+        // avoiding the need to modify sql_mode which could affect other queries.
+        // For deduplication, keeping the value with the lowest ID is reasonable.
 
-        $sql = <<<SQL
-            SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
-            DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
+        // Drop temporary table if it exists from a previous failed run.
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `value_temporary`');
+
+        // Create temporary table with one ID per unique value combination.
+        // Include value_annotation_id so values with different annotations are not duplicates.
+        $sqlCreate = <<<SQL
             CREATE TEMPORARY TABLE `value_temporary` (`id` INT, PRIMARY KEY (`id`))
             AS
-                SELECT $prefix`id`$suffix
+                SELECT MIN(`id`) AS `id`
                 FROM `value`
-                WHERE 1 = 1
-                    $sqlWhere1
-                GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`, `value_annotation_id`;
+                $sqlWhere1
+                GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`, `value_annotation_id`
+            SQL;
+        $this->connection->executeStatement($sqlCreate, $bind, $types);
+
+        // Delete duplicates (values not in the temporary table).
+        $sqlDelete = <<<SQL
             DELETE `v`
             FROM `value` AS `v`
             LEFT JOIN `value_temporary` AS `value_temporary`
                 ON `value_temporary`.`id` = `v`.`id`
             WHERE `value_temporary`.`id` IS NULL
-                $sqlWhere2;
-            DROP TEMPORARY TABLE IF EXISTS `value_temporary`;
+                $sqlWhere2
             SQL;
+        $count = $this->connection->executeStatement($sqlDelete, $bind, $types);
 
-        $this->connection->executeStatement($sql, $bind, $types);
-        $this->connection->executeStatement("SET sql_mode = '$sqlMode';");
+        // Clean up temporary table.
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `value_temporary`');
 
-        // Output the right number of deduplicated values.
-        $sqlCount = 'SELECT COUNT(*) FROM `value`';
-        $count = $totalCount - (int) $this->connection->fetchOne($sqlCount);
-
-        $this->logger->info(
-            'Deduplicated {count} values.', // @translate
-            ['count' => $count]
-        );
+        if ($count) {
+            $this->logger->info(
+                'Deduplicated {count} values.', // @translate
+                ['count' => $count]
+            );
+        }
 
         return (int) $count;
     }
@@ -445,23 +433,5 @@ class DbValueClean extends AbstractCheck
         }
 
         return $result;
-    }
-
-    protected function supportAnyValue(): bool
-    {
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $services = $this->getServiceLocator();
-        $connection = $services->get('Omeka\Connection');
-
-        // To do a request is the simpler way to check if the flag ONLY_FULL_GROUP_BY
-        // is set in any databases, systems and versions and that it can be
-        // bypassed by Any_value().
-        $sql = 'SELECT ANY_VALUE(id) FROM user LIMIT 1;';
-        try {
-            $connection->executeQuery($sql)->fetchOne();
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
     }
 }
