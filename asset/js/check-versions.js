@@ -53,8 +53,12 @@ $(document).ready(function() {
         .done(function(data) {
             var lastVersions = {};
             data.split("\n").forEach(line => {
+                line = line.trim();
+                if (!line) return;
                 const moduleVersion = line.split("\t");
-                lastVersions[moduleVersion[0]] = moduleVersion[1];
+                if (moduleVersion.length >= 2) {
+                    lastVersions[moduleVersion[0].trim()] = moduleVersion[1].trim();
+                }
             });
             $('#modules .module').each(function(index) {
                 const module = $(this);
@@ -74,7 +78,8 @@ $(document).ready(function() {
                     return;
                 }
                 const addonId = addon.data('addon-id');
-                const currentVersion = addon.data('current-version');
+                // Ensure version is a string (jQuery.data() may do type coercion).
+                const currentVersion = String(addon.data('current-version') || '');
                 const lastVersion = addonId in lastVersions ? lastVersions[addonId] : null;
                 const lastVersionIsDev = lastVersion && lastVersion.match(/alpha|beta|dev/);
                 if (lastVersion
@@ -92,6 +97,7 @@ $(document).ready(function() {
                             }
                             return;
                         } catch (e) {
+                            console.warn('EasyAdmin: compareVersions error for', addonId, ':', e.message, {currentVersion, lastVersion});
                         }
                     } else if (typeof semver !== 'undefined') {
                         try {
@@ -100,6 +106,7 @@ $(document).ready(function() {
                             }
                             return;
                         } catch (e) {
+                            console.warn('EasyAdmin: semver error for', addonId, ':', e.message, {currentVersion, lastVersion});
                         }
                     }
                     if (compareVersionNumbers(currentVersion, lastVersion) < 0) {
