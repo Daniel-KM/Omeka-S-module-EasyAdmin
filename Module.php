@@ -306,12 +306,24 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        // Handle session cleanup when triggered by Cron module.
-        $sharedEventManager->attach(
-            \Cron\Job\CronTasks::class,
-            'cron.execute',
-            [$this, 'handleCronExecute']
-        );
+        // Handle cron tasks: use Cron module if available, otherwise run
+        // independently via view.layout trigger.
+        if (class_exists('Cron\Module', false)) {
+            // Handle session cleanup when triggered by Cron module.
+            $sharedEventManager->attach(
+                \Cron\Job\CronTasks::class,
+                'cron.execute',
+                [$this, 'handleCronExecute']
+            );
+        } else {
+            // Handle cron tasks independently when Cron module is not installed.
+            // Triggered on any admin page load.
+            $sharedEventManager->attach(
+                '*',
+                'view.layout',
+                [$this, 'handleCron']
+            );
+        }
 
         // Manage buttons in admin resources.
         // Uses view.layout instead of Omeka 4.1 view.show.page_actions because
@@ -565,6 +577,71 @@ class Module extends AbstractModule
             'include' => $include,
             'compression' => 6,
         ]);
+    }
+
+    /**
+     * Handle cron tasks independently when Cron module is not installed.
+     *
+     * This method is triggered on view.layout to execute scheduled tasks
+     * without requiring the Cron module.
+     */
+    public function handleCron(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+
+        // Independent mode: execute cron tasks without the Cron module.
+        $settings = $services->get('Omeka\Settings');
+        $enabledTasks = $this->getEnabledCronTasks($settings);
+        if (!count($enabledTasks)) {
+            return;
+        }
+
+        // Check frequency (at most once per hour).
+        $lastCron = (int) $settings->get('easyadmin_cron_last');
+        $time = time();
+        if ($lastCron + 3600 > $time) {
+            return;
+        }
+        $settings->set('easyadmin_cron_last', $time);
+
+        // Dispatch the CronTasks job.
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+        $dispatcher->dispatch(\EasyAdmin\Job\CronTasks::class, [
+            'tasks' => $enabledTasks,
+            'manual' => false,
+        ]);
+    }
+
+    /**
+     * Get enabled cron tasks from settings.
+     *
+     * Supports both new structure (easyadmin_cron with nested tasks) and
+     * legacy structure (easyadmin_cron_tasks as flat array).
+     */
+    protected function getEnabledCronTasks(\Omeka\Settings\Settings $settings): array
+    {
+        // New structure.
+        $cronSettings = $settings->get('easyadmin_cron', []);
+        if (!empty($cronSettings['tasks'])) {
+            $enabledTasks = [];
+            foreach ($cronSettings['tasks'] as $taskId => $taskSettings) {
+                if (!empty($taskSettings['enabled'])) {
+                    $enabledTasks[$taskId] = $taskSettings;
+                }
+            }
+            return $enabledTasks;
+        }
+
+        // Legacy structure for backward compatibility.
+        $oldTasks = $settings->get('easyadmin_cron_tasks', []);
+        if (!count($oldTasks)) {
+            return [];
+        }
+        $enabledTasks = [];
+        foreach ($oldTasks as $taskId) {
+            $enabledTasks[$taskId] = ['enabled' => true, 'frequency' => 'hourly'];
+        }
+        return $enabledTasks;
     }
 
     public function handleViewLayoutResource(Event $event): void
