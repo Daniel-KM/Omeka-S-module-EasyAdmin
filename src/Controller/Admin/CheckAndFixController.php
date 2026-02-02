@@ -271,11 +271,13 @@ class CheckAndFixController extends AbstractActionController
                 } else {
                     /*
                     $resultConfig = @opcache_get_configuration();
-                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($resultConfig, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $json = json_encode($resultConfig, 448);
+                    $msg = new PsrMessage(nl2br(htmlspecialchars($json === false ? '{}' : $json, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
                     $msg->setEscapeHtml(false);
                     $messenger->addSuccess($msg);
                     */
-                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($result, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $json = json_encode($result, 448);
+                    $msg = new PsrMessage(nl2br(htmlspecialchars($json === false ? '{}' : $json, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
                     $msg->setEscapeHtml(false);
                     $messenger->addSuccess($msg);
                 }
@@ -299,7 +301,8 @@ class CheckAndFixController extends AbstractActionController
                 if (!$result) {
                     $messenger->addWarning('An issue occurred when checking status of "apcu" or the status is disabled.'); // @translate
                 } else {
-                    $msg = new PsrMessage(nl2br(htmlspecialchars(json_encode($result, 448), ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
+                    $json = json_encode($result, 448);
+                    $msg = new PsrMessage(nl2br(htmlspecialchars($json === false ? '{}' : $json, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_XHTML)));
                     $msg->setEscapeHtml(false);
                     $messenger->addSuccess($msg);
                 }
