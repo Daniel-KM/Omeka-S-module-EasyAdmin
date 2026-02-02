@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 00:00+0000\n"
-"PO-Revision-Date: 2026-01-26 00:00+0000\n"
+"POT-Creation-Date: 2026-02-02 00:00+0000\n"
+"PO-Revision-Date: 2026-02-02 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -22,13 +22,7 @@ msgstr ""
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
 
-#: data/scripts/upgrade.php:55
-#, php-format
-msgid "The module %1$s requires the module %2$s. Install and enable it first."
-msgstr ""
-"Le module %1$s nécessite le module %2$s. Installez et activez le d’abord."
-
-#: data/scripts/upgrade.php:96
+#: data/scripts/upgrade.php:83
 msgid ""
 "This module cannot install its tables, because they exist already. Try to "
 "remove them first."
@@ -569,6 +563,10 @@ msgstr "Fichier : %s"
 msgid "Optimize size for web (may degrade quality)"
 msgstr "Optimiser la taille pour le web (peut dégrader la qualité)"
 
+#: view/omeka/admin/asset/add-form.phtml:25
+msgid "Store with original name"
+msgstr ""
+
 #: view/omeka/admin/asset/show-details.phtml:18
 msgid "[unknown]"
 msgstr "[Inconnu]"
@@ -585,19 +583,19 @@ msgstr ""
 msgid "Renderer"
 msgstr "Rendu"
 
-#: data/scripts/upgrade.php:75 data/scripts/upgrade.php:159
-#: data/scripts/upgrade.php:177
+#: data/scripts/upgrade.php:62 data/scripts/upgrade.php:146
+#: data/scripts/upgrade.php:164
 msgid "The module replaces the module {module}. The upgrade is automatic."
 msgstr ""
 "Ce module remplace le module {module}. La mise à niveau est automatique."
 
-#: data/scripts/upgrade.php:80
+#: data/scripts/upgrade.php:67
 msgid "It’s now possible to install {link}modules and themes{link_end}."
 msgstr ""
 "Il est désormais possible d’installer {link}des modules et des "
 "thèmes{link_end}."
 
-#: data/scripts/upgrade.php:105
+#: data/scripts/upgrade.php:92
 msgid ""
 "A anti-concurrent editing feature has been added: when a user opens a "
 "resource for edition, others users cannot edit it until submission."
@@ -606,17 +604,17 @@ msgstr ""
 "utilisateur ouvre une ressource en cours d’édition, les autres utilisateurs "
 "ne peuvent pas la modifier jusqu’à l’enregistrement."
 
-#: data/scripts/upgrade.php:109 data/scripts/upgrade.php:125
+#: data/scripts/upgrade.php:96 data/scripts/upgrade.php:112
 msgid "This option can be enabled/disabled in {link}main settings{link_end}."
 msgstr ""
 "Cette option peut être activée ou désactivée dans les {link}paramètres "
 "généraux{link_end}."
 
-#: data/scripts/upgrade.php:122
+#: data/scripts/upgrade.php:109
 msgid "The content locks are removed after 24h by default."
 msgstr "Les verrous de contenu sont supprimés après 24h par défaut."
 
-#: data/scripts/upgrade.php:135
+#: data/scripts/upgrade.php:122
 msgid ""
 "A task has been added to manage precise xml media types, for example "
 "\"application/alto+xml\" instead of \"text/xml\"."
@@ -624,15 +622,15 @@ msgstr ""
 "Une tâche a été ajoutée pour gérer les types précis des fichiers xml, par "
 "exemple « application/alto+xml » au lieu de « text/xml »."
 
-#: data/scripts/upgrade.php:139
+#: data/scripts/upgrade.php:126
 msgid "This task can be run via the main {link}menu{link_end}."
 msgstr "Cette tâche peut être lancée dans le {link}menu principal{link_end}."
 
-#: data/scripts/upgrade.php:168
+#: data/scripts/upgrade.php:155
 msgid "easyadmin_maintenance_text"
 msgstr "easyadmin_maintenance_text"
 
-#: data/scripts/upgrade.php:182
+#: data/scripts/upgrade.php:169
 msgid ""
 "It’s now possible to set the site in {link}maintenance mode{link_end} for "
 "public or users."
@@ -640,7 +638,7 @@ msgstr ""
 "Il est désormais possible de définir le site dans le {link}mode de "
 "maintenance{link_end} pour les visiteurs ou les utilisateurs."
 
-#: data/scripts/upgrade.php:196
+#: data/scripts/upgrade.php:183
 msgid ""
 "An {link}soption{link_end} allows to display a link from the resource admin "
 "page to the public page."
@@ -648,7 +646,7 @@ msgstr ""
 "Une {link}option{link_end} permet d’afficher un lien depuis la page "
 "d’administration de chaque ressource vers la page publique."
 
-#: data/scripts/upgrade.php:223 Module.php:257
+#: data/scripts/upgrade.php:210 Module.php:257
 msgid ""
 "The module \"{module}\" was upgraded by module \"{module_2}\" and "
 "uninstalled."
@@ -656,7 +654,7 @@ msgstr ""
 "Le module « {module} » a été mis à niveau par le module « {module_2} » et "
 "supprimé."
 
-#: data/scripts/upgrade.php:233
+#: data/scripts/upgrade.php:220
 msgid ""
 "An {link}option{link_end} allows to display links to previous and next "
 "resources."
@@ -664,7 +662,7 @@ msgstr ""
 "Une {link}option{link_end} permet d’afficher les liens vers les ressources "
 "précédente et suivante."
 
-#: data/scripts/upgrade.php:252
+#: data/scripts/upgrade.php:239
 msgid ""
 "The script for tasks was updated and option `--job` is now passed by "
 "default. Check your cron tasks if you use it."
@@ -672,7 +670,7 @@ msgstr ""
 "Le script pour les tâches ont été mis à jour et l’option « --job » est "
 "désormais passée par défaut. Vérifiez vos tâches cron si vous les utilisez."
 
-#: data/scripts/upgrade.php:259
+#: data/scripts/upgrade.php:246
 msgid ""
 "New tasks were added to set the primary media of all items and to check "
 "resources."
@@ -680,12 +678,12 @@ msgstr ""
 "De nouvelles tâches ont été ajoutées pour définir le média principal de "
 "chaque contenu et pour vérifier les ressources."
 
-#: data/scripts/upgrade.php:267 data/scripts/upgrade.php:301 Module.php:217
+#: data/scripts/upgrade.php:254 data/scripts/upgrade.php:288 Module.php:217
 #: Module.php:225 Module.php:233
 msgid "The directory \"{dir}\" is not writeable."
 msgstr "Le dossier « {dir} » n’est pas accessible en écriture."
 
-#: data/scripts/upgrade.php:274
+#: data/scripts/upgrade.php:261
 msgid ""
 "A new task allows to backup Omeka installation files (without directory /"
 "files)."
@@ -693,7 +691,7 @@ msgstr ""
 "Une nouvelle tâche permet de sauvegarder les fichiers d’installation Omeka "
 "(sans le dossier /files)."
 
-#: data/scripts/upgrade.php:279
+#: data/scripts/upgrade.php:266
 msgid ""
 "A new task allows to clear php caches (code and data), in particular after "
 "an update or direct modification of code."
@@ -701,7 +699,7 @@ msgstr ""
 "Une nouvelle tâche permet d’effacer les caches php (code et données), en "
 "particulier après une mise à jour ou après une modification directe du code."
 
-#: data/scripts/upgrade.php:308
+#: data/scripts/upgrade.php:295
 msgid ""
 "A new task allows to loop resources, for example to manage a new setting in "
 "template or in parameters via triggers."
@@ -710,7 +708,7 @@ msgstr ""
 "exemple pour gérer une nouvelle option dans les modèles ou les paramètres "
 "via les déclencheurs."
 
-#: data/scripts/upgrade.php:313
+#: data/scripts/upgrade.php:300
 msgid ""
 "It is now possible to bulk upload files without any server limit (file size, "
 "post size, number of files) in item form and in a separate form (feature "
@@ -723,22 +721,22 @@ msgstr ""
 "(fonctionnalité déplacée depuis le module {link_module}Bulk "
 "Import{link_end}, implémente {link_github}omeka/omeka-s #1785{link_end})."
 
-#: data/scripts/upgrade.php:324
+#: data/scripts/upgrade.php:311
 msgid "A new option allows to notify new version of inactive modules."
 msgstr ""
 "Une nouvelle option permet de notifier les nouvelles versions des modules "
 "inactifs."
 
-#: data/scripts/upgrade.php:331
+#: data/scripts/upgrade.php:318
 msgid "It is now possible to optimize assets for web."
 msgstr "Il est désormais possible d’optimiser les fichiers pour le web."
 
-#: data/scripts/upgrade.php:354
+#: data/scripts/upgrade.php:341
 msgid "It is now possible to install a curated selection of modules."
 msgstr ""
 "Il est désormais possible d’installer des sélections choisies de modules."
 
-#: data/scripts/upgrade.php:361
+#: data/scripts/upgrade.php:348
 msgid ""
 "It is now possible to upload and delete local files in a configurated "
 "directory."
@@ -746,7 +744,7 @@ msgstr ""
 "Il est désormais possible de téléverser et de supprimer des fichiers locaux "
 "dans un dossier défini."
 
-#: data/scripts/upgrade.php:368
+#: data/scripts/upgrade.php:355
 msgid ""
 "To allow to upload files in a specific path outside of directory files/, "
 "update the file local.config.php."
@@ -754,7 +752,7 @@ msgstr ""
 "Pour autoriser le téléchargement des fichiers dans un dossier hors le "
 "dossier files/, indiquez-le dans le fichier local.config.php."
 
-#: data/scripts/upgrade.php:380
+#: data/scripts/upgrade.php:367
 msgid ""
 "It is now possible to define regular tasks to remove sessions regularly. A "
 "first cleaning of old ones is launched."
@@ -763,7 +761,7 @@ msgstr ""
 "des sessions régulièrement. Un premier nettoyage des vieilles sessions a été "
 "lancé."
 
-#: data/scripts/upgrade.php:405
+#: data/scripts/upgrade.php:392
 msgid ""
 "The feature to lock concurrent editing was moved to the new module {link}"
 "Lock Edit{link_end}. You should install it if you need it."
@@ -772,13 +770,13 @@ msgstr ""
 "déplacée dans le module {link}Lock Edit{link_end}. Vous devez l’installer si "
 "vous en avez besoin."
 
-#: data/scripts/upgrade.php:415
+#: data/scripts/upgrade.php:402
 msgid "A new setting allows the reviewer to delete any resource."
 msgstr ""
 "Un nouveau paramètre permet au relecteur de supprimer n’importe quelle "
 "ressource."
 
-#: data/scripts/upgrade.php:420
+#: data/scripts/upgrade.php:407
 msgid ""
 "A new setting allows to add a button to quick create a resource with a "
 "specific template."
@@ -786,11 +784,11 @@ msgstr ""
 "Un nouveau paramètre permet d’afficher un bouton de création rapide d’une "
 "ressource avec un modèle spécifique."
 
-#: data/scripts/upgrade.php:427
+#: data/scripts/upgrade.php:414
 msgid "A new setting allows to define the name of the administrator."
 msgstr "Un nouveau paramètre permet de définir le nom de l’administrateur."
 
-#: data/scripts/upgrade.php:432
+#: data/scripts/upgrade.php:419
 msgid ""
 "A new setting allows to define a no-reply email for automatic messages and "
 "notifications."
@@ -798,33 +796,29 @@ msgstr ""
 "Un nouveau paramètre permet de définir un mail ne-pas-répondre pour les "
 "messages automatiques et les notifications."
 
-#: data/scripts/upgrade.php:450
+#: data/scripts/upgrade.php:437
 msgid ""
 "A new setting allows to define a list of directories available for browsing."
 msgstr ""
 "Un nouveau paramètre permet de définir une liste de dossiers disponibles "
 "pour la gestion de fichiers."
 
-#: data/scripts/upgrade.php:457
+#: data/scripts/upgrade.php:444
 msgid "A new task allows to clean and to deduplicate resources values."
 msgstr ""
 "Un nouveau paramètre permet de nettoyer et de dédoublonner les valeurs des "
 "ressources."
 
-#: data/scripts/upgrade.php:464
+#: data/scripts/upgrade.php:451
 msgid "A new setting allows to define more media-types for assets."
 msgstr ""
 "Un nouveau paramètre permet de définir davantage de types de données pour "
 "les fichiers."
 
-#: data/scripts/upgrade.php:498
+#: data/scripts/upgrade.php:485
 msgid ""
 "A new setting allows to skip security check csrf when uploading files in "
 "order to fix use behind some vpn/proxy."
-msgstr ""
-
-#: data/scripts/upgrade.php:538
-msgid "Cron settings have been migrated to the Cron module."
 msgstr ""
 
 #: data/scripts/task.php:21
@@ -1130,12 +1124,8 @@ msgstr ""
 "Le fichier « {asset_filename} » (#{asset_id}) a été optimisé de {percent}%, "
 "de {size_1} à {size_2} octets."
 
-#: Module.php:1533
+#: Module.php:1542
 msgid "Unable to rename asset file from \"{old}\" to \"{new}\"."
-msgstr ""
-
-#: Module.php:1590
-msgid "Store with original name"
 msgstr ""
 
 #: src/Mvc/Controller/Plugin/Addons.php:309
@@ -2827,43 +2817,63 @@ msgid "Select resource classes…"
 msgstr "Choisir des classes de ressource…"
 
 #: src/Form/SettingsFieldset.php:130
+msgid "Asset: allowed media types"
+msgstr "Fichiers : types de média autorisés"
+
+#: src/Form/SettingsFieldset.php:131
+msgid ""
+"Additional media types allowed for assets. Common image types (jpeg, png, "
+"gif, webp) are included by default. One media type per line."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:143
+msgid "Asset: allowed extensions"
+msgstr "Fichiers : extensions autorisées"
+
+#: src/Form/SettingsFieldset.php:144
+msgid ""
+"Additional extensions allowed for assets. Common image extensions (jpg, "
+"jpeg, png, gif, webp) are included by default. Separate with spaces."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:157
 msgid "Default upload folder"
 msgstr "Dossier de téléversement par défaut"
 
-#: src/Form/SettingsFieldset.php:131
+#: src/Form/SettingsFieldset.php:158
 msgid ""
 "Default folder for file uploads. Must be inside /files but not in protected "
 "directories (original, asset, large, medium, square)."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:135
+#: src/Form/SettingsFieldset.php:162
 msgid "/var/www/html/files/upload"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:143
+#: src/Form/SettingsFieldset.php:170
 msgid "Additional folders"
 msgstr "Dossiers complémentaires"
 
-#: src/Form/SettingsFieldset.php:144
+#: src/Form/SettingsFieldset.php:171
 msgid ""
 "Additional folders available in the file manager. One path per line. "
 "Protected Omeka directories (original, asset, derivatives) are always "
 "available for browsing but are read-only."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:156
+#: src/Form/SettingsFieldset.php:183
 msgid "Disable CSRF check for uploads"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:157
+#: src/Form/SettingsFieldset.php:184
 msgid "May be required with some VPN/proxy configurations."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:168
+#: src/Form/SettingsFieldset.php:195
 msgid "Allow empty files"
 msgstr "Autoriser les fichiers vides"
 
-#: src/Form/SettingsFieldset.php:169
+#: src/Form/SettingsFieldset.php:196
 msgid ""
 "Allow uploading empty files. Requires disabling file validation or adding "
 "media type \"application/x-empty\" in main settings."
@@ -2872,19 +2882,19 @@ msgstr ""
 "désactiver la vérification des fichiers ou d’ajouter le type de média "
 "« application/x-empty » dans les paramètres généraux."
 
-#: src/Form/SettingsFieldset.php:181
+#: src/Form/SettingsFieldset.php:208
 msgid "Notify new versions for inactive modules"
 msgstr "Notifier des nouvelles versions des modules inactifs"
 
-#: src/Form/SettingsFieldset.php:192
+#: src/Form/SettingsFieldset.php:219
 msgid "Notify development versions of modules"
 msgstr "Notifier des versions de développement des modules"
 
-#: src/Form/SettingsFieldset.php:204
+#: src/Form/SettingsFieldset.php:231
 msgid "Display error on screen"
 msgstr "Afficher les erreurs sur l’écran"
 
-#: src/Form/SettingsFieldset.php:205
+#: src/Form/SettingsFieldset.php:232
 msgid ""
 "This option helps fix issues and should be unset in production. For "
 "development, use the key \"APPLICATION_ENV\" in file .htaccess."
@@ -2893,19 +2903,19 @@ msgstr ""
 "production. Pour le développement, utiliser la clé \"APPLICATION_ENV\" dans "
 "le fichier .htaccess."
 
-#: src/Form/SettingsFieldset.php:218
+#: src/Form/SettingsFieldset.php:245
 msgid "Set Omeka under maintenance"
 msgstr "Placer Omeka en maintenance"
 
-#: src/Form/SettingsFieldset.php:221
+#: src/Form/SettingsFieldset.php:248
 msgid "Public front-end"
 msgstr "Interface publique"
 
-#: src/Form/SettingsFieldset.php:222
+#: src/Form/SettingsFieldset.php:249
 msgid "Admin (except global admins)"
 msgstr "Admin (sauf les administrateurs généraux)"
 
-#: src/Form/SettingsFieldset.php:236
+#: src/Form/SettingsFieldset.php:263
 msgid "Text to display for maintenance"
 msgstr "Texte à afficher durant la maintenance"
 
@@ -3731,39 +3741,39 @@ msgstr ""
 msgid "Weekly"
 msgstr ""
 
-#: src/Form/CronForm.php:116 config/module.config.php:306
+#: src/Form/CronForm.php:116 config/module.config.php:322
 msgid "Clear old sessions"
 msgstr "Effacer les anciennes sessions"
 
-#: src/Form/CronForm.php:122 config/module.config.php:312
+#: src/Form/CronForm.php:122 config/module.config.php:328
 msgid "older than 1 hour"
 msgstr "plus d’une heure"
 
-#: src/Form/CronForm.php:123 config/module.config.php:313
+#: src/Form/CronForm.php:123 config/module.config.php:329
 msgid "older than 2 hours"
 msgstr "plus de 2 heures"
 
-#: src/Form/CronForm.php:124 config/module.config.php:314
+#: src/Form/CronForm.php:124 config/module.config.php:330
 msgid "older than 4 hours"
 msgstr "plus de 4 heures"
 
-#: src/Form/CronForm.php:125 config/module.config.php:315
+#: src/Form/CronForm.php:125 config/module.config.php:331
 msgid "older than 12 hours"
 msgstr "plus de 12 heures"
 
-#: src/Form/CronForm.php:126 config/module.config.php:316
+#: src/Form/CronForm.php:126 config/module.config.php:332
 msgid "older than 1 day"
 msgstr "plus d’un jour"
 
-#: src/Form/CronForm.php:127 config/module.config.php:317
+#: src/Form/CronForm.php:127 config/module.config.php:333
 msgid "older than 2 days"
 msgstr "plus de 2 jours"
 
-#: src/Form/CronForm.php:128 config/module.config.php:318
+#: src/Form/CronForm.php:128 config/module.config.php:334
 msgid "older than 8 days"
 msgstr "plus de 8 jours"
 
-#: src/Form/CronForm.php:129 config/module.config.php:319
+#: src/Form/CronForm.php:129 config/module.config.php:335
 msgid "older than 30 days"
 msgstr "plus de 30 jours"
 
@@ -3949,42 +3959,42 @@ msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « opcache » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:285
+#: src/Controller/Admin/CheckAndFixController.php:287
 msgid "The cache \"opcache\" was reset."
 msgstr "Le cache « opcache » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:287
+#: src/Controller/Admin/CheckAndFixController.php:289
 msgid "The cache \"opcache\" is disabled."
 msgstr "Le cache « opcache » est désactivé."
 
-#: src/Controller/Admin/CheckAndFixController.php:291
+#: src/Controller/Admin/CheckAndFixController.php:293
 msgid "The php extension \"opcache\" is not available."
 msgstr "L’extension php « opcache » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:300
+#: src/Controller/Admin/CheckAndFixController.php:302
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « apcu » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:308
+#: src/Controller/Admin/CheckAndFixController.php:311
 msgid "The cache \"apcu\" was reset."
 msgstr "Le cache « apcu » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:311
+#: src/Controller/Admin/CheckAndFixController.php:314
 msgid "The php extension \"apcu\" is not available."
 msgstr "L’extension php « apcu » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:319
+#: src/Controller/Admin/CheckAndFixController.php:322
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:334
+#: src/Controller/Admin/CheckAndFixController.php:337
 msgid "Install tasks were run without errors."
 msgstr "La vérification de l’installation n’a pas trouvé d’erreur."
 
-#: src/Controller/Admin/CheckAndFixController.php:341
+#: src/Controller/Admin/CheckAndFixController.php:344
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to translate dates."
@@ -3992,25 +4002,25 @@ msgstr ""
 "L’extension php \"intl\" n’est pas disponible. Il est recommandé de "
 "l’installer pour traduire les dates."
 
-#: src/Controller/Admin/CheckAndFixController.php:362
+#: src/Controller/Admin/CheckAndFixController.php:365
 msgid ""
 "Current email configuration:\n"
 "{config}"
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:377
+#: src/Controller/Admin/CheckAndFixController.php:380
 msgid "No recipient email provided. Test email was not sent."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:383
+#: src/Controller/Admin/CheckAndFixController.php:386
 msgid "Invalid recipient email address: {email}"
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:396
+#: src/Controller/Admin/CheckAndFixController.php:399
 msgid "[{title}] Test email"
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:400
+#: src/Controller/Admin/CheckAndFixController.php:403
 msgid ""
 "This is a test email from {title}.\n"
 "\n"
@@ -4020,11 +4030,11 @@ msgid ""
 "Sent at: {datetime}"
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:412
+#: src/Controller/Admin/CheckAndFixController.php:415
 msgid "Test email successfully sent to {email}."
 msgstr ""
 
-#: src/Controller/Admin/CheckAndFixController.php:417
+#: src/Controller/Admin/CheckAndFixController.php:420
 msgid "Failed to send test email: {error}"
 msgstr "Impossible d’envoyer un mail de test : {error}"
 
@@ -4088,29 +4098,35 @@ msgstr "Le dossier local ne peut être lu."
 msgid "Local path is not writeable."
 msgstr "Le dossier local ne peut être écrit."
 
-#: config/module.config.php:184 config/module.config.php:221
+#: config/module.config.php:191 config/module.config.php:228
 msgid "Checks and fixes"
 msgstr "Réparations"
 
-#: config/module.config.php:330
+#: config/module.config.php:346
 msgid "Compressed (gzip)"
 msgstr ""
 
-#: config/module.config.php:331
+#: config/module.config.php:347
 msgid "Plain SQL"
 msgstr ""
 
-#: config/module.config.php:336
+#: config/module.config.php:352
 msgid "Backup files (modules, themes, config)"
 msgstr ""
 
-#: config/module.config.php:342
+#: config/module.config.php:358
 msgid "Full backup (core, modules, themes, config)"
 msgstr ""
 
-#: config/module.config.php:343
+#: config/module.config.php:359
 msgid "Configuration only"
 msgstr ""
+
+#, php-format
+#~ msgid ""
+#~ "The module %1$s requires the module %2$s. Install and enable it first."
+#~ msgstr ""
+#~ "Le module %1$s nécessite le module %2$s. Installez et activez le d’abord."
 
 #~ msgid "Any"
 #~ msgstr "Tous"
