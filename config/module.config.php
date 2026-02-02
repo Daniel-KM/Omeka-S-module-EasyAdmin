@@ -8,6 +8,13 @@ return [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
     ],
+    'api_adapters' => [
+        'delegators' => [
+            \Omeka\Api\Adapter\AssetAdapter::class => [
+                Service\Delegator\AssetAdapterDelegatorFactory::class,
+            ],
+        ],
+    ],
     'listeners' => [
         Mvc\MvcListeners::class,
     ],
@@ -295,6 +302,15 @@ return [
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             'easyadmin_display_exception' => false,
+            // Assets: additional allowed media types and extensions.
+            'easyadmin_asset_media_types' => [
+                // 'application/pdf',
+                // 'image/svg+xml',
+            ],
+            'easyadmin_asset_extensions' => [
+                // 'pdf',
+                // 'svg',
+            ],
             // Maintenance
             'easyadmin_maintenance_mode' => '',
             'easyadmin_maintenance_text' => 'This site is down for maintenance. Please contact the site administrator for more information.', // @translate

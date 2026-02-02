@@ -123,6 +123,33 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_asset_media_types',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Asset: allowed media types', // @translate
+                    'info' => 'Additional media types allowed for assets. Common image types (jpeg, png, gif, webp) are included by default. One media type per line.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_asset_media_types',
+                    'placeholder' => "image/apng\nimage/avif\nimage/svg+xml\napplication/pdf",
+                ],
+            ])
+            ->add([
+                'name' => 'easyadmin_asset_extensions',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Asset: allowed extensions', // @translate
+                    'info' => 'Additional extensions allowed for assets. Common image extensions (jpg, jpeg, png, gif, webp) are included by default. Separate with spaces.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_asset_extensions',
+                    'placeholder' => 'apng avif svg pdf',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_local_path',
                 'type' => Element\Text::class,
                 'options' => [
