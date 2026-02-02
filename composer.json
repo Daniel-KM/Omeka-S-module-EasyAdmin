@@ -1,28 +1,27 @@
 {
     "name": "daniel-km/omeka-s-module-easy-admin",
-    "description": "Module for Omeka S that improves admin interface for curators: install modules and themes, check database and files, simplify bulk upload, run cron tasks, use json endpoints.",
-    "type": "library",
+    "type": "omeka-s-module",
+    "description": "Module for Omeka S: Manage tasks from the admin interface: install modules and themes, check database and files, bulk upload without limits.",
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "administration",
+        "miscellaneous",
+        "check",
+        "curation"
+    ],
     "license": "CECILL-2.1",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin",
     "authors": [
         {
             "name": "Daniel Berthereau",
             "email": "Daniel.packagist@Berthereau.net"
         }
     ],
-    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin",
     "support": {
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/issues",
         "forum": "https://forum.omeka.org/"
     },
-    "keywords": [
-        "Omeka S",
-        "module",
-        "admin",
-        "install",
-        "checks",
-        "bulk upload",
-        "curation"
-    ],
     "require": {
         "flowjs/flow-php-server": "^1.2",
         "flowjs/flow.js": "^2.14",
