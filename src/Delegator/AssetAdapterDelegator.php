@@ -18,6 +18,19 @@ use Omeka\Stdlib\ErrorStore;
  */
 class AssetAdapterDelegator extends AssetAdapter
 {
+    /**
+     * Return the original AssetAdapter class as the ACL resource ID.
+     *
+     * The ACL system uses getResourceId() to check permissions. Since only
+     * the original AssetAdapter is registered as an ACL resource, we must
+     * return its class name instead of the delegator's class name.
+     * Otherwise, ACL checks fail with "Resource not found" error.
+     */
+    public function getResourceId(): string
+    {
+        return AssetAdapter::class;
+    }
+
     public function hydrate(Request $request, EntityInterface $entity, ErrorStore $errorStore): void
     {
         $data = $request->getContent();
