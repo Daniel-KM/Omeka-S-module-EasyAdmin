@@ -20,6 +20,7 @@ admin interface:
 - clear php caches
 - launch simple tasks, that can be any job of any module
 - allow (or not) reviewer to delete any resources
+- allow more file types for assets
 
 Checks and fixes that are doable:
 
