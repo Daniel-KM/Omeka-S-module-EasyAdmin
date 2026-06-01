@@ -29,19 +29,29 @@ class DbResourceInvalid extends AbstractCheck
      */
     protected function checkResourceInvalid(bool $fix): bool
     {
-        $sqlCount = <<<'SQL'
+        $tables = $this->getResourceSubTables();
+
+        $joins = [];
+        $orWheres = [];
+        $caseLines = [];
+        foreach ($tables as $table => $class) {
+            $classEscaped = str_replace('\\', '\\\\', $class);
+            $joins[] = sprintf('LEFT JOIN `%1$s` ON `%1$s`.`id` = `resource`.`id`', $table);
+            $orWheres[] = sprintf("(`%s`.`id` IS NOT NULL AND `resource`.`resource_type` != '%s')", $table, $classEscaped);
+            $caseLines[] = sprintf("WHEN `%s`.`id` IS NOT NULL THEN '%s'", $table, $classEscaped);
+        }
+
+        $joinsSql = implode("\n            ", $joins);
+        $whereSql = implode("\n                OR ", $orWheres);
+        $caseSql = implode("\n                        ", $caseLines);
+
+        $sqlCount = <<<SQL
             SELECT `resource`.`id`, `resource`.`resource_type`
             FROM `resource`
-            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-            LEFT JOIN `value_annotation` ON `value_annotation`.`id` = `resource`.`id`
-            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Item')
-                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ItemSet')
-                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Media')
-                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ValueAnnotation')
+            $joinsSql
+            WHERE $whereSql
             ;
-        SQL;
+            SQL;
         $result = $this->connection->executeQuery($sqlCount)->fetchAllKeyValue();
 
         if (!$result) {
@@ -56,36 +66,22 @@ class DbResourceInvalid extends AbstractCheck
             ['count' => count($result), 'json' => json_encode($result, 448)]
         );
 
-        if (!$fix || !$result) {
+        if (!$fix) {
             return true;
         }
 
-        // Do the update.
-        $sql = <<<'SQL'
+        $sql = <<<SQL
             UPDATE `resource`
-            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-            LEFT JOIN `value_annotation` ON `value_annotation`.`id` = `resource`.`id`
+            $joinsSql
             SET
                 `resource_type` =
                     CASE
-                        WHEN `item`.`id` IS NOT NULL
-                            THEN 'Omeka\\Entity\\Item'
-                        WHEN `item_set`.`id` IS NOT NULL
-                            THEN 'Omeka\\Entity\\ItemSet'
-                        WHEN `media`.`id` IS NOT NULL
-                            THEN 'Omeka\\Entity\\Media'
-                        WHEN `value_annotation`.`id` IS NOT NULL
-                            THEN 'Omeka\\Entity\\ValueAnnotation'
+                        $caseSql
                         ELSE `resource_type`
                     END
-            WHERE (`item`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Item')
-                OR (`item_set`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ItemSet')
-                OR (`media`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\Media')
-                OR (`value_annotation`.`id` IS NOT NULL AND `resource`.`resource_type` != 'Omeka\\Entity\\ValueAnnotation')
+            WHERE $whereSql
             ;
-        SQL;
+            SQL;
         $result = $this->connection->executeStatement($sql);
 
         $newList = $this->connection->executeQuery($sqlCount)->fetchAllKeyValue();

@@ -29,62 +29,38 @@ class DbResourceIncomplete extends AbstractCheck
      */
     protected function checkResourceIncomplete(bool $fix): bool
     {
-        // Use a try-catch block to fix cases during upgrade/disable.
+        $tables = $this->getResourceSubTables();
 
-        // $hasValueAnnotation = version_compare(\Omeka\Module::VERSION, '3.2', '>=');
-        try {
-            $this->connection->executeQuery('SELECT id FROM value_annotation')->fetchOne();
-            $joinValueAnnotation = 'LEFT JOIN `value_annotation` ON `value_annotation`.`id` = `resource`.`id`';
-            $whereValueAnnotation = 'AND `value_annotation`.`id` IS NULL';
-        } catch (\Throwable $e) {
-            $joinValueAnnotation = '';
-            $whereValueAnnotation = '';
+        $joins = [];
+        $wheres = [];
+        foreach (array_keys($tables) as $table) {
+            $joins[] = sprintf('LEFT JOIN `%1$s` ON `%1$s`.`id` = `resource`.`id`', $table);
+            $wheres[] = sprintf('`%s`.`id` IS NULL', $table);
         }
 
-        // $hasAnnotation = $this->isModuleActive('Annotate');
-        try {
-            $this->connection->executeQuery('SELECT id FROM annotation')->fetchOne();
-            $joinAnnotation = 'LEFT JOIN `annotation` ON `annotation`.`id` = `resource`.`id`';
-            $whereAnnotation = 'AND `annotation`.`id` IS NULL';
-        } catch (\Throwable $e) {
-            $joinAnnotation = '';
-            $whereAnnotation = '';
-        }
-
-        // Old versions of module Annotate has four tables.
-        if ($joinAnnotation) {
-            try {
-                $this->connection->executeQuery('SELECT id FROM annotation_part')->fetchOne();
-                $joinAnnotation .= "\n" . <<<'SQL'
-                    LEFT JOIN `annotation_part` ON `annotation_part`.`id` = `resource`.`id`
-                    LEFT JOIN `annotation_body` ON `annotation_body`.`id` = `resource`.`id`
-                    LEFT JOIN `annotation_target` ON `annotation_target`.`id` = `resource`.`id`
-                    SQL;
-                $whereAnnotation .= "\n" . <<<'SQL'
-                        AND `annotation_part`.`id` IS NULL
-                        AND `annotation_body`.`id` IS NULL
-                        AND `annotation_target`.`id` IS NULL
-                    SQL;
-            } catch (\Throwable $e) {
-                // Nothing to do.
+        // Old versions of module Annotate had three additional tables.
+        if (isset($tables['annotation'])) {
+            foreach (['annotation_part', 'annotation_body', 'annotation_target'] as $legacy) {
+                try {
+                    $this->connection->executeQuery(sprintf('SELECT 1 FROM `%s` LIMIT 1', $legacy));
+                    $joins[] = sprintf('LEFT JOIN `%1$s` ON `%1$s`.`id` = `resource`.`id`', $legacy);
+                    $wheres[] = sprintf('`%s`.`id` IS NULL', $legacy);
+                } catch (\Throwable $e) {
+                    // Skip.
+                }
             }
         }
+
+        $joinsSql = implode("\n", $joins);
+        $wheresSql = implode("\n            AND ", $wheres);
 
         $totalResources = $this->connection->executeQuery('SELECT COUNT(`resource`.`id`) FROM `resource`')->fetchOne();
 
         $sql = <<<SQL
             SELECT COUNT(`resource`.`id`)
             FROM `resource`
-            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-            $joinValueAnnotation
-            $joinAnnotation
-            WHERE `item`.`id` IS NULL
-                AND `item_set`.`id` IS NULL
-                AND `media`.`id` IS NULL
-                $whereValueAnnotation
-                $whereAnnotation
+            $joinsSql
+            WHERE $wheresSql
             ;
             SQL;
         $result = $this->connection->executeQuery($sql)->fetchOne();
@@ -97,20 +73,11 @@ class DbResourceIncomplete extends AbstractCheck
             return true;
         }
 
-        // Do the update.
         $sql = <<<SQL
             DELETE `resource`
             FROM `resource`
-            LEFT JOIN `item` ON `item`.`id` = `resource`.`id`
-            LEFT JOIN `item_set` ON `item_set`.`id` = `resource`.`id`
-            LEFT JOIN `media` ON `media`.`id` = `resource`.`id`
-            $joinValueAnnotation
-            $joinAnnotation
-            WHERE `item`.`id` IS NULL
-                AND `item_set`.`id` IS NULL
-                AND `media`.`id` IS NULL
-                $whereValueAnnotation
-                $whereAnnotation
+            $joinsSql
+            WHERE $wheresSql
             ;
             SQL;
         $result = $this->connection->executeStatement($sql);

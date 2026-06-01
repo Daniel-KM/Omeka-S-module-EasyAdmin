@@ -349,6 +349,43 @@ abstract class AbstractCheck extends AbstractJob
     }
 
     /**
+     * Return the list of sub-tables of `resource` that currently exist, mapped
+     * to their entity class (the value stored in `resource_type`).
+     *
+     * Each entry is `table => entityClass`. Tables added by optional modules
+     * (Annotate, DigitalObject) are included only when their table exists.
+     *
+     * @return array<string,string>
+     */
+    protected function getResourceSubTables(): array
+    {
+        static $tables;
+        if ($tables !== null) {
+            return $tables;
+        }
+
+        $candidates = [
+            'item' => \Omeka\Entity\Item::class,
+            'item_set' => \Omeka\Entity\ItemSet::class,
+            'media' => \Omeka\Entity\Media::class,
+            'value_annotation' => 'Omeka\\Entity\\ValueAnnotation',
+            'annotation' => 'Annotate\\Entity\\Annotation',
+            'digital_object' => 'DigitalObject\\Entity\\DigitalObject',
+        ];
+
+        $tables = [];
+        foreach ($candidates as $table => $class) {
+            try {
+                $this->connection->executeQuery(sprintf('SELECT 1 FROM `%s` LIMIT 1', $table));
+                $tables[$table] = $class;
+            } catch (\Throwable $e) {
+                // Table absent: skip silently.
+            }
+        }
+        return $tables;
+    }
+
+    /**
      * Check if a module is active.
      *
      * @param string $module
