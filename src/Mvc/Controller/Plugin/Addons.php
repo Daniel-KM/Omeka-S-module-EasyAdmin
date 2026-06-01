@@ -411,8 +411,10 @@ class Addons extends AbstractPlugin
         }
 
         $tempDir = sys_get_temp_dir() . '/easyadmin_update_'
-            . $addon['dir'] . '_' . time();
+            . $addon['dir'] . '_' . bin2hex(random_bytes(8));
         @mkdir($tempDir, 0775, true);
+        $extractDir = $tempDir . '/extract';
+        @mkdir($extractDir, 0775, true);
 
         // Pick the latest compatible version for current Omeka S.
         $compatible = $this->pickCompatibleVersion($addon);
@@ -449,8 +451,9 @@ class Addons extends AbstractPlugin
             return false;
         }
 
-        // Unzip into temp.
-        $result = $this->unzipFile($zipFile, $tempDir);
+        // Unzip into a fresh sub-directory to avoid any collision with the
+        // downloaded zip file or stale entries.
+        $result = $this->unzipFile($zipFile, $extractDir);
         @unlink($zipFile);
         if (!$result) {
             $this->messenger->addError(new PsrMessage(
@@ -478,9 +481,9 @@ class Addons extends AbstractPlugin
         // Find the extracted directory inside temp (the zip top-level dir may
         // have any name, e.g. "Foo-1.0.1").
         $extractedPath = null;
-        foreach (array_diff(scandir($tempDir) ?: [], ['.', '..']) as $entry) {
-            if (is_dir($tempDir . '/' . $entry)) {
-                $extractedPath = $tempDir . '/' . $entry;
+        foreach (array_diff(scandir($extractDir) ?: [], ['.', '..']) as $entry) {
+            if (is_dir($extractDir . '/' . $entry)) {
+                $extractedPath = $extractDir . '/' . $entry;
                 break;
             }
         }
@@ -843,8 +846,10 @@ class Addons extends AbstractPlugin
         array $addon
     ): array {
         $tempDir = sys_get_temp_dir() . '/easyadmin_check_'
-            . ($addon['dir'] ?? 'unknown') . '_' . time();
+            . ($addon['dir'] ?? 'unknown') . '_' . bin2hex(random_bytes(8));
         @mkdir($tempDir, 0775, true);
+        $extractDir = $tempDir . '/extract';
+        @mkdir($extractDir, 0775, true);
 
         $zipFile = $tempDir . '/' . basename($addon['zip'] ?? '');
         if (!$this->downloadFile(
@@ -855,7 +860,7 @@ class Addons extends AbstractPlugin
             return [];
         }
 
-        if (!$this->unzipFile($zipFile, $tempDir)) {
+        if (!$this->unzipFile($zipFile, $extractDir)) {
             $this->rmDir($tempDir);
             return [];
         }
@@ -863,10 +868,10 @@ class Addons extends AbstractPlugin
 
         // Find the extracted directory.
         $dirs = array_filter(
-            array_diff(scandir($tempDir) ?: [], ['.', '..']),
-            fn ($f) => is_dir($tempDir . '/' . $f)
+            array_diff(scandir($extractDir) ?: [], ['.', '..']),
+            fn ($f) => is_dir($extractDir . '/' . $f)
         );
-        $extractedDir = $tempDir . '/' . reset($dirs);
+        $extractedDir = $extractDir . '/' . reset($dirs);
         if (!$extractedDir || !is_dir($extractedDir)) {
             $this->rmDir($tempDir);
             return [];
@@ -1237,11 +1242,13 @@ class Addons extends AbstractPlugin
             return false;
         }
 
-        // Download into a temp directory to avoid polluting the
-        // modules/themes dir during extraction.
+        // Download into a temp directory to avoid polluting the modules/themes
+        // dir during extraction.
         $tempDir = sys_get_temp_dir() . '/easyadmin_install_'
-            . $addon['dir'] . '_' . time();
+            . $addon['dir'] . '_' . bin2hex(random_bytes(8));
         @mkdir($tempDir, 0775, true);
+        $extractDir = $tempDir . '/extract';
+        @mkdir($extractDir, 0775, true);
 
         // Pick the latest compatible version for current Omeka S.
         $compatible = $this->pickCompatibleVersion($addon);
@@ -1268,7 +1275,7 @@ class Addons extends AbstractPlugin
             return false;
         }
 
-        $result = $this->unzipFile($zipFile, $tempDir);
+        $result = $this->unzipFile($zipFile, $extractDir);
         @unlink($zipFile);
         if (!$result) {
             $this->messenger->addError(new PsrMessage(
@@ -1279,12 +1286,12 @@ class Addons extends AbstractPlugin
             return false;
         }
 
-        // Find the extracted directory and move it to the final
-        // destination with the correct name.
+        // Find the extracted directory and move it to the final destination
+        // with the correct name.
         $extractedPath = null;
-        foreach (array_diff(scandir($tempDir) ?: [], ['.', '..']) as $entry) {
-            if (is_dir($tempDir . '/' . $entry)) {
-                $extractedPath = $tempDir . '/' . $entry;
+        foreach (array_diff(scandir($extractDir) ?: [], ['.', '..']) as $entry) {
+            if (is_dir($extractDir . '/' . $entry)) {
+                $extractedPath = $extractDir . '/' . $entry;
                 break;
             }
         }
@@ -1473,7 +1480,10 @@ class Addons extends AbstractPlugin
                         return false;
                     }
                 }
-                $result = $zip->extractTo($destination);
+                // Suppress harmless "File exists" warnings emitted by some
+                // archives (duplicate directory entries) without losing the
+                // boolean return value.
+                $result = @$zip->extractTo($destination);
                 $zip->close();
             } else {
                 /*
