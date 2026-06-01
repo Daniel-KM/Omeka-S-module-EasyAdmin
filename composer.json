@@ -28,7 +28,7 @@
     },
     "require": {
         "flowjs/flow-php-server": "^1.2",
-        "sempia/external-assets": "^1.0"
+        "sempia/external-assets": "^1.1"
     },
     "autoload": {
         "psr-4": {
