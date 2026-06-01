@@ -158,6 +158,13 @@ Some options are added in main settings:
 - Allow the reviewer to delete any resource.
 - Manage the maintenance.
 - Display a quick button to create a resource template
+- Add an "Apply" button on every module config form, to save the settings and
+  stay on the form (active tab included) instead of returning to the module
+  list.
+- Override the base URI of local files (section "Maintenance and tests"), to
+  serve file URLs from another server (for example production) while keeping
+  uploads and derivatives local. Useful to work on a copy of the database
+  without the files.
 
 ### Bulk Upload in item form and in separate form
 
@@ -225,6 +232,16 @@ in Omeka Classic.
 
 Go to the menu "Bulk Check", select your process, set your options if needed,
 and click the submit buttons. The results are available in logs currently.
+
+The processes cover items, item sets, media, annotations, value annotations and
+digital objects, when the related modules are installed. For file checks (hashes,
+sizes, dimensions, thumbnails, missing or excess files), the entities to process
+(media and/or digital objects) can be selected.
+
+A check also detects and removes orphan resource rows: rows in the `resource`
+table without a matching row in a sub-table (`item`, `item_set`, `media`,
+`annotation`, `value_annotation`, `digital_object`), and the reverse, which can
+happen after a crash or an incomplete deletion.
 
 ### Install and update modules and themes
 
@@ -368,7 +385,7 @@ TODO
 - [x] Dump database: see adminer.
 - [x] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
 - [ ] Add a module setting for the csrf lifetime for bulk uploads and for main resource edit page.
-- [ ] check and remove orphan resource rows (rows in table `resource` without a matching row in `item`, `item_set` or `media`, which can happen after a crash or an incomplete deletion)
+- [x] check and remove orphan resource rows (rows in table `resource` without a matching row in `item`, `item_set` or `media`, which can happen after a crash or an incomplete deletion)
 
 
 Warning
