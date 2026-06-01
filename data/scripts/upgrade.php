@@ -37,10 +37,10 @@ $entityManager = $services->get('Omeka\EntityManager');
 $config = $services->get('Config');
 $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.84')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.86')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-        'Common', '3.4.84'
+        'Common', '3.4.86'
     );
     $messenger->addError($message);
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
