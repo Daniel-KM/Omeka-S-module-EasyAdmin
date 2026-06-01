@@ -356,6 +356,7 @@ class FileDerivative extends AbstractCheck
         $entityTypes = $this->getArg('entity_types') ?: ['media'];
         if (in_array('digital_object', $entityTypes, true)) {
             $this->processDigitalObjects($basePath, $types, $skipExisting, $tempFileFactory);
+            $this->processDigitalObjectsWithoutOriginal($basePath, $types, $skipExisting);
         }
 
         $this->finalizeOutput();
@@ -493,6 +494,183 @@ class FileDerivative extends AbstractCheck
             'End of derivative files creation for digital objects: {succeed} succeed, {existing} skipped, {failed} failed.', // @translate
             ['succeed' => $succeed, 'existing' => $existing, 'failed' => $failed]
         );
+    }
+
+    /**
+     * Rebuild thumbnails for digital objects without an original file (IIIF
+     * Image, IIIF Presentation), by downloading the remote thumbnail.
+     *
+     * Mirrors processMediaWithoutOriginal() but resolves the url from the
+     * digital object data (raw info.json for IIIF Image, manifest thumbnail for
+     * IIIF Presentation).
+     */
+    protected function processDigitalObjectsWithoutOriginal(
+        string $basePath,
+        array $types,
+        bool $skipExisting
+    ): void {
+        $doClass = 'DigitalObject\\Entity\\DigitalObject';
+        if (!class_exists($doClass)) {
+            return;
+        }
+        try {
+            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $repository = $this->entityManager->getRepository($doClass);
+
+        $criteria = Criteria::create();
+        $expr = $criteria->expr();
+        $criteria
+            ->where($expr->eq('hasOriginal', 0))
+            ->orderBy(['id' => 'ASC'])
+            ->setMaxResults(self::SQL_LIMIT);
+
+        $totalToProcess = $repository->matching($criteria)->count();
+        if (!$totalToProcess) {
+            $this->logger->info(
+                'No digital object without original to process.' // @translate
+            );
+            return;
+        }
+
+        $this->logger->info(
+            'Processing {total} digital objects without original (IIIF).', // @translate
+            ['total' => $totalToProcess]
+        );
+
+        $downloader = $this->getServiceLocator()->get('Omeka\File\Downloader');
+
+        $offset = 0;
+        $succeed = 0;
+        $failed = 0;
+        $existing = 0;
+
+        while (true) {
+            $criteria->setFirstResult($offset);
+            $items = $repository->matching($criteria);
+            if (!$items->count()) {
+                break;
+            }
+
+            foreach ($items as $entity) {
+                if ($this->shouldStop()) {
+                    break 2;
+                }
+
+                $storageId = $entity->getStorageId();
+                if (!$storageId) {
+                    ++$failed;
+                    continue;
+                }
+
+                if ($skipExisting && $entity->hasThumbnails()) {
+                    $allExist = true;
+                    foreach ($types as $type) {
+                        if (!file_exists($basePath . '/' . $type . '/' . $storageId . '.jpg')) {
+                            $allExist = false;
+                            break;
+                        }
+                    }
+                    if ($allExist) {
+                        ++$existing;
+                        continue;
+                    }
+                }
+
+                $thumbnailUrl = $this->getThumbnailUrlForDigitalObject($entity);
+                if (!$thumbnailUrl) {
+                    $this->logger->notice(
+                        'DigitalObject #{id}: no thumbnail URL derivable.', // @translate
+                        ['id' => $entity->getId()]
+                    );
+                    ++$failed;
+                    continue;
+                }
+
+                $tempFile = $downloader->download($thumbnailUrl);
+                if (!$tempFile) {
+                    $this->logger->notice(
+                        'DigitalObject #{id}: download failed for {url}.', // @translate
+                        ['id' => $entity->getId(), 'url' => $thumbnailUrl]
+                    );
+                    ++$failed;
+                    continue;
+                }
+
+                $tempFile->setStorageId($storageId);
+                $result = $tempFile->storeThumbnails();
+                @unlink($tempFile->getTempPath());
+
+                $entity->setHasThumbnails((bool) $result);
+                $this->entityManager->persist($entity);
+
+                if ($result) {
+                    ++$succeed;
+                    $this->logger->info(
+                        'DigitalObject #{id}: thumbnails rebuilt.', // @translate
+                        ['id' => $entity->getId()]
+                    );
+                } else {
+                    ++$failed;
+                }
+            }
+
+            unset($items);
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+
+            $offset += self::SQL_LIMIT;
+        }
+
+        $this->logger->info(
+            'End rebuild for digital objects without original: {succeed} succeed, {existing} skipped, {failed} failed.', // @translate
+            ['succeed' => $succeed, 'existing' => $existing, 'failed' => $failed]
+        );
+    }
+
+    /**
+     * Derive the thumbnail url from a digital object stored data.
+     *
+     * IIIF Presentation stores the manifest thumbnail url directly; IIIF Image
+     * stores its info.json raw, so the largest full-region image is computed
+     * per API version.
+     *
+     * @see \DigitalObject\Api\Representation\DigitalObjectRepresentation
+     */
+    protected function getThumbnailUrlForDigitalObject($entity): ?string
+    {
+        $data = $entity->getData() ?: [];
+        if (!is_array($data)) {
+            return null;
+        }
+
+        // IIIF Presentation: the manifest thumbnail url is stored as data.
+        if (($data['type'] ?? null) === 'iiif-presentation') {
+            return !empty($data['thumbnail']) ? (string) $data['thumbnail'] : null;
+        }
+
+        // IIIF Image: data is the raw info.json.
+        $context = $data['@context'] ?? '';
+        $context = is_array($context) ? implode(' ', $context) : (string) $context;
+        $isIiifImage = ($data['protocol'] ?? null) === 'http://iiif.io/api/image'
+            || strpos($context, 'iiif.io/api/image') !== false;
+        if (!$isIiifImage) {
+            return null;
+        }
+
+        $serviceId = $data['id'] ?? $data['@id'] ?? null;
+        if (!is_string($serviceId) || $serviceId === '') {
+            return null;
+        }
+        $serviceId = rtrim($serviceId, '/');
+
+        if (strpos($context, 'image/3') !== false) {
+            return $serviceId . '/full/max/0/default.jpg';
+        }
+        return $serviceId . '/full/full/0/default.jpg';
     }
 
     /**
