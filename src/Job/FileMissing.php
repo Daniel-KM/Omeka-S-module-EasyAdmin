@@ -803,7 +803,7 @@ class FileMissing extends AbstractCheckFile
      */
     protected function checkMissingFilesDigitalObjects(): void
     {
-        if (!$this->hasDigitalObjectTable()) {
+        if (!class_exists('DigitalObject\Module', false)) {
             return;
         }
 
@@ -888,19 +888,5 @@ class FileMissing extends AbstractCheckFile
             'End of process (digital objects): {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed.', // @translate
             ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_succeed' => $totalSucceed, 'total_failed' => $totalFailed]
         );
-    }
-
-    protected function hasDigitalObjectTable(): bool
-    {
-        static $has;
-        if ($has !== null) {
-            return $has;
-        }
-        try {
-            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
-            return $has = true;
-        } catch (\Throwable $e) {
-            return $has = false;
-        }
     }
 }

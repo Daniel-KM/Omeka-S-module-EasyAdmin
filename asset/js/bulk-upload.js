@@ -527,10 +527,10 @@
          */
         function fixJson(json) {
             if (json.substring(0, 1) === '<' && json.indexOf('>') !== -1) {
-                console.log(json.substring(0, json.lastIndexOf('>') + 1));
+                console.warn('Server prepended HTML to JSON:', json.substring(0, json.lastIndexOf('>') + 1));
                 return json.substring(json.lastIndexOf('>') + 1);
             } else if (json.indexOf('<') !== -1 && json.slice(-1) === '>') {
-                console.log(json.substring(json.indexOf('<')));
+                console.warn('Server appended HTML to JSON:', json.substring(json.indexOf('<')));
                 return json.substring(0, json.indexOf('<'));
             }
             return json;

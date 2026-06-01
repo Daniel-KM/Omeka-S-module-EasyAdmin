@@ -197,15 +197,9 @@ class FileExcess extends AbstractCheckFile
         $storageIds = array_unique(array_column($storageMap, 'storageId'));
 
         // Single batched query instead of N individual queries. Include
-        // digital_object rows when the table exists so DigitalObject files are
-        // not flagged as excess.
-        $hasDigitalObject = false;
-        try {
-            $connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
-            $hasDigitalObject = true;
-        } catch (\Throwable $e) {
-            // Module not installed.
-        }
+        // digital_object rows when the module DigitalObject is active so its
+        // files are not flagged as excess.
+        $hasDigitalObject = class_exists('DigitalObject\Module', false);
         if ($isOriginal) {
             $sql = 'SELECT `id`, `item_id`, `storage_id`, `extension` FROM `media`'
                 . ' WHERE `storage_id` IN (:ids) AND `has_original` = 1';

@@ -376,12 +376,7 @@ class FileDerivative extends AbstractCheck
         \Omeka\File\TempFileFactory $tempFileFactory
     ): void {
         $doClass = 'DigitalObject\\Entity\\DigitalObject';
-        if (!class_exists($doClass)) {
-            return;
-        }
-        try {
-            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
-        } catch (\Throwable $e) {
+        if (!class_exists('DigitalObject\Module', false)) {
             return;
         }
 
@@ -510,12 +505,7 @@ class FileDerivative extends AbstractCheck
         bool $skipExisting
     ): void {
         $doClass = 'DigitalObject\\Entity\\DigitalObject';
-        if (!class_exists($doClass)) {
-            return;
-        }
-        try {
-            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
-        } catch (\Throwable $e) {
+        if (!class_exists('DigitalObject\Module', false)) {
             return;
         }
 

@@ -370,17 +370,10 @@ abstract class AbstractCheckFile extends AbstractCheck
      */
     protected function checkFileDataDigitalObjects(string $column, bool $fix): void
     {
-        $doClass = 'DigitalObject\\Entity\\DigitalObject';
-        if (!class_exists($doClass)) {
+        if (!class_exists('DigitalObject\Module', false)) {
             return;
         }
-        try {
-            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
-        } catch (\Throwable $e) {
-            return;
-        }
-
-        $repository = $this->entityManager->getRepository($doClass);
+        $repository = $this->entityManager->getRepository('DigitalObject\Entity\DigitalObject');
         $criteria = ['hasOriginal' => 1];
 
         $totalToProcess = (int) $this->connection
