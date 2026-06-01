@@ -12,23 +12,32 @@
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$disabledLink = function (string $label, string $title) use ($escapeAttr): string {
+    return sprintf(
+        '<span class="button button-disabled" role="link" aria-disabled="true" aria-label="%1$s" title="%1$s">%2$s</span>',
+        $escapeAttr($title),
+        $escapeAttr($label)
+    );
+};
 
 if ($previous):
-    echo $hyperlink('<', $previous->url('show'), ['class' => 'button', 'rel' => 'prev', 'title' => $translate('Previous resource')]);
+    echo $hyperlink('<', $previous->url('show'), ['class' => 'button', 'rel' => 'prev', 'title' => $translate('Previous resource'), 'aria-label' => $translate('Previous resource')]);
 else:
-    echo $hyperlink('<', '#', ['class' => 'button', 'rel' => 'prev', 'title' => $translate('No previous resource'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+    echo $disabledLink('<', $translate('No previous resource'));
 endif;
 
 if (!empty($back)):
     if ($lastBrowseUrl):
-        echo $hyperlink('^', $lastBrowseUrl, ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search')]);
+        echo $hyperlink('^', $lastBrowseUrl, ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search'), 'aria-label' => $translate('Back to last search')]);
     else:
-        echo $hyperlink('^', '#', ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+        echo $disabledLink('^', $translate('Back to last search'));
     endif;
 endif;
 
 if ($next):
-    echo $hyperlink('>', $next->url('show'), ['class' => 'button', 'rel' => 'next', 'title' => $translate('Next resource')]);
+    echo $hyperlink('>', $next->url('show'), ['class' => 'button', 'rel' => 'next', 'title' => $translate('Next resource'), 'aria-label' => $translate('Next resource')]);
 else:
-    echo $hyperlink('>', '#', ['class' => 'button', 'rel' => 'next', 'title' => $translate('No next resource'), 'disabled' => 'disabled', 'style' => 'color:gray;pointer-events:none;', 'tabindex' => '-1']);
+    echo $disabledLink('>', $translate('No next resource'));
 endif;

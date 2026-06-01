@@ -23,7 +23,7 @@ $form->setButtonLabel('Confirm delete'); // @translate
 
 <?php if ($wrapSidebar): ?>
 <div id="delete" class="sidebar">
-    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close'), 'aria-label' => $translate('Close')]) ?>
 <?php endif; ?>
     <div id="sidebar-confirm">
         <?php $resourceLabel = $translate($resourceLabel); ?>

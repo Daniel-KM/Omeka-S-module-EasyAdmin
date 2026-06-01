@@ -15,7 +15,7 @@ $search = $this->params()->fromQuery('search', '');
 $ownerId = $this->params()->fromQuery('owner_id');
 ?>
 
-<a href="#" class="sidebar-close o-icon-close"><span class="screen-reader-text"><?php echo $translate('Close'); ?></span></a>
+<a href="#" class="sidebar-close o-icon-close" title="<?php echo $translate('Close'); ?>" aria-label="<?php echo $translate('Close'); ?>"><span class="screen-reader-text"><?php echo $translate('Close'); ?></span></a>
 
 <?php
 if ($this->userIsAllowed('Omeka\Api\Adapter\AssetAdapter', 'create')):

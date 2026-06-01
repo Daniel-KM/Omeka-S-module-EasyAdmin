@@ -51,7 +51,7 @@ $isComposer = is_dir($composerAddonsPath . '/' . $moduleId);
 <?php if (!empty($ini['module_link'])): ?>
 <div class="meta-group">
     <h4><?= $translate('Link') ?></h4>
-    <div class="value"><a href="<?= $escape($ini['module_link']) ?>" target="_blank"><?= $escape($ini['module_link']) ?></a></div>
+    <div class="value"><a href="<?= $escape($ini['module_link']) ?>" target="_blank" rel="noopener noreferrer"><?= $escape($ini['module_link']) ?></a></div>
 </div>
 <?php endif ?>
 
@@ -63,7 +63,7 @@ $omekaOrgUrl = ($addon['server'] ?? '') === 'omeka.org'
 if ($omekaOrgUrl): ?>
 <div class="meta-group">
     <h4><?= $translate('Omeka.org') ?></h4>
-    <div class="value"><a href="<?= $escape($omekaOrgUrl) ?>" target="_blank" class="o-icon-omeka" title="<?= $escape($translate('View on Omeka.org')) ?>"><?= $escape($translate('View on Omeka.org')) ?></a></div>
+    <div class="value"><a href="<?= $escape($omekaOrgUrl) ?>" target="_blank" rel="noopener noreferrer" class="o-icon-omeka" title="<?= $escape($translate('View on Omeka.org')) ?>"><?= $escape($translate('View on Omeka.org')) ?></a></div>
 </div>
 <?php endif ?>
 

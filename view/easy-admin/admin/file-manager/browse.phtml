@@ -194,18 +194,18 @@ $formatSize = function ($bytes) {
                         <?php if (!$file['isDir']): ?>
                         <?php if ($isUserData): ?>
                         <li><a href="<?= $escapeAttr($url('admin/easy-admin/file-manager', ['action' => 'download'], ['query' => ['dir_path' => $dirPath, 'filename' => $file['name']]])) ?>"
-                           class="o-icon-download" title="<?= $translate('Download') ?>"></a></li>
+                           class="o-icon-download" title="<?= $translate('Download') ?>" aria-label="<?= $translate('Download') ?>"></a></li>
                         <?php elseif ($localUrl): ?>
                         <li><a href="<?= $escapeAttr(rtrim($localUrl, '/') . '/' . rawurlencode($file['name'])) ?>"
                            download="<?= $escapeAttr($file['name']) ?>"
-                           class="o-icon-download" title="<?= $translate('Download') ?>"></a></li>
+                           class="o-icon-download" title="<?= $translate('Download') ?>" aria-label="<?= $translate('Download') ?>"></a></li>
                         <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($canDelete && !$file['isDir'] && $file['isWritable']): ?>
                         <li><a href="#" class="o-icon-delete sidebar-content delete-one"
                            data-sidebar-selector="#sidebar"
                            data-sidebar-content-url="<?= $escapeAttr($url('admin/easy-admin/file-manager', ['action' => 'delete-confirm'], ['query' => ['dir_path' => $dirPath, 'filename' => $file['name']]])) ?>"
-                           title="<?= $translate('Delete') ?>"></a></li>
+                           title="<?= $translate('Delete') ?>" aria-label="<?= $translate('Delete') ?>"></a></li>
                         <?php endif; ?>
                     </ul>
                 </td>
@@ -245,12 +245,12 @@ $formatSize = function ($bytes) {
 <?php // Delete confirmation sidebar ?>
 <?php if ($canDelete): ?>
 <div id="sidebar" class="sidebar">
-    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close'), 'aria-label' => $translate('Close')]) ?>
     <div class="sidebar-content"></div>
 </div>
 
 <div id="sidebar-confirm-batch" class="sidebar">
-    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close'), 'aria-label' => $translate('Close')]) ?>
     <div class="sidebar-content">
         <h3><?= $translate('Delete files') ?></h3>
         <p><?= $translate('Are you sure you want to delete the selected files?') ?></p>

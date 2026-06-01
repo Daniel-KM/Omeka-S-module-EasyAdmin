@@ -189,7 +189,8 @@
         opacity: 0.4;
     }
 
-    /* Modules browse */
+    /* Modules and themes browse */
+
     #page-actions .refresh-form {
         display: inline-block;
     }
@@ -239,6 +240,17 @@
         font-size: .85em;
     }
 
+    .modules.browse td:first-child,
+    .modules.browse th:first-child,
+    .themes.browse td:first-child,
+    .themes.browse th:first-child {
+        width: 67%;
+    }
+    .themes.browse td:last-child,
+    .themes.browse th:last-child {
+        width: 142px
+    }
+
     /* Addon browse: multi-line cells with tablesaw */
     .col-state .tablesaw-cell-content {
         flex-direction: column;
@@ -259,6 +271,9 @@
     }
 
     /* Addon browse: theme thumbnail */
+    .themes.browse td:first-child .actions {
+        margin-left: auto;
+    }
     .theme-thumb {
         display: block;
         max-width: 120px;

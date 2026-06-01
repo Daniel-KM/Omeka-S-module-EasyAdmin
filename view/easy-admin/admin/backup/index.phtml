@@ -249,10 +249,10 @@ $formatSize = function ($bytes) {
                 <td><?= $formatSize($backup['size']) ?></td>
                 <td class="actions">
                     <a href="<?= $escapeAttr($url(null, ['action' => 'download'], ['query' => ['file' => $backup['name']]], true)) ?>"
-                       class="o-icon-download" title="<?= $translate('Download') ?>"></a>
+                       class="o-icon-download" title="<?= $translate('Download') ?>" aria-label="<?= $translate('Download') ?>"></a>
                     <a href="#" class="o-icon-delete delete-backup"
                        data-url-sidebar-content="<?= $escapeAttr($url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true)) ?>"
-                       title="<?= $translate('Delete') ?>"></a>
+                       title="<?= $translate('Delete') ?>" aria-label="<?= $translate('Delete') ?>"></a>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -265,6 +265,6 @@ $formatSize = function ($bytes) {
 
 <?php // Delete confirmation sidebar ?>
 <div id="sidebar" class="sidebar">
-    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+    <?= $hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close'), 'aria-label' => $translate('Close')]) ?>
     <div class="sidebar-content"></div>
 </div>

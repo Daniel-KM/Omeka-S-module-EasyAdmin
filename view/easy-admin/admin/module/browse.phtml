@@ -127,7 +127,7 @@ $states = [
     <?php $refreshForm->prepare(); echo $this->form()->openTag($refreshForm->setAttribute('class', 'refresh-form')); ?>
     <button type="submit" class="button"><?= $escape($translate('Refresh catalogue')) ?></button>
     <?= $this->form()->closeTag($refreshForm) ?>
-    <a class="button sidebar-content" data-sidebar-selector="#sidebar-install"><?= $escape($translate('Install new module')) ?></a>
+    <button type="button" class="button sidebar-content" data-sidebar-selector="#sidebar-install"><?= $escape($translate('Install new module')) ?></button>
 </div>
 
 <br/>
@@ -141,6 +141,7 @@ $states = [
         <option value="update_available"<?= $filterState === 'update_available' ? ' selected' : '' ?>><?= $escape($translate('Update available')) ?></option>
         <option value="error"<?= $filterState === 'error' ? ' selected' : '' ?>><?= $escape($translate('Error')) ?></option>
     </select>
+    <button type="submit" class="screen-reader-text"><?= $escape($translate('Filter')) ?></button>
 </form>
 
 <?php if ($installedModules): ?>
@@ -169,7 +170,7 @@ echo $this->form()->openTag($manageForm);
         <button type="submit" class="activate" name="batch_submit" value="activate" style="display:none"><?= $translate('Go') ?></button>
         <button type="submit" class="deactivate" name="batch_submit" value="deactivate" style="display:none"><?= $translate('Go') ?></button>
         <button type="submit" class="update" name="batch_submit" value="update" style="display:none"><?= $translate('Go') ?></button>
-        <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected" style="display:none"><?= $translate('Go') ?></a>
+        <button type="button" class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected" style="display:none"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -266,11 +267,11 @@ echo $this->form()->openTag($manageForm);
                 <?php endif ?>
 
                 <?php if ($moduleLink = $module->getIni('module_link')): ?>
-                <?= $hyperlink($name, $moduleLink, ['target' => '_blank']) ?>
+                <?= $hyperlink($name, $moduleLink, ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
                 <?php else: ?>
                 <strong><?= $escape($name) ?></strong>
                 <?php endif ?>
-                <?php if ($moduleId !== $name): ?>
+                <?php if (strcasecmp($moduleId, strtr($name, [' ' => '']))): ?>
                 <span class="addon-dir">[<?= $escape($moduleId) ?>]</span>
                 <?php endif ?>
 
@@ -288,7 +289,10 @@ echo $this->form()->openTag($manageForm);
                         <li>
                             <button type="submit" name="state_action_id" value="install-module:<?= $escape($moduleId) ?>"
                                 formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'install-module'], ['query' => ['id' => $moduleId]])) ?>"
-                                class="o-icon-install button"><?= $translate('Install') ?></button>
+                                class="o-icon-install button"
+                                title="<?= $escapeAttr($translate('Install')) ?>"
+                                aria-label="<?= $escapeAttr($translate('Install')) ?>"
+                                ><?= $translate('Install') ?></button>
                         </li>
                         <?php endif ?>
 
@@ -296,12 +300,18 @@ echo $this->form()->openTag($manageForm);
                         <li>
                             <button type="submit" name="state_action_id" value="activate:<?= $escape($moduleId) ?>"
                                 formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'activate'], ['query' => ['id' => $moduleId]])) ?>"
-                                class="o-icon-activate button"><?= $translate('Activate') ?></button>
+                                class="o-icon-activate button"
+                                title="<?= $escapeAttr($translate('Activate')) ?>"
+                                aria-label="<?= $escapeAttr($translate('Activate')) ?>"
+                                ><?= $translate('Activate') ?></button>
                         </li>
                         <li>
                             <button type="submit" name="state_action_id" value="uninstall:<?= $escape($moduleId) ?>"
                                 formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'uninstall'], ['query' => ['id' => $moduleId]])) ?>"
-                                class="o-icon-uninstall button"><?= $translate('Uninstall') ?></button>
+                                class="o-icon-uninstall button"
+                                title="<?= $escapeAttr($translate('Uninstall')) ?>"
+                                aria-label="<?= $escapeAttr($translate('Uninstall')) ?>"
+                                ><?= $translate('Uninstall') ?></button>
                         </li>
                         <?php endif ?>
 
@@ -309,7 +319,10 @@ echo $this->form()->openTag($manageForm);
                         <li>
                             <button type="submit" name="state_action_id" value="deactivate:<?= $escape($moduleId) ?>"
                                 formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'deactivate'], ['query' => ['id' => $moduleId]])) ?>"
-                                class="o-icon-deactivate button"><?= $translate('Deactivate') ?></button>
+                                class="o-icon-deactivate button"
+                                title="<?= $escapeAttr($translate('Deactivate')) ?>"
+                                aria-label="<?= $escapeAttr($translate('Deactivate')) ?>"
+                                ><?= $translate('Deactivate') ?></button>
                         </li>
                         <?php endif ?>
 
@@ -317,7 +330,10 @@ echo $this->form()->openTag($manageForm);
                         <li>
                             <button type="submit" name="state_action_id" value="upgrade:<?= $escape($moduleId) ?>"
                                 formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'upgrade'], ['query' => ['id' => $moduleId]])) ?>"
-                                class="o-icon-upgrade button"><?= $translate('Upgrade') ?></button>
+                                class="o-icon-upgrade button"
+                                title="<?= $escapeAttr($translate('Upgrade')) ?>"
+                                aria-label="<?= $escapeAttr($translate('Upgrade')) ?>"
+                                ><?= $translate('Upgrade') ?></button>
                         </li>
                         <?php endif ?>
 
@@ -327,6 +343,7 @@ echo $this->form()->openTag($manageForm);
                             'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'update-confirm'], ['query' => ['id' => $moduleId]]),
                             'class' => 'o-icon-upgrade sidebar-content',
                             'title' => $translate('Update files'),
+                            'aria-label' => $translate('Update files'),
                         ]) ?></li>
                         <?php endif ?>
 
@@ -343,13 +360,14 @@ echo $this->form()->openTag($manageForm);
                             'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'remove-confirm'], ['query' => ['id' => $moduleId]]),
                             'class' => 'o-icon-delete sidebar-content',
                             'title' => $translate('Remove'),
+                            'aria-label' => $translate('Remove'),
                         ]) ?></li>
                         <?php endif ?>
 
                     <?php endif ?>
 
                     <?php if ($isComposer): ?>
-                    <li><span class="o-icon-lock" aria-label="Composer" title="<?= $escape($translate('Managed by Composer')) ?>"></span></li>
+                    <li><span class="o-icon-lock" role="img" aria-label="Composer" title="<?= $escape($translate('Managed by Composer')) ?>"></span></li>
                     <?php endif ?>
 
                     <li><?= $hyperlink('', '#', [
@@ -357,11 +375,12 @@ echo $this->form()->openTag($manageForm);
                         'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'show-details'], ['query' => ['id' => $moduleId]]),
                         'class' => 'o-icon-more sidebar-content',
                         'title' => $translate('Details'),
+                        'aria-label' => $translate('Details'),
                     ]) ?></li>
                 </ul>
             </td>
             <td class="col-version<?= $hasUpdate ? ' has-update' : '' ?><?= $versionMismatch ? ' version-mismatch' : '' ?>">
-                <span class="current-version"><?= $escape($version) ?></span>
+                <span class="current-version"><?= $escape($version) ?></span>&nbsp;
                 <?php if ($versionMismatch): ?>
                 <span class="error version-rollback" title="<?= $escapeAttr(sprintf(
                     $translate('The database is on version %1$s but the installed files are on version %2$s. The module files were probably rolled back without rolling back the database. Re-install a version that matches the database, or upgrade the files again.'),
@@ -406,6 +425,7 @@ echo $this->form()->openTag($manageForm);
     <?= $hyperlink('', '#', [
         'class' => 'sidebar-close o-icon-close',
         'title' => $translate('Close'),
+        'aria-label' => $translate('Close'),
     ]) ?>
     <div class="sidebar-content"></div>
 </div>
@@ -436,6 +456,7 @@ uasort($catalogueList, function ($a, $b) {
     <?= $hyperlink('', '#', [
         'class' => 'sidebar-close o-icon-close',
         'title' => $translate('Close'),
+        'aria-label' => $translate('Close'),
     ]) ?>
     <div class="sidebar-content">
         <h3><?= $escape($translate('Install new module from catalogue')) ?></h3>
@@ -474,9 +495,9 @@ uasort($catalogueList, function ($a, $b) {
                 <span class="addon-check-name"><?= $escape($catModule['name']) ?></span>
                 <span class="addon-check-source">
                 <?php if (!empty($catModule['is_omeka'])): ?>
-                    <a href="<?= $escape('https://omeka.org/s/modules/' . $dir) ?>" target="_blank" rel="noopener" class="o-icon-omeka" title="Omeka.org" onclick="event.stopPropagation();"></a>
+                    <a href="<?= $escape('https://omeka.org/s/modules/' . $dir) ?>" target="_blank" rel="noopener noreferrer" class="o-icon-omeka" title="Omeka.org" aria-label="Omeka.org" onclick="event.stopPropagation();"></a>
                 <?php elseif ($sourceUrl): ?>
-                    <a href="<?= $escape($sourceUrl) ?>" target="_blank" rel="noopener" class="o-icon-external" title="<?= $escape($translate('Source')) ?>" onclick="event.stopPropagation();"></a>
+                    <a href="<?= $escape($sourceUrl) ?>" target="_blank" rel="noopener noreferrer" class="o-icon-external" title="<?= $escape($translate('Source')) ?>" aria-label="<?= $escape($translate('Source')) ?>" onclick="event.stopPropagation();"></a>
                 <?php endif ?>
                 </span>
             </label>

@@ -48,7 +48,7 @@ $catalogueThemes = array_merge($omekaThemes, $webThemes);
 <?php endif ?>
 
 <div id="page-actions">
-    <a class="button sidebar-content" data-sidebar-selector="#sidebar-install"><?= $escape($translate('Install new theme')) ?></a>
+    <button type="button" class="button sidebar-content" data-sidebar-selector="#sidebar-install"><?= $escape($translate('Install new theme')) ?></button>
 </div>
 
 <br/>
@@ -74,7 +74,7 @@ echo $this->form()->openTag($manageForm);
     <div class="batch-actions">
         <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
         <button type="submit" class="update" name="batch_submit" value="update" style="display:none"><?= $translate('Go') ?></button>
-        <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected" style="display:none"><?= $translate('Go') ?></a>
+        <button type="button" class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected" style="display:none"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -124,7 +124,7 @@ echo $this->form()->openTag($manageForm);
                 <?php endif ?>
 
                 <?php if (!empty($theme['theme_link'])): ?>
-                <?= $hyperlink($theme['name'], $theme['theme_link'], ['target' => '_blank']) ?>
+                <?= $hyperlink($theme['name'], $theme['theme_link'], ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
                 <?php else: ?>
                 <strong><?= $escape($theme['name']) ?></strong>
                 <?php endif ?>
@@ -155,6 +155,7 @@ echo $this->form()->openTag($manageForm);
                             'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'theme', 'action' => 'update-confirm'], ['query' => ['id' => $themeId]]),
                             'class' => 'o-icon-install sidebar-content',
                             'title' => $translate('Update files'),
+                            'aria-label' => $translate('Update files'),
                         ]) ?></li>
                         <?php endif ?>
 
@@ -163,11 +164,12 @@ echo $this->form()->openTag($manageForm);
                             'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'theme', 'action' => 'remove-confirm'], ['query' => ['id' => $themeId]]),
                             'class' => 'o-icon-delete sidebar-content',
                             'title' => $translate('Remove'),
+                            'aria-label' => $translate('Remove'),
                         ]) ?></li>
                     <?php endif ?>
 
                     <?php if ($isComposer): ?>
-                    <li><span class="o-icon-lock" aria-label="Composer" title="<?= $escape($translate('Managed by Composer')) ?>"></span></li>
+                    <li><span class="o-icon-lock" role="img" aria-label="Composer" title="<?= $escape($translate('Managed by Composer')) ?>"></span></li>
                     <?php endif ?>
 
                     <li><?= $hyperlink('', '#', [
@@ -175,6 +177,7 @@ echo $this->form()->openTag($manageForm);
                         'data-sidebar-content-url' => $url('admin/easy-admin/default', ['controller' => 'theme', 'action' => 'show-details'], ['query' => ['id' => $themeId]]),
                         'class' => 'o-icon-more sidebar-content',
                         'title' => $translate('Details'),
+                        'aria-label' => $translate('Details'),
                     ]) ?></li>
                 </ul>
             </td>
@@ -203,6 +206,7 @@ echo $this->form()->openTag($manageForm);
     <?= $hyperlink('', '#', [
         'class' => 'sidebar-close o-icon-close',
         'title' => $translate('Close'),
+        'aria-label' => $translate('Close'),
     ]) ?>
     <div class="sidebar-content"></div>
 </div>
@@ -233,6 +237,7 @@ uasort($catalogueList, function ($a, $b) {
     <?= $hyperlink('', '#', [
         'class' => 'sidebar-close o-icon-close',
         'title' => $translate('Close'),
+        'aria-label' => $translate('Close'),
     ]) ?>
     <div class="sidebar-content">
         <h3><?= $escape($translate('Install new theme from catalogue')) ?></h3>
@@ -258,9 +263,9 @@ uasort($catalogueList, function ($a, $b) {
                 <span class="addon-check-name"><?= $escape($catTheme['name']) ?></span>
                 <span class="addon-check-source">
                 <?php if (!empty($catTheme['is_omeka'])): ?>
-                    <a href="<?= $escape('https://omeka.org/s/themes/' . ($catTheme['dir'] ?? '')) ?>" target="_blank" rel="noopener" class="o-icon-omeka" title="Omeka.org" onclick="event.stopPropagation();"></a>
+                    <a href="<?= $escape('https://omeka.org/s/themes/' . ($catTheme['dir'] ?? '')) ?>" target="_blank" rel="noopener noreferrer" class="o-icon-omeka" title="Omeka.org" aria-label="Omeka.org" onclick="event.stopPropagation();"></a>
                 <?php elseif ($sourceUrl): ?>
-                    <a href="<?= $escape($sourceUrl) ?>" target="_blank" rel="noopener" class="o-icon-external" title="<?= $escape($translate('Source')) ?>" onclick="event.stopPropagation();"></a>
+                    <a href="<?= $escape($sourceUrl) ?>" target="_blank" rel="noopener noreferrer" class="o-icon-external" title="<?= $escape($translate('Source')) ?>" aria-label="<?= $escape($translate('Source')) ?>" onclick="event.stopPropagation();"></a>
                 <?php endif ?>
                 </span>
             </label>
