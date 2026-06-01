@@ -212,6 +212,21 @@
         background-color: #fce4ec;
     }
 
+    /* Addon browse: database version newer than installed files */
+    .col-version.version-mismatch {
+        background-color: #fff4c2;
+        white-space: normal;
+    }
+    .col-version .version-rollback {
+        display: block;
+        margin-top: .15em;
+        padding: 0 .35em;
+        color: #8a6d00;
+        background-color: #fff4c2;
+        font-size: .85em;
+        font-weight: bold;
+    }
+
     /* Addon browse: author and description */
     .addon-author {
         color: #666;

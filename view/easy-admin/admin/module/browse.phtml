@@ -82,6 +82,7 @@ $escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/easy-admin.css', 'EasyAdmin'));
@@ -196,6 +197,14 @@ echo $this->form()->openTag($manageForm);
         $ini = $module->getIni();
         $version = $ini['version'] ?? '';
         $name = $module->getName() ?: $moduleId;
+
+        // Detect a rollback: the database is on a higher version than the
+        // installed files. This usually happens when an admin reverts a
+        // module after a failed update without rolling back the schema.
+        $dbVersion = (string) ($module->getDb('version') ?? '');
+        $versionMismatch = $version
+            && $dbVersion
+            && version_compare($dbVersion, $version, '>');
 
         $catalogueVersion = null;
         $catalogueVersionCompatible = null;
@@ -351,8 +360,15 @@ echo $this->form()->openTag($manageForm);
                     ]) ?></li>
                 </ul>
             </td>
-            <td class="col-version<?= $hasUpdate ? ' has-update' : '' ?>">
-                <?= $escape($version) ?>
+            <td class="col-version<?= $hasUpdate ? ' has-update' : '' ?><?= $versionMismatch ? ' version-mismatch' : '' ?>">
+                <span class="current-version"><?= $escape($version) ?></span>
+                <?php if ($versionMismatch): ?>
+                <span class="error version-rollback" title="<?= $escapeAttr(sprintf(
+                    $translate('The database is on version %1$s but the installed files are on version %2$s. The module files were probably rolled back without rolling back the database. Re-install a version that matches the database, or upgrade the files again.'),
+                    $dbVersion,
+                    $version
+                )) ?>"><?= sprintf($escape($translate('⚠ DB: %s')), $escape($dbVersion)) ?></span>
+                <?php endif ?>
                 <?php if ($hasVersionConstraints): ?>
                     <?php if ($hasCompatibleUpdate): ?>
                     <span class="compatible-update" title="<?= $escape(sprintf($translate('Latest version compatible with Omeka S %s'), $omekaVersion)) ?>"> → <?= $escape($catalogueVersionCompatible) ?></span>
