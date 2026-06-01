@@ -1459,10 +1459,11 @@ class Module extends AbstractModule
             return;
         }
 
-        // In background (bulk import), run synchronously to avoid registering
-        // a shutdown that fires only at end of the long cli process.
+        $services = $this->getServiceLocator();
+
+        // In background (bulk import), run synchronously to avoid registering a
+        // shutdown that fires only at end of the long cli process.
         if ($this->isBackgroundProcess()) {
-            $services = $this->getServiceLocator();
             $job = new \Omeka\Entity\Job();
             $job->setPid(null);
             $job->setStatus(\Omeka\Entity\Job::STATUS_IN_PROGRESS);
