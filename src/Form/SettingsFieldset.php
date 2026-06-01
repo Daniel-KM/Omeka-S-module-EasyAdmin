@@ -142,6 +142,7 @@ class SettingsFieldset extends Fieldset
                     'element_group' => 'easy_admin',
                     'label' => 'Asset: allowed extensions', // @translate
                     'info' => 'Additional extensions allowed for assets. Common image extensions (jpg, jpeg, png, gif, webp) are included by default. Separate with spaces.', // @translate
+                    'value_separator' => ' ',
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_asset_extensions',
