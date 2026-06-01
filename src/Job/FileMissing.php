@@ -135,6 +135,14 @@ class FileMissing extends AbstractCheckFile
 
         $this->checkMissingFiles($fix, ['include_derivatives' => $includeDerivatives]);
 
+        // Digital objects are standalone resources: the fix logic (restore from
+        // source, delete items) does not apply, so only the check of missing
+        // original files is run.
+        $entityTypes = $this->getArg('entity_types') ?: ['media'];
+        if (in_array('digital_object', $entityTypes, true)) {
+            $this->checkMissingFilesDigitalObjects();
+        }
+
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
             ['process' => $process]
@@ -788,5 +796,111 @@ class FileMissing extends AbstractCheckFile
         );
 
         return true;
+    }
+
+    /**
+     * Check original files of digital objects that are missing on disk.
+     */
+    protected function checkMissingFilesDigitalObjects(): void
+    {
+        if (!$this->hasDigitalObjectTable()) {
+            return;
+        }
+
+        $totalToProcess = (int) $this->connection
+            ->executeQuery('SELECT COUNT(`id`) FROM `digital_object` WHERE `has_original` = 1')
+            ->fetchOne();
+
+        $this->logger->notice(
+            'Checking {total} digital objects with original files.', // @translate
+            ['total' => $totalToProcess]
+        );
+
+        if (!$totalToProcess) {
+            return;
+        }
+
+        $yes = $this->translator->translate('Yes'); // @translate
+        $no = $this->translator->translate('No'); // @translate
+
+        $originalPath = $this->basePath . '/original';
+        $offset = 0;
+        $totalProcessed = 0;
+        $totalSucceed = 0;
+        $totalFailed = 0;
+
+        while (true) {
+            $rows = $this->connection->executeQuery(
+                'SELECT `id`, `storage_id`, `extension`, `sha256`, `source`
+                FROM `digital_object` WHERE `has_original` = 1
+                ORDER BY `id` ASC LIMIT :limit OFFSET :offset',
+                ['limit' => (int) self::SQL_LIMIT_LARGE, 'offset' => (int) $offset],
+                ['limit' => \PDO::PARAM_INT, 'offset' => \PDO::PARAM_INT]
+            )->fetchAllAssociative();
+            if (!count($rows)) {
+                break;
+            }
+
+            if ($offset && $this->shouldStop()) {
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return;
+            }
+
+            foreach ($rows as $dbRow) {
+                $storageId = $dbRow['storage_id'];
+                $extension = $dbRow['extension'] ?? '';
+                $filename = $storageId . (strlen((string) $extension) ? '.' . $extension : '');
+                $exists = file_exists($originalPath . '/' . $filename);
+
+                if ($exists) {
+                    ++$totalSucceed;
+                } else {
+                    ++$totalFailed;
+                    $this->logger->warn(
+                        'DigitalObject #{id}: original file "{filename}" is missing.', // @translate
+                        ['id' => $dbRow['id'], 'filename' => $filename]
+                    );
+                }
+
+                if (!$exists || $this->reportFull) {
+                    $this->writeRow([
+                        'item' => '',
+                        'media' => $dbRow['id'],
+                        'filename' => $filename,
+                        'extension' => $extension,
+                        'hash' => $dbRow['sha256'] ?? '',
+                        'type' => 'original',
+                        'exists' => $exists ? $yes : $no,
+                        'source' => $dbRow['source'] ?? '',
+                        'fixed' => '',
+                    ]);
+                }
+
+                ++$totalProcessed;
+            }
+
+            $offset += self::SQL_LIMIT_LARGE;
+        }
+
+        $this->logger->notice(
+            'End of process (digital objects): {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed.', // @translate
+            ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_succeed' => $totalSucceed, 'total_failed' => $totalFailed]
+        );
+    }
+
+    protected function hasDigitalObjectTable(): bool
+    {
+        static $has;
+        if ($has !== null) {
+            return $has;
+        }
+        try {
+            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+            return $has = true;
+        } catch (\Throwable $e) {
+            return $has = false;
+        }
     }
 }

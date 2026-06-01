@@ -353,7 +353,146 @@ class FileDerivative extends AbstractCheck
             );
         }
 
+        $entityTypes = $this->getArg('entity_types') ?: ['media'];
+        if (in_array('digital_object', $entityTypes, true)) {
+            $this->processDigitalObjects($basePath, $types, $skipExisting, $tempFileFactory);
+        }
+
         $this->finalizeOutput();
+    }
+
+    /**
+     * Rebuild derivatives for DigitalObject entities (module DigitalObject).
+     *
+     * Mirrors the media loop but on the `digital_object` sub-table and its
+     * dedicated repository. Skipped silently if the module/table is not
+     * available.
+     */
+    protected function processDigitalObjects(
+        string $basePath,
+        array $types,
+        bool $skipExisting,
+        \Omeka\File\TempFileFactory $tempFileFactory
+    ): void {
+        $doClass = 'DigitalObject\\Entity\\DigitalObject';
+        if (!class_exists($doClass)) {
+            return;
+        }
+        try {
+            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $repository = $this->entityManager->getRepository($doClass);
+
+        $criteria = Criteria::create();
+        $expr = $criteria->expr();
+        $criteria
+            ->where($expr->gt('id', 0))
+            ->andWhere($expr->eq('hasOriginal', 1))
+            ->orderBy(['id' => 'ASC'])
+            ->setMaxResults(self::SQL_LIMIT);
+
+        $totalResources = $repository->count([]);
+        $totalToProcess = $repository->matching($criteria)->count();
+
+        if (!$totalToProcess) {
+            $this->logger->info(
+                'No digital object to process for creation of derivative files (on a total of {total}).', // @translate
+                ['total' => $totalResources]
+            );
+            return;
+        }
+
+        $this->logger->info(
+            'Processing creation of derivative files of {total_process} digital objects (on a total of {total}).', // @translate
+            ['total_process' => $totalToProcess, 'total' => $totalResources]
+        );
+
+        $offset = 0;
+        $succeed = 0;
+        $failed = 0;
+        $existing = 0;
+
+        while (true) {
+            $criteria->setFirstResult($offset);
+            $items = $repository->matching($criteria);
+            if (!$items->count()) {
+                break;
+            }
+
+            foreach ($items as $key => $entity) {
+                if ($this->shouldStop()) {
+                    break 2;
+                }
+
+                $storageId = $entity->getStorageId();
+                $extension = $entity->getExtension() ?: '';
+                if (!$storageId) {
+                    ++$failed;
+                    continue;
+                }
+
+                $filename = $storageId . ($extension !== '' ? '.' . $extension : '');
+                $sourcePath = $basePath . '/original/' . $filename;
+                if (!file_exists($sourcePath) || !is_readable($sourcePath)) {
+                    $this->logger->warn(
+                        'DigitalObject #{id}: original file "{filename}" missing or not readable.', // @translate
+                        ['id' => $entity->getId(), 'filename' => $filename]
+                    );
+                    ++$failed;
+                    continue;
+                }
+
+                if ($skipExisting && $entity->hasThumbnails()) {
+                    $allExist = true;
+                    foreach ($types as $type) {
+                        if (!file_exists($basePath . '/' . $type . '/' . $storageId . '.jpg')) {
+                            $allExist = false;
+                            break;
+                        }
+                    }
+                    if ($allExist) {
+                        ++$existing;
+                        continue;
+                    }
+                }
+
+                $tempFile = $tempFileFactory->build();
+                $tempFile->setTempPath($sourcePath);
+                $tempFile->setStorageId($storageId);
+                $tempFile->setSourceName($entity->getSource());
+
+                $result = $tempFile->storeThumbnails();
+                $entity->setHasThumbnails((bool) $result);
+                $this->entityManager->persist($entity);
+
+                if ($result) {
+                    ++$succeed;
+                    $this->logger->info(
+                        'DigitalObject #{id} ({index}/{total}): derivative files created.', // @translate
+                        ['id' => $entity->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess]
+                    );
+                } else {
+                    ++$failed;
+                    $this->logger->notice(
+                        'DigitalObject #{id} ({index}/{total}): derivative files not created.', // @translate
+                        ['id' => $entity->getId(), 'index' => $offset + $key + 1, 'total' => $totalToProcess]
+                    );
+                }
+            }
+
+            unset($items);
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+            $offset += self::SQL_LIMIT;
+        }
+
+        $this->logger->info(
+            'End of derivative files creation for digital objects: {succeed} succeed, {existing} skipped, {failed} failed.', // @translate
+            ['succeed' => $succeed, 'existing' => $existing, 'failed' => $failed]
+        );
     }
 
     /**

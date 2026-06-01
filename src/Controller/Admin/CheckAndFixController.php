@@ -52,6 +52,7 @@ class CheckAndFixController extends AbstractActionController
         $dispatcher = $this->jobDispatcher();
         $defaultParams = [
             'process' => $process,
+            'entity_types' => $params['files_checkfix']['entity_types'] ?? ['media'],
         ];
 
         switch ($process) {

@@ -36,8 +36,14 @@ class FileDimension extends AbstractCheckFile
         }
 
         $process = $this->getArg('process');
+        $fix = $process === 'files_dimension_fix';
 
-        $this->checkFilesDimensions($process === 'files_dimension_fix');
+        $this->checkFilesDimensions($fix);
+
+        $entityTypes = $this->getArg('entity_types') ?: ['media'];
+        if (in_array('digital_object', $entityTypes, true)) {
+            $this->checkFilesDimensionsDigitalObjects($fix);
+        }
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -45,6 +51,142 @@ class FileDimension extends AbstractCheckFile
         );
 
         $this->finalizeOutput();
+    }
+
+    /**
+     * Mirror of checkFilesDimensions() on the digital_object table.
+     *
+     * Dimensions are stored in the entity `data` JSON column, like media.
+     */
+    protected function checkFilesDimensionsDigitalObjects(bool $fix): void
+    {
+        $doClass = 'DigitalObject\\Entity\\DigitalObject';
+        if (!class_exists($doClass)) {
+            return;
+        }
+        try {
+            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        /** @var \IiifServer\Mvc\Controller\Plugin\MediaDimension $mediaDimension */
+        $mediaDimension = $services->get('ControllerPluginManager')->get('mediaDimension');
+
+        $types = array_merge(['original'], array_keys($this->config['thumbnails']['types']));
+
+        $repository = $this->entityManager->getRepository($doClass);
+        $criteria = new \Doctrine\Common\Collections\Criteria();
+        $expr = $criteria->expr();
+        $criteria
+            ->where($expr->andX(
+                $expr->orX(
+                    $expr->eq('hasOriginal', 1),
+                    $expr->eq('hasThumbnails', 1)
+                ),
+                $expr->orX(
+                    $expr->startsWith('mediaType', 'image/'),
+                    $expr->startsWith('mediaType', 'audio/'),
+                    $expr->startsWith('mediaType', 'video/')
+                )
+            ))
+            ->orderBy(['id' => 'ASC'])
+            ->setMaxResults(self::SQL_LIMIT);
+
+        $totalToProcess = $repository->matching($criteria)->count();
+        if (!$totalToProcess) {
+            $this->logger->notice(
+                'No digital object image, audio or video to process.' // @translate
+            );
+            return;
+        }
+
+        $this->logger->notice(
+            'Checking dimensions of {total} digital objects with original or thumbnails.', // @translate
+            ['total' => $totalToProcess]
+        );
+
+        $lastId = 0;
+        $totalProcessed = 0;
+        $totalFixed = 0;
+        $baseCriteria = $criteria;
+        while (true) {
+            $criteria = clone $baseCriteria;
+            $criteria->andWhere($expr->gt('id', $lastId));
+            $entities = $repository->matching($criteria);
+            if (!$entities->count()) {
+                break;
+            }
+
+            if ($this->shouldStop()) {
+                $this->logger->warn(
+                    'The job was stopped.' // @translate
+                );
+                return;
+            }
+
+            foreach ($entities as $entity) {
+                $lastId = $entity->getId();
+                $storageId = $entity->getStorageId();
+                $extension = $entity->getExtension();
+                $originalFilename = $storageId . ($extension !== null && $extension !== '' ? '.' . $extension : '');
+
+                $data = $entity->getData() ?: [];
+                $existingDimensions = [];
+                foreach ($types as $type) {
+                    if (isset($data['dimensions'][$type]['width'])) {
+                        $existingDimensions[$type] = $data['dimensions'][$type];
+                    }
+                }
+
+                $dimensions = [];
+                foreach ($types as $type) {
+                    $filepath = $type === 'original'
+                        ? $this->basePath . '/original/' . $originalFilename
+                        : $this->basePath . '/' . $type . '/' . $storageId . '.jpg';
+                    if (!file_exists($filepath) || !is_readable($filepath) || !filesize($filepath)) {
+                        continue;
+                    }
+                    $dimensions[$type] = $mediaDimension($filepath);
+                }
+
+                $newDimensions = array_filter($dimensions, fn ($d) => !empty($d['width']));
+                $row = [
+                    'item' => '',
+                    'media' => $entity->getId(),
+                    'filename' => $originalFilename,
+                    'media_type' => $entity->getMediaType(),
+                    'type' => implode(', ', array_keys($newDimensions)),
+                    'exists' => '',
+                    'dimensions' => json_encode($existingDimensions, 320),
+                    'new_dimensions' => json_encode($newDimensions, 320),
+                    'fixed' => '',
+                ];
+
+                if ($fix && $newDimensions) {
+                    $data['dimensions'] = array_merge($existingDimensions, $newDimensions);
+                    $entity->setData($data);
+                    $this->entityManager->persist($entity);
+                    $totalFixed += count($newDimensions);
+                    $row['fixed'] = $this->translator->translate('Yes');
+                }
+
+                $this->writeRow($row);
+                ++$totalProcessed;
+            }
+
+            if ($fix) {
+                $this->entityManager->flush();
+            }
+            $this->entityManager->clear();
+            unset($entities);
+        }
+
+        $this->logger->notice(
+            'End of process (digital objects): {processed}/{total} processed, {total_fixed} fixed.', // @translate
+            ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_fixed' => $totalFixed]
+        );
     }
 
     protected function checkFilesDimensions(bool $fix)

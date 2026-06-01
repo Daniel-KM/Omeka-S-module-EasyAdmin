@@ -357,7 +357,197 @@ abstract class AbstractCheckFile extends AbstractCheck
             ]
         );
 
+        $entityTypes = $this->getArg('entity_types') ?: ['media'];
+        if (in_array('digital_object', $entityTypes, true)) {
+            $this->checkFileDataDigitalObjects($column, $fix);
+        }
+
         return true;
+    }
+
+    /**
+     * Mirror of checkFileData() loop on the digital_object table.
+     */
+    protected function checkFileDataDigitalObjects(string $column, bool $fix): void
+    {
+        $doClass = 'DigitalObject\\Entity\\DigitalObject';
+        if (!class_exists($doClass)) {
+            return;
+        }
+        try {
+            $this->connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $repository = $this->entityManager->getRepository($doClass);
+        $criteria = ['hasOriginal' => 1];
+
+        $totalToProcess = (int) $this->connection
+            ->executeQuery('SELECT COUNT(`id`) FROM `digital_object` WHERE `has_original` = 1')
+            ->fetchOne();
+        if (!$totalToProcess) {
+            $this->logger->notice(
+                'No digital object to process.' // @translate
+            );
+            return;
+        }
+        $this->logger->notice(
+            'Checking {total} digital objects with original files.', // @translate
+            ['total' => $totalToProcess]
+        );
+
+        $yesNo = $this->getYesNo();
+        $yes = $yesNo['yes'];
+        $no = $yesNo['no'];
+        $empty = $this->translator->translate('[empty]');
+        $specifyMediaType = $this->getServiceLocator()->get('ControllerPluginManager')->get('specifyMediaType');
+        $originalPath = $this->basePath . '/original';
+        $offset = 0;
+        $totalProcessed = 0;
+        $totalSucceed = 0;
+        $totalFailed = 0;
+
+        while (true) {
+            $entities = $repository->findBy($criteria, ['id' => 'ASC'], self::SQL_LIMIT, $offset);
+            if (!count($entities)) {
+                break;
+            }
+
+            if ($offset) {
+                $this->logger->info(
+                    '{processed}/{total} digital objects processed.', // @translate
+                    ['processed' => $offset, 'total' => $totalToProcess]
+                );
+                if ($this->shouldStop()) {
+                    return;
+                }
+            }
+
+            foreach ($entities as $key => $entity) {
+                $storageId = $entity->getStorageId();
+                $extension = $entity->getExtension();
+                $filename = $storageId . ($extension !== null && $extension !== '' ? '.' . $extension : '');
+                $filepath = $originalPath . '/' . $filename;
+
+                $row = [
+                    'item' => '',
+                    'media' => $entity->getId(),
+                    'filename' => $filename,
+                    'extension' => (string) $extension,
+                    'exists' => '',
+                    $column => '',
+                    "real_$column" => '',
+                    'fixed' => '',
+                ];
+
+                if (!file_exists($filepath)) {
+                    ++$totalFailed;
+                    $this->logger->warn(
+                        'DigitalObject #{id} ({processed}/{total}): original file "{filename}" does not exist.', // @translate
+                        ['id' => $entity->getId(), 'processed' => $offset + $key + 1, 'total' => $totalToProcess, 'filename' => $filename]
+                    );
+                    $row['exists'] = $no;
+                    $this->writeRow($row);
+                    ++$totalProcessed;
+                    continue;
+                }
+
+                $row['exists'] = $yes;
+                $isFixable = false;
+                switch ($column) {
+                    case 'size':
+                        $dbValue = $entity->getSize();
+                        $realValue = filesize($filepath);
+                        $isFixable = true;
+                        break;
+                    case 'sha256':
+                        $dbValue = $entity->getSha256();
+                        $realValue = hash_file('sha256', $filepath);
+                        $isFixable = true;
+                        break;
+                    case 'media_type':
+                        $dbValue = $entity->getMediaType();
+                        $realValue = $specifyMediaType($filepath);
+                        $isFixable = true;
+                        break;
+                    case 'storage_id':
+                        $dbValue = $entity->getStorageId();
+                        $realValue = bin2hex(\Laminas\Math\Rand::getBytes(20));
+                        $isFixable = $dbValue && is_writeable($filepath);
+                        break;
+                    default:
+                        $dbValue = null;
+                        $realValue = null;
+                }
+
+                $isDifferent = $dbValue != $realValue;
+                $row[$column] = $dbValue;
+                $row["real_$column"] = $realValue;
+
+                if ($fix && $isDifferent) {
+                    $isFixed = false;
+                    switch ($column) {
+                        case 'size':
+                            $entity->setSize($realValue);
+                            $isFixed = true;
+                            break;
+                        case 'sha256':
+                            $entity->setSha256($realValue);
+                            $isFixed = true;
+                            break;
+                        case 'media_type':
+                            $entity->setMediaType($realValue);
+                            $isFixed = true;
+                            break;
+                        case 'storage_id':
+                            if ($isFixable) {
+                                $newFilepath = dirname($filepath) . '/' . $realValue . ($extension ? '.' . $extension : '');
+                                $isFixed = rename($filepath, $newFilepath);
+                                if ($isFixed) {
+                                    $entity->setStorageId($realValue);
+                                }
+                            }
+                            break;
+                    }
+                    $this->entityManager->persist($entity);
+                    ++$totalSucceed;
+                    $row['fixed'] = $isFixed ? $yes : $no;
+                    if ($column !== 'storage_id') {
+                        $this->logger->notice(
+                            'DigitalObject #{id}: {type} updated to {real_value} (was {old_value}).', // @translate
+                            ['id' => $entity->getId(), 'type' => $column, 'real_value' => $realValue, 'old_value' => $dbValue ?: $empty]
+                        );
+                    }
+                } elseif ($fix) {
+                    ++$totalSucceed;
+                    $row['fixed'] = $yes;
+                } elseif ($isDifferent) {
+                    ++$totalFailed;
+                    $this->logger->warn(
+                        'DigitalObject #{id}: {type} differs: {db_value} ≠ {real_value}.', // @translate
+                        ['id' => $entity->getId(), 'type' => $column, 'db_value' => $dbValue ?: $empty, 'real_value' => $realValue]
+                    );
+                } else {
+                    ++$totalSucceed;
+                }
+
+                $this->writeRow($row);
+                ++$totalProcessed;
+            }
+
+            if ($fix) {
+                $this->entityManager->flush();
+            }
+            $this->entityManager->clear();
+            unset($entities);
+            $offset += self::SQL_LIMIT;
+        }
+
+        $this->logger->notice(
+            'End of process (digital objects): {processed}/{total} processed, {total_succeed} succeed, {total_failed} failed.', // @translate
+            ['processed' => $totalProcessed, 'total' => $totalToProcess, 'total_succeed' => $totalSucceed, 'total_failed' => $totalFailed]
+        );
     }
 
     protected function createDir($path): bool

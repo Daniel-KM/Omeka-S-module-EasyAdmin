@@ -196,13 +196,30 @@ class FileExcess extends AbstractCheckFile
 
         $storageIds = array_unique(array_column($storageMap, 'storageId'));
 
-        // Single batched query instead of N individual queries.
+        // Single batched query instead of N individual queries. Include
+        // digital_object rows when the table exists so DigitalObject files are
+        // not flagged as excess.
+        $hasDigitalObject = false;
+        try {
+            $connection->executeQuery('SELECT 1 FROM `digital_object` LIMIT 1');
+            $hasDigitalObject = true;
+        } catch (\Throwable $e) {
+            // Module not installed.
+        }
         if ($isOriginal) {
             $sql = 'SELECT `id`, `item_id`, `storage_id`, `extension` FROM `media`'
                 . ' WHERE `storage_id` IN (:ids) AND `has_original` = 1';
+            if ($hasDigitalObject) {
+                $sql .= ' UNION ALL SELECT `id`, NULL AS `item_id`, `storage_id`, `extension`'
+                    . ' FROM `digital_object` WHERE `storage_id` IN (:ids) AND `has_original` = 1';
+            }
         } else {
             $sql = 'SELECT `id`, `item_id`, `storage_id` FROM `media`'
                 . ' WHERE `storage_id` IN (:ids) AND `has_thumbnails` = 1';
+            if ($hasDigitalObject) {
+                $sql .= ' UNION ALL SELECT `id`, NULL AS `item_id`, `storage_id`'
+                    . ' FROM `digital_object` WHERE `storage_id` IN (:ids) AND `has_thumbnails` = 1';
+            }
         }
         $stmt = $connection->executeQuery($sql, ['ids' => $storageIds], ['ids' => Connection::PARAM_STR_ARRAY]);
         $dbRows = $stmt->fetchAllAssociative();

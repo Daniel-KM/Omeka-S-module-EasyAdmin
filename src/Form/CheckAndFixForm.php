@@ -238,6 +238,25 @@ class CheckAndFixForm extends Form
                 ],
             ]);
 
+        $available = $this->getOption('available_resource_types') ?: ['items', 'item_sets', 'media', 'value_annotations', 'annotations', 'digital_objects'];
+        $fieldset
+            ->add([
+                'name' => 'entity_types',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'label' => 'Entities to process (file tasks)', // @translate
+                    'info' => 'Most file tasks apply to medias and, when the module is present, to digital objects.', // @translate
+                    'value_options' => array_filter([
+                        'media' => 'Media', // @translate
+                        'digital_object' => in_array('digital_objects', $available, true) ? 'Digital objects' : null, // @translate
+                    ]),
+                ],
+                'attributes' => [
+                    'id' => 'files_checkfix-entity_types',
+                    'value' => ['media'],
+                ],
+            ]);
+
         $fieldset
             ->add([
                 'type' => Fieldset::class,
@@ -579,6 +598,48 @@ class CheckAndFixForm extends Form
                 ],
             ]);
 
+        $available = $this->getOption('available_resource_types') ?: ['items', 'item_sets', 'media', 'value_annotations', 'annotations', 'digital_objects'];
+        $hasValueAnnotation = in_array('value_annotations', $available, true);
+
+        $processOptions = [
+            'db_loop_save' => 'Save all resources, for example to apply new settings via triggers', // @translate
+            'db_resource_invalid_check' => 'Check if all resource have valid types. (Item, ItemSet, etc)', // @translate
+            'db_resource_invalid_fix' => 'Fix all resource with invalid types.', // @translate
+            'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
+            'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
+            'db_resource_orphans_check' => 'Check rows in sub-tables (item, media, item_set, value_annotation, annotation, digital_object) without a matching resource', // @translate
+            'db_resource_orphans_fix' => 'Remove orphan rows in sub-tables without a matching resource', // @translate
+            'db_item_no_value' => 'Check items without value (media values are not checked)', // @translate
+            'db_item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
+            'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
+            'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
+            'db_value_clean_fix' => 'Clean and deduplicate values', // @translate
+            'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate
+            'db_resource_title_fix' => 'Update resource titles', // @translate
+            'db_item_primary_media_check' => 'Check if the primary medias are set', // @translate
+            'db_item_primary_media_fix' => 'Set the primary medias to all items', // @translate
+        ];
+        if ($hasValueAnnotation) {
+            $processOptions['db_value_annotation_template_check'] = 'Check templates for value annotations (module Advanced Resource Template)'; // @translate
+            $processOptions['db_value_annotation_template_fix'] = 'Fix templates for value annotations (module Advanced Resource Template)'; // @translate
+        }
+
+        $resourceTypeLabels = [
+            'all' => 'All', // @translate
+            'items' => 'Items', // @translate
+            'item_sets' => 'Item sets', // @translate
+            'media' => 'Medias', // @translate
+            'value_annotations' => 'Value annotations', // @translate
+            'annotations' => 'Annotations', // @translate
+            'digital_objects' => 'Digital objects', // @translate
+        ];
+        $resourceTypeOptions = ['all' => $resourceTypeLabels['all']];
+        foreach ($available as $apiName) {
+            if (isset($resourceTypeLabels[$apiName])) {
+                $resourceTypeOptions[$apiName] = $resourceTypeLabels[$apiName];
+            }
+        }
+
         $fieldset = $this->get('resource_values');
         $fieldset
             ->add([
@@ -588,26 +649,7 @@ class CheckAndFixForm extends Form
                     'label' => 'Tasks', // @translate
                     // Fix the formatting issue of the label in Omeka.
                     'label_attributes' => ['style' => 'display: inline-block'],
-                    'value_options' => [
-                        'db_loop_save' => 'Save all resources, for example to apply new settings via triggers', // @translate
-                        'db_resource_invalid_check' => 'Check if all resource have valid types. (Item, ItemSet, etc)', // @translate
-                        'db_resource_invalid_fix' => 'Fix all resource with invalid types.', // @translate
-                        'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
-                        'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
-                        'db_resource_orphans_check' => 'Check rows in sub-tables (item, media, item_set, value_annotation, annotation, digital_object) without a matching resource', // @translate
-                        'db_resource_orphans_fix' => 'Remove orphan rows in sub-tables without a matching resource', // @translate
-                        'db_item_no_value' => 'Check items without value (media values are not checked)', // @translate
-                        'db_item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
-                        'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
-                        'db_utf8_encode_fix' => 'Fix utf-8 encoding issues', // @translate
-                        'db_value_clean_fix' => 'Clean and deduplicate values', // @translate
-                        'db_resource_title_check' => 'Check resource titles, for example after hard import', // @translate
-                        'db_resource_title_fix' => 'Update resource titles', // @translate
-                        'db_item_primary_media_check' => 'Check if the primary medias are set', // @translate
-                        'db_item_primary_media_fix' => 'Set the primary medias to all items', // @translate
-                        'db_value_annotation_template_check' => 'Check templates for value annotations (module Advanced Resource Template)', // @translate
-                        'db_value_annotation_template_fix' => 'Fix templates for value annotations (module Advanced Resource Template)', // @translate
-                    ],
+                    'value_options' => $processOptions,
                 ],
                 'attributes' => [
                     'id' => 'resource_values-process',
@@ -633,15 +675,7 @@ class CheckAndFixForm extends Form
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Types of resources to process', // @translate
-                    'value_options' => [
-                        'all' => 'All', // @translate
-                        'items' => 'Items', // @translate
-                        'item_sets' => 'Item sets', // @translate
-                        'media' => 'Medias', // @translate
-                        'value_annotations' => 'Value annotations', // @translate
-                        'annotations' => 'Annotations', // @translate
-                        'digital_objects' => 'Digital objects', // @translate
-                    ],
+                    'value_options' => $resourceTypeOptions,
                 ],
                 'attributes' => [
                     'id' => 'db_loop_save-resource_types',
@@ -733,15 +767,7 @@ class CheckAndFixForm extends Form
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Types of resources to process', // @translate
-                    'value_options' => [
-                        'all' => 'All', // @translate
-                        'items' => 'Items', // @translate
-                        'item_sets' => 'Item sets', // @translate
-                        'media' => 'Medias', // @translate
-                        'value_annotations' => 'Value annotations', // @translate
-                        'annotations' => 'Annotations', // @translate
-                        'digital_objects' => 'Digital objects', // @translate
-                    ],
+                    'value_options' => $resourceTypeOptions,
                 ],
                 'attributes' => [
                     'id' => 'db_value_clean-resource_types',
