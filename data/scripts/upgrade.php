@@ -534,3 +534,17 @@ if (version_compare($oldVersion, '3.4.43', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.45', '<')) {
+    // Fix easyadmin_asset_extensions stored as a single space-separated string
+    // instead of an array of extensions (missing value_separator in fieldset
+    // before this version).
+    $extensions = $settings->get('easyadmin_asset_extensions', []) ?: [];
+    $fixed = [];
+    foreach ($extensions as $extension) {
+        foreach (preg_split('~\s+~', trim((string) $extension), -1, PREG_SPLIT_NO_EMPTY) as $value) {
+            $fixed[] = ltrim($value, '.');
+        }
+    }
+    $settings->set('easyadmin_asset_extensions', array_values(array_unique($fixed)));
+}

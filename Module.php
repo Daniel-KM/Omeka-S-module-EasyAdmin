@@ -207,12 +207,10 @@ class Module extends AbstractModule
 
     protected function installDirs(): void
     {
-        // Don't use PsrMessage during install.
         $services = $this->getServiceLocator();
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
-        $translator = $services->get('MvcTranslator');
 
         // Automatic upgrade from module Bulk Check.
         $result = null;
