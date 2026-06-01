@@ -5,7 +5,6 @@ namespace EasyAdmin\Mvc\Controller\Plugin;
 use Common\Stdlib\PsrMessage;
 use Doctrine\Inflector\InflectorFactory;
 use Exception;
-use Laminas\Http\Client\Adapter\Curl as CurlAdapter;
 use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client as HttpClient;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -977,22 +976,10 @@ class Addons extends AbstractPlugin
      */
     protected function fileGetContents($url): ?string
     {
-        // Use Laminas Http first: works even when allow_url_fopen is off.
-        // Generous timeout: some sources (GitHub raw) serve 300+ KB JSON files
-        // and the Laminas Socket adapter forces HTTP/1.1.
-        //
-        // Try HTTP/2 (curl + nghttp2) when available: CURL_HTTP_VERSION_2TLS
-        // negotiates h2 via TLS-ALPN and falls back to HTTP/1.1 transparently
-        // if the server does not support HTTP/2.
-        //
-        // Proxy and SSL options live on the HttpClient itself (not the
-        // adapter). The client passes its config to the adapter on every
-        // send(), so swapping the adapter does not lose proxy/cert settings.
+        // The Omeka HttpClient factory selects the Curl adapter with HTTP/2
+        // negotiation when available, so this single call is enough.
+        // Generous timeout: some sources (GitHub raw) serve 300+ KB JSON files.
         $body = null;
-        $canHttp2 = extension_loaded('curl')
-            && defined('CURL_HTTP_VERSION_2TLS');
-        $originalAdapter = null;
-
         try {
             $this->httpClient->reset();
             $this->httpClient->setUri(new HttpUri($url));
@@ -1000,60 +987,12 @@ class Addons extends AbstractPlugin
                 'timeout' => 30,
                 'connecttimeout' => 5,
             ]);
-
-            if ($canHttp2) {
-                $currentAdapter = $this->httpClient->getAdapter();
-                if ($currentAdapter instanceof CurlAdapter) {
-                    // Already curl: just hint HTTP/2 via merged curloptions.
-                    $currentAdapter->setOptions([
-                        'curloptions' => [
-                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
-                        ],
-                    ]);
-                } else {
-                    // Replace the adapter for this single call, keep a ref
-                    // to restore it afterwards (the HttpClient service is
-                    // shared).
-                    $originalAdapter = $currentAdapter;
-                    $curl = new CurlAdapter();
-                    $curl->setOptions([
-                        'curloptions' => [
-                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
-                        ],
-                    ]);
-                    $this->httpClient->setAdapter($curl);
-                }
-            }
-
             $response = $this->httpClient->send();
             if ($response->isOk()) {
                 $body = $response->getBody();
             }
         } catch (\Exception $e) {
             $body = null;
-        } finally {
-            if ($originalAdapter !== null) {
-                $this->httpClient->setAdapter($originalAdapter);
-            }
-        }
-
-        // Fallback to the original adapter (HTTP/1.1) if curl was used and
-        // failed for any non-protocol reason (timeout, broken pipe, etc.).
-        if (empty($body) && $canHttp2 && $originalAdapter !== null) {
-            try {
-                $this->httpClient->reset();
-                $this->httpClient->setUri(new HttpUri($url));
-                $this->httpClient->setOptions([
-                    'timeout' => 30,
-                    'connecttimeout' => 5,
-                ]);
-                $response = $this->httpClient->send();
-                if ($response->isOk()) {
-                    $body = $response->getBody();
-                }
-            } catch (\Exception $e) {
-                $body = null;
-            }
         }
 
         // Last-resort fallback: file_get_contents when allow_url_fopen is on.
