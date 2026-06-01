@@ -30,10 +30,12 @@ class HttpClientFactory implements FactoryInterface
             $options = $config['http_client'];
         }
 
-        // Pick the Curl adapter by default when curl supports HTTP/2.
+        // Pick the Curl adapter by default whenever the curl extension is
+        // loaded. HTTP/2 is enabled below only when libcurl supports it; on
+        // older builds, Curl still handles HTTP/1.1 (better TLS chain
+        // resolution than Socket).
         if (empty($options['adapter'])) {
             $options['adapter'] = extension_loaded('curl')
-                && defined('CURL_HTTP_VERSION_2TLS')
                 ? Curl::class
                 : Socket::class;
         }

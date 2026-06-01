@@ -3,11 +3,6 @@
 namespace EasyAdmin;
 
 return [
-    // Override http_client to support autodetection in http factory.
-    // It allows to support http/2, only managed by curl.
-    'http_client' => [
-        'adapter' => null,
-    ],
     'service_manager' => [
         'invokables' => [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,

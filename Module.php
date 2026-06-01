@@ -70,6 +70,12 @@ class Module extends AbstractModule
         if (version_compare(\Omeka\Module::VERSION, '4.2', '>=')) {
             unset($config['form_elements']['factories']['Omeka\Form\AssetEditForm']);
         }
+        // HTTP/2 support (curl adapter autodetection) is integrated in the core
+        // http client since 4.3, so let the core factory take over for newer
+        // versions and keep this override only for older ones.
+        if (version_compare(\Omeka\Module::VERSION, '4.3', '>=')) {
+            unset($config['service_manager']['factories']['Omeka\HttpClient']);
+        }
         return $config;
     }
 
