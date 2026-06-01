@@ -212,6 +212,18 @@ class SettingsFieldset extends Fieldset
                     'id' => 'easyadmin_allow_empty_files',
                 ],
             ])
+            ->add([
+                'name' => 'easyadmin_config_apply_button',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'easy_admin',
+                    'label' => 'Add an "Apply" button on the config form of each module', // @translate
+                    'info' => 'Save the settings and stay on the config form instead of returning to the module list.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_config_apply_button',
+                ],
+            ])
 
             ->add([
                 'name' => 'easyadmin_addon_notify_version_inactive',

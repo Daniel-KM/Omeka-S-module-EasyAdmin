@@ -317,6 +317,7 @@ return [
             'easyadmin_user_directories' => false,
             'easyadmin_disable_csrf' => false,
             'easyadmin_allow_empty_files' => false,
+            'easyadmin_config_apply_button' => false,
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             'easyadmin_display_exception' => '',

@@ -324,6 +324,22 @@ class Module extends AbstractModule
             );
         }
 
+        // Add the "Apply" button (save and stay on the form) on every module
+        // config page. The button is added on render (configure GET) and the
+        // core redirect to the module list is rewritten to the config form on
+        // an apply submit (dispatch runs after the controller action).
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Module',
+            'view.layout',
+            [$this, 'handleConfigApplyButton']
+        );
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Module',
+            'dispatch',
+            [$this, 'handleConfigApplyRedirect'],
+            -100
+        );
+
         // Manage buttons in admin resources.
         // Uses view.layout instead of Omeka 4.1 view.show.page_actions because
         // page_actions does not exist for browse pages.
@@ -659,6 +675,80 @@ class Module extends AbstractModule
             $enabledTasks[$taskId] = ['enabled' => true, 'frequency' => 'hourly'];
         }
         return $enabledTasks;
+    }
+
+    /**
+     * Add the "Apply" button asset on the module config form (configure page).
+     */
+    public function handleConfigApplyButton(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Settings')->get('easyadmin_config_apply_button')) {
+            return;
+        }
+
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
+        $view = $event->getTarget();
+        if (($view->params()->fromRoute('action') ?? '') !== 'configure') {
+            return;
+        }
+
+        $view->headScript()
+            ->appendScript(sprintf('var CommonConfigApply = %s;', json_encode(['label' => $view->translate('Apply')])))
+            ->appendFile($view->assetUrl('js/common-config-apply.js', 'Common'));
+    }
+
+    /**
+     * Stay on the module config form on an "apply" submit: rewrite the core
+     * redirect (to the module list) to the configure action. Runs after the
+     * controller action (negative priority), so the 302 response is available.
+     */
+    public function handleConfigApplyRedirect(MvcEvent $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Settings')->get('easyadmin_config_apply_button')) {
+            return;
+        }
+
+        $request = $event->getRequest();
+        if (!$request->isPost() || !$request->getPost('apply')) {
+            return;
+        }
+
+        $routeMatch = $event->getRouteMatch();
+        if (!$routeMatch || $routeMatch->getParam('action') !== 'configure') {
+            return;
+        }
+
+        /** @var \Laminas\Http\Response $response */
+        $response = $event->getResponse();
+        if (!$response instanceof \Laminas\Http\Response || !$response->isRedirect()) {
+            return;
+        }
+
+        $id = (string) $request->getQuery('id');
+        if ($id === '') {
+            return;
+        }
+
+        $options = [
+            'name' => 'admin/default',
+            'query' => ['id' => $id],
+        ];
+        $fragment = (string) $request->getPost('apply_fragment');
+        if ($fragment !== '') {
+            $options['fragment'] = $fragment;
+        }
+        $url = $event->getRouter()->assemble(
+            ['controller' => 'module', 'action' => 'configure'],
+            $options
+        );
+
+        $headers = $response->getHeaders();
+        if ($headers->has('Location')) {
+            $headers->removeHeader($headers->get('Location'));
+        }
+        $headers->addHeaderLine('Location', $url);
     }
 
     public function handleViewLayoutResource(Event $event): void
