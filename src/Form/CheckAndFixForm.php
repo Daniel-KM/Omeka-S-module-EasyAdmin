@@ -594,6 +594,8 @@ class CheckAndFixForm extends Form
                         'db_resource_invalid_fix' => 'Fix all resource with invalid types.', // @translate
                         'db_resource_incomplete_check' => 'Check if all resources are specified as items, medias, etc.', // @translate
                         'db_resource_incomplete_fix' => 'Remove all resources that are not specified', // @translate
+                        'db_resource_orphans_check' => 'Check rows in sub-tables (item, media, item_set, value_annotation, annotation, digital_object) without a matching resource', // @translate
+                        'db_resource_orphans_fix' => 'Remove orphan rows in sub-tables without a matching resource', // @translate
                         'db_item_no_value' => 'Check items without value (media values are not checked)', // @translate
                         'db_item_no_value_fix' => 'Remove items without value (files are moved into "/files/check/")', // @translate
                         'db_utf8_encode_check' => 'Check if all values are utf-8 encoded (Windows issues like "Ã©" for "é")', // @translate
@@ -638,6 +640,7 @@ class CheckAndFixForm extends Form
                         'media' => 'Medias', // @translate
                         'value_annotations' => 'Value annotations', // @translate
                         'annotations' => 'Annotations', // @translate
+                        'digital_objects' => 'Digital objects', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -737,6 +740,7 @@ class CheckAndFixForm extends Form
                         'media' => 'Medias', // @translate
                         'value_annotations' => 'Value annotations', // @translate
                         'annotations' => 'Annotations', // @translate
+                        'digital_objects' => 'Digital objects', // @translate
                     ],
                 ],
                 'attributes' => [

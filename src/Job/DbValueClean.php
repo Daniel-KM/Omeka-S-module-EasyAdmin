@@ -50,6 +50,7 @@ class DbValueClean extends AbstractCheck
             'media',
             'value_annotations',
             'annotations',
+            'digital_objects',
         ];
 
         $resourceTypes = $this->getArg('resource_types') ?: [];

@@ -57,6 +57,7 @@ class DbLoopResources extends AbstractJob
             'media',
             'value_annotations',
             'annotations',
+            'digital_objects',
         ];
         $resourceTypes = $this->getArg('resource_types') ?: [];
         $resourceTypes = array_intersect($allowedResourceTypes, $resourceTypes);

@@ -617,6 +617,8 @@ class DbResourceTitle extends AbstractCheck
             'Omeka\Entity\Media' => 'media',
             // Annotation module.
             'Annotate\Entity\Annotation' => 'annotations',
+            // DigitalObject module.
+            'DigitalObject\Entity\DigitalObject' => 'digital_objects',
         ];
         return $map[$resourceType] ?? null;
     }
