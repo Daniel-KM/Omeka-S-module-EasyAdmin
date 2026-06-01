@@ -68,7 +68,7 @@ if (version_compare($oldVersion, '3.3.5', '<')) {
             'It’s now possible to install {link}modules and themes{link_end}.', // @translate
             [
                 // Route easy-admin is not available during upgrade.
-                'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons'])),
+                'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'easy-admin', 'action' => 'addons']))),
                 'link_end' => '</a>',
             ]
         );
@@ -97,7 +97,7 @@ if (version_compare($oldVersion, '3.3.6', '<')) {
     $message = new PsrMessage(
         'This option can be enabled/disabled in {link}main settings{link_end}.', // @translate
         [
-            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+            'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin']))),
             'link_end' => '</a>',
         ]
     );
@@ -113,7 +113,7 @@ if (version_compare($oldVersion, '3.3.7', '<')) {
     $message = new PsrMessage(
         'This option can be enabled/disabled in {link}main settings{link_end}.', // @translate
         [
-            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+            'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin']))),
             'link_end' => '</a>',
         ]
     );
@@ -127,7 +127,7 @@ if (version_compare($oldVersion, '3.3.7', '<')) {
     $message = new PsrMessage(
         'This task can be run via the main {link}menu{link_end}.', // @translate
         [
-            'link' => sprintf('<a href="%s">', $url('admin', [], true) . '/easy-admin/check-and-fix#files_database'),
+            'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin', [], true) . '/easy-admin/check-and-fix#files_database')),
             'link_end' => '</a>',
         ]
     );
@@ -170,7 +170,7 @@ if (version_compare($oldVersion, '3.3.8', '<')) {
         $message = new PsrMessage(
             'It’s now possible to set the site in {link}maintenance mode{link_end} for public or users.', // @translate
             [
-                'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin'])),
+                'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'setting'], ['fragment' => 'easy-admin']))),
                 'link_end' => '</a>',
             ]
         );
@@ -184,7 +184,7 @@ if (version_compare($oldVersion, '3.4.8', '<')) {
     $message = new PsrMessage(
         'An {link}soption{link_end} allows to display a link from the resource admin page to the public page.', // @translate
         [
-            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+            'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface']))),
             'link_end' => '</a>',
         ]
     );
@@ -221,7 +221,7 @@ if (version_compare($oldVersion, '3.4.11', '<')) {
     $settings->set('easyadmin_interface', ['resource_public_view']);
     $message = new PsrMessage('An {link}option{link_end} allows to display links to previous and next resources.', // @translate
         [
-            'link' => sprintf('<a href="%s">', $url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface'])),
+            'link' => sprintf('<a href="%s">', htmlspecialchars($url('admin/default', ['controller' => 'setting'], ['fragment' => 'easyadmin_interface']))),
             'link_end' => '</a>',
         ]
     );
