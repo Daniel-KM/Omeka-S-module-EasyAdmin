@@ -287,10 +287,16 @@ class SettingsFieldset extends Fieldset
                 'options' => [
                     'element_group' => 'maintenance',
                     'label' => 'Set Omeka under maintenance', // @translate
+                    'label_attributes' => [
+                        'style' => 'display: block;',
+                    ],
                     'value_options' => [
                         '' => 'No', // @translate
-                        'public' => 'Public front-end', // @translate
-                        'admin' => 'Admin (except global admins)', // @translate
+                        'anonymous' => 'Public front-end blocked for anonymous visitors', // @translate
+                        'admin' => 'Public front-end blocked for anybody except global admin', // @translate
+                        'public' => 'Public front-end blocked for anybody', // @translate
+                        'backend' => 'Admin back-end blocked for anybody except global admin (public front-end remains open)', // @translate
+                        'lockdown' => 'Admin back-end and public front-end blocked for anybody except global admin', // @translate
                     ],
                 ],
                 'attributes' => [

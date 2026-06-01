@@ -22,6 +22,18 @@ class MvcListeners extends AbstractListenerAggregate
      * Redirect requests when wanted.
      *
      * The Omeka checks are already done.
+     *
+     * Supported modes:
+     * - 'anonymous': block the public front-end for anonymous visitors only;
+     *   authenticated users (admins included) can still browse sites.
+     * - 'admin': block the public front-end for everyone except global admins
+     *   (the admin back-end stays open for authorized users).
+     * - 'public': block the public front-end for everyone (the admin back-end
+     *   stays open for authorized users).
+     * - 'backend': block the admin back-end for every user except global
+     *   admins (the public front-end remains open).
+     * - 'lockdown': block both the public front-end and the admin back-end
+     *   for everyone except global admins (full lockdown).
      */
     public function redirectToMaintenance(MvcEvent $event)
     {
@@ -35,6 +47,7 @@ class MvcListeners extends AbstractListenerAggregate
             'migrate',
             'install',
             'login',
+            'logout',
         ])) {
             return;
         }
@@ -47,8 +60,34 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
+        $isAdminRoute = (bool) $routeMatch->getParam('__ADMIN__');
+
         if ($maintenanceMode === 'public') {
-            if ($routeMatch->getParam('__ADMIN__')) {
+            if ($isAdminRoute) {
+                return;
+            }
+        } elseif ($maintenanceMode === 'anonymous') {
+            if ($isAdminRoute) {
+                return;
+            }
+            $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+            if ($user) {
+                return;
+            }
+        } elseif ($maintenanceMode === 'backend') {
+            if (!$isAdminRoute) {
+                return;
+            }
+            $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+            if ($user && $user->getRole() === Acl::ROLE_GLOBAL_ADMIN) {
+                return;
+            }
+        } elseif ($maintenanceMode === 'admin') {
+            if ($isAdminRoute) {
+                return;
+            }
+            $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+            if ($user && $user->getRole() === Acl::ROLE_GLOBAL_ADMIN) {
                 return;
             }
         } else {
