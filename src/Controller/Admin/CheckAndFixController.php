@@ -156,9 +156,6 @@ class CheckAndFixController extends AbstractActionController
             case 'db_customvocab_missing_itemsets_clean':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\DbCustomVocabMissingItemSets::class, $defaultParams + $params['database']['db_customvocab_missing_itemsets']);
                 break;
-            case 'backup_install':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\Backup::class, $defaultParams + $params['backup']['backup_install']);
-                break;
             case 'theme_templates_check':
             case 'theme_templates_fix':
                 $job = $dispatcher->dispatch(\EasyAdmin\Job\ThemeTemplate::class, $defaultParams + $params['themes']['theme_templates'] + $params['themes']['theme_templates_warn']);

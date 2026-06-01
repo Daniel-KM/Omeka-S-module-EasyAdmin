@@ -184,6 +184,24 @@ $formatSize = function ($bytes) {
                     <?= $translate('.htaccess') ?>
                 </label>
             </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="htpasswd">
+                    <?= $translate('.htpasswd') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="hidden">
+                    <?= $translate('Hidden files (dot files)') ?>
+                </label>
+            </div>
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="include[]" value="zip">
+                    <?= $translate('Compressed files (with extension bzip, bz2, tar, gz, xz, zip)') ?>
+                </label>
+            </div>
         </fieldset>
 
         <div class="field">
