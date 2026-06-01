@@ -379,7 +379,9 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
             SET foreign_key_checks = 0;
             DROP TABLE IF EXISTS content_lock;
             SQL;
-        $connection->executeStatement($sql);
+        foreach (array_filter(array_map('trim', explode(";\n", $sql))) as $sql) {
+            $connection->executeStatement($sql);
+        }
     } else {
         // Simplify upgrade or migration.
         $connection->executeStatement('TRUNCATE TABLE content_lock;');

@@ -371,7 +371,7 @@ class DbUtf8Encode extends AbstractCheck
             ->addOrderBy('property.id', 'asc')
             ->addGroupBy('property.id')
         ;
-        $this->properties = $this->connection->executeQuery($qb)->fetchAllKeyValue();
+        $this->properties = $this->connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
         return $this->properties;
     }
 }
