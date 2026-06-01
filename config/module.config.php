@@ -7,6 +7,11 @@ return [
         'invokables' => [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
+        'delegators' => [
+            'Omeka\File\Store\Local' => [
+                Service\File\Store\LocalStoreBaseUriDelegatorFactory::class,
+            ],
+        ],
     ],
     'api_adapters' => [
         'delegators' => [
@@ -318,6 +323,7 @@ return [
             'easyadmin_disable_csrf' => false,
             'easyadmin_allow_empty_files' => false,
             'easyadmin_config_apply_button' => false,
+            'easyadmin_local_store_base_uri' => '',
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             'easyadmin_display_exception' => '',

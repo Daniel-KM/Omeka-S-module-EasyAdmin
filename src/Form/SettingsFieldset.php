@@ -13,7 +13,7 @@ class SettingsFieldset extends Fieldset
 
     protected $elementGroups = [
         'easy_admin' => 'Easy Admin', // @translate
-        'maintenance' => 'Maintenance', // @translate
+        'maintenance' => 'Maintenance and tests', // @translate
     ];
 
     public function init(): void
@@ -245,6 +245,20 @@ class SettingsFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'easyadmin_addon_notify_version_dev',
+                ],
+            ])
+
+            ->add([
+                'name' => 'easyadmin_local_store_base_uri',
+                'type' => CommonElement\OptionalUrl::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Base url of files (dev/test)', // @translate
+                    'info' => 'Serve file from this base url (for example a production server). Useful to work on a copy of the database without the files.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_local_store_base_uri',
+                    'placeholder' => 'https://example.org/files',
                 ],
             ])
 
