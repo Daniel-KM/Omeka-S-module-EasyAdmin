@@ -95,8 +95,18 @@ $this->headScript()
     ->appendFile($assetUrl('js/addon-filter.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
 $this->htmlElement('body')->appendAttribute('class', 'modules browse easy-admin');
 
-// Merged catalogue for update detection.
-$catalogueModules = array_merge($omekaModules, $webModules);
+// Merged catalogue for update detection. Both lists are keyed by the url of
+// the repository, so for a common addon the entry with the greatest version is
+// kept: any of the two sources may be outdated.
+$catalogueModules = $omekaModules;
+foreach ($webModules as $catUrl => $catAddon) {
+    $knownVersion = $catalogueModules[$catUrl]['version'] ?? null;
+    if ($knownVersion === null
+        || version_compare((string) ($catAddon['version'] ?? ''), (string) $knownVersion, '>')
+    ) {
+        $catalogueModules[$catUrl] = $catAddon;
+    }
+}
 
 
 $states = [

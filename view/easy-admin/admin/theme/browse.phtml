@@ -33,8 +33,18 @@ $this->htmlElement('body')->appendAttribute('class', 'themes browse easy-admin')
 
 $omekaVersion = \Omeka\Module::VERSION;
 
-// Merged catalogue for update detection.
-$catalogueThemes = array_merge($omekaThemes, $webThemes);
+// Merged catalogue for update detection. Both lists are keyed by the url of
+// the repository, so for a common addon the entry with the greatest version is
+// kept: any of the two sources may be outdated.
+$catalogueThemes = $omekaThemes;
+foreach ($webThemes as $catUrl => $catAddon) {
+    $knownVersion = $catalogueThemes[$catUrl]['version'] ?? null;
+    if ($knownVersion === null
+        || version_compare((string) ($catAddon['version'] ?? ''), (string) $knownVersion, '>')
+    ) {
+        $catalogueThemes[$catUrl] = $catAddon;
+    }
+}
 ?>
 
 <?= $this->pageTitle($translate('Manage themes'), 1, $translate('Easy Admin')) ?>
