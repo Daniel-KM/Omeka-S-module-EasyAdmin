@@ -772,7 +772,12 @@ class CheckAndFixController extends AbstractActionController
 
         $grouped = array_fill_keys(array_keys($labels), []);
 
-        $collect = function (string $key, $rawValue, string $prefix) use ($categorize, $relevant, $format, &$grouped): void {
+        // The urls pointing to another server than the current one are the
+        // most likely to be wrong after a copy of the database.
+        $currentHost = strtolower((string) parse_url($this->viewHelpers()->get('ServerUrl')->__invoke(), PHP_URL_HOST));
+        $otherHosts = [];
+
+        $collect = function (string $key, $rawValue, string $prefix) use ($categorize, $relevant, $format, $currentHost, &$grouped, &$otherHosts): void {
             $category = $categorize($key);
             if (!$category) {
                 return;
@@ -781,7 +786,18 @@ class CheckAndFixController extends AbstractActionController
             if (!$relevant($category, $value)) {
                 return;
             }
-            $grouped[$category][] = sprintf('%s%s = %s', $prefix, $key, $format($value, $category === 'secret'));
+            $line = sprintf('%s%s = %s', $prefix, $key, $format($value, $category === 'secret'));
+            $grouped[$category][] = $line;
+            if ($category === 'url' && $currentHost !== '') {
+                $flat = is_array($value) ? (string) json_encode($value, JSON_UNESCAPED_SLASHES) : (string) $value;
+                preg_match_all('~(?:https?:)?//([a-z0-9.-]+)~i', $flat, $matches);
+                foreach (array_unique(array_map('strtolower', $matches[1])) as $host) {
+                    if ($host !== $currentHost) {
+                        $otherHosts[] = $line;
+                        break;
+                    }
+                }
+            }
         };
 
         $settings = $connection->executeQuery('SELECT id, value FROM setting ORDER BY id')->fetchAllAssociative();
@@ -814,6 +830,17 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addSuccess($message);
         }
 
+        if ($otherHosts) {
+            $message = new PsrMessage(
+                "Settings with an url of another server than this one ({host}), to check first:\n{list}", // @translate
+                ['host' => $currentHost, 'list' => '<br/>' . implode('<br/>', array_map('htmlspecialchars', $otherHosts))]
+            );
+            $message->setEscapeHtml(false);
+            $messenger->addWarning($message);
+        }
+
+        $this->checkSettingsImageServer();
+
         // Configuration outside the settings tables, not detectable here.
         $messenger->addNotice(new PsrMessage(
             'Also review configurations stored outside the settings: search engines (SearchSolr cores/nodes, url and host), file paths and mailer in "config/local.config.php", and any external service of the modules.' // @translate
@@ -839,6 +866,65 @@ class CheckAndFixController extends AbstractActionController
                 ['title' => $newTitle]
             ));
         }
+    }
+
+    /**
+     * Check the mode of tiling of the module Image Server when an external image
+     * server (Cantaloupe, IIPImage…) answers to the iiif urls.
+     *
+     * After a copy of the database, the mode may be the one of another server:
+     * the module creates local tiles for each new media, while the external
+     * image server serves the images and ignores them.
+     */
+    protected function checkSettingsImageServer(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $module = $services->get('Omeka\ModuleManager')->getModule('ImageServer');
+        if (!$module || $module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
+            return;
+        }
+
+        $settings = $services->get('Omeka\Settings');
+        $tileMode = $settings->get('imageserver_tile_mode', 'auto');
+        if ($tileMode !== 'auto') {
+            return;
+        }
+
+        $server = $settings->get('iiifserver_media_api_url') ?: $this->probeExternalImageServer();
+        if (!$server) {
+            return;
+        }
+
+        $this->messenger()->addWarning(new PsrMessage(
+            'An external image server answers to the iiif urls ({server}), but the module Image Server creates local tiles for each new media (option "Tile processing mode" = "auto"). Set it to "external" if the external server serves all the images.', // @translate
+            ['server' => $server]
+        ));
+    }
+
+    /**
+     * Get the name of the external image server answering to the iiif urls.
+     *
+     * The self request reads the headers of the response to the info.json of a
+     * missing media: Omeka answers with Apache/php, an external server with its
+     * own name.
+     */
+    protected function probeExternalImageServer(): ?string
+    {
+        $url = $this->viewHelpers()->get('ServerUrl')->__invoke()
+            . $this->viewHelpers()->get('BasePath')->__invoke()
+            . '/iiif/3/0/info.json';
+        $context = stream_context_create([
+            'http' => ['method' => 'GET', 'timeout' => 5, 'follow_location' => 0, 'ignore_errors' => true],
+        ]);
+        @file_get_contents($url, false, $context);
+        $headers = implode("\n", $http_response_header ?? []);
+        if (stripos($headers, 'Cantaloupe') !== false || preg_match('/^Server:\s*Jetty/im', $headers)) {
+            return 'Cantaloupe';
+        }
+        if (stripos($headers, 'IIPImage') !== false || stripos($headers, 'iipsrv') !== false) {
+            return 'IIPImage';
+        }
+        return null;
     }
 
     /**
