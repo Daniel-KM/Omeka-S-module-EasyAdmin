@@ -14,7 +14,36 @@
  * @todo Use the true Laminas console routing system.
  */
 
-require dirname(__DIR__, 4) . '/bootstrap.php';
+// Find the root of Omeka. The directory of the module may be a symbolic link,
+// for example when modules are shared between instances, and php resolves it in
+// __DIR__, so the path used to call the script is checked first, without
+// resolving it. The module may be installed in "modules/" or in
+// "composer-addons/modules/".
+$taskPath = $_SERVER['SCRIPT_FILENAME'] ?? '';
+if ($taskPath !== '' && $taskPath[0] !== '/') {
+    // The variable PWD of the shell keeps the symbolic links, unlike getcwd().
+    $taskPath = (getenv('PWD') ?: getcwd()) . '/' . $taskPath;
+}
+$taskPath = preg_replace('~/(?:\./)+~', '/', $taskPath);
+$omekaPath = null;
+foreach ([
+    $taskPath ? dirname($taskPath, 4) : null,
+    $taskPath ? dirname($taskPath, 5) : null,
+    dirname(__DIR__, 4),
+    dirname(__DIR__, 5),
+] as $path) {
+    if ($path && is_file($path . '/bootstrap.php') && is_file($path . '/application/Module.php')) {
+        $omekaPath = $path;
+        break;
+    }
+}
+if (!$omekaPath) {
+    fwrite(STDERR, 'The root of Omeka cannot be found from the path of this script.' . PHP_EOL);
+    exit(1);
+}
+unset($taskPath, $path);
+
+require $omekaPath . '/bootstrap.php';
 
 use Omeka\Stdlib\Message;
 

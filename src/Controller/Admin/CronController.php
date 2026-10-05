@@ -184,7 +184,21 @@ class CronController extends AbstractActionController
         $serverUrl = $this->viewHelpers()->get('ServerUrl');
         $basePath = $this->viewHelpers()->get('BasePath');
 
-        $scriptPath = realpath(dirname(__DIR__, 3) . '/data/scripts/task.php');
+        // The path is not resolved: the directory of the module may be a
+        // symbolic link, for example when modules are shared between
+        // instances, and the task finds the root of Omeka from the path used to
+        // call it.
+        $scriptPath = null;
+        foreach ([
+            OMEKA_PATH . '/modules/EasyAdmin/data/scripts/task.php',
+            OMEKA_PATH . '/composer-addons/modules/EasyAdmin/data/scripts/task.php',
+            dirname(__DIR__, 3) . '/data/scripts/task.php',
+        ] as $path) {
+            if (is_file($path)) {
+                $scriptPath = $path;
+                break;
+            }
+        }
 
         // Suggest daily execution by default.
         return sprintf(
