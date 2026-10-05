@@ -33,131 +33,19 @@
             return fieldset.querySelector('.fieldsets-heading');
         });
 
-    // Highlight the query in a container, resetting any previous highlight.
-    var highlight = function (container, query) {
-        if (!container) {
-            return;
-        }
-        // Remove previous highlights by unwrapping the <mark> nodes. This
-        // preserves sibling nodes and their event listeners (e.g. the per-field
-        // buttons injected by other modules such as SiteHub), unlike a
-        // container.innerHTML rewrite, which destroys them.
-        container.querySelectorAll('mark.setting-filter-hit').forEach(function (mark) {
-            mark.replaceWith(document.createTextNode(mark.textContent));
-        });
-        container.normalize();
-        if (!query) {
-            return;
-        }
-        var walker = document.createTreeWalker(
-            container,
-            NodeFilter.SHOW_TEXT,
-            null
-        );
-        var nodes = [];
-        while (walker.nextNode()) {
-            nodes.push(walker.currentNode);
-        }
-        nodes.forEach(function (node) {
-            var text = node.nodeValue;
-            var lower = text.toLowerCase();
-            var index = lower.indexOf(query);
-            if (index === -1) {
-                return;
-            }
-            var fragment = document.createDocumentFragment();
-            var last = 0;
-            while (index !== -1) {
-                fragment.appendChild(
-                    document.createTextNode(text.slice(last, index))
-                );
-                var mark = document.createElement('mark');
-                mark.className = 'setting-filter-hit';
-                mark.textContent = text.slice(index, index + query.length);
-                fragment.appendChild(mark);
-                last = index + query.length;
-                index = lower.indexOf(query, last);
-            }
-            fragment.appendChild(document.createTextNode(text.slice(last)));
-            node.parentNode.replaceChild(fragment, node);
-        });
-    };
+    // Helpers shared with the filters added to the filter of the core
+    // (see settings-fields.js).
+    var lib = (window.EasyAdmin && window.EasyAdmin.settingsFields) || {};
+    var highlight = lib.highlight;
+    var isTextField = lib.isTextField;
+    var fieldStatus = lib.fieldStatus;
+    var fieldValueText = lib.fieldValueText;
 
-    // Strings and the field classification are injected by the module (see
-    // appendSettingsFilterAssets), with an English fallback for the strings.
+    // Strings are injected by the module (see appendSettingsFilterAssets),
+    // with an English fallback.
     var i18n = (window.EasyAdmin && window.EasyAdmin.settingsFilter) || {};
     var placeholder = i18n.placeholder || 'Filter settings…';
     var countTemplate = i18n.count || '%s settings';
-    var kinds = i18n.kinds || {};
-    var statuses = i18n.status || {};
-
-    // Setting name of a field, from the name of its control.
-    var baseKey = function (field) {
-        var el = field.querySelector('input[name], select[name], textarea[name]');
-        var base = el && el.name ? el.name.replace(/\[.*$/, '') : '';
-        return base && base.charAt(0) !== '_' ? base : '';
-    };
-
-    // The kind of a field (structural | literal | manual) comes from the type
-    // of its form element, classified server-side like the SiteHub module. A
-    // field is a text field when its kind is "literal".
-    // A note is a static text (no named control), rendered as ".note".
-    var isNote = function (field) {
-        return !!field.querySelector('.note');
-    };
-
-    var kindCache = new WeakMap();
-    var isTextField = function (field) {
-        if (kindCache.has(field)) {
-            return kindCache.get(field);
-        }
-        var base = baseKey(field);
-        // A note is not a text setting; ambiguous fields default to text, as in
-        // the classifier.
-        var kind = isNote(field)
-            ? 'structural'
-            : (base && kinds[base] ? kinds[base] : 'literal');
-        var text = kind === 'literal';
-        kindCache.set(field, text);
-        return text;
-    };
-
-    // Status of a field: default, modified or unknown, computed server-side
-    // from the module defaults declared in module.config.php. A note has no
-    // value, so it is always at its default.
-    var fieldStatus = function (field) {
-        if (isNote(field)) {
-            return 'default';
-        }
-        var base = baseKey(field);
-        return base && statuses[base] ? statuses[base] : 'unknown';
-    };
-
-    // Current textual value of a field's controls, to search within the values.
-    var fieldValueText = function (field) {
-        var parts = [];
-        field.querySelectorAll('input, select, textarea').forEach(function (el) {
-            var type = (el.type || '').toLowerCase();
-            if (type === 'hidden' || type === 'submit' || type === 'button'
-                || type === 'password'
-                || el.classList.contains('setting-filter-input')
-            ) {
-                return;
-            }
-            if (type === 'checkbox' || type === 'radio') {
-                if (el.checked) {
-                    parts.push(el.value || '');
-                }
-            } else if (el.tagName === 'SELECT') {
-                Array.prototype.forEach.call(el.selectedOptions || [], function (o) {
-                    parts.push(o.textContent);
-                });
-            } else if (el.value) {
-                parts.push(el.value);
-            }
-        });
-        return parts.join(' ').toLowerCase();
-    };
 
     var apply = function () {
         var query = input.value.trim().toLowerCase();
@@ -219,19 +107,7 @@
     input.setAttribute('placeholder', placeholder);
     input.setAttribute('aria-label', placeholder);
 
-    var makeToggle = function (className, label) {
-        var wrap = document.createElement('label');
-        wrap.className = 'setting-filter-toggle';
-        var box = document.createElement('input');
-        box.type = 'checkbox';
-        box.className = className;
-        var text = document.createElement('span');
-        text.className = 'setting-filter-label';
-        text.textContent = label;
-        wrap.appendChild(box);
-        wrap.appendChild(text);
-        return { label: wrap, box: box, text: text };
-    };
+    var makeToggle = lib.makeToggle;
 
     var controls = document.createElement('div');
     controls.className = 'setting-filter-controls';
@@ -266,18 +142,7 @@
     count.setAttribute('aria-live', 'polite');
     // The checkboxes are grouped in two labelled sections, separated by a
     // divider: the value status and the field type.
-    var makeGroup = function (label, ctls) {
-        var group = document.createElement('div');
-        group.className = 'setting-filter-group';
-        var title = document.createElement('span');
-        title.className = 'setting-filter-group-label';
-        title.textContent = label;
-        group.appendChild(title);
-        ctls.forEach(function (ctl) {
-            group.appendChild(ctl.label);
-        });
-        return group;
-    };
+    var makeGroup = lib.makeGroup;
     var separator = document.createElement('span');
     separator.className = 'setting-filter-sep';
     separator.setAttribute('aria-hidden', 'true');
@@ -296,38 +161,12 @@
     controls.appendChild(toggles);
     controls.appendChild(count);
 
-    // All the filters are enabled by default (they only narrow when unchecked
-    // or when a query is typed); "include values" sits next to the field.
-    [
-        valuesToggle, defaultToggle, modifiedToggle, unknownToggle,
-        textToggle, nonTextToggle,
-    ].forEach(function (box) {
-        box.checked = true;
-    });
-
     wrapper.appendChild(input);
     wrapper.appendChild(valuesCtl.label);
     wrapper.appendChild(controls);
     root.insertBefore(wrapper, root.firstChild);
 
-    // A coloured status marker (default / modified / unknown) at the start of
-    // each field label.
-    fields.forEach(function (field) {
-        var meta = field.querySelector('.field-meta');
-        if (!meta) {
-            return;
-        }
-        var st = fieldStatus(field);
-        var label = i18n[st] || st;
-        var dot = document.createElement('span');
-        dot.className = 'setting-status-dot setting-status-' + st;
-        // Accessible: the colour also has a name, so it is not conveyed by
-        // colour alone (a distinct shape is added in CSS for colour blindness).
-        dot.title = label;
-        dot.setAttribute('role', 'img');
-        dot.setAttribute('aria-label', label);
-        meta.insertBefore(dot, meta.firstChild);
-    });
+    lib.appendStatusDots(fields, i18n);
 
     var timer = null;
     input.addEventListener('input', function () {
