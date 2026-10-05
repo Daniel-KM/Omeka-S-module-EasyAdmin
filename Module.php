@@ -1483,6 +1483,20 @@ class Module extends AbstractModule
             ->appendFile($view->plugin('assetUrl')('js/settings-enhancements-enable.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
     }
 
+    /**
+     * Does the core filter the settings pages by itself?
+     *
+     * Omeka 4.3 added a filter and group chips to the settings pages, rendered
+     * by the view helper "settingsFilter". The helper is checked too, so a
+     * version without it keeps the full filter of the module instead of no
+     * filter at all.
+     */
+    protected function hasCoreSettingsFilter(): bool
+    {
+        return version_compare(\Omeka\Module::VERSION, '4.3', '>=')
+            && $this->getServiceLocator()->get('ViewHelperManager')->has('settingsFilter');
+    }
+
     protected function appendSettingsFilterAssets(PhpRenderer $view, string $formClass): void
     {
         $services = $this->getServiceLocator();
@@ -1510,8 +1524,17 @@ class Module extends AbstractModule
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $view->headScript()
             ->appendScript(sprintf('window.EasyAdmin=window.EasyAdmin||{};window.EasyAdmin.settingsFilter=%s;', $strings))
-            ->appendFile($assetUrl('js/settings-filter.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
-            ->appendFile($assetUrl('js/settings-nav.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+            ->appendFile($assetUrl('js/settings-fields.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+        // The filter and the group navigation of the core replace the ones of
+        // the module, that keeps only its own features.
+        if ($this->hasCoreSettingsFilter()) {
+            $view->headScript()
+                ->appendFile($assetUrl('js/settings-filter-core.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+        } else {
+            $view->headScript()
+                ->appendFile($assetUrl('js/settings-filter.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('js/settings-nav.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+        }
     }
 
     /**
