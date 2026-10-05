@@ -3,10 +3,13 @@
 namespace EasyAdmin;
 
 return [
-    // Reset adapter to null so overridden http client factory can autodetect
-    // curl (HTTP/2) on older Omeka cores that pin a socket adapter.
+    // Use curl (HTTP/2) when available on older Omeka cores that pin a socket
+    // adapter. The adapter must remain a valid class, because the config may be
+    // passed directly to a laminas http client by other modules.
     'http_client' => [
-        'adapter' => null,
+        'adapter' => extension_loaded('curl')
+            ? \Laminas\Http\Client\Adapter\Curl::class
+            : \Laminas\Http\Client\Adapter\Socket::class,
         'curloptions' => [],
     ],
     'service_manager' => [
