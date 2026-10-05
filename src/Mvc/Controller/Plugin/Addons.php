@@ -1194,7 +1194,8 @@ class Addons extends AbstractPlugin
                 continue;
             }
 
-            $version = $data['latest_version'];
+            // An addon of omeka.org may have no published release.
+            $version = (string) ($data['latest_version'] ?? '');
             $host = $data['host'] ?? 'github.com';
             $url = 'https://' . $host . '/' . $data['owner'] . '/' . $data['repo'];
             // Fallback when no download_url: use host-specific archive URL. The
@@ -1221,7 +1222,7 @@ class Addons extends AbstractPlugin
             $addon['name'] = $name;
             $addon['basename'] = $data['dirname'];
             $addon['dir'] = $data['dirname'];
-            $addon['version'] = $data['latest_version'];
+            $addon['version'] = $version;
             $addon['versions'] = $versions;
             $addon['url'] = $url;
             $addon['zip'] = $zip;
