@@ -19,7 +19,7 @@
         }
     ],
     "support": {
-        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/issues",
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/work_items",
         "forum": "https://forum.omeka.org/"
     },
     "_require (not set until Omeka S merges PR #2432)": {
@@ -28,7 +28,7 @@
     },
     "require": {
         "flowjs/flow-php-server": "^1.2",
-        "sempia/external-assets": "^1.2"
+        "sempia/external-assets": "^1.3"
     },
     "suggest": {
         "ext-zip": "To install, update and backup modules and themes without the commands \"zip\" and \"unzip\"."
