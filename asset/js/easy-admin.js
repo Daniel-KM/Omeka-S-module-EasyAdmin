@@ -44,7 +44,10 @@ $(document).ready(function () {
         return $('.check-and-fix fieldset.field-container').find('fieldset');
     };
 
-    var $entityField = $('#files_checkfix-entity_types_field');
+    // The row of the field, found from the element itself: the core adds the
+    // id "<element id>_field" on the row since Omeka S 4.2 only, so the field
+    // would stay in the page with the previous versions.
+    var $entityField = $('#files_checkfix-entity_types').closest('.field');
 
     // A single checkbox is rendered with its label in ".field-meta" and a bare
     // box in ".inputs", which reads as unlabeled once stacked in the sidebar.

@@ -597,7 +597,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'files_excess_check' => 'List files that are present in "/files/", but not in database (originals only)', // @translate
                         'files_excess_check_full' => 'List files that are present in "/files/", but not in database (include derivatives)', // @translate
@@ -968,7 +972,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'files_media_no_original' => 'Check media rendered as "file", but without original', // @translate
                         'files_media_no_original_fix' => 'Delete media rendered as "file", but without original (WARNING: export your media first)', // @translate
@@ -1069,7 +1077,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => $processOptions,
                 ],
                 'attributes' => [
@@ -1282,7 +1294,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'db_job_check' => 'Check dead jobs (living in database, but non-existent in system)', // @translate
                         'db_job_fix' => 'Set status "stopped" for jobs that never started, and "error" for the jobs that never ended', // @translate
@@ -1435,7 +1451,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'theme_templates_check' => 'Check templates to migrate in themes for Omeka S v4.1', // @translate
                         'theme_templates_fix' => 'Migrate templates in themes for Omeka S v4.1 (WARNING: backup themes first)', // @translate
@@ -1524,7 +1544,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
                         'settings_environment_check' => 'List environment-specific settings to review after a copy of the database (title, urls, paths, hosts, emails, api keys…)', // @translate
@@ -1710,7 +1734,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'security_check' => 'Audit the security and privacy of the system (file protection, user data leaks, private data leaks, dangerous settings)', // @translate
                         'security_htaccess_fix' => 'Protect the sensitive directories of "files/" with a ".htaccess" (backups, imports, exports, logs, contributions, user data…)', // @translate
@@ -1771,7 +1799,11 @@ class CheckAndFixForm extends Form
                 'name' => 'process',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => '',
+                    // No label: the label of the fieldset is enough. An empty
+                    // string cannot be used, because the helper FormRow of
+                    // laminas-form 3.1 (Omeka S 4.1 and below) passes it to
+                    // the helper formLabel, that throws a DomainException. A
+                    // label that is not set is skipped by all versions.
                     'value_options' => [
                         'db_fulltext_index' => 'Omeka: Index full-text search', // @translate
                     ],
