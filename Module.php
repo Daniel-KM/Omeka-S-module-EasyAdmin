@@ -280,6 +280,35 @@ class Module extends AbstractModule
         $settings->set('easyadmin_quick_template', $val);
     }
 
+    /**
+     * Move the content of a directory into another one, without overwriting.
+     *
+     * The source directory is removed when all its content is moved.
+     *
+     * @return int The number of entries that remain in the source directory.
+     */
+    protected function mergeDirectoryInto(string $source, string $destination): int
+    {
+        $remaining = 0;
+        foreach (array_diff(scandir($source) ?: [], ['.', '..']) as $name) {
+            $from = $source . '/' . $name;
+            $to = $destination . '/' . $name;
+            if (!file_exists($to)) {
+                if (!@rename($from, $to)) {
+                    ++$remaining;
+                }
+            } elseif (is_dir($from) && is_dir($to) && !is_link($from)) {
+                $remaining += $this->mergeDirectoryInto($from, $to);
+            } else {
+                ++$remaining;
+            }
+        }
+        if (!$remaining) {
+            @rmdir($source);
+        }
+        return $remaining;
+    }
+
     protected function installDirs(): void
     {
         $services = $this->getServiceLocator();
@@ -290,13 +319,26 @@ class Module extends AbstractModule
         // Automatic upgrade from module Bulk Check.
         $result = null;
         $bulkCheckPath = $basePath . '/bulk_check';
-        if (file_exists($bulkCheckPath) && is_dir($bulkCheckPath)) {
-            $result = rename($bulkCheckPath, $basePath . '/check');
-            if (!$result) {
-                $message = new PsrMessage(
-                    'Upgrading module BulkCheck: Unable to rename directory "files/bulk_check" into "files/check". Trying to create it.' // @translate
-                );
-                $messenger->addWarning($message);
+        $checkPath = $basePath . '/check';
+        if (is_dir($bulkCheckPath)) {
+            if (!file_exists($checkPath)) {
+                $result = @rename($bulkCheckPath, $checkPath);
+                if (!$result) {
+                    $messenger->addWarning(new PsrMessage(
+                        'Upgrading module BulkCheck: Unable to rename directory "files/bulk_check" into "files/check". Trying to create it.' // @translate
+                    ));
+                }
+            } else {
+                // The directory "check" exists already, so the content of the
+                // old one is moved into it, without overwriting any file, and
+                // the old one is removed when it is empty.
+                $remaining = $this->mergeDirectoryInto($bulkCheckPath, $checkPath);
+                if ($remaining) {
+                    $messenger->addWarning(new PsrMessage(
+                        'Upgrading module BulkCheck: {count} files of directory "files/bulk_check" were not moved into "files/check", because they exist there already or cannot be moved. Check them, then remove the directory.', // @translate
+                        ['count' => $remaining]
+                    ));
+                }
             }
         }
 
