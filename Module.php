@@ -445,6 +445,13 @@ class Module extends AbstractModule
             );
         }
 
+        // Set the color of the admin left sidebar.
+        $sharedEventManager->attach(
+            '*',
+            'view.layout',
+            [$this, 'handleAdminBoardColor']
+        );
+
         // Enrich the system information page with the diagnostics of the
         // PHP-CLI used by background jobs. The core triggers the "system_info"
         // event since Omeka S 4.2 (before, the listener is simply never
@@ -745,6 +752,25 @@ class Module extends AbstractModule
      * This method is triggered on view.layout to execute scheduled tasks
      * without requiring the Cron module.
      */
+    public function handleAdminBoardColor(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Status')->isAdminRequest()) {
+            return;
+        }
+
+        $color = (string) $services->get('Omeka\Settings')
+            ->get('easyadmin_admin_board_color', '');
+        if ($color === '') {
+            return;
+        }
+
+        // The class "admin-board" is not set in all versions of the layout.
+        $event->getTarget()->headStyle()->appendStyle(
+            'body > .flex > header { background-color: ' . $color . '; }'
+        );
+    }
+
     public function handleCron(Event $event): void
     {
         // Quick static check to avoid reading settings on every page load.

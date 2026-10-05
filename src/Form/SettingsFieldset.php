@@ -89,6 +89,19 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_admin_board_color',
+                'type' => OmekaElement\ColorPicker::class,
+                'options' => [
+                    'element_group' => 'display',
+                    'label' => 'Color of the admin left sidebar', // @translate
+                    'info' => 'Useful to distinguish instances, for example a test one from the production one.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_admin_board_color',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_rights_reviewer_delete_all',
                 'type' => Element\Checkbox::class,
                 'options' => [

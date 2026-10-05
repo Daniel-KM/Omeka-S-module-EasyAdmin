@@ -326,6 +326,7 @@ return [
                 // 'resource_previous_next',
             ],
             'easyadmin_settings_enhancements' => false,
+            'easyadmin_admin_board_color' => '',
             // Editing.
             'easyadmin_rights_reviewer_delete_all' => false,
             'easyadmin_quick_template' => [],
