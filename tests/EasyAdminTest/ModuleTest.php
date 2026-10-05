@@ -25,6 +25,49 @@ class ModuleTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * The filter of the settings pages of the module is skipped when the core
+     * has its own one, so the two are never displayed together.
+     */
+    public function testCoreSettingsFilterIsDetected(): void
+    {
+        $module = new \EasyAdmin\Module();
+        $module->setServiceLocator($this->getApplication()->getServiceManager());
+
+        $method = new \ReflectionMethod($module, 'hasCoreSettingsFilter');
+        $method->setAccessible(true);
+        $result = $method->invoke($module);
+
+        $this->assertIsBool($result);
+        // The features of the module are not skipped without the view helper
+        // that renders the filter of the core.
+        $hasHelper = $this->getService('ViewHelperManager')->has('settingsFilter');
+        if (!$hasHelper) {
+            $this->assertFalse($result);
+        }
+        // And they are skipped only with a core that has it.
+        if ($result) {
+            $this->assertTrue($hasHelper);
+            $this->assertTrue(version_compare(\Omeka\Module::VERSION, '4.3', '>='));
+        }
+    }
+
+    /**
+     * The scripts of the settings pages must exist, else the pages break.
+     */
+    public function testSettingsFilterAssetsExist(): void
+    {
+        $dir = dirname(__DIR__, 2) . '/asset/js/';
+        foreach ([
+            'settings-fields.js',
+            'settings-filter.js',
+            'settings-filter-core.js',
+            'settings-nav.js',
+        ] as $file) {
+            $this->assertFileExists($dir . $file);
+        }
+    }
+
+    /**
      * Test module is installed.
      */
     public function testModuleIsInstalled(): void
