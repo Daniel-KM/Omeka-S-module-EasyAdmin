@@ -23,7 +23,8 @@ use Omeka\Module\Exception\ModuleCannotInstallException;
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $plugins = $services->get('ControllerPluginManager');
-$url = $services->get('ViewHelperManager')->get('url');
+$helpers = $services->get('ViewHelperManager');
+$url = $helpers->get('url');
 $api = $plugins->get('api');
 $logger = $services->get('Omeka\Logger');
 $settings = $services->get('Omeka\Settings');
@@ -467,7 +468,7 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
     $settings->set('easyadmin_quick_template', $val);
 
     // Rename some cron tasks.
-    $cronTasks = $settings->get('easyadmin_cron_tasks', $val);
+    $cronTasks = $settings->get('easyadmin_cron_tasks') ?: [];
     $renameTasks = [
         'session_1' => 'session_1d',
         'session_2' => 'session_2d',
