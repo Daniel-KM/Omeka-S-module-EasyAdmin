@@ -15,6 +15,10 @@ class ModuleControllerFactory implements FactoryInterface
         $basePath = $config['file_store']['local']['base_path']
             ?: (OMEKA_PATH . '/files');
 
-        return new ModuleController($moduleManager, $basePath);
+        return new ModuleController(
+            $moduleManager,
+            $basePath,
+            $services->get('Omeka\\EntityManager')
+        );
     }
 }

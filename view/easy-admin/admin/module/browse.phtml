@@ -404,6 +404,17 @@ echo $this->form()->openTag($manageForm);
                         </li>
                         <?php endif ?>
 
+                        <?php if ($versionMismatch): ?>
+                        <li>
+                            <button type="submit" name="state_action_id" value="downgrade-version:<?= $escape($moduleId) ?>"
+                                formaction="<?= $escape($url('admin/easy-admin/default', ['controller' => 'module', 'action' => 'downgrade-version'], ['query' => ['id' => $moduleId]])) ?>"
+                                class="o-icon-undo button"
+                                title="<?= $escapeAttr(sprintf($translate('Set the version %1$s of the database to the version %2$s of the files. The database schema and the data are not modified.'), $dbVersion, $version)) ?>"
+                                aria-label="<?= $escapeAttr($translate('Set the version of the database to the version of the files')) ?>"
+                                ><?= $translate('Fix version') ?></button>
+                        </li>
+                        <?php endif ?>
+
                         <?php if ($hasCompatibleUpdate): ?>
                         <li><?= $hyperlink('', '#', [
                             'data-sidebar-selector' => '#sidebar',

@@ -21,12 +21,19 @@ class ModuleController extends AbstractActionController
      */
     protected $basePath;
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $entityManager;
+
     public function __construct(
         OmekaModuleManager $moduleManager,
-        string $basePath
+        string $basePath,
+        \Doctrine\ORM\EntityManager $entityManager
     ) {
         $this->moduleManager = $moduleManager;
         $this->basePath = $basePath;
+        $this->entityManager = $entityManager;
     }
 
     public function indexAction()
@@ -621,6 +628,81 @@ class ModuleController extends AbstractActionController
         }
 
         return $this->redirectToBrowse('needs_upgrade');
+    }
+
+    /**
+     * Set the version stored in the database to the version of the files.
+     *
+     * When files are rolled back without rolling back the database, the
+     * database keeps a version greater than the one of the files, so Omeka
+     * does not run any upgrade and the module stays in an inconsistent state.
+     * This marks the real version, so the next update runs the upgrades from
+     * it. The database schema and the data are not modified, so this is only
+     * useful when the rolled back versions did not change them, or when they
+     * were reverted by other means.
+     */
+    public function downgradeVersionAction()
+    {
+        if (!$this->getRequest()->isPost()) {
+            return $this->redirectToBrowse();
+        }
+
+        $id = $this->params()->fromPost('id')
+            ?: $this->params()->fromQuery('id');
+        $module = $this->moduleManager->getModule($id);
+        if (!$module) {
+            $this->messenger()->addError(new PsrMessage(
+                'Module "{name}" not found.', // @translate
+                ['name' => $id]
+            ));
+            return $this->redirectToBrowse();
+        }
+
+        // The version of the database is read from the entity and not from the
+        // module manager, whose data is a snapshot built at the beginning of
+        // the request.
+        $entity = $this->entityManager
+            ->find(\Omeka\Entity\Module::class, $id);
+        if (!$entity) {
+            $this->messenger()->addError(new PsrMessage(
+                'Module "{name}" is not installed.', // @translate
+                ['name' => $id]
+            ));
+            return $this->redirectToBrowse();
+        }
+
+        $iniVersion = (string) $module->getIni('version');
+        $dbVersion = (string) $entity->getVersion();
+        if (!$iniVersion || !$dbVersion) {
+            $this->messenger()->addError(new PsrMessage(
+                'Module "{name}" has no version in the files or in the database.', // @translate
+                ['name' => $id]
+            ));
+            return $this->redirectToBrowse();
+        }
+
+        if (version_compare($dbVersion, $iniVersion, '<=')) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'The database of module "{name}" is already on version {version_db}, that is not greater than the version {version_ini} of the files.', // @translate
+                ['name' => $id, 'version_db' => $dbVersion, 'version_ini' => $iniVersion]
+            ));
+            return $this->redirectToBrowse();
+        }
+
+        try {
+            $entity->setVersion($iniVersion);
+            $this->entityManager->flush();
+        } catch (\Throwable $e) {
+            $this->addModuleErrorMessage($e, $id);
+            return $this->redirectToBrowse();
+        }
+
+        $this->messenger()->addSuccess(new PsrMessage(
+            'The version of module "{name}" in the database was set from {version_db} to {version_ini}, the version of the files. The database schema and the data were not modified.', // @translate
+            ['name' => $id, 'version_db' => $dbVersion, 'version_ini' => $iniVersion]
+        ));
+
+        return $this->redirectToBrowse();
     }
 
     public function installAction()
