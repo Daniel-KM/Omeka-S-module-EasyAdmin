@@ -252,6 +252,17 @@ default is not declared (mostly settings of modules that do not declare theirs)
 stay unknown. It can be enabled with the button "Enable filters" in main
 settings page.
 
+Since Omeka 4.3, the settings pages have their own filter, with chips to select
+an element group. In that case, only the features that the core does not
+provide are added: the highlight of the matches, the status of each value and
+the filters on it, the filters on the type of field, and the search inside the
+current values.
+
+### Color of the admin sidebar
+
+The background color of the admin left sidebar can be set in main settings, for
+example to distinguish a test instance from the production one.
+
 ### Security and privacy
 
 An audit lists the security and privacy weaknesses of the install: sensitive
@@ -316,6 +327,14 @@ Simply select either the desired module or the desired theme and click "upload".
 
 See more details on [modules] and [themes].
 
+When the files of a module are rolled back without rolling back the database,
+the database keeps a version greater than the one of the files, so Omeka does
+not run any upgrade and the module stays in an inconsistent state. The page of
+the modules displays both versions in that case, with a button "Fix version"
+to store the version of the files in the database. The database schema and the
+data are not modified, so it is useful only when the rolled back versions did
+not change them, or when they were reverted by other means.
+
 ### Content lock (Easy Admin until version 3.4.30)
 
 The feature was moved to the module [Lock Edit] since version 3.4.31.
@@ -353,6 +372,15 @@ the task creates files inside Omeka "/files/" directory. If the task only uses
 the database, it is usually not needed, but you need to take care of modules
 that can create derivative or temp files. And you may need to take care of
 escaping json arguments.
+
+The script finds the root of Omeka from the path used to call it, so the path
+must be the one inside the directory of Omeka, for example
+"/path/to/omeka/modules/EasyAdmin/data/scripts/task.php". When the directory of
+the module is a symbolic link, for example when modules are shared between
+instances, the real path of the script ("/path/to/shared/modules/EasyAdmin/…")
+cannot be used, because it does not indicate the instance. The command displayed
+in the page "Cron" of the module uses the right path. The same rule applies to
+the script of the module [Cron].
 
 A sudo command may be used:
 
