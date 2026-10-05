@@ -170,26 +170,14 @@ trait PreviousNextResourceTrait
 
         $resourceId = $resource->id();
 
-        // Get only the two adjacent ids (previous and next) using two bounded
-        // queries instead of loading all ids into memory.
-        // The original query builder has the correct filters, sort, and joins.
-        // We clone it and add a condition on id to get only the adjacent ids.
-        // This works because `addOrderBy('omeka_root.id', ...)` is always
-        // appended (line 260), making the sort fully deterministic.
-
-        // Load a bounded window of ids instead of the full result set.
-        // This caps memory usage for very large collections.
-        // For result sets larger than this, resources beyond the limit
-        // won't have prev/next navigation.
-        $maxWindow = 10000;
+        // Load all ids of the result set: only scalar ids are fetched, so it
+        // remains quick and light even for hundred of thousands of resources,
+        // and the position of the resource is found whatever the sort.
         $qb->select('omeka_root.id');
-        $qb->setMaxResults($maxWindow + 1);
         $ids = $qb->getQuery()->getSingleColumnResult();
 
         $index = array_search($resourceId, $ids);
         if ($index === false) {
-            // Resource is outside the window (very large filtered result set)
-            // or not in the result set at all.
             return [null, null];
         }
 
