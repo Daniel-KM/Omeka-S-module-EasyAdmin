@@ -21,7 +21,8 @@ class AddonsFactory implements FactoryInterface
             $plugins->get('api'),
             $services->get('Omeka\HttpClient'),
             $plugins->get('messenger'),
-            $moduleManager
+            $moduleManager,
+            $services->get('Common\DirectoryManager')
         );
     }
 }

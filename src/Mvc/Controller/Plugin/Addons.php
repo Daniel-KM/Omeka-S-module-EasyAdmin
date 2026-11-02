@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Mvc\Controller\Plugin;
 
+use Common\Stdlib\DirectoryManager;
 use Common\Stdlib\PsrMessage;
 use Doctrine\Inflector\InflectorFactory;
 use Exception;
@@ -45,6 +46,11 @@ class Addons extends AbstractPlugin
      * @var \Omeka\Module\Manager
      */
     protected $moduleManager;
+
+    /**
+     * @var \Common\Stdlib\DirectoryManager|null
+     */
+    protected $directoryManager;
 
     /**
      * Source of data and destination of addons.
@@ -102,12 +108,14 @@ class Addons extends AbstractPlugin
         Api $api,
         HttpClient $httpClient,
         Messenger $messenger,
-        ?ModuleManager $moduleManager = null
+        ?ModuleManager $moduleManager = null,
+        ?DirectoryManager $directoryManager = null
     ) {
         $this->api = $api;
         $this->httpClient = $httpClient;
         $this->messenger = $messenger;
         $this->moduleManager = $moduleManager;
+        $this->directoryManager = $directoryManager;
     }
 
     public function __invoke(): self
@@ -2064,10 +2072,9 @@ class Addons extends AbstractPlugin
         array $addon
     ): ?string {
         $backupDir = OMEKA_PATH . '/files/backup';
-        if (!is_dir($backupDir)) {
-            @mkdir($backupDir, 0775, true);
-        }
-        if (!is_dir($backupDir) || !is_writeable($backupDir)) {
+        if (!$this->directoryManager
+            || !$this->directoryManager->checkDestinationDir($backupDir, true)
+        ) {
             return null;
         }
 
