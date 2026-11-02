@@ -317,6 +317,8 @@ class Module extends AbstractModule
         $easyMeta = $services->get('Common\EasyMeta');
         $val = array_values($easyMeta->resourceTemplateIds());
         $settings->set('easyadmin_quick_template', $val);
+
+        $this->uninstallMergedModules();
     }
 
     /**
@@ -397,26 +399,52 @@ class Module extends AbstractModule
                 ['dirs' => implode(', ', $disabled)]
             ));
         }
+    }
 
-        /** @var \Omeka\Module\Manager $moduleManager */
-        $modules = [
-            'BulkCheck',
-            'EasyInstall',
-            'Maintenance',
-        ];
+    protected function postUpgrade(?string $oldVersion, ?string $newVersion): void
+    {
+        $this->postUpgradeAuto($oldVersion, $newVersion);
+        $this->uninstallMergedModules();
+    }
+
+    /**
+     * Uninstall the modules merged in Easy Admin, with their settings.
+     *
+     * It is run on each install and upgrade, because an old module may have
+     * been installed again. The modules Next and Generic are not uninstalled:
+     * the features of Next are split between several modules and Generic is
+     * still required by old modules.
+     */
+    protected function uninstallMergedModules(): void
+    {
+        $services = $this->getServiceLocator();
         $connection = $services->get('Omeka\Connection');
-        $moduleManager = $services->get('Omeka\ModuleManager');
-        foreach ($modules as $moduleName) {
-            $module = $moduleManager->getModule($moduleName);
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+
+        // The module Maintenance blocked the public front-end for anybody.
+        if ($settings->get('maintenance_status') && !$settings->get('easyadmin_maintenance_mode')) {
+            $settings->set('easyadmin_maintenance_mode', 'public');
+            $text = trim((string) $settings->get('maintenance_text'));
+            if ($text !== '') {
+                $settings->set('easyadmin_maintenance_text', $text);
+            }
+        }
+        // Obsolete key, replaced by "easyadmin_maintenance_mode".
+        $settings->delete('easyadmin_maintenance_status');
+
+        foreach (['BulkCheck', 'EasyInstall', 'Maintenance'] as $moduleName) {
+            $isInstalled = (bool) $connection->fetchOne('SELECT 1 FROM `module` WHERE `id` = ?', [$moduleName]);
+            $prefix = strtolower($moduleName) . '\_%';
             $connection->executeStatement('DELETE FROM `module` WHERE `id` = ?', [$moduleName]);
-            $connection->executeStatement('DELETE FROM `setting` WHERE `id` LIKE ?', [strtolower($moduleName) . '\_%']);
-            $connection->executeStatement('DELETE FROM `site_setting` WHERE `id` LIKE ?', [strtolower($moduleName) . '\_%']);
-            if ($module) {
-                $message = new PsrMessage(
-                    'The module "{module}" was upgraded by module "{module_2}" and uninstalled.', // @translate
+            $connection->executeStatement('DELETE FROM `setting` WHERE `id` LIKE ?', [$prefix]);
+            $connection->executeStatement('DELETE FROM `site_setting` WHERE `id` LIKE ?', [$prefix]);
+            $connection->executeStatement('DELETE FROM `user_setting` WHERE `id` LIKE ?', [$prefix]);
+            if ($isInstalled) {
+                $messenger->addWarning(new PsrMessage(
+                    'The module "{module}" was merged into module "{module_2}" and uninstalled.', // @translate
                     ['module' => $moduleName, 'module_2' => 'Easy Admin']
-                );
-                $messenger->addWarning($message);
+                ));
             }
         }
     }
