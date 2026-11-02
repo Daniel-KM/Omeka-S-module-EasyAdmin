@@ -191,7 +191,7 @@ abstract class AbstractCheck extends AbstractJob
             $this->options['enclosure'] = "\0";
         }
         if ($this->options['escape'] === 0) {
-            $this->options['escape'] = "\0";
+            $this->options['escape'] = '';
         }
 
         $row = [];

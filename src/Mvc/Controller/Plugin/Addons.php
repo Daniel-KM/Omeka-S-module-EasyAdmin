@@ -158,7 +158,7 @@ class Addons extends AbstractPlugin
             $headers = [];
             $isFirst = true;
             foreach (explode("\n", $csv) as $row) {
-                $row = str_getcsv($row) ?: [];
+                $row = str_getcsv($row, ',', '"', '') ?: [];
                 if ($isFirst) {
                     $headers = array_flip($row);
                     $isFirst = false;
