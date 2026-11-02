@@ -595,10 +595,8 @@ if (version_compare($oldVersion, '3.4.46', '<')) {
     }
 
     // Warn if the Cron module is present but too old for the new task model.
-    if (method_exists($this, 'isModuleActive')
-        && method_exists($this, 'isModuleVersionAtLeast')
-        && $this->isModuleActive('Cron')
-        && !$this->isModuleVersionAtLeast('Cron', '3.4.3')
+    if (method_exists($this, 'checkModuleAvailability')
+        && !$this->checkModuleAvailability('Cron', '3.4.3')
     ) {
         $messenger->addWarning(new PsrMessage(
             'The module Cron should be upgraded to version {version} or later for the new cron task configuration.', // @translate
