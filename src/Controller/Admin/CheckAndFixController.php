@@ -9,6 +9,11 @@ use Laminas\View\Model\ViewModel;
 class CheckAndFixController extends AbstractActionController
 {
     /**
+     * Color of the admin sidebar of a test copy.
+     */
+    const TEST_BOARD_COLOR = '#8b1a1a';
+
+    /**
      * Processes quick enough to run in the web process, with instant feedback.
      *
      * They are dispatched as jobs anyway, so the job log and history are kept,
@@ -224,9 +229,8 @@ class CheckAndFixController extends AbstractActionController
                 $this->checkInstall();
                 break;
             case 'settings_environment_check':
-            case 'settings_environment_fix':
                 $this->checkSettingsEnvironment(
-                    $process === 'settings_environment_fix',
+                    (string) ($params['system']['settings_environment']['mode'] ?? ''),
                     !empty($params['system']['settings_environment']['include_empty'])
                 );
                 break;
@@ -662,15 +666,15 @@ class CheckAndFixController extends AbstractActionController
      * installation title, urls, hosts, paths, emails, api keys and tokens. The
      * detection is based on the name of the setting, so it covers modules
      * without any dependency on them. Secret values (keys, tokens, passwords)
-     * are redacted. The optional fix only prefixes the installation title with
-     * « TEST »; all other values require a new server-specific value and are
-     * listed for a manual review.
+     * are redacted. The mode "test" or "production" adapts the few settings that
+     * distinguish a test copy; all other values require a new server-specific
+     * value and are listed for a manual review.
      *
      * Empty settings are listed only when $includeEmpty is set, and some known
      * settings that match a pattern but never depend on the server (standard
      * rights uris, durations, static route paths…) are always excluded.
      */
-    protected function checkSettingsEnvironment(bool $fix, bool $includeEmpty): void
+    protected function checkSettingsEnvironment(string $mode, bool $includeEmpty): void
     {
         /** @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger */
         $messenger = $this->messenger();
@@ -857,13 +861,27 @@ class CheckAndFixController extends AbstractActionController
             'Also review configurations stored outside the settings: search engines (SearchSolr cores/nodes, url and host), file paths and mailer in "config/local.config.php", and any external service of the modules.' // @translate
         ));
 
-        if (!$fix) {
-            return;
+        if ($mode === 'test') {
+            $this->adaptSettingsForTest();
+        } elseif ($mode === 'production') {
+            $this->adaptSettingsForProduction();
         }
+    }
 
-        /** @var \Omeka\Settings\Settings $mainSettings */
-        $mainSettings = $services->get('Omeka\Settings');
-        $title = (string) $mainSettings->get('installation_title', '');
+    /**
+     * Adapt the settings for a test copy of a site.
+     *
+     * The copy is distinguished at first glance, the errors are displayed and
+     * the statistics are no longer sent to the analytics server of the site.
+     */
+    protected function adaptSettingsForTest(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $connection = $services->get('Omeka\Connection');
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $this->messenger();
+
+        $title = (string) $settings->get('installation_title', '');
         if (mb_strpos($title, 'TEST') === 0) {
             $messenger->addNotice(new PsrMessage(
                 'The installation title already starts with « TEST »: {title}', // @translate
@@ -871,34 +889,30 @@ class CheckAndFixController extends AbstractActionController
             ));
         } else {
             $newTitle = trim('TEST ' . $title);
-            $mainSettings->set('installation_title', $newTitle);
+            $settings->set('installation_title', $newTitle);
             $messenger->addSuccess(new PsrMessage(
                 'The installation title is now: {title}', // @translate
                 ['title' => $newTitle]
             ));
         }
 
-        // A colored admin sidebar distinguishes the copy from the original site
-        // at first glance. A color already chosen is kept.
-        if (!$mainSettings->get('easyadmin_admin_board_color')) {
-            $mainSettings->set('easyadmin_admin_board_color', '#8b1a1a');
+        // A color already chosen is kept.
+        if (!$settings->get('easyadmin_admin_board_color')) {
+            $settings->set('easyadmin_admin_board_color', self::TEST_BOARD_COLOR);
             $messenger->addSuccess(new PsrMessage(
                 'The admin sidebar is now colored ({color}).', // @translate
-                ['color' => '#8b1a1a']
+                ['color' => self::TEST_BOARD_COLOR]
             ));
         }
 
-        // The errors are displayed to anybody to help to fix the issues found
-        // on the copy.
-        if ($mainSettings->get('easyadmin_display_exception') !== 'all') {
-            $mainSettings->set('easyadmin_display_exception', 'all');
+        if ($settings->get('easyadmin_display_exception') !== 'all') {
+            $settings->set('easyadmin_display_exception', 'all');
             $messenger->addSuccess(new PsrMessage(
                 'The errors are now displayed on screen for anybody.' // @translate
             ));
         }
 
-        // The statistics of the copy must not be sent to the analytics server
-        // of the original site: tracking scripts and server-side tracker.
+        // Tracking scripts and server-side tracker.
         $trackers = $connection->executeStatement(
             'UPDATE setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
             ['""', ['analyticssnippet_inline_public', 'analyticssnippet_inline_admin', 'analyticssnippetpiwik_tracker_url'], ['""', 'null', '']],
@@ -912,6 +926,58 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addSuccess(new PsrMessage(
                 'The statistics trackers were removed ({count} settings), so the visits of this copy are not sent to the analytics server of the original site.', // @translate
                 ['count' => $trackers]
+            ));
+        }
+    }
+
+    /**
+     * Restore the settings of a test copy for the production.
+     *
+     * Only the values set for the test are reverted: the prefix of the title,
+     * the color of the admin sidebar and the display of the errors. The removed
+     * statistics trackers cannot be restored.
+     */
+    protected function adaptSettingsForProduction(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $connection = $services->get('Omeka\Connection');
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $this->messenger();
+
+        $title = (string) $settings->get('installation_title', '');
+        if (mb_strpos($title, 'TEST') === 0) {
+            $newTitle = trim(mb_substr($title, 4));
+            $settings->set('installation_title', $newTitle);
+            $messenger->addSuccess(new PsrMessage(
+                'The installation title is now: {title}', // @translate
+                ['title' => $newTitle]
+            ));
+        }
+
+        // A color chosen for the production is kept.
+        if ($settings->get('easyadmin_admin_board_color') === self::TEST_BOARD_COLOR) {
+            $settings->set('easyadmin_admin_board_color', '');
+            $messenger->addSuccess(new PsrMessage(
+                'The admin sidebar has now its default color.' // @translate
+            ));
+        }
+
+        if ($settings->get('easyadmin_display_exception')) {
+            $settings->set('easyadmin_display_exception', '');
+            $messenger->addSuccess(new PsrMessage(
+                'The errors are no longer displayed on screen.' // @translate
+            ));
+        }
+
+        $emptyTrackers = (int) $connection->fetchOne(
+            'SELECT COUNT(*) FROM setting WHERE id IN (?) AND value IN (?)',
+            [['analyticssnippet_inline_public', 'analyticssnippet_inline_admin', 'analyticssnippetpiwik_tracker_url'], ['""', 'null', '']],
+            [\Doctrine\DBAL\Connection::PARAM_STR_ARRAY, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+        );
+        if ($emptyTrackers) {
+            $messenger->addWarning(new PsrMessage(
+                'The statistics trackers are empty ({count} settings): set them again if needed.', // @translate
+                ['count' => $emptyTrackers]
             ));
         }
     }

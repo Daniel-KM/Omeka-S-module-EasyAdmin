@@ -325,10 +325,9 @@ class CheckAndFixForm extends Form
             ],
             'settings_environment' => [
                 'name' => 'Environment settings', // @translate
-                'description' => 'Settings depending on the server to review after a copy of the database (title, urls, paths, hosts, emails, api keys…).', // @translate
+                'description' => 'Settings depending on the server to review after a copy of the database (title, urls, paths, hosts, emails, api keys…), optionally adapted for a test copy or for the production.', // @translate
                 'actions' => [
                     'settings_environment_check' => 'List', // @translate
-                    'settings_environment_fix' => 'Adapt for a test copy', // @translate
                 ],
             ],
             // Security and privacy.
@@ -548,6 +547,10 @@ class CheckAndFixForm extends Form
             ]);
         $inputFilter->get('system')
             ->get('settings_environment')
+            ->add([
+                'name' => 'mode',
+                'required' => false,
+            ])
             ->add([
                 'name' => 'include_empty',
                 'required' => false,
@@ -1551,8 +1554,7 @@ class CheckAndFixForm extends Form
                     // label that is not set is skipped by all versions.
                     'value_options' => [
                         'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
-                        'settings_environment_check' => 'List environment-specific settings to review after a copy of the database (title, urls, paths, hosts, emails, api keys…)', // @translate
-                        'settings_environment_fix' => 'Adapt settings for a test/dev copy (prefix the title with « TEST », color the admin sidebar, display the errors on screen, remove the statistics trackers, then list the other settings to review)', // @translate
+                        'settings_environment_check' => 'List environment-specific settings to review after a copy of the database (title, urls, paths, hosts, emails, api keys…), optionally adapted for a test copy or for the production', // @translate
                         'cache_check' => 'Check caches', // @translate
                         'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate
                         'mail_check' => 'Check email configuration and send test email', // @translate
@@ -1694,10 +1696,26 @@ class CheckAndFixForm extends Form
                     'label' => 'Options for environment settings', // @translate
                 ],
                 'attributes' => [
-                    'class' => 'settings_environment_check settings_environment_fix',
+                    'class' => 'settings_environment_check',
                 ],
             ])
             ->get('settings_environment')
+            ->add([
+                'name' => 'mode',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Adapt the settings', // @translate
+                    'value_options' => [
+                        '' => 'No', // @translate
+                        'test' => 'For a test copy: prefix the title with « TEST », color the admin sidebar, display the errors on screen and remove the statistics trackers', // @translate
+                        'production' => 'For the production: remove the prefix « TEST » of the title, the color of the admin sidebar of the test and the display of the errors', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'settings-environment-mode',
+                    'value' => '',
+                ],
+            ])
             ->add([
                 'name' => 'include_empty',
                 'type' => \Common\Form\Element\OptionalCheckbox::class,
