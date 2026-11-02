@@ -820,66 +820,15 @@ class DatabaseBackup extends AbstractJob
     }
 
     /**
-     * Check or create destination directory.
+     * Check or create destination directory, protected from a direct web access.
      *
-     * Also creates .htaccess to deny direct web access since backups
-     * contain sensitive data (database credentials, user passwords, API keys).
+     * The backups contain sensitive data (database credentials, user passwords,
+     * api keys).
      */
     protected function checkDestinationDir(string $dirPath): bool
     {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_writeable($dirPath)) {
-                $this->logger->err(
-                    'The backup directory is not writeable: {path}', // @translate
-                    ['path' => $dirPath]
-                );
-                return false;
-            }
-            // Ensure .htaccess exists even for existing directories.
-            $this->createHtaccess($dirPath);
-            return true;
-        }
-
-        $result = @mkdir($dirPath, 0775, true);
-        if (!$result) {
-            $this->logger->err(
-                'Unable to create backup directory: {path}', // @translate
-                ['path' => $dirPath]
-            );
-            return false;
-        }
-
-        $this->createHtaccess($dirPath);
-        return true;
-    }
-
-    /**
-     * Create .htaccess to deny direct web access to backup files.
-     *
-     * Backups contain sensitive information and must only be downloaded
-     * via the admin controller which checks authentication.
-     */
-    protected function createHtaccess(string $dirPath): void
-    {
-        $htaccessPath = $dirPath . '/.htaccess';
-        if (file_exists($htaccessPath)) {
-            return;
-        }
-
-        $htaccessContent = <<<'HTACCESS'
-            # Deny direct access to backup files.
-            # Backups contain sensitive data (database credentials, API keys, user passwords).
-            # Downloads must go through the admin controller for authentication.
-            <IfModule mod_authz_core.c>
-                Require all denied
-            </IfModule>
-            <IfModule !mod_authz_core.c>
-                Order deny,allow
-                Deny from all
-            </IfModule>
-            HTACCESS;
-
-        @file_put_contents($htaccessPath, $htaccessContent);
+        return (bool) $this->getServiceLocator()->get('Common\DirectoryManager')
+            ->checkDestinationDir($dirPath, true);
     }
 
     /**

@@ -409,64 +409,8 @@ abstract class AbstractCheck extends AbstractJob
      */
     protected function checkDestinationDir($dirPath): ?string
     {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
-                $this->logger->err(
-                    'The directory "{path}" is not writeable.', // @translate
-                    ['path' => $dirPath]
-                );
-                return null;
-            }
-            // Ensure .htaccess exists for backup directories.
-            if (basename($dirPath) === 'backup') {
-                $this->createBackupHtaccess($dirPath);
-            }
-            return $dirPath;
-        }
-
-        $result = @mkdir($dirPath, 0775, true);
-        if (!$result) {
-            $this->logger->err(
-                'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
-            );
-            return null;
-        }
-
-        // Create .htaccess for backup directories.
-        if (basename($dirPath) === 'backup') {
-            $this->createBackupHtaccess($dirPath);
-        }
-
-        return $dirPath;
-    }
-
-    /**
-     * Create .htaccess to deny direct web access to backup files.
-     *
-     * Backups contain sensitive information and must only be downloaded
-     * via the admin controller which checks authentication.
-     */
-    protected function createBackupHtaccess(string $dirPath): void
-    {
-        $htaccessPath = $dirPath . '/.htaccess';
-        if (file_exists($htaccessPath)) {
-            return;
-        }
-
-        $htaccessContent = <<<'HTACCESS'
-            # Deny direct access to backup files.
-            # Backups contain sensitive data (database credentials, API keys, user passwords).
-            # Downloads must go through the admin controller for authentication.
-            <IfModule mod_authz_core.c>
-                Require all denied
-            </IfModule>
-            <IfModule !mod_authz_core.c>
-                Order deny,allow
-                Deny from all
-            </IfModule>
-            HTACCESS;
-
-        @file_put_contents($htaccessPath, $htaccessContent);
+        // The backup directory is protected from a direct web access.
+        return $this->getServiceLocator()->get('Common\DirectoryManager')
+            ->checkDestinationDir($dirPath, basename($dirPath) === 'backup');
     }
 }

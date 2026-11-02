@@ -121,33 +121,7 @@ trait TraitEasyDir
      */
     protected function ensureDenyHtaccess(string $dirBasePath): void
     {
-        if (!is_dir($dirBasePath)) {
-            @mkdir($dirBasePath, 0775, true);
-        }
-        $htaccessPath = rtrim($dirBasePath, '/') . '/.htaccess';
-        if (!file_exists($htaccessPath)) {
-            @file_put_contents($htaccessPath, $this->denyHtaccessContent());
-        }
-    }
-
-    /**
-     * The .htaccess content denying direct web access to private files.
-     */
-    protected function denyHtaccessContent(): string
-    {
-        return <<<'HTACCESS'
-            # Deny direct access to private files.
-            # They contain sensitive data (database credentials, API keys, user
-            # passwords, private uploads) and must only be downloaded through the
-            # authenticated admin controller.
-            <IfModule mod_authz_core.c>
-                Require all denied
-            </IfModule>
-            <IfModule !mod_authz_core.c>
-                Order deny,allow
-                Deny from all
-            </IfModule>
-            HTACCESS;
+        $this->plugin('checkDestinationDir')($dirBasePath, true);
     }
 
     /**
@@ -336,26 +310,6 @@ trait TraitEasyDir
      */
     protected function checkDestinationDir(string $dirPath): ?string
     {
-        if (file_exists($dirPath)) {
-            if (!is_dir($dirPath) || !is_readable($dirPath) || !is_writeable($dirPath)) {
-                $this->logger()->err(
-                    'The directory "{path}" is not writeable.', // @translate
-                    ['path' => $dirPath]
-                );
-                return null;
-            }
-            return $dirPath;
-        }
-
-        $result = @mkdir($dirPath, 0775, true);
-        if (!$result) {
-            $this->logger()->err(
-                'The directory "{path}" is not writeable: {error}.', // @translate
-                ['path' => $dirPath, 'error' => error_get_last()['message'] ?? 'unknown error']
-            );
-            return null;
-        }
-
-        return $dirPath;
+        return $this->plugin('checkDestinationDir')($dirPath);
     }
 }
