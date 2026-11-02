@@ -888,6 +888,15 @@ class CheckAndFixController extends AbstractActionController
             ));
         }
 
+        // The errors are displayed to anybody to help to fix the issues found
+        // on the copy.
+        if ($mainSettings->get('easyadmin_display_exception') !== 'all') {
+            $mainSettings->set('easyadmin_display_exception', 'all');
+            $messenger->addSuccess(new PsrMessage(
+                'The errors are now displayed on screen for anybody.' // @translate
+            ));
+        }
+
         // The statistics of the copy must not be sent to the analytics server
         // of the original site: tracking scripts and server-side tracker.
         $trackers = $connection->executeStatement(

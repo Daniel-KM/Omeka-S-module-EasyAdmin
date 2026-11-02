@@ -1552,7 +1552,7 @@ class CheckAndFixForm extends Form
                     'value_options' => [
                         'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
                         'settings_environment_check' => 'List environment-specific settings to review after a copy of the database (title, urls, paths, hosts, emails, api keys…)', // @translate
-                        'settings_environment_fix' => 'Adapt settings for a test/dev copy (prefix the title with « TEST », color the admin sidebar, remove the statistics trackers, then list the other settings to review)', // @translate
+                        'settings_environment_fix' => 'Adapt settings for a test/dev copy (prefix the title with « TEST », color the admin sidebar, display the errors on screen, remove the statistics trackers, then list the other settings to review)', // @translate
                         'cache_check' => 'Check caches', // @translate
                         'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate
                         'mail_check' => 'Check email configuration and send test email', // @translate
