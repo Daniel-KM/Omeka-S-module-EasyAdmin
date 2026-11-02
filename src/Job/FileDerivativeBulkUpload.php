@@ -140,10 +140,12 @@ class FileDerivativeBulkUpload extends AbstractJob
         }
 
         $settings = $services->get('Omeka\Settings');
-        // Manage old version of ImageServer.
-        $imageServerTileManual = $settings->get('imageserver_tile_mode', $settings->get('imageserver_tile_manual') ? 'manual' : 'auto') === 'manual';
+        // Manage old version of ImageServer. Tiles are useless with an
+        // external image server.
+        $imageServerTileAuto = $hasBulkSizer
+            && $settings->get('imageserver_tile_mode', $settings->get('imageserver_tile_manual') ? 'manual' : 'auto') === 'auto';
         // Don't run bulksizer if MediaDimension is done.
-        if ($hasMediaDimension && $imageServerTileManual) {
+        if ($hasMediaDimension && !$imageServerTileAuto) {
             $subJobClasses = [
                 \IiifServer\Job\MediaDimensions::class,
             ];
@@ -152,7 +154,7 @@ class FileDerivativeBulkUpload extends AbstractJob
                 \IiifServer\Job\MediaDimensions::class,
                 \ImageServer\Job\BulkTiler::class,
             ];
-        } elseif ($imageServerTileManual) {
+        } elseif (!$imageServerTileAuto) {
             $subJobClasses = [
                 \ImageServer\Job\BulkSizer::class,
             ];
