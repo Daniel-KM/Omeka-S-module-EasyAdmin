@@ -38,7 +38,7 @@ class CronForm extends Form
 
     public function init(): void
     {
-        $this->setAttribute('id', 'form-cron');
+        $this->setAttribute('id', 'cron-form');
 
         // Collect tasks from modules via event.
         $this->collectTasks();
