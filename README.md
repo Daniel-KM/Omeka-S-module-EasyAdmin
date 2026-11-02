@@ -273,6 +273,18 @@ belongs to. The protection is also applied on upgrade. Directories owned by a
 feature that serves files directly (for example the "zip" directory of modules
 Derivative Media and Zip) are excluded.
 
+The backups (database, modules, themes, config) are stored in `files/backup/`,
+protected by a ".htaccess" created with the directory, and downloaded through
+an authenticated action. A ".htaccess" is read only by Apache with the option
+`AllowOverride`: with nginx or another server, deny the access to the sensitive
+directories in the config of the server, for example for nginx:
+
+```nginx
+location ~ ^/files/(backup|userdata)/ {
+    deny all;
+}
+```
+
 ### Checks and fixes
 
 Go to the menu "Bulk Check", select your process, set your options if needed,
@@ -319,7 +331,11 @@ extensible via configuration.
 After copying a production database to a test install, several settings must be
 adapted to the new environment. A task lists these environment-specific settings
 (and site settings) so they can be reviewed and updated, without touching values
-that are not environment-related.
+that are not environment-related. An option adapts the settings for a test copy:
+the title is prefixed with « TEST », the admin sidebar is colored, the errors are
+displayed on screen for anybody and the statistics trackers are removed. Another
+option reverts them for the production, except the statistics trackers, that
+should be set again.
 
 ### Install and update modules and themes
 
