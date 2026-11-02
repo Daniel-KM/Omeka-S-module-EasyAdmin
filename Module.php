@@ -92,6 +92,45 @@ class Module extends AbstractModule
             [$this, 'onEventMergeConfig'],
             -100
         );
+
+        // Only before php 8.4, that accepts all ids, when a cookie is sent and
+        // when the core does not check it itself.
+        if (PHP_VERSION_ID < 80400
+            && $_COOKIE
+            && !method_exists(\Omeka\Mvc\MvcListeners::class, 'discardInvalidSessionId')
+        ) {
+            $moduleManager->getEventManager()->attach(
+                ModuleEvent::EVENT_MERGE_CONFIG,
+                [$this, 'discardInvalidSessionId']
+            );
+        }
+    }
+
+    /**
+     * Discard the session id of the cookie when the session validator would
+     * reject it.
+     *
+     * After an upgrade of php, the setting "session.sid_bits_per_character" may
+     * change, so the ids created before contain characters that are no longer
+     * allowed and the session fails to start with an error on every page, until
+     * the user removes the cookie. Without the id, php starts a new session and
+     * replaces the cookie. It is checked before the bootstrap, because a module
+     * may start the session early.
+     */
+    public function discardInvalidSessionId(ModuleEvent $event): void
+    {
+        $config = $event->getParam('configListener')->getMergedConfig(false);
+        $sessionName = $config['session']['config']['name'] ?? md5(OMEKA_PATH);
+        if (!isset($_COOKIE[$sessionName])) {
+            return;
+        }
+
+        $sessionId = $_COOKIE[$sessionName];
+        if (!is_string($sessionId)
+            || !(new \Laminas\Session\Validator\Id($sessionId))->isValid()
+        ) {
+            unset($_COOKIE[$sessionName]);
+        }
     }
 
     /**
