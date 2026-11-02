@@ -703,8 +703,13 @@ class CheckAndFixController extends AbstractActionController
             if (in_array($key, $excluded, true)) {
                 return null;
             }
-            if ($key === 'installation_title') {
+            if ($key === 'installation_title' || $key === 'easyadmin_admin_board_color') {
                 return 'title';
+            }
+            // Scripts of statistics: a copy sends its visits to the analytics
+            // server of the original site.
+            if (preg_match('/^analyticssnippet_inline_/', $key)) {
+                return 'tracking';
             }
             if (preg_match('/(api_?key|_token|_secret|password|_credential)/', $key)) {
                 return 'secret';
@@ -712,8 +717,11 @@ class CheckAndFixController extends AbstractActionController
             if (preg_match('/(_email|_recipient|_sender|reply_to)/', $key)) {
                 return 'email';
             }
-            if (preg_match('/(base_uri|_uri|_url|_host|_hostname|_endpoint)/', $key)) {
+            if (preg_match('/(base_uri|_uri|_url|apiurl|_host|_hostname|_endpoint)/', $key)) {
                 return 'url';
+            }
+            if ($key === 'oaipmhrepository_namespace_id') {
+                return 'host';
             }
             if (preg_match('/(_path|_dir|_directory)/', $key)) {
                 return 'path';
@@ -722,8 +730,10 @@ class CheckAndFixController extends AbstractActionController
         };
 
         $labels = [
-            'title' => 'Installation title', // @translate
+            'title' => 'Installation title and color of the admin sidebar', // @translate
+            'tracking' => 'Statistics trackers (scripts sending the visits to an analytics server)', // @translate
             'url' => 'Urls, hosts and endpoints', // @translate
+            'host' => 'Host names used as identifiers', // @translate
             'path' => 'Paths and directories', // @translate
             'email' => 'Emails', // @translate
             'secret' => 'Api keys, tokens and secrets (redacted)', // @translate
@@ -750,6 +760,7 @@ class CheckAndFixController extends AbstractActionController
                 : (is_scalar($value) ? (string) $value : '');
             switch ($category) {
                 case 'url': return str_contains($flat, '://') || str_starts_with($flat, '//');
+                case 'host': return str_contains($flat, '.');
                 case 'path': return str_contains($flat, '/');
                 case 'email': return str_contains($flat, '@');
                 default: return true;
@@ -864,6 +875,34 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addSuccess(new PsrMessage(
                 'The installation title is now: {title}', // @translate
                 ['title' => $newTitle]
+            ));
+        }
+
+        // A colored admin sidebar distinguishes the copy from the original site
+        // at first glance. A color already chosen is kept.
+        if (!$mainSettings->get('easyadmin_admin_board_color')) {
+            $mainSettings->set('easyadmin_admin_board_color', '#8b1a1a');
+            $messenger->addSuccess(new PsrMessage(
+                'The admin sidebar is now colored ({color}).', // @translate
+                ['color' => '#8b1a1a']
+            ));
+        }
+
+        // The statistics of the copy must not be sent to the analytics server
+        // of the original site: tracking scripts and server-side tracker.
+        $trackers = $connection->executeStatement(
+            'UPDATE setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
+            ['""', ['analyticssnippet_inline_public', 'analyticssnippet_inline_admin', 'analyticssnippetpiwik_tracker_url'], ['""', 'null', '']],
+            [\Doctrine\DBAL\ParameterType::STRING, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+        ) + $connection->executeStatement(
+            'UPDATE site_setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
+            ['""', ['analyticssnippet_inline_public', 'analyticssnippet_inline_admin'], ['""', 'null', '']],
+            [\Doctrine\DBAL\ParameterType::STRING, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
+        );
+        if ($trackers) {
+            $messenger->addSuccess(new PsrMessage(
+                'The statistics trackers were removed ({count} settings), so the visits of this copy are not sent to the analytics server of the original site.', // @translate
+                ['count' => $trackers]
             ));
         }
     }
