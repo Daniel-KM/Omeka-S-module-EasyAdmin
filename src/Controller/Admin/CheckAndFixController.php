@@ -430,6 +430,112 @@ class CheckAndFixController extends AbstractActionController
         }
 
         $this->checkHttpClient();
+        $this->checkWebServer(true);
+    }
+
+    /**
+     * Check the configuration of the web server for the files: compatibility
+     * of the root ".htaccess" with the active modules and protection of the
+     * sensitive directories, that depends on the server.
+     *
+     * @param bool $probe Check that the ".htaccess" are applied with a request
+     *   to a protected directory of this server.
+     */
+    protected function checkWebServer(bool $probe): void
+    {
+        $messenger = $this->messenger();
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $moduleManager = $services->get('Omeka\ModuleManager');
+
+        $activeModules = [];
+        foreach (array_keys(\EasyAdmin\Stdlib\HtaccessAudit::MODULE_ROUTES) as $moduleName) {
+            $module = $moduleManager->getModule($moduleName);
+            if ($module && $module->getState() === \Omeka\Module\Manager::STATE_ACTIVE) {
+                $activeModules[] = $moduleName;
+            }
+        }
+
+        $htaccessPath = OMEKA_PATH . '/.htaccess';
+        $htaccess = is_readable($htaccessPath) ? (string) file_get_contents($htaccessPath) : null;
+        $serverSoftware = (string) ($_SERVER['SERVER_SOFTWARE'] ?? '');
+
+        $issues = (new \EasyAdmin\Stdlib\HtaccessAudit())->audit($htaccess, $activeModules, $serverSoftware);
+        foreach ($issues as [$level, $template, $params]) {
+            $message = new PsrMessage($template, $params);
+            if ($level === 'error') {
+                $messenger->addError($message);
+            } elseif ($level === 'warning') {
+                $messenger->addWarning($message);
+            } else {
+                $messenger->addNotice($message);
+            }
+        }
+        if (!$issues) {
+            $messenger->addSuccess(new PsrMessage(
+                'Web server ({server}): the file ".htaccess" is compatible with the active modules.', // @translate
+                ['server' => $serverSoftware ?: $this->translate('unknown')] // @translate
+            ));
+        }
+
+        if ($probe) {
+            $this->probeHtaccessProtection();
+        }
+    }
+
+    /**
+     * Request a protected file of "files/" to check that the ".htaccess" are
+     * applied by the web server.
+     */
+    protected function probeHtaccessProtection(): void
+    {
+        $messenger = $this->messenger();
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        // The files must be served from the directory of Omeka to be probed.
+        if (realpath($basePath) !== realpath(OMEKA_PATH . '/files')
+            || !$this->getRequest() instanceof \Laminas\Http\PhpEnvironment\Request
+        ) {
+            return;
+        }
+
+        $protected = null;
+        foreach (glob($basePath . '/*/.htaccess') ?: [] as $file) {
+            if (stripos((string) file_get_contents($file), 'deny') !== false) {
+                $protected = basename(dirname($file));
+                break;
+            }
+        }
+        if (!$protected) {
+            return;
+        }
+
+        $helpers = $services->get('ViewHelperManager');
+        $url = $helpers->get('serverUrl')($helpers->get('basePath')('/files/' . $protected . '/.htaccess'));
+        try {
+            $client = clone $services->get('Omeka\HttpClient');
+            $client->resetParameters(true);
+            $client->setUri($url)->setOptions(['timeout' => 5]);
+            $status = $client->send()->getStatusCode();
+        } catch (\Throwable $e) {
+            $messenger->addNotice(new PsrMessage(
+                'The protection of the directories could not be checked with a request to {url}: {error}', // @translate
+                ['url' => $url, 'error' => $e->getMessage()]
+            ));
+            return;
+        }
+
+        if ($status === 200) {
+            $messenger->addError(new PsrMessage(
+                'The protected file {url} is public: the files ".htaccess" are not applied by the web server (option "AllowOverride" of Apache, or another server), so the sensitive directories of "files/" are public. Protect them in the config of the server.', // @translate
+                ['url' => $url]
+            ));
+        } else {
+            $messenger->addSuccess(new PsrMessage(
+                'The files ".htaccess" are applied: the protected file {url} is not public (http status {status}).', // @translate
+                ['url' => $url, 'status' => $status]
+            ));
+        }
     }
 
     /**
@@ -1249,6 +1355,7 @@ class CheckAndFixController extends AbstractActionController
         $connection = $services->get('Omeka\Connection');
 
         $this->securityCheckFileProtection($messenger, $services);
+        $this->checkWebServer($probeApi);
         $this->securityCheckPrivateData($messenger, $connection, $services);
         $this->securityCheckUserData($messenger, $connection);
         $this->securityCheckDangerousSettings($messenger, $services);
