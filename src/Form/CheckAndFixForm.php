@@ -318,7 +318,7 @@ class CheckAndFixForm extends Form
             ],
             'install' => [
                 'name' => 'Installation', // @translate
-                'description' => 'Check the consistency of the installation.', // @translate
+                'description' => 'Check the consistency of the installation, the http client, the proxy and the access to the web.', // @translate
                 'actions' => [
                     'install_check' => 'Check', // @translate
                 ],
@@ -1553,7 +1553,7 @@ class CheckAndFixForm extends Form
                     // the helper formLabel, that throws a DomainException. A
                     // label that is not set is skipped by all versions.
                     'value_options' => [
-                        'install_check' => 'Run installation checks (after a copy of the database on a new server)', // @translate
+                        'install_check' => 'Run installation checks (after a copy of the database on a new server), with the http client, the proxy and the access to the web', // @translate
                         'settings_environment_check' => 'List environment-specific settings to review after a copy of the database (title, urls, paths, hosts, emails, api keys…), optionally adapted for a test copy or for the production', // @translate
                         'cache_check' => 'Check caches', // @translate
                         'cache_fix' => 'Clear caches (after update or modifications of code)', // @translate

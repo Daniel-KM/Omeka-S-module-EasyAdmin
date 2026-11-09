@@ -428,6 +428,126 @@ class CheckAndFixController extends AbstractActionController
                 'The php extension "intl" is not available. It is recommended to install it to translate dates.' // @translate
             );
         }
+
+        $this->checkHttpClient();
+    }
+
+    /**
+     * Check the http client: adapter, proxy, certificates and access to the
+     * web, that may change after a copy on another server.
+     */
+    protected function checkHttpClient(): void
+    {
+        $messenger = $this->messenger();
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $info = $this->httpClientInfo();
+
+        $messenger->addNotice(new PsrMessage(
+            'The http client uses the adapter "{adapter}" and {proxy}.', // @translate
+            [
+                'adapter' => $info['adapter'],
+                'proxy' => $info['proxy']
+                    ? (string) new PsrMessage('the proxy "{proxy}" (set in {source})', ['proxy' => $info['proxy'], 'source' => $info['source']]) // @translate
+                    : $this->translate('no proxy'), // @translate
+            ]
+        ));
+
+        if ($info['ignoredEnv']) {
+            $messenger->addWarning(new PsrMessage(
+                'The environment defines a proxy ({vars}), but the adapter "{adapter}" ignores it: set the keys "proxy_host" and "proxy_port" of "http_client" in the file "config/local.config.php", or use the adapter "curl".', // @translate
+                ['vars' => implode(', ', array_keys($info['env'])), 'adapter' => $info['adapter']]
+            ));
+        }
+
+        foreach ($info['sslMissing'] as $key => $path) {
+            $messenger->addError(new PsrMessage(
+                'The path set in the key "{key}" of "http_client" does not exist on this server: {path}. The secure requests will fail.', // @translate
+                ['key' => $key, 'path' => $path]
+            ));
+        }
+
+        $url = 'https://omeka.org/';
+        try {
+            $client = clone $services->get('Omeka\HttpClient');
+            $client->resetParameters(true);
+            $client->setUri($url)->setMethod('HEAD')->setOptions(['timeout' => 10]);
+            $response = $client->send();
+            $messenger->addSuccess(new PsrMessage(
+                'The server can access the web ({url}: http status {status}).', // @translate
+                ['url' => $url, 'status' => $response->getStatusCode()]
+            ));
+        } catch (\Throwable $e) {
+            $messenger->addError(new PsrMessage(
+                'The server cannot access the web ({url}): {error}. Check the proxy and the firewall: the catalogue of modules, the updates, the imports and the value suggestions will fail.', // @translate
+                ['url' => $url, 'error' => $e->getMessage()]
+            ));
+        }
+    }
+
+    /**
+     * Get the configuration of the http client that depends on the server.
+     *
+     * The proxy may be set in the config ("proxy_host", used by the adapters
+     * proxy and curl), in the options of curl, or in the environment, that is
+     * used by curl only. The credentials are redacted.
+     *
+     * @return array Keys: adapter, proxy, source, env, ignoredEnv, sslMissing.
+     */
+    protected function httpClientInfo(): array
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $config = $services->get('Config')['http_client'] ?? [];
+
+        $adapter = $config['adapter'] ?? null;
+        if (is_string($adapter)) {
+            $adapter = ['curl' => \Laminas\Http\Client\Adapter\Curl::class, 'socket' => \Laminas\Http\Client\Adapter\Socket::class][strtolower($adapter)] ?? $adapter;
+        }
+        if (!$adapter) {
+            $adapter = extension_loaded('curl') ? \Laminas\Http\Client\Adapter\Curl::class : \Laminas\Http\Client\Adapter\Socket::class;
+        }
+        $isCurl = is_string($adapter) && is_a($adapter, \Laminas\Http\Client\Adapter\Curl::class, true);
+
+        $redact = fn (string $url): string => preg_replace('~^([a-z0-9+.-]*://)?[^/@]+@~i', '$1***@', $url);
+
+        $env = [];
+        foreach (['https_proxy', 'HTTPS_PROXY', 'http_proxy', 'HTTP_PROXY', 'all_proxy', 'ALL_PROXY'] as $name) {
+            $value = getenv($name);
+            if (is_string($value) && $value !== '') {
+                $env[$name] = $redact($value);
+            }
+        }
+
+        $proxy = null;
+        $source = null;
+        if (!empty($config['proxy_host'])) {
+            $proxy = $config['proxy_host'] . (empty($config['proxy_port']) ? '' : ':' . $config['proxy_port']);
+            if (!empty($config['proxy_user'])) {
+                $proxy = '***@' . $proxy;
+            }
+            $source = '"config/local.config.php"';
+        } elseif (defined('CURLOPT_PROXY') && !empty($config['curloptions'][CURLOPT_PROXY])) {
+            $proxy = $redact((string) $config['curloptions'][CURLOPT_PROXY]);
+            $source = $this->translate('the options of curl in "config/local.config.php"'); // @translate
+        } elseif ($env && $isCurl) {
+            $proxy = reset($env);
+            $source = $this->translate('the environment of the server'); // @translate
+        }
+
+        $sslMissing = [];
+        foreach (['sslcafile', 'sslcapath'] as $key) {
+            if (!empty($config[$key]) && !file_exists($config[$key])) {
+                $sslMissing[$key] = $config[$key];
+            }
+        }
+
+        return [
+            'adapter' => is_string($adapter) ? substr(strrchr('\\' . $adapter, '\\'), 1) : get_class($adapter),
+            'proxy' => $proxy,
+            'source' => $source,
+            'env' => $env,
+            'ignoredEnv' => $env && !$isCurl && !$proxy,
+            'sslMissing' => $sslMissing,
+        ];
     }
 
     /**
@@ -855,6 +975,31 @@ class CheckAndFixController extends AbstractActionController
         }
 
         $this->checkSettingsImageServer();
+
+        // The proxy and the certificates of the http client are set in the file
+        // config or in the environment, so they may be the ones of the server
+        // of the copy.
+        $info = $this->httpClientInfo();
+        $lines = [sprintf('adapter = %s', $info['adapter'])];
+        $lines[] = $info['proxy']
+            ? sprintf('proxy = %s (%s)', $info['proxy'], $info['source'])
+            : 'proxy = ' . $this->translate('none'); // @translate
+        foreach ($info['env'] as $name => $value) {
+            $lines[] = sprintf('$%s = %s', $name, $value);
+        }
+        foreach ($info['sslMissing'] as $key => $path) {
+            $lines[] = sprintf('%s = %s (%s)', $key, $path, $this->translate('missing')); // @translate
+        }
+        $message = new PsrMessage(
+            "Http client and proxy (file config/local.config.php and environment), to check after a copy on another server:\n{list}", // @translate
+            ['list' => '<br/>' . implode('<br/>', array_map('htmlspecialchars', $lines))]
+        );
+        $message->setEscapeHtml(false);
+        if ($info['sslMissing'] || $info['ignoredEnv']) {
+            $messenger->addWarning($message);
+        } else {
+            $messenger->addNotice($message);
+        }
 
         // Configuration outside the settings tables, not detectable here.
         $messenger->addNotice(new PsrMessage(
