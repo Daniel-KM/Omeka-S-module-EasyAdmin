@@ -38,6 +38,15 @@ class ManageAddons extends AbstractJob
         $operation = $this->getArg('operation', 'install');
         $options = $this->getArg('options', []);
 
+        $this->logger->notice(
+            'Starting the process "{operation}" for {count} addons: {addons}.', // @translate
+            [
+                'operation' => $operation,
+                'count' => count($this->getArg('addons', [])),
+                'addons' => implode(', ', $this->getArg('addons', [])),
+            ]
+        );
+
         switch ($operation) {
             case 'install':
                 $this->performInstall($addons, $messenger);
@@ -46,7 +55,12 @@ class ManageAddons extends AbstractJob
                 $this->performUpdate($addons, $messenger, $options);
                 break;
             case 'upgrade':
-                $this->performUpgrade($addons, $messenger);
+                // Download the new version of the modules, then finalize the
+                // upgrade of their database.
+                $this->performUpdate($addons, $messenger, ['auto_upgrade' => true] + $options);
+                break;
+            case 'finalize':
+                $this->performFinalize($addons, $messenger);
                 break;
             case 'remove':
                 $this->performRemove($addons, $messenger);
@@ -129,14 +143,15 @@ class ManageAddons extends AbstractJob
                     'Unknown addon for update: {name}.', // @translate
                     ['name' => $addonName]
                 );
+                // The files of an unknown module may be updated manually.
+                if ($autoUpgrade) {
+                    $updated[] = $addonName;
+                }
                 continue;
             }
             $result = $addons->updateAddon($addon);
             if ($result) {
                 $updated[] = $addonName;
-                if ($autoUpgrade) {
-                    $this->tryUpgradeDb($addonName);
-                }
             } else {
                 $errors[] = $addonName;
             }
@@ -162,6 +177,20 @@ class ManageAddons extends AbstractJob
                 ['addons' => implode(', ', $updated)]
             );
         }
+
+        // The database is upgraded in a new process: this one has loaded the
+        // previous version of the modules, so the module manager does not know
+        // the new files.
+        if ($autoUpgrade && $updated && $type === 'module') {
+            $job = $this->getServiceLocator()->get(\Omeka\Job\Dispatcher::class)->dispatch(
+                self::class,
+                ['operation' => 'finalize', 'type' => 'module', 'addons' => $updated]
+            );
+            $this->logger->notice(
+                'The upgrade of the database of the modules is processed in job #{job_id}.', // @translate
+                ['job_id' => $job->getId()]
+            );
+        }
     }
 
     /**
@@ -170,19 +199,51 @@ class ManageAddons extends AbstractJob
      * This is not the download of the new files, that is done by the operation
      * "update".
      */
-    protected function performUpgrade($addons, $messenger): void
+    protected function performFinalize($addons, $messenger): void
     {
         // Upgrade the dependencies before the modules that require them.
         $addonList = $addons->sortByDependencies(
             $this->getArg('addons', [])
         );
 
+        $upgraded = [];
+        $errors = [];
+        $skipped = [];
         foreach ($addonList as $addonName) {
-            $this->tryUpgradeDb($addonName);
+            $result = $this->tryUpgradeDb($addonName);
+            if ($result === true) {
+                $upgraded[] = $addonName;
+            } elseif ($result === false) {
+                $errors[] = $addonName;
+            } else {
+                $skipped[] = $addonName;
+            }
             $this->flushMessages($messenger);
         }
 
         $this->flushMessages($messenger);
+
+        if ($skipped) {
+            $this->logger->notice(
+                'No upgrade needed for: {addons}. Only the modules whose files were updated can be upgraded.', // @translate
+                ['addons' => implode(', ', $skipped)]
+            );
+        }
+        if ($errors) {
+            $this->job->setStatus(
+                \Omeka\Entity\Job::STATUS_ERROR
+            );
+            $this->logger->err(
+                'Failed to upgrade: {addons}.', // @translate
+                ['addons' => implode(', ', $errors)]
+            );
+        }
+        if ($upgraded) {
+            $this->logger->notice(
+                'Upgraded: {addons}.', // @translate
+                ['addons' => implode(', ', $upgraded)]
+            );
+        }
     }
 
     protected function performRemove($addons, $messenger): void
@@ -242,7 +303,13 @@ class ManageAddons extends AbstractJob
         }
     }
 
-    protected function tryUpgradeDb(string $moduleId): void
+    /**
+     * Upgrade the database of a module that needs it.
+     *
+     * @return bool|null True when upgraded, false on error, null when the module
+     * does not need an upgrade.
+     */
+    protected function tryUpgradeDb(string $moduleId): ?bool
     {
         $services = $this->getServiceLocator();
         $moduleManager = $services->get('Omeka\ModuleManager');
@@ -257,6 +324,7 @@ class ManageAddons extends AbstractJob
                     'Upgrade of module "{name}" finalized.', // @translate
                     ['name' => $moduleId]
                 );
+                return true;
             } catch (\Throwable $e) {
                 $this->logger->err(
                     'Upgrade of module "{name}" could not be finalized: {error}', // @translate
@@ -265,8 +333,10 @@ class ManageAddons extends AbstractJob
                         'error' => $e->getMessage(),
                     ]
                 );
+                return false;
             }
         }
+        return null;
     }
 
     /**

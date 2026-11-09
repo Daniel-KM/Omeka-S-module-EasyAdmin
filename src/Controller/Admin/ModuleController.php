@@ -920,9 +920,13 @@ class ModuleController extends AbstractActionController
                 in_array($action, ['remove', 'deactivate'], true)
             );
 
-            // For large selections, dispatch as job.
-            if (count($selected) > 3
-                && in_array($action, ['update', 'upgrade', 'remove'])
+            // For large selections, dispatch as job. The upgrade of the database
+            // after a download is always done in a job, because this process has
+            // loaded the previous version of the modules.
+            $autoUpgrade = !empty($post['auto_upgrade']);
+            if ($action === 'upgrade'
+                || ($action === 'update' && $autoUpgrade)
+                || (count($selected) > 3 && in_array($action, ['update', 'remove']))
             ) {
                 $dispatcher = $this->jobDispatcher();
                 $args = [
@@ -930,9 +934,7 @@ class ModuleController extends AbstractActionController
                     'type' => 'module',
                     'addons' => $selected,
                     'options' => [
-                        'auto_upgrade' => !empty(
-                            $post['auto_upgrade']
-                        ),
+                        'auto_upgrade' => $autoUpgrade,
                     ],
                 ];
                 $job = $dispatcher->dispatch(
@@ -1003,31 +1005,6 @@ class ModuleController extends AbstractActionController
                         ) ?: $addons->dataFromNamespace($moduleId);
                         if ($addon) {
                             $addons->updateAddon($addon);
-                        }
-                        break;
-
-                    case 'upgrade':
-                        // Upgrade the database of a module whose files are
-                        // already updated: this is not the download above.
-                        $module = $this->moduleManager->getModule($moduleId);
-                        if (!$module) {
-                            break;
-                        }
-                        if ($module->getState() !== OmekaModuleManager::STATE_NEEDS_UPGRADE) {
-                            $this->messenger()->addWarning(new PsrMessage(
-                                'The module "{name}" does not need to be upgraded.', // @translate
-                                ['name' => $moduleId]
-                            ));
-                            break;
-                        }
-                        try {
-                            $this->moduleManager->upgrade($module);
-                            $this->messenger()->addSuccess(new PsrMessage(
-                                'Upgrade of module "{name}" finalized.', // @translate
-                                ['name' => $moduleId]
-                            ));
-                        } catch (\Throwable $e) {
-                            $this->addModuleErrorMessage($e, $moduleId);
                         }
                         break;
 
