@@ -1,793 +1,832 @@
 @media all {
-    /* Download icon (not in Omeka core) */
-    .o-icon-download::before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        content: "\f019";
-    }
-
-    /* Easy Admin general styles */
-    .easy-admin .subhead::before,
-    .easy-admin-addons .no-resources:before,
-    .check-and-fix .subhead::before,
-    .check-and-fix .no-resources:before,
-    .easy-admin-addons .subhead::before,
-    .easy-admin.cron .subhead::before,
-    .easy-admin.cron .no-resources:before,
-    .file-manager .subhead::before,
-    .file-manager .no-resources:before {
-        content: ""; /* fas fa-tools */
-    }
-
-    .easy-admin-addons .chosen-container .chosen-results {
-        max-height: 50vh;
-    }
-
-    /* File Manager styles */
-
-    /* Directory selector */
-    #dir-select-form {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    #dir-select-form label {
-        font-weight: bold;
-    }
-
-    #dir-select-form select {
-        min-width: 300px;
-        max-width: 500px;
-    }
-
-    .display-dir-label {
-        font-weight: normal !important;
-        margin-left: 10px;
-    }
-
-    /* Upload zone */
-    .upload-zone {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-        border: 2px dashed #ccc;
-        border-radius: 4px;
-        background: #fafafa;
-    }
-
-    .upload-zone:hover {
-        border-color: #999;
-    }
-
-    .bulk-drop {
-        flex: 1;
-        text-align: center;
-        color: #666;
-        padding: 20px;
-    }
-
-    .upload-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .upload-progress {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-    }
-
-    .upload-progress.empty {
-        display: none;
-    }
-
-    .progress-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .upload-list ol {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-
-    /* File manager: batch actions */
-    .file-manager .batch-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .file-manager .selected-count {
-        color: #666;
-        font-size: 0.9em;
-    }
-
-    /* Pagination */
-    .pagination-info {
-        color: #666;
-        margin-bottom: 10px;
-    }
-
-    .pagination {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-    }
-
-    .pagination .page-info {
-        color: #666;
-    }
-
-    /* File table */
-    .file-manager table {
-        width: 100%;
-    }
-
-    .file-manager .col-date {
-        width: 140px;
-    }
-
-    .file-manager .col-size {
-        width: 100px;
-        text-align: right;
-    }
-
-    .file-manager td:first-child {
-        word-break: break-word;
-    }
-
-    .file-manager .is-dir td:first-child a {
-        font-weight: bold;
-    }
-
-    .file-manager .is-dir td:first-child a::before {
-        content: "\f07b";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        margin-right: 5px;
-    }
-
-    .file-manager .file-name {
-        display: inline;
-    }
-
-    .file-manager .file-manager-parent {
-        margin: 0 0 8px;
-    }
-    .file-manager .file-manager-parent a.folder-up {
-        font-weight: bold;
-    }
-    .file-manager .file-manager-parent a.folder-up::before {
-        content: "\f062"; /* fa-arrow-up */
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        margin-right: 5px;
-    }
-
-    /* No files message */
-    .no-files {
-        color: #666;
-        text-align: center;
-        padding: 40px;
-        background: #f9f9f9;
-        border-radius: 4px;
-    }
-
-    /* Chosen v2: compatibility with Omeka that uses <abbr> instead of standard <button> */
-    .chosen-container-single .chosen-single button.search-choice-close {
-        top: 12px;
-    }
-
-    /* Chosen sortable: drag-and-drop reordering for multiselect */
-    .chosen-container-multi .chosen-choices .search-choice {
-        cursor: grab;
-    }
-    .chosen-container-multi .chosen-choices .search-choice:active {
-        cursor: grabbing;
-    }
-    .chosen-sortable-ghost {
-        opacity: 0.4;
-    }
-
-    /* Modules and themes browse */
-
-    #page-actions .refresh-form {
-        display: inline-block;
-    }
-
-    /* Install action: a distinct icon, since the core "o-icon-install" uses icon download. */
-    .modules.browse .o-icon-install::before,
-    .themes.browse .o-icon-install::before,
-    .modules.browse .o-icon-uninstall::before,
-    .themes.browse .o-icon-uninstall::before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-    }
-    .modules.browse .o-icon-install::before,
-    .themes.browse .o-icon-install::before {
-        content: "\f055"; /* fa-plus-circle */
-    }
-    .modules.browse .o-icon-uninstall::before,
-    .themes.browse .o-icon-uninstall::before {
-        content: "\f056"; /* fa-minus-circle */
-    }
-
-    /* Addon browse: version column */
-    .themes.browse td.col-version,
-    .modules.browse td.col-version {
-        white-space: nowrap;
-    }
-
-    /* Addon browse: filter by state and by name, both in the browser, on a row */
-    .themes.browse .addon-filters,
-    .modules.browse .addon-filters {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0 0 1em;
-    }
-    .modules.browse .addon-filters .state-filter {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 4px 14px;
-        flex: 1 1 auto;
-        min-width: 0;
-        margin: 0;
-        padding: 0;
-        border: 0;
-    }
-    .modules.browse .addon-filters .state-filter .state-filter-check {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        margin: 0;
-        white-space: nowrap;
-        font-weight: normal;
-    }
-    .modules.browse .addon-filters .state-filter .state-filter-check input {
-        margin: 0;
-    }
-    .themes.browse .addon-filter {
-        flex: 1 1 auto;
-        margin: 0;
-    }
-    .modules.browse .addon-filter {
-        flex: 0 0 260px;
-        margin: 0;
-    }
-    /* Mobile: stack the state checkboxes below the text filter. */
-    @media (max-width: 640px) {
-        .modules.browse .addon-filters {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .modules.browse .addon-filter {
-            flex: 1 1 auto;
-        }
-    }
-    .themes.browse .addon-filter-input,
-    .modules.browse .addon-filter-input {
-        box-sizing: border-box;
-        width: 100%;
-        height: 36px;
-        padding: 0 .6em;
-    }
-    .addon-filter-target .addon-hidden-filter {
-        display: none !important;
-    }
-
-    /* Addon browse: update available */
-    .col-version.has-update {
-        color: green;
-        background-color: #cdffcd;
-    }
-
-    /* Addon browse: invalid omeka version */
-    .col-version.invalid-omeka {
-        color: #c62828;
-        background-color: #fce4ec;
-    }
-
-    /* Addon browse: database version newer than installed files */
-    .col-version.version-mismatch {
-        background-color: #fff4c2;
-        white-space: normal;
-    }
-
-    /* Addon browse: installed files ahead of database, upgrade pending */
-    .col-version.needs-upgrade {
-        background-color: #fff4c2;
-    }
-    .col-version .pending-upgrade {
-        color: #8a6d00;
-        font-weight: bold;
-    }
-    .col-version .version-rollback {
-        display: block;
-        margin-top: .15em;
-        padding: 0 .35em;
-        color: #8a6d00;
-        background-color: #fff4c2;
-        font-size: .85em;
-        font-weight: bold;
-    }
-
-    /* Addon browse: author and description */
-    .addon-author {
-        color: #666;
-        font-size: .85em;
-        font-style: italic;
-    }
-    .addon-description {
-        display: block;
-        color: #666;
-        font-size: .85em;
-    }
-
-    .modules.browse td:first-child,
-    .modules.browse th:first-child,
-    .themes.browse td:first-child,
-    .themes.browse th:first-child {
-        width: 67%;
-    }
-    .themes.browse td:last-child,
-    .themes.browse th:last-child {
-        width: 142px
-    }
-    @media (max-width: 640px) {
-        .modules.browse .addon-filter-target td,
-        .modules.browse .addon-filter-target th,
-        .themes.browse .addon-filter-target td,
-        .themes.browse .addon-filter-target th {
-            width: 100%;
-        }
-    }
-
-    /* Addon browse: multi-line cells with tablesaw */
-    .col-state .tablesaw-cell-content {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .modules.browse td:first-child .tablesaw-cell-content,
-    .themes.browse td:first-child .tablesaw-cell-content {
-        flex-wrap: wrap;
-        align-items: baseline;
-        column-gap: .5em;
-    }
-    .modules.browse td:first-child .addon-description,
-    .themes.browse td:first-child .addon-description {
-        flex-basis: 100%;
-        order: 10;
-    }
-
-    /* Addon browse: theme thumbnail */
-    .theme-thumb {
-        display: block;
-        max-width: 120px;
-        height: auto;
-        margin: 4px 0;
-    }
-    .sidebar .theme-thumb {
-        max-width: 100%;
-    }
-    .theme-thumbnail {
-        margin-bottom: 1em;
-    }
-
-    /* Addon install sidebar: Omeka sidebar-select pattern */
-    #sidebar-install {
-        overflow: hidden;
-    }
-    #sidebar-install form {
-        flex: 1 1 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        overflow: hidden;
-    }
-    #sidebar-install .confirm-panel {
-        position: static;
-    }
-    .addon-install-filter-field {
-        margin-bottom: 12px;
-    }
-    .addon-install-filter-field .addon-install-filter {
-        width: 100%;
-    }
-    .addon-checklist {
-        flex: 1 1 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        min-height: 0;
-        border-top: 1px solid #dfdfdf;
-        border-bottom: 1px solid #dfdfdf;
-    }
-    .addon-check-item {
-        display: flex;
-        align-items: center;
-        gap: .5em;
-        padding: .4em .6em;
-        border-bottom: 1px solid #f0f0f0;
-        cursor: pointer;
-        font-weight: normal;
-        margin: 0;
-        width: 100%;
-        background-color: inherit;
-    }
-    .addon-check-item::after {
-        content: none;
-    }
-    #sidebar-install .addon-check-item,
-    #sidebar-install .addon-check-item::after {
-	   background-color: inherit;
-    }
-    #sidebar-install .addon-check-item:hover {
-        background-color: #eee;
-    }
-    .addon-check-item.incompatible {
-        cursor: not-allowed;
-        opacity: .6;
-    }
-    .addon-check-item.incompatible .addon-check-name {
-        text-decoration: line-through;
-    }
-    .addon-check-incompatible {
-        color: #c62828;
-        font-size: .85em;
-        font-style: italic;
-    }
-    .addon-check-source {
-        margin-left: auto;
-        flex-shrink: 0;
-        text-align: right;
-        float: right;
-    }
-    .o-icon-omeka::before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        content: "\f0ac";
-        font-size: .85em;
-    }
-    .addon-check-source a {
-        color: #888;
-    }
-    .addon-check-source a:hover {
-        color: #333;
-    }
-
-    /* Sidebar improvements */
-    .sidebar .error {
-        color: #c62828;
-    }
-
-    /* Checkbox alignment placeholder */
-    .checkbox-placeholder {
-        display: inline-block;
-        width: 13px;
-        margin-right: 5px;
-    }
-
-    /* Addon directory indicator */
-    .addon-dir {
-        font-size: .9em;
-        color: #555;
-        margin-left: .25em;
-    }
-
-    /* Theme site usage badge */
-    .theme-sites-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 1.5em;
-        height: 1.5em;
-        padding: 0 .35em;
-        margin-left: .5em;
-        border-radius: 50%;
-        background: #dfdfdf;
-        font-size: .85em;
-        line-height: 1;
-        vertical-align: middle;
-        cursor: default;
-    }
-
-    /* Sidebar scrollable content with sticky footer */
-    .sidebar-content .sidebar-scroller {
-        overflow-y: auto;
-        overflow-x: hidden;
-        max-height: calc(100vh - 200px);
-        padding-bottom: 1em;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .sidebar-content .sidebar-footer {
-        padding: .75em 0;
-        border-top: 1px solid #dfdfdf;
-    }
-
-    .sidebar-content .sidebar-footer .button {
-        display: block;
-        width: 100%;
-        margin-top: .5em;
-    }
-
-    /* External link icon in sidebar site lists */
-    .sidebar .meta-group.item-sites .o-icon-external {
-        float: right;
-    }
-
-    /* Theme version error on its own line, left-aligned */
-    .themes .col-version.invalid-omeka .tablesaw-cell-content {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    #db_loop_save-query_field.field .inputs .messages,
-    #db_value_clean-query_field.field .inputs .messages {
-        width: initial;
-    }
-
-    /* Check and fix: live filter */
-    .check-and-fix .task-filter {
-        margin: 0 0 1em;
-    }
-    .check-and-fix .task-filter-input {
-        width: 100%;
-        padding: .4em .6em;
-    }
-    .check-and-fix .task-hidden-filter {
-        display: none !important;
-    }
-
-    /* Check and fix: subject blocks in the left list (name + description) */
-    .check-and-fix .task-subject {
-        margin: 0 0 .3em;
-        border-left: 3px solid #dfdfdf;
-    }
-    /* The head is a <button> for keyboard a11y; reset native button styling. */
-    .check-and-fix .task-subject-head {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: .35em .6em;
-        border: 0;
-        border-radius: 0;
-        background: none;
-        font: inherit;
-        color: inherit;
-        text-align: left;
-        cursor: pointer;
-    }
-    .check-and-fix .task-subject-head:hover {
-        background-color: rgba(0, 0, 0, .04);
-    }
-    .check-and-fix .task-subject-head:focus-visible {
-        outline: 2px solid #2f6f9f;
-        outline-offset: -2px;
-    }
-    .check-and-fix .task-subject.selected {
-        border-left-color: #2f6f9f;
-    }
-    .check-and-fix .task-subject.selected > .task-subject-head {
-        background-color: rgba(47, 111, 159, .08);
-    }
-    /* Description under the name, for readability. */
-    .check-and-fix .task-subject-name {
-        display: block;
-        font-weight: bold;
-    }
-    .check-and-fix .task-subject-desc {
-        display: block;
-        color: #666;
-        font-size: .92em;
-    }
-
-    /* Legacy grouping for tasks added by other modules (fallback) */
-    .check-and-fix .task-group {
-        margin: 0 0 .6em;
-        padding: .3em .6em;
-        border-left: 3px solid #dfdfdf;
-    }
-    .check-and-fix .task-group > label {
-        display: block;
-        margin: .15em 0;
-    }
-
-    /* Recap sidebar (task config + options), shared by check-and-fix and backup. */
-    #cf-sidebar .task-help h3,
-    #cf-sidebar .task-recap-name,
-    #backup-sidebar .task-help h3,
-    #backup-sidebar .task-recap-name {
-        margin-top: 0;
-    }
-    #cf-sidebar .task-recap-desc,
-    #backup-sidebar .task-recap-desc {
-        color: #555;
-    }
-    #cf-sidebar .task-recap-actions {
-        margin: .6em 0;
-    }
-    #cf-sidebar .task-recap-actions > label {
-        display: inline-block;
-        margin: 0 1.2em .3em 0;
-    }
-    #cf-sidebar .task-recap-options .field,
-    #backup-sidebar .task-recap-options .field {
-        display: block;
-    }
-    #cf-sidebar .task-recap-options .field-meta,
-    #cf-sidebar .task-recap-options .inputs {
-        width: 100%;
-    }
-
-    /* "Display dangerous tasks" toggle in the sidebar help (ui-only, no form). */
-    #cf-sidebar .task-help .task-toggle-dangerous {
-        margin: 1em 0 0;
-        padding-top: .75em;
-        border-top: 1px solid #dfdfdf;
-    }
-    #cf-sidebar .task-help .task-toggle-dangerous label {
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    /* Keep the info arrow on the label line, at the far right */
-    #cf-sidebar .task-recap-options .field-meta,
-    #cf-sidebar .task-recap-options .cf-bare-checkbox .inputs {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        padding-right: 0;
-    }
-    #cf-sidebar .task-recap-options .field-meta > label,
-    #cf-sidebar .task-recap-options .cf-bare-checkbox .inputs > label {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-    #cf-sidebar .task-recap-options .field-meta > .expand,
-    #cf-sidebar .task-recap-options .cf-bare-checkbox .inputs > .expand {
-        flex: 0 0 auto;
-        margin-left: auto;
-    }
-    #cf-sidebar .task-recap-options .field-meta > .collapsible,
-    #cf-sidebar .task-recap-options .cf-bare-checkbox .inputs > .collapsible {
-        flex: 0 0 100%;
-    }
-
-    /* Pinned submit, using the core confirm-main/confirm-panel pattern. */
-    #cf-sidebar .confirm-main,
-    #backup-sidebar .confirm-main {
-        position: absolute;
-        top: 0;
-        bottom: 60px;
-        left: 0;
-        right: 0;
-        overflow-y: auto;
-        padding: 12px 12px 0;
-    }
-    #cf-sidebar .confirm-panel,
-    #backup-sidebar .confirm-panel {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1;
-        padding: 12px;
-        background-color: #f7f7f7;
-        border-top: 1px solid #dfdfdf;
-    }
-    #cf-sidebar .confirm-panel .button,
-    #backup-sidebar .confirm-panel .button {
-        display: block;
-        width: 100%;
-        margin: 0;
-    }
-
-    /* Backup: master-detail (task list + options sidebar), like check-and-fix. */
-    .backup .backup-tasks {
-        margin: 0 0 1em;
-    }
-    .backup .backup-task {
-        margin: 0 0 .3em;
-        border-left: 3px solid #dfdfdf;
-    }
-    .backup .backup-task.selected {
-        border-left-color: #2f6f9f;
-    }
-    .backup .backup-task.selected > .backup-task-head {
-        background-color: rgba(47, 111, 159, .08);
-    }
-    .backup .backup-task-head {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: .5em .6em;
-        border: 0;
-        border-radius: 0;
-        background: none;
-        font: inherit;
-        color: inherit;
-        text-align: left;
-        cursor: pointer;
-    }
-    .backup .backup-task-head:hover {
-        background-color: rgba(0, 0, 0, .04);
-    }
-    .backup .backup-task-head:focus-visible {
-        outline: 2px solid #2f6f9f;
-        outline-offset: -2px;
-    }
-    .backup .backup-task-name {
-        font-weight: bold;
-    }
-    .backup .backup-task-desc {
-        display: block;
-        color: #666;
-        font-size: .92em;
-    }
-    .backup .backup-task > .backup-task-config {
-        display: none;
-    }
-    #backup-sidebar .task-recap-options > .backup-task-config {
-        display: block;
-    }
-    /* Backup-specific option content: plain fieldsets (not core form rendering). */
-    #backup-sidebar .task-help h4 {
-        margin: 1em 0 .3em;
-    }
-    #backup-sidebar .backup-dir {
-        white-space: pre-wrap;
-        word-break: break-all;
-        padding: .5em;
-        background: #f0f0f0;
-        font-size: .85em;
-    }
-    #backup-sidebar fieldset {
-        margin: 0 0 1em;
-        padding: 0;
-        border: 0;
-    }
-    /* Keep the core ".sidebar legend" styling to look like check-and-fix ones. */
-    #backup-sidebar legend {
-        margin-top: 0;
-    }
-    #backup-sidebar .task-recap-options .inputs label {
-        display: block;
-        margin: .3em 0;
-    }
-    #backup-sidebar .task-recap-options .inputs select {
-        margin-top: .2em;
-    }
-    #backup-sidebar .explanation {
-        margin: .2em 0 .5em;
-        color: #666;
-        font-size: .9em;
-    }
-
-    /* The pinned submit is only useful once a task is selected. */
-    #cf-sidebar:not(.has-selection) .confirm-panel,
-    #backup-sidebar:not(.has-selection) .confirm-panel {
-        display: none;
-    }
-    #cf-sidebar:not(.has-selection) .confirm-main,
-    #backup-sidebar:not(.has-selection) .confirm-main {
-        bottom: 0;
-    }
+	/* Download icon (not in Omeka core) */
+	.o-icon-download::before {
+	    font-family: "Font Awesome 5 Free";
+	    font-weight: 900;
+	    content: "\f019";
+	}
+
+	/* Easy Admin general styles */
+	.easy-admin .subhead::before,
+	.easy-admin-addons .no-resources:before,
+	.check-and-fix .subhead::before,
+	.check-and-fix .no-resources:before,
+	.easy-admin-addons .subhead::before,
+	.easy-admin.cron .subhead::before,
+	.easy-admin.cron .no-resources:before,
+	.file-manager .subhead::before,
+	.file-manager .no-resources:before {
+	    content: ""; /* fas fa-tools */
+	}
+
+	.easy-admin-addons .chosen-container .chosen-results {
+	    max-height: 50vh;
+	}
+
+	/* File Manager styles */
+
+	/* Directory selector */
+	#dir-select-form {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+		& label {
+			font-weight: bold;
+		}
+
+		& select {
+			min-width: 300px;
+			max-width: 500px;
+		}
+	}
+
+	.display-dir-label {
+	    font-weight: normal !important;
+	    margin-left: 10px;
+	}
+
+	/* Upload zone */
+	.upload-zone {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 20px;
+		border: 2px dashed #ccc;
+		border-radius: 4px;
+		background: #fafafa;
+		&:hover {
+			border-color: #999;
+		}
+	}
+
+	.bulk-drop {
+	    flex: 1;
+	    text-align: center;
+	    color: #666;
+	    padding: 20px;
+	}
+
+	.upload-buttons {
+	    display: flex;
+	    gap: 10px;
+	}
+
+	.upload-progress {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px 0;
+		&.empty {
+			display: none;
+		}
+	}
+
+	.progress-info {
+	    display: flex;
+	    align-items: center;
+	    gap: 10px;
+	}
+
+	.upload-list ol {
+	    margin: 0;
+	    padding: 0;
+	    list-style: none;
+	}
+
+	/* File manager: batch actions */
+	.file-manager {
+		& .batch-actions {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+
+		& .selected-count {
+			color: #666;
+			font-size: 0.9em;
+		}
+	}
+
+	/* Pagination */
+	.pagination-info {
+	    color: #666;
+	    margin-bottom: 10px;
+	}
+
+	.pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 15px;
+		margin-top: 20px;
+		padding-top: 20px;
+		border-top: 1px solid #eee;
+		& .page-info {
+			color: #666;
+		}
+	}
+
+	/* File table */
+	.file-manager {
+		& table {
+			width: 100%;
+		}
+
+		& .col-date {
+			width: 140px;
+		}
+
+		& .col-size {
+			width: 100px;
+			text-align: right;
+		}
+
+		& td:first-child {
+			word-break: break-word;
+		}
+
+		& .is-dir {
+			& td:first-child {
+				& a {
+					font-weight: bold;
+				}
+
+				& a::before {
+					content: "\f07b";
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					margin-right: 5px;
+				}
+			}
+		}
+
+		& .file-name {
+			display: inline;
+		}
+
+		& .file-manager-parent {
+			margin: 0 0 8px;
+			& a.folder-up {
+				font-weight: bold;
+				&::before {
+					content: "\f062"; /* fa-arrow-up */
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					margin-right: 5px;
+				}
+			}
+		}
+	}
+
+	/* No files message */
+	.no-files {
+	    color: #666;
+	    text-align: center;
+	    padding: 40px;
+	    background: #f9f9f9;
+	    border-radius: 4px;
+	}
+
+	/* Chosen v2: compatibility with Omeka that uses <abbr> instead of standard <button> */
+	.chosen-container-single .chosen-single button.search-choice-close {
+	    top: 12px;
+	}
+
+	/* Chosen sortable: drag-and-drop reordering for multiselect */
+	.chosen-container-multi {
+		& .chosen-choices {
+			& .search-choice {
+				cursor: grab;
+				&:active {
+					cursor: grabbing;
+				}
+			}
+		}
+	}
+	.chosen-sortable-ghost {
+	    opacity: 0.4;
+	}
+
+	/* Modules and themes browse */
+
+	#page-actions .refresh-form {
+	    display: inline-block;
+	}
+
+	/* Install action: a distinct icon, since the core "o-icon-install" uses icon download. */
+	.modules.browse .o-icon-install::before,
+	.themes.browse .o-icon-install::before,
+	.modules.browse .o-icon-uninstall::before,
+	.themes.browse .o-icon-uninstall::before {
+	    font-family: "Font Awesome 5 Free";
+	    font-weight: 900;
+	}
+	.modules.browse .o-icon-install::before,
+	.themes.browse .o-icon-install::before {
+	    content: "\f055"; /* fa-plus-circle */
+	}
+	.modules.browse .o-icon-uninstall::before,
+	.themes.browse .o-icon-uninstall::before {
+	    content: "\f056"; /* fa-minus-circle */
+	}
+
+	/* Addon browse: version column */
+	.themes.browse td.col-version,
+	.modules.browse td.col-version {
+	    white-space: nowrap;
+	}
+
+	/* Addon browse: filter by state and by name, both in the browser, on a row */
+	.themes.browse .addon-filters,
+	.modules.browse .addon-filters {
+	    display: flex;
+	    align-items: center;
+	    gap: 12px;
+	    margin: 0 0 1em;
+	}
+	.modules.browse {
+		& .addon-filters {
+			& .state-filter {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 4px 14px;
+				flex: 1 1 auto;
+				min-width: 0;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				& .state-filter-check {
+					display: inline-flex;
+					align-items: center;
+					gap: 4px;
+					margin: 0;
+					white-space: nowrap;
+					font-weight: normal;
+				}
+				& .state-filter-check input {
+					margin: 0;
+				}
+			}
+		}
+	}
+	.themes.browse .addon-filter {
+	    flex: 1 1 auto;
+	    margin: 0;
+	}
+	.modules.browse .addon-filter {
+	    flex: 0 0 260px;
+	    margin: 0;
+	}
+	/* Mobile: stack the state checkboxes below the text filter. */
+	@media (max-width: 640px) {
+		.modules.browse {
+			& .addon-filters {
+				flex-direction: column;
+				align-items: stretch;
+			}
+			& .addon-filter {
+				flex: 1 1 auto;
+			}
+		}
+	}
+	.themes.browse .addon-filter-input,
+	.modules.browse .addon-filter-input {
+	    box-sizing: border-box;
+	    width: 100%;
+	    height: 36px;
+	    padding: 0 .6em;
+	}
+	.addon-filter-target .addon-hidden-filter {
+	    display: none !important;
+	}
+
+	/* Addon browse: update available */
+	.col-version.has-update {
+	    color: green;
+	    background-color: #cdffcd;
+	}
+
+	/* Addon browse: invalid omeka version */
+	.col-version.invalid-omeka {
+	    color: #c62828;
+	    background-color: #fce4ec;
+	}
+
+	/* Addon browse: database version newer than installed files */
+	.col-version.version-mismatch {
+	    background-color: #fff4c2;
+	    white-space: normal;
+	}
+
+	/* Addon browse: installed files ahead of database, upgrade pending */
+	.col-version.needs-upgrade {
+	    background-color: #fff4c2;
+	}
+	.col-version {
+		& .pending-upgrade {
+			color: #8a6d00;
+			font-weight: bold;
+		}
+		& .version-rollback {
+			display: block;
+			margin-top: .15em;
+			padding: 0 .35em;
+			color: #8a6d00;
+			background-color: #fff4c2;
+			font-size: .85em;
+			font-weight: bold;
+		}
+	}
+
+	/* Addon browse: author and description */
+	.addon-author {
+	    color: #666;
+	    font-size: .85em;
+	    font-style: italic;
+	}
+	.addon-description {
+	    display: block;
+	    color: #666;
+	    font-size: .85em;
+	}
+
+	.modules.browse td:first-child,
+	.modules.browse th:first-child,
+	.themes.browse td:first-child,
+	.themes.browse th:first-child {
+	    width: 67%;
+	}
+	.themes.browse td:last-child,
+	.themes.browse th:last-child {
+	    width: 142px
+	}
+	@media (max-width: 640px) {
+		.modules.browse .addon-filter-target td,
+		.modules.browse .addon-filter-target th,
+		.themes.browse .addon-filter-target td,
+		.themes.browse .addon-filter-target th {
+		    width: 100%;
+		}
+	}
+
+	/* Addon browse: multi-line cells with tablesaw */
+	.col-state .tablesaw-cell-content {
+	    flex-direction: column;
+	    align-items: flex-start;
+	}
+	.modules.browse td:first-child .tablesaw-cell-content,
+	.themes.browse td:first-child .tablesaw-cell-content {
+	    flex-wrap: wrap;
+	    align-items: baseline;
+	    column-gap: .5em;
+	}
+	.modules.browse td:first-child .addon-description,
+	.themes.browse td:first-child .addon-description {
+	    flex-basis: 100%;
+	    order: 10;
+	}
+
+	/* Addon browse: theme thumbnail */
+	.theme-thumb {
+	    display: block;
+	    max-width: 120px;
+	    height: auto;
+	    margin: 4px 0;
+	}
+	.sidebar .theme-thumb {
+	    max-width: 100%;
+	}
+	.theme-thumbnail {
+	    margin-bottom: 1em;
+	}
+
+	/* Addon install sidebar: Omeka sidebar-select pattern */
+	#sidebar-install {
+		overflow: hidden;
+		& form {
+			flex: 1 1 0;
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+		}
+		& .confirm-panel {
+			position: static;
+		}
+	}
+	.addon-install-filter-field {
+		margin-bottom: 12px;
+		& .addon-install-filter {
+			width: 100%;
+		}
+	}
+	.addon-checklist {
+	    flex: 1 1 0;
+	    overflow-y: auto;
+	    overflow-x: hidden;
+	    min-height: 0;
+	    border-top: 1px solid #dfdfdf;
+	    border-bottom: 1px solid #dfdfdf;
+	}
+	.addon-check-item {
+		display: flex;
+		align-items: center;
+		gap: .5em;
+		padding: .4em .6em;
+		border-bottom: 1px solid #f0f0f0;
+		cursor: pointer;
+		font-weight: normal;
+		margin: 0;
+		width: 100%;
+		background-color: inherit;
+		&::after {
+			content: none;
+		}
+	}
+	#sidebar-install {
+		& .addon-check-item,
+		& .addon-check-item::after {
+			background-color: inherit;
+		}
+		& .addon-check-item:hover {
+			background-color: #eee;
+		}
+	}
+	.addon-check-item.incompatible {
+		cursor: not-allowed;
+		opacity: .6;
+		& .addon-check-name {
+			text-decoration: line-through;
+		}
+	}
+	.addon-check-incompatible {
+	    color: #c62828;
+	    font-size: .85em;
+	    font-style: italic;
+	}
+	.addon-check-source {
+	    margin-left: auto;
+	    flex-shrink: 0;
+	    text-align: right;
+	    float: right;
+	}
+	.o-icon-omeka::before {
+	    font-family: "Font Awesome 5 Free";
+	    font-weight: 900;
+	    content: "\f0ac";
+	    font-size: .85em;
+	}
+	.addon-check-source {
+		& a {
+			color: #888;
+			&:hover {
+				color: #333;
+			}
+		}
+	}
+
+	/* Sidebar improvements */
+	.sidebar .error {
+	    color: #c62828;
+	}
+
+	/* Checkbox alignment placeholder */
+	.checkbox-placeholder {
+	    display: inline-block;
+	    width: 13px;
+	    margin-right: 5px;
+	}
+
+	/* Addon directory indicator */
+	.addon-dir {
+	    font-size: .9em;
+	    color: #555;
+	    margin-left: .25em;
+	}
+
+	/* Theme site usage badge */
+	.theme-sites-badge {
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	    min-width: 1.5em;
+	    height: 1.5em;
+	    padding: 0 .35em;
+	    margin-left: .5em;
+	    border-radius: 50%;
+	    background: #dfdfdf;
+	    font-size: .85em;
+	    line-height: 1;
+	    vertical-align: middle;
+	    cursor: default;
+	}
+
+	/* Sidebar scrollable content with sticky footer */
+	.sidebar-content {
+		& .sidebar-scroller {
+			overflow-y: auto;
+			overflow-x: hidden;
+			max-height: calc(100vh - 200px);
+			padding-bottom: 1em;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
+
+		& .sidebar-footer {
+			padding: .75em 0;
+			border-top: 1px solid #dfdfdf;
+			& .button {
+				display: block;
+				width: 100%;
+				margin-top: .5em;
+			}
+		}
+	}
+
+	/* External link icon in sidebar site lists */
+	.sidebar .meta-group.item-sites .o-icon-external {
+	    float: right;
+	}
+
+	/* Theme version error on its own line, left-aligned */
+	.themes .col-version.invalid-omeka .tablesaw-cell-content {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: flex-start;
+	}
+
+	#db_loop_save-query_field.field .inputs .messages,
+	#db_value_clean-query_field.field .inputs .messages {
+	    width: initial;
+	}
+
+	/* Check and fix: live filter */
+	.check-and-fix {
+		& .task-filter {
+			margin: 0 0 1em;
+		}
+		& .task-filter-input {
+			width: 100%;
+			padding: .4em .6em;
+		}
+		& .task-hidden-filter {
+			display: none !important;
+		}
+
+		/* Check and fix: subject blocks in the left list (name + description) */
+		& .task-subject {
+			margin: 0 0 .3em;
+			border-left: 3px solid #dfdfdf;
+		}
+		/* The head is a <button> for keyboard a11y; reset native button styling. */
+		& .task-subject-head {
+			display: block;
+			width: 100%;
+			margin: 0;
+			padding: .35em .6em;
+			border: 0;
+			border-radius: 0;
+			background: none;
+			font: inherit;
+			color: inherit;
+			text-align: left;
+			cursor: pointer;
+			&:hover {
+				background-color: rgba(0, 0, 0, .04);
+			}
+			&:focus-visible {
+				outline: 2px solid #2f6f9f;
+				outline-offset: -2px;
+			}
+		}
+		& .task-subject.selected {
+			border-left-color: #2f6f9f;
+			& > .task-subject-head {
+				background-color: rgba(47, 111, 159, .08);
+			}
+		}
+		/* Description under the name, for readability. */
+		& .task-subject-name {
+			display: block;
+			font-weight: bold;
+		}
+		& .task-subject-desc {
+			display: block;
+			color: #666;
+			font-size: .92em;
+		}
+
+		/* Legacy grouping for tasks added by other modules (fallback) */
+		& .task-group {
+			margin: 0 0 .6em;
+			padding: .3em .6em;
+			border-left: 3px solid #dfdfdf;
+			& > label {
+				display: block;
+				margin: .15em 0;
+			}
+		}
+	}
+
+	/* Recap sidebar (task config + options), shared by check-and-fix and backup. */
+	#cf-sidebar .task-help h3,
+	#cf-sidebar .task-recap-name,
+	#backup-sidebar .task-help h3,
+	#backup-sidebar .task-recap-name {
+	    margin-top: 0;
+	}
+	#cf-sidebar .task-recap-desc,
+	#backup-sidebar .task-recap-desc {
+	    color: #555;
+	}
+	#cf-sidebar {
+		& .task-recap-actions {
+			margin: .6em 0;
+			& > label {
+				display: inline-block;
+				margin: 0 1.2em .3em 0;
+			}
+		}
+	}
+	#cf-sidebar .task-recap-options .field,
+	#backup-sidebar .task-recap-options .field {
+	    display: block;
+	}
+	#cf-sidebar {
+		& .task-recap-options .field-meta,
+		& .task-recap-options .inputs {
+			width: 100%;
+		}
+
+		/* "Display dangerous tasks" toggle in the sidebar help (ui-only, no form). */
+		& .task-help {
+			& .task-toggle-dangerous {
+				margin: 1em 0 0;
+				padding-top: .75em;
+				border-top: 1px solid #dfdfdf;
+				& label {
+					font-weight: bold;
+					cursor: pointer;
+				}
+			}
+		}
+
+		/* Keep the info arrow on the label line, at the far right */
+		& .task-recap-options {
+			& .field-meta,
+			& .cf-bare-checkbox .inputs {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				padding-right: 0;
+			}
+			& .field-meta > label,
+			& .cf-bare-checkbox .inputs > label {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+			& .field-meta > .expand,
+			& .cf-bare-checkbox .inputs > .expand {
+				flex: 0 0 auto;
+				margin-left: auto;
+			}
+			& .field-meta > .collapsible,
+			& .cf-bare-checkbox .inputs > .collapsible {
+				flex: 0 0 100%;
+			}
+		}
+	}
+
+	/* Pinned submit, using the core confirm-main/confirm-panel pattern. */
+	#cf-sidebar .confirm-main,
+	#backup-sidebar .confirm-main {
+	    position: absolute;
+	    top: 0;
+	    bottom: 60px;
+	    left: 0;
+	    right: 0;
+	    overflow-y: auto;
+	    padding: 12px 12px 0;
+	}
+	#cf-sidebar .confirm-panel,
+	#backup-sidebar .confirm-panel {
+	    position: absolute;
+	    bottom: 0;
+	    left: 0;
+	    right: 0;
+	    z-index: 1;
+	    padding: 12px;
+	    background-color: #f7f7f7;
+	    border-top: 1px solid #dfdfdf;
+	}
+	#cf-sidebar .confirm-panel .button,
+	#backup-sidebar .confirm-panel .button {
+	    display: block;
+	    width: 100%;
+	    margin: 0;
+	}
+
+	/* Backup: master-detail (task list + options sidebar), like check-and-fix. */
+	.backup {
+		& .backup-tasks {
+			margin: 0 0 1em;
+		}
+		& .backup-task {
+			margin: 0 0 .3em;
+			border-left: 3px solid #dfdfdf;
+			&.selected {
+				border-left-color: #2f6f9f;
+			}
+			&.selected > .backup-task-head {
+				background-color: rgba(47, 111, 159, .08);
+			}
+		}
+		& .backup-task-head {
+			display: block;
+			width: 100%;
+			margin: 0;
+			padding: .5em .6em;
+			border: 0;
+			border-radius: 0;
+			background: none;
+			font: inherit;
+			color: inherit;
+			text-align: left;
+			cursor: pointer;
+			&:hover {
+				background-color: rgba(0, 0, 0, .04);
+			}
+			&:focus-visible {
+				outline: 2px solid #2f6f9f;
+				outline-offset: -2px;
+			}
+		}
+		& .backup-task-name {
+			font-weight: bold;
+		}
+		& .backup-task-desc {
+			display: block;
+			color: #666;
+			font-size: .92em;
+		}
+		& .backup-task > .backup-task-config {
+			display: none;
+		}
+	}
+	#backup-sidebar {
+		& .task-recap-options > .backup-task-config {
+			display: block;
+		}
+		/* Backup-specific option content: plain fieldsets (not core form rendering). */
+		& .task-help h4 {
+			margin: 1em 0 .3em;
+		}
+		& .backup-dir {
+			white-space: pre-wrap;
+			word-break: break-all;
+			padding: .5em;
+			background: #f0f0f0;
+			font-size: .85em;
+		}
+		& fieldset {
+			margin: 0 0 1em;
+			padding: 0;
+			border: 0;
+		}
+		/* Keep the core ".sidebar legend" styling to look like check-and-fix ones. */
+		& legend {
+			margin-top: 0;
+		}
+		& .task-recap-options {
+			& .inputs {
+				& label {
+					display: block;
+					margin: .3em 0;
+				}
+				& select {
+					margin-top: .2em;
+				}
+			}
+		}
+		& .explanation {
+			margin: .2em 0 .5em;
+			color: #666;
+			font-size: .9em;
+		}
+	}
+
+	/* The pinned submit is only useful once a task is selected. */
+	#cf-sidebar:not(.has-selection) .confirm-panel,
+	#backup-sidebar:not(.has-selection) .confirm-panel {
+	    display: none;
+	}
+	#cf-sidebar:not(.has-selection) .confirm-main,
+	#backup-sidebar:not(.has-selection) .confirm-main {
+	    bottom: 0;
+	}
 }
 
 /* Main and site settings page live filter and group navigation. */
@@ -907,20 +946,20 @@ mark.setting-filter-hit {
     flex: 1 1 100%;
 }
 .setting-nav-summary {
-    cursor: pointer;
-    color: #6f7476;
-    font-size: .9em;
-    user-select: none;
-    list-style: none;
-}
-.setting-nav-summary::-webkit-details-marker {
-    display: none;
-}
-.setting-nav-summary::before {
-    content: '\25B8';
-    display: inline-block;
-    margin-right: .35em;
-    transition: transform .1s ease;
+	cursor: pointer;
+	color: #6f7476;
+	font-size: .9em;
+	user-select: none;
+	list-style: none;
+	&::-webkit-details-marker {
+		display: none;
+	}
+	&::before {
+		content: '\25B8';
+		display: inline-block;
+		margin-right: .35em;
+		transition: transform .1s ease;
+	}
 }
 .setting-nav[open] .setting-nav-summary::before {
     transform: rotate(90deg);
@@ -932,28 +971,28 @@ mark.setting-filter-hit {
     margin-top: 6px;
 }
 .setting-nav-chip {
-    padding: 2px 10px;
-    border: 1px solid #cdd2d4;
-    border-radius: 12px;
-    background: #f4f6f6;
-    color: #33454c;
-    font-size: .88em;
-    line-height: 1.6;
-    text-decoration: none;
-    white-space: nowrap;
-}
-.setting-nav-chip:hover {
-    border-color: #4a90d9;
-    color: #14689e;
-}
-.setting-nav-chip.setting-nav-active {
-    border-color: #4a90d9;
-    background: #e3f0fb;
-    color: #14689e;
-    font-weight: 600;
-}
-.setting-nav-chip.setting-nav-hidden {
-    display: none;
+	padding: 2px 10px;
+	border: 1px solid #cdd2d4;
+	border-radius: 12px;
+	background: #f4f6f6;
+	color: #33454c;
+	font-size: .88em;
+	line-height: 1.6;
+	text-decoration: none;
+	white-space: nowrap;
+	&:hover {
+		border-color: #4a90d9;
+		color: #14689e;
+	}
+	&.setting-nav-active {
+		border-color: #4a90d9;
+		background: #e3f0fb;
+		color: #14689e;
+		font-weight: 600;
+	}
+	&.setting-nav-hidden {
+		display: none;
+	}
 }
 .setting-nav-target {
     scroll-margin-top: 96px;
