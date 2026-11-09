@@ -91,6 +91,98 @@ class ModuleControllerTest extends AbstractHttpControllerTestCase
         }
     }
 
+    public function testBrowseWarnsWhenTheLastJobDidNotStart(): void
+    {
+        $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+        $job = new \Omeka\Entity\Job();
+        $job->setClass(\EasyAdmin\Job\ManageAddons::class);
+        $job->setArgs(['operation' => 'upgrade', 'type' => 'module', 'addons' => ['Common']]);
+        $job->setStatus(\Omeka\Entity\Job::STATUS_STARTING);
+        $entityManager->persist($job);
+        $entityManager->flush();
+        $jobId = $job->getId();
+        // The date is set on persist, so it is updated directly.
+        $entityManager->getConnection()->executeStatement(
+            'UPDATE job SET started = ? WHERE id = ?',
+            [(new \DateTime('-2 minutes'))->format('Y-m-d H:i:s'), $jobId]
+        );
+        $entityManager->clear();
+
+        try {
+            $this->dispatch('/admin/easy-admin/module');
+            $this->assertResponseStatusCode(200);
+            $this->assertStringContainsString('did not start', $this->getResponse()->getBody() . $this->lastMessage());
+        } finally {
+            $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+            $job = $entityManager->find(\Omeka\Entity\Job::class, $jobId);
+            if ($job) {
+                $entityManager->remove($job);
+                $entityManager->flush();
+            }
+        }
+    }
+
+    public function testBrowseDoesNotWarnForARecentJob(): void
+    {
+        $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+        $job = new \Omeka\Entity\Job();
+        $job->setClass(\EasyAdmin\Job\ManageAddons::class);
+        $job->setArgs(['operation' => 'upgrade', 'type' => 'module', 'addons' => ['Common']]);
+        $job->setStatus(\Omeka\Entity\Job::STATUS_STARTING);
+        $job->setStarted(new \DateTime('now'));
+        $entityManager->persist($job);
+        $entityManager->flush();
+        $jobId = $job->getId();
+
+        try {
+            $this->dispatch('/admin/easy-admin/module');
+            $this->assertResponseStatusCode(200);
+            $this->assertStringNotContainsString('did not start', $this->getResponse()->getBody() . $this->lastMessage());
+        } finally {
+            $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+            $job = $entityManager->find(\Omeka\Entity\Job::class, $jobId);
+            if ($job) {
+                $entityManager->remove($job);
+                $entityManager->flush();
+            }
+        }
+    }
+
+    public function testBrowseWarnsForReadOnlySymbolicLinks(): void
+    {
+        $base = sys_get_temp_dir() . '/easyadmin_test_links_' . uniqid();
+        $readOnly = $base . '/readonly/ZzReadOnlyLink';
+        $writeable = $base . '/writeable/ZzWriteableLink';
+        mkdir($readOnly, 0775, true);
+        mkdir($writeable, 0775, true);
+        chmod($readOnly, 0555);
+        chmod(dirname($readOnly), 0555);
+        $linkReadOnly = OMEKA_PATH . '/modules/ZzReadOnlyLink';
+        $linkWriteable = OMEKA_PATH . '/modules/ZzWriteableLink';
+        symlink($readOnly, $linkReadOnly);
+        symlink($writeable, $linkWriteable);
+
+        try {
+            $links = $this->getApplicationServiceLocator()->get('ControllerPluginManager')
+                ->get('easyAdminAddons')->readOnlyLinks('modules');
+            $this->assertArrayHasKey('ZzReadOnlyLink', $links);
+            $this->assertSame(realpath($readOnly), $links['ZzReadOnlyLink']);
+            $this->assertArrayNotHasKey('ZzWriteableLink', $links);
+
+            $this->dispatch('/admin/easy-admin/module');
+            $this->assertResponseStatusCode(200);
+            $body = $this->getResponse()->getBody();
+            $this->assertStringContainsString('symbolic links to a directory that is not writeable', $body);
+            $this->assertStringContainsString('ZzReadOnlyLink', $body);
+        } finally {
+            unlink($linkReadOnly);
+            unlink($linkWriteable);
+            chmod(dirname($readOnly), 0775);
+            chmod($readOnly, 0775);
+            exec('rm -rf ' . escapeshellarg($base));
+        }
+    }
+
     protected function moduleEntity(string $id): ModuleEntity
     {
         return $this->getApplication()->getServiceManager()

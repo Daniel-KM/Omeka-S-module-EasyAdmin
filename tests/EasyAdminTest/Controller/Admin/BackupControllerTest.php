@@ -320,4 +320,103 @@ class BackupControllerTest extends AbstractHttpControllerTestCase
 
         $this->assertResponseStatusCode(200);
     }
+
+    /**
+     * A running backup job is displayed and its file is marked in progress,
+     * without size nor actions, unlike an older file.
+     */
+    public function testRunningBackupIsDisplayedInProgress(): void
+    {
+        if (!is_dir($this->backupDir)) {
+            mkdir($this->backupDir, 0755, true);
+        }
+        $oldFile = $this->backupDir . '/database-test-old.sql';
+        $this->testBackupFile = $this->backupDir . '/database-test-running.sql';
+        file_put_contents($oldFile, '-- Old');
+        touch($oldFile, time() - 3600);
+        file_put_contents($this->testBackupFile, '-- Partial');
+
+        $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+        $job = new \Omeka\Entity\Job();
+        $job->setClass(\EasyAdmin\Job\DatabaseBackup::class);
+        $job->setStatus(\Omeka\Entity\Job::STATUS_IN_PROGRESS);
+        $entityManager->persist($job);
+        $entityManager->flush();
+        $jobId = $job->getId();
+        // The date is set on persist, so it is updated directly.
+        $entityManager->getConnection()->executeStatement(
+            'UPDATE job SET started = ? WHERE id = ?',
+            [date('Y-m-d H:i:s', time() - 60), $jobId]
+        );
+        $entityManager->clear();
+
+        try {
+            $this->dispatch('/admin/easy-admin/backup');
+            $this->assertResponseStatusCode(200);
+            $body = $this->getResponse()->getBody();
+            $this->assertStringContainsString('A backup is in progress', $body);
+
+            $dom = new \Laminas\Dom\Query($body);
+            $rows = [];
+            foreach ($dom->execute('#backup-list tbody tr') as $row) {
+                $rows[trim($row->getElementsByTagName('td')->item(0)->textContent)] = $row;
+            }
+            $html = fn ($node) => $node->ownerDocument->saveHTML($node);
+            $this->assertStringContainsString('In progress', $rows['database-test-running.sql']->textContent);
+            $this->assertStringNotContainsString('download', $html($rows['database-test-running.sql']));
+            $this->assertStringNotContainsString('In progress', $rows['database-test-old.sql']->textContent);
+            $this->assertStringContainsString('download', $html($rows['database-test-old.sql']));
+        } finally {
+            @unlink($oldFile);
+            $this->getApplicationServiceLocator()->get('Omeka\Connection')
+                ->executeStatement('DELETE FROM job WHERE id = ?', [$jobId]);
+        }
+    }
+
+    /**
+     * A job started long ago is a job that died without updating its status,
+     * so it is not displayed and the files are complete.
+     */
+    public function testOldRunningBackupIsIgnored(): void
+    {
+        if (!is_dir($this->backupDir)) {
+            mkdir($this->backupDir, 0755, true);
+        }
+        // The file of a dead job is no longer written.
+        $this->testBackupFile = $this->backupDir . '/database-test-stalled.sql';
+        file_put_contents($this->testBackupFile, '-- Partial');
+        touch($this->testBackupFile, time() - 600);
+
+        $entityManager = $this->getApplicationServiceLocator()->get('Omeka\EntityManager');
+        $job = new \Omeka\Entity\Job();
+        $job->setClass(\EasyAdmin\Job\DatabaseBackup::class);
+        $job->setStatus(\Omeka\Entity\Job::STATUS_IN_PROGRESS);
+        $entityManager->persist($job);
+        $entityManager->flush();
+        $jobId = $job->getId();
+        $entityManager->getConnection()->executeStatement(
+            'UPDATE job SET started = ? WHERE id = ?',
+            [date('Y-m-d H:i:s', time() - 2 * 86400), $jobId]
+        );
+        $entityManager->clear();
+
+        try {
+            $this->dispatch('/admin/easy-admin/backup');
+            $this->assertResponseStatusCode(200);
+            $body = $this->getResponse()->getBody();
+            // Other tests may dispatch real backup jobs, so only this one is
+            // checked.
+            $this->assertStringNotContainsString('>#' . $jobId . '<', $body);
+            $dom = new \Laminas\Dom\Query($body);
+            foreach ($dom->execute('#backup-list tbody tr') as $row) {
+                if (trim($row->getElementsByTagName('td')->item(0)->textContent) === 'database-test-stalled.sql') {
+                    $this->assertStringNotContainsString('In progress', $row->textContent);
+                }
+            }
+        } finally {
+            $this->getApplicationServiceLocator()->get('Omeka\Connection')
+                ->executeStatement('DELETE FROM job WHERE id = ?', [$jobId]);
+        }
+    }
+
 }
