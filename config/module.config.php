@@ -24,6 +24,9 @@ return [
             'Omeka\File\Store\Local' => [
                 Service\File\Store\LocalStoreBaseUriDelegatorFactory::class,
             ],
+            'Omeka\Mailer' => [
+                Service\Mail\MailerTestCopyDelegatorFactory::class,
+            ],
         ],
     ],
     'api_adapters' => [
@@ -341,6 +344,9 @@ return [
             'easyadmin_config_apply_button' => false,
             'easyadmin_local_store_base_uri' => '',
             'easyadmin_local_store_fake_images' => '',
+            'easyadmin_mail_test_copy' => '',
+            'easyadmin_mail_redirect_to' => '',
+            'easyadmin_mail_team_domains' => '',
             'easyadmin_local_store_wikimedia_keyword' => 'landscape',
             // Internal: local images of Wikimedia Commons, or state of the job.
             'easyadmin_local_store_wikimedia_images' => [],

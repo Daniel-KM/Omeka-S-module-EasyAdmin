@@ -591,6 +591,117 @@ class CheckAndFixController extends AbstractActionController
     }
 
     /**
+     * Check who may receive the emails of this install.
+     *
+     * A copy of the database contains the real accounts and the real recipients
+     * of the notifications, so the emails of the tests may reach them, unless
+     * the option to protect a test copy is set.
+     */
+    protected function checkMailRecipients(): void
+    {
+        $messenger = $this->messenger();
+        $audit = $this->mailAudit();
+
+        $modes = [
+            '' => 'none', // @translate
+            'redirect' => 'redirection to {email}', // @translate
+            'team' => 'only to the domains of the team', // @translate
+            'capture' => 'capture in files, nothing sent', // @translate
+        ];
+        $messenger->addNotice(new PsrMessage(
+            'Emails: transport "{transport}"{sent}, protection of a test copy: {protection}. Domains of the team: {domains}.', // @translate
+            [
+                'transport' => $audit['transport'],
+                'sent' => $audit['real'] ? '' : sprintf(' (%s)', $this->translate('nothing is sent')), // @translate
+                'protection' => (string) new PsrMessage($modes[$audit['mode']] ?? $modes[''], ['email' => $audit['redirectTo'] ?: $this->translate('capture')]), // @translate
+                'domains' => $audit['domains'] ? implode(', ', $audit['domains']) : $this->translate('none'), // @translate
+            ]
+        ));
+
+        $messenger->addNotice(new PsrMessage(
+            'Accounts: {total} ({active} active, {admins} administrators), including {outside} active accounts outside the domains of the team.', // @translate
+            $audit['users']
+        ));
+
+        if ($audit['recipients']) {
+            $messenger->addNotice(new PsrMessage(
+                'Recipients set in the settings outside the domains of the team: {list}.', // @translate
+                ['list' => implode(', ', array_slice($audit['recipients'], 0, 20)) . (count($audit['recipients']) > 20 ? ' …' : '')]
+            ));
+        }
+
+        if ($audit['real']
+            && $audit['mode'] === ''
+            && ($audit['users']['outside'] || $audit['recipients'])
+        ) {
+            $messenger->addWarning(new PsrMessage(
+                'This install can send emails to {users} real users and {recipients} recipients set in the settings. On a test copy, set the option "Emails of a test copy" in the settings, or run the task of the environment settings in mode test.', // @translate
+                ['users' => $audit['users']['outside'], 'recipients' => count($audit['recipients'])]
+            ));
+        }
+    }
+
+    /**
+     * Get the transport, the protection and the recipients of the emails.
+     *
+     * @return array Keys: transport, real, mode, redirectTo, domains, users,
+     *   recipients.
+     */
+    protected function mailAudit(): array
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $connection = $services->get('Omeka\Connection');
+        $settings = $services->get('Omeka\Settings');
+        $config = $services->get('Config');
+
+        $transport = strtolower((string) ($config['mail']['transport']['type'] ?? 'sendmail'));
+        $domains = \EasyAdmin\Service\Mail\MailerTestCopyDelegatorFactory::teamDomains($settings);
+        $isTeam = function (string $email) use ($domains): bool {
+            return in_array(strtolower(substr((string) strrchr($email, '@'), 1)), $domains, true);
+        };
+
+        $users = ['total' => 0, 'active' => 0, 'admins' => 0, 'outside' => 0];
+        foreach ($connection->executeQuery('SELECT email, role, is_active FROM user')->fetchAllAssociative() as $user) {
+            ++$users['total'];
+            if ($user['is_active']) {
+                ++$users['active'];
+                if (!$isTeam($user['email'])) {
+                    ++$users['outside'];
+                }
+            }
+            if (in_array($user['role'], ['global_admin', 'site_admin'], true)) {
+                ++$users['admins'];
+            }
+        }
+
+        // The settings of the module are excluded: they are the protection.
+        $recipients = [];
+        $values = $connection->executeQuery(
+            "SELECT value FROM setting WHERE id NOT LIKE 'easyadmin\\_mail\\_%' UNION ALL SELECT value FROM site_setting"
+        )->fetchFirstColumn();
+        foreach ($values as $value) {
+            preg_match_all('~[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}~i', (string) $value, $matches);
+            foreach ($matches[0] as $email) {
+                $email = strtolower($email);
+                if (!$isTeam($email)) {
+                    $recipients[$email] = $email;
+                }
+            }
+        }
+        sort($recipients);
+
+        return [
+            'transport' => $transport,
+            'real' => !in_array($transport, ['file', 'inmemory'], true),
+            'mode' => (string) $settings->get('easyadmin_mail_test_copy', ''),
+            'redirectTo' => (string) $settings->get('easyadmin_mail_redirect_to', ''),
+            'domains' => $domains,
+            'users' => $users,
+            'recipients' => array_values($recipients),
+        ];
+    }
+
+    /**
      * Get the configuration of the http client that depends on the server.
      *
      * The proxy may be set in the config ("proxy_host", used by the adapters
@@ -1107,6 +1218,8 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addNotice($message);
         }
 
+        $this->checkMailRecipients();
+
         // Configuration outside the settings tables, not detectable here.
         $messenger->addNotice(new PsrMessage(
             'Also review configurations stored outside the settings: search engines (SearchSolr cores/nodes, url and host), file paths and mailer in "config/local.config.php", and any external service of the modules.' // @translate
@@ -1161,6 +1274,18 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addSuccess(new PsrMessage(
                 'The errors are now displayed on screen for anybody.' // @translate
             ));
+        }
+
+        // The real users of the copy should not receive the emails of the tests,
+        // so they are redirected to the administrator who adapts the copy.
+        if (!$settings->get('easyadmin_mail_test_copy')) {
+            $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+            $email = $settings->get('easyadmin_mail_redirect_to') ?: ($user ? $user->getEmail() : '');
+            $settings->set('easyadmin_mail_redirect_to', $email);
+            $settings->set('easyadmin_mail_test_copy', 'redirect');
+            $messenger->addSuccess($email
+                ? new PsrMessage('All the emails are now redirected to {email}.', ['email' => $email]) // @translate
+                : new PsrMessage('All the emails are now captured in files, without being sent.')); // @translate
         }
 
         // A copy has generally no files, so the images are replaced by grey
@@ -1256,6 +1381,13 @@ class CheckAndFixController extends AbstractActionController
             $settings->set('easyadmin_display_exception', '');
             $messenger->addSuccess(new PsrMessage(
                 'The errors are no longer displayed on screen.' // @translate
+            ));
+        }
+
+        if ($settings->get('easyadmin_mail_test_copy')) {
+            $settings->set('easyadmin_mail_test_copy', '');
+            $messenger->addSuccess(new PsrMessage(
+                'The emails are now sent normally to their recipients.' // @translate
             ));
         }
 
@@ -1859,6 +1991,8 @@ class CheckAndFixController extends AbstractActionController
         );
         $message->setEscapeHtml(false);
         $messenger->addSuccess($message);
+
+        $this->checkMailRecipients();
 
         // Check dns records if requested.
         $checkDns = !empty($options['check_dns']);

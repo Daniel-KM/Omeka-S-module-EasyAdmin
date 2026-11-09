@@ -342,6 +342,50 @@ class SettingsFieldset extends Fieldset
                     'placeholder' => 'landscape',
                 ],
             ])
+            ->add([
+                'name' => 'easyadmin_mail_test_copy',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Emails of a test copy', // @translate
+                    'info' => 'A copy of the database contains the real accounts and the real recipients of the notifications, so they may receive the emails of the tests (password, registration, contact, contribution…). All the emails sent through Omeka are managed.', // @translate
+                    'value_options' => [
+                        '' => 'Send normally', // @translate
+                        'redirect' => 'Redirect all emails to the address below, with the original recipients in the subject', // @translate
+                        'team' => 'Send only to the domains of the team below and skip the other recipients', // @translate
+                        'capture' => 'Send nothing and write the emails in "files/mailcapture/"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_mail_test_copy',
+                    'value' => '',
+                ],
+            ])
+            ->add([
+                'name' => 'easyadmin_mail_redirect_to',
+                'type' => CommonElement\OptionalEmail::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Email to redirect all emails to', // @translate
+                    'info' => 'Without address, the emails are captured.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_mail_redirect_to',
+                ],
+            ])
+            ->add([
+                'name' => 'easyadmin_mail_team_domains',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Email domains of the team', // @translate
+                    'info' => 'Domains separated by a space or a comma. Without domain, the one of the administrator email is used.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_mail_team_domains',
+                    'placeholder' => 'example.org, example.net',
+                ],
+            ])
 
             ->add([
                 'name' => 'easyadmin_display_exception',
