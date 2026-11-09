@@ -102,6 +102,19 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
+                'name' => 'easyadmin_skip_lazy_loading',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'display',
+                    'label' => 'Load all thumbnails at once (skip lazy loading)', // @translate
+                    'info' => 'By default, the thumbnails are loaded only when they are displayed, so a page with many media is loaded quickly.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_skip_lazy_loading',
+                ],
+            ])
+
+            ->add([
                 'name' => 'easyadmin_rights_reviewer_delete_all',
                 'type' => Element\Checkbox::class,
                 'options' => [

@@ -327,6 +327,7 @@ return [
             ],
             'easyadmin_settings_enhancements' => false,
             'easyadmin_admin_board_color' => '',
+            'easyadmin_skip_lazy_loading' => false,
             // Editing.
             'easyadmin_rights_reviewer_delete_all' => false,
             'easyadmin_quick_template' => [],

@@ -82,6 +82,11 @@ class Module extends AbstractModule
 
     const NAMESPACE = __NAMESPACE__;
 
+    /**
+     * @var bool|null
+     */
+    protected $lazyLoading;
+
     public function init(ModuleManager $moduleManager): void
     {
 
@@ -505,6 +510,13 @@ class Module extends AbstractModule
             [$this, 'handleAdminBoardColor']
         );
 
+        // Load the thumbnails only when they are displayed.
+        $sharedEventManager->attach(
+            '*',
+            'view_helper.thumbnail.attribs',
+            [$this, 'handleThumbnailAttribs']
+        );
+
         // Enrich the system information page with the diagnostics of the
         // PHP-CLI used by background jobs. The core triggers the "system_info"
         // event since Omeka S 4.2 (before, the listener is simply never
@@ -822,6 +834,27 @@ class Module extends AbstractModule
         $event->getTarget()->headStyle()->appendStyle(
             'body > .flex > header { background-color: ' . $color . '; }'
         );
+    }
+
+    /**
+     * Add the attribute "loading" to the thumbnails, so a page with many media
+     * does not load all their thumbnails at once.
+     *
+     * The attribute is set before "src", because firefox ignores it after.
+     *
+     * @link https://bugzilla.mozilla.org/show_bug.cgi?id=1647077
+     */
+    public function handleThumbnailAttribs(Event $event): void
+    {
+        $this->lazyLoading ??= !$this->getServiceLocator()->get('Omeka\Settings')
+            ->get('easyadmin_skip_lazy_loading', false);
+        if (!$this->lazyLoading) {
+            return;
+        }
+        $attribs = $event->getParam('attribs') ?: [];
+        if (!isset($attribs['loading'])) {
+            $event->setParam('attribs', ['loading' => 'lazy'] + $attribs);
+        }
     }
 
     public function handleCron(Event $event): void
