@@ -645,3 +645,20 @@ if (version_compare($oldVersion, '3.4.48', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.52', '<')) {
+    $settings->set('easyadmin_skip_lazy_loading', false);
+    $message = new PsrMessage(
+        'The thumbnails are loaded only when they are displayed, so a page with many media is loaded quickly. This behavior can be disabled in the main settings.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    if (!$this->isModuleActive('JobQueue')) {
+        $message = new PsrMessage(
+            'The optional module {link}Job Queue{link_end} can be installed to avoid running the same background jobs several times in parallel and to limit the number of heavy jobs running at the same time.', // @translate
+            ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-JobQueue" target="_blank" rel="noopener">', 'link_end' => '</a>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addNotice($message);
+    }
+}
