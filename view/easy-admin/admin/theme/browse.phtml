@@ -21,6 +21,7 @@ $catalogueUrl = $catalogueUrl ?? '';
 $plugins = $this->getHelperPluginManager();
 $url = $plugins->get('url');
 $escape = $plugins->get('escapeHtml');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
@@ -123,11 +124,15 @@ echo $this->form()->openTag($manageForm);
         <option value="default"><?= $translate('Batch actions') ?></option>
         <option value="update" disabled="disabled"><?= $escape($translate('Update selected')) ?></option>
         <option value="remove" disabled="disabled"><?= $escape($translate('Remove selected')) ?></option>
+        <option value="copy-selected" disabled="disabled"><?= $escape($translate('Copy the list of selected')) ?></option>
+        <option value="copy-all" data-always="1"><?= $escape($translate('Copy the list of all')) ?></option>
     </select>
     <div class="batch-actions">
         <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
         <button type="submit" class="update" name="batch_submit" value="update"><?= $translate('Go') ?></button>
         <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected"><?= $translate('Go') ?></a>
+        <button type="button" class="copy-selected" data-copy="selected" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-all" data-copy="all" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -175,7 +180,7 @@ echo $this->form()->openTag($manageForm);
             ? $this->basePath(substr($themePath, strlen(OMEKA_PATH) + 1) . '/theme.jpg')
             : null;
     ?>
-        <tr>
+        <tr data-copy="<?= $escapeAttr($themeId) ?>">
             <td>
                 <?php if (!$isComposer): ?>
                 <input type="checkbox" name="themes[]" value="<?= $escape($themeId) ?>" aria-label="<?= $escape(sprintf($translate('Select %s'), $theme['name'])) ?>">

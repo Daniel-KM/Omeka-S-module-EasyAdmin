@@ -218,6 +218,8 @@ echo $this->form()->openTag($manageForm);
         <option value="update" disabled="disabled"><?= $escape($translate('Download the new version of selected')) ?></option>
         <option value="upgrade" disabled="disabled"><?= $escape($translate('Upgrade selected')) ?></option>
         <option value="remove" disabled="disabled"><?= $escape($translate('Remove selected')) ?></option>
+        <option value="copy-selected" disabled="disabled"><?= $escape($translate('Copy the list of selected')) ?></option>
+        <option value="copy-all" data-always="1"><?= $escape($translate('Copy the list of all')) ?></option>
     </select>
     <div class="batch-actions">
         <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
@@ -226,6 +228,8 @@ echo $this->form()->openTag($manageForm);
         <button type="submit" class="update" name="batch_submit" value="update"><?= $translate('Go') ?></button>
         <button type="submit" class="upgrade" name="batch_submit" value="upgrade"><?= $translate('Go') ?></button>
         <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected"><?= $translate('Go') ?></a>
+        <button type="button" class="copy-selected" data-copy="selected" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-all" data-copy="all" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -317,7 +321,7 @@ echo $this->form()->openTag($manageForm);
         // in the browser (js), without reload, like the filter by name.
         $isError = in_array($state, $errorStates, true);
     ?>
-        <tr data-state="<?= $escape($state) ?>" data-update-available="<?= $hasUpdate ? '1' : '0' ?>" data-error="<?= $isError ? '1' : '0' ?>">
+        <tr data-copy="<?= $escapeAttr($moduleId) ?>" data-state="<?= $escape($state) ?>" data-update-available="<?= $hasUpdate ? '1' : '0' ?>" data-error="<?= $isError ? '1' : '0' ?>">
             <td>
                 <?php if (!$isComposer): ?>
                 <input type="checkbox" name="modules[]" value="<?= $escape($moduleId) ?>" aria-label="<?= $escape(sprintf($translate('Select %s'), $name)) ?>">
