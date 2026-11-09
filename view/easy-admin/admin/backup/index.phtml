@@ -2,6 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $backups
+ * @var \Omeka\Entity\Job[] $runningJobs
  * @var string $backupDir
  * @var \Omeka\Form\ConfirmForm $formDelete
  * @var \Laminas\Form\Form $formBackup
@@ -218,6 +219,16 @@ $urlFiles = $url(null, ['action' => 'backup-files'], true);
 <div id="backup-list" class="block">
     <h2><?= $translate('Existing backups') ?></h2>
 
+    <?php foreach ($runningJobs as $job): ?>
+    <div class="messages warning">
+        <p><?= sprintf(
+            $escape($translate('A backup is in progress (job %s), since %s. Its file is not complete yet: reload the page later.')),
+            $hyperlink('#' . $job->getId(), $url('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
+            $escape($job->getStarted() ? $job->getStarted()->format('Y-m-d H:i:s') : '')
+        ) ?></p>
+    </div>
+    <?php endforeach; ?>
+
     <?php if ($backups): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
@@ -241,6 +252,10 @@ $urlFiles = $url(null, ['action' => 'backup-files'], true);
                     <?php endif; ?>
                 </td>
                 <td><?= date('Y-m-d H:i:s', $backup['mtime']) ?></td>
+                <?php if ($backup['in_progress']): ?>
+                <td><em><?= $escape($translate('In progress')) ?></em></td>
+                <td class="actions"></td>
+                <?php else: ?>
                 <td><?= $formatSize($backup['size']) ?></td>
                 <td class="actions">
                     <a href="<?= $escapeAttr($url(null, ['action' => 'download'], ['query' => ['file' => $backup['name']]], true)) ?>"
@@ -249,6 +264,7 @@ $urlFiles = $url(null, ['action' => 'backup-files'], true);
                        data-url-sidebar-content="<?= $escapeAttr($url(null, ['action' => 'delete-confirm'], ['query' => ['filename' => $backup['name']]], true)) ?>"
                        title="<?= $translate('Delete') ?>" aria-label="<?= $translate('Delete') ?>"></a>
                 </td>
+                <?php endif; ?>
             </tr>
             <?php endforeach; ?>
         </tbody>

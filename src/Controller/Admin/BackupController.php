@@ -27,7 +27,8 @@ class BackupController extends AbstractActionController
     public function indexAction()
     {
         $backupDir = $this->basePath . '/backup';
-        $backups = $this->getBackupList($backupDir);
+        $runningJobs = $this->getRunningBackupJobs();
+        $backups = $this->getBackupList($backupDir, $runningJobs);
 
         $formDelete = $this->getForm(ConfirmForm::class);
         $formDelete
@@ -39,6 +40,7 @@ class BackupController extends AbstractActionController
 
         return new ViewModel([
             'backups' => $backups,
+            'runningJobs' => $runningJobs,
             'backupDir' => $backupDir,
             'formDelete' => $formDelete,
             'formBackup' => $formBackup,
@@ -265,10 +267,67 @@ class BackupController extends AbstractActionController
     }
 
     /**
-     * Get list of backup files.
+     * Get the backup jobs that are running, the most recent first.
+     *
+     * The status of the job is checked with the process when the module Log
+     * is available, else the status stored in the database is used.
+     *
+     * @return \Omeka\Entity\Job[]
      */
-    protected function getBackupList(string $backupDir): array
+    protected function getRunningBackupJobs(): array
     {
+        $entityManager = $this->getEvent()->getApplication()->getServiceManager()->get('Omeka\EntityManager');
+        $jobs = $entityManager->getRepository(\Omeka\Entity\Job::class)->findBy(
+            [
+                'class' => [DatabaseBackup::class, BackupJob::class],
+                'status' => [
+                    \Omeka\Entity\Job::STATUS_STARTING,
+                    \Omeka\Entity\Job::STATUS_IN_PROGRESS,
+                    \Omeka\Entity\Job::STATUS_STOPPING,
+                ],
+            ],
+            ['id' => 'DESC'],
+            10
+        );
+
+        // A job that died without updating its status stays running forever,
+        // so an old one is skipped.
+        $jobs = array_values(array_filter($jobs, fn ($job) => $job->getStarted()
+            && $job->getStarted()->getTimestamp() > time() - 86400));
+
+        $plugins = $this->getPluginManager();
+        if (!$plugins->has('jobState')) {
+            return $jobs;
+        }
+
+        // A known state of the process that is not processing means that the
+        // job is ended, even if its status was not updated.
+        $jobState = $plugins->get('jobState');
+        return array_values(array_filter($jobs, function ($job) use ($jobState) {
+            $state = $job->getPid() ? $jobState($job) : null;
+            return $state === null
+                || !empty(\Log\Stdlib\JobState::STATES[$state]['processing']);
+        }));
+    }
+
+    /**
+     * Get list of backup files.
+     *
+     * A file whose type matches a running job, modified since the start of the
+     * job and in the last minutes is being created, so its size is not the
+     * final one. A file no longer modified belongs to a job that died.
+     *
+     * @param \Omeka\Entity\Job[] $runningJobs
+     */
+    protected function getBackupList(string $backupDir, array $runningJobs = []): array
+    {
+        $runningSince = [];
+        foreach ($runningJobs as $job) {
+            $type = $job->getClass() === DatabaseBackup::class ? 'database' : 'files';
+            $started = $job->getStarted() ? $job->getStarted()->getTimestamp() : 0;
+            $runningSince[$type] = isset($runningSince[$type]) ? min($runningSince[$type], $started) : $started;
+        }
+
         if (!is_dir($backupDir) || !is_readable($backupDir)) {
             return [];
         }
@@ -295,12 +354,17 @@ class BackupController extends AbstractActionController
                 continue;
             }
 
+            $type = $this->getBackupType($entry);
+            $mtime = filemtime($filepath);
             $files[] = [
                 'name' => $entry,
                 'path' => $filepath,
                 'size' => filesize($filepath),
-                'mtime' => filemtime($filepath),
-                'type' => $this->getBackupType($entry),
+                'mtime' => $mtime,
+                'type' => $type,
+                'in_progress' => isset($runningSince[$type])
+                    && $mtime >= $runningSince[$type]
+                    && $mtime > time() - 300,
             ];
         }
 
