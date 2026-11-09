@@ -155,15 +155,19 @@ class FileDerivative extends AbstractCheck
         $failed = $translator->translate('Failed'); // @translate
 
         $offset = 0;
+        $lastId = 0;
         $totalProcessed = 0;
         $totalSucceed = 0;
         $totalExisting = 0;
         $totalFailed = 0;
         while (true) {
-            $criteria
-                ->setFirstResult($offset);
-            $medias = $this->mediaRepository->matching($criteria);
-            if (!$medias->count()) {
+            // Keyset pagination: the filters (for example the missing thumbnails)
+            // change while processing, so an offset would skip rows, and the
+            // count of a lazy collection ignores the limit, so it never ends.
+            $batchCriteria = clone $criteria;
+            $batchCriteria->andWhere($batchCriteria->expr()->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($batchCriteria)->toArray();
+            if (!$medias) {
                 break;
             }
 
@@ -322,6 +326,7 @@ class FileDerivative extends AbstractCheck
             }
 
             // Avoid memory issue.
+            $lastId = end($medias)->getId();
             unset($medias);
             $this->entityManager->flush();
             $this->entityManager->clear();
@@ -407,14 +412,19 @@ class FileDerivative extends AbstractCheck
         );
 
         $offset = 0;
+        $lastId = 0;
         $succeed = 0;
         $failed = 0;
         $existing = 0;
 
         while (true) {
-            $criteria->setFirstResult($offset);
-            $items = $repository->matching($criteria);
-            if (!$items->count()) {
+            // Keyset pagination: the filters (for example the missing thumbnails)
+            // change while processing, so an offset would skip rows, and the
+            // count of a lazy collection ignores the limit, so it never ends.
+            $batchCriteria = clone $criteria;
+            $batchCriteria->andWhere($batchCriteria->expr()->gt('id', $lastId));
+            $items = $repository->matching($batchCriteria)->toArray();
+            if (!$items) {
                 break;
             }
 
@@ -479,6 +489,7 @@ class FileDerivative extends AbstractCheck
                 }
             }
 
+            $lastId = end($items)->getId();
             unset($items);
             $this->entityManager->flush();
             $this->entityManager->clear();
@@ -534,14 +545,19 @@ class FileDerivative extends AbstractCheck
         $downloader = $this->getServiceLocator()->get('Omeka\File\Downloader');
 
         $offset = 0;
+        $lastId = 0;
         $succeed = 0;
         $failed = 0;
         $existing = 0;
 
         while (true) {
-            $criteria->setFirstResult($offset);
-            $items = $repository->matching($criteria);
-            if (!$items->count()) {
+            // Keyset pagination: the filters (for example the missing thumbnails)
+            // change while processing, so an offset would skip rows, and the
+            // count of a lazy collection ignores the limit, so it never ends.
+            $batchCriteria = clone $criteria;
+            $batchCriteria->andWhere($batchCriteria->expr()->gt('id', $lastId));
+            $items = $repository->matching($batchCriteria)->toArray();
+            if (!$items) {
                 break;
             }
 
@@ -608,6 +624,7 @@ class FileDerivative extends AbstractCheck
                 }
             }
 
+            $lastId = end($items)->getId();
             unset($items);
             $this->entityManager->flush();
             $this->entityManager->clear();
@@ -724,14 +741,19 @@ class FileDerivative extends AbstractCheck
         $downloader = $this->getServiceLocator()->get('Omeka\File\Downloader');
 
         $offset = 0;
+        $lastId = 0;
         $succeed = 0;
         $failed = 0;
         $existing = 0;
 
         while (true) {
-            $criteria->setFirstResult($offset);
-            $medias = $this->mediaRepository->matching($criteria);
-            if (!$medias->count()) {
+            // Keyset pagination: the filters (for example the missing thumbnails)
+            // change while processing, so an offset would skip rows, and the
+            // count of a lazy collection ignores the limit, so it never ends.
+            $batchCriteria = clone $criteria;
+            $batchCriteria->andWhere($batchCriteria->expr()->gt('id', $lastId));
+            $medias = $this->mediaRepository->matching($batchCriteria)->toArray();
+            if (!$medias) {
                 break;
             }
 
@@ -798,6 +820,7 @@ class FileDerivative extends AbstractCheck
                 }
             }
 
+            $lastId = end($medias)->getId();
             unset($medias);
             $this->entityManager->flush();
             $this->entityManager->clear();
