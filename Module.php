@@ -2168,7 +2168,10 @@ class Module extends AbstractModule
 
         $originalName = $asset->getName();
         if (!$originalName) {
-            $logger->warn('Asset #{asset_id}: cannot rename, asset has no name.', ['asset_id' => $asset->getId()]);
+            $logger->warn(
+                'Asset #{asset_id}: cannot rename, asset has no name.', // @translate
+                ['asset_id' => $asset->getId()]
+            );
             return;
         }
 
@@ -2177,7 +2180,10 @@ class Module extends AbstractModule
         // Remove characters that are problematic on filesystems.
         $originalName = preg_replace('/[^\w.\-]/', '_', $originalName);
         if (!strlen($originalName) || $originalName === '.' || $originalName === '..') {
-            $logger->warn('Asset #{asset_id}: cannot rename, sanitized name is empty.', ['asset_id' => $asset->getId()]);
+            $logger->warn(
+                'Asset #{asset_id}: cannot rename, sanitized name is empty.', // @translate
+                ['asset_id' => $asset->getId()]
+            );
             return;
         }
 
