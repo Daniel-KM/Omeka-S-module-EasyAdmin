@@ -6,88 +6,57 @@ Easy Admin (module for Omeka S)
 > than the previous repository.__
 
 [Easy Admin] is a module for [Omeka S] that allows to manage Omeka from the
-admin interface:
+admin interface, without access to the server.
 
-- bulk upload multiple files in item form, bypassing any server post limits
-- per-user private directories for uploads and imports
-- buttons to public view and previous/next resources in admin resource show page
-- install modules and themes
-- install [curated selection of modules]
-- update modules (in a future version)
-- add more asset media types
-- maintenance state for public and admin even when no migration
-- checks database and files
-- backup install
-- clear php caches
-- launch simple tasks, that can be any job of any module
-- allow (or not) reviewer to delete any resources
-- allow more file types for assets
-- filter and section navigation on the settings and site settings pages
-- audit security and privacy (file protection, user and private data leaks)
-- diagnose background jobs (php-cli path, version parity, extensions)
-- list useless database tables (orphan tables left by removed modules)
-- adapt environment settings after a copy of the production database
+- Files
+  - bulk upload of files in the item form, without the limits of the server
+  - private directories by user for uploads and imports
+  - file manager
+- Interface
+  - buttons "Public view" and "Previous/Next" in the resource pages
+  - filter and navigation in the settings pages
+  - color of the admin sidebar, to distinguish a test instance
+  - thumbnails loaded only when they are displayed, so long pages load quickly
+  - button "Apply" in the config forms of the modules
+- Modules and themes
+  - install modules and themes, or a [curated selection of modules]
+  - fix the version of a module whose files were rolled back
+- Maintenance
+  - maintenance mode for the public and the admin interface
+  - checks and fixes of the files and of the database (see below)
+  - backup of the database and of the files
+  - clear the php caches
+  - adapt the settings after a copy of the production database
+- Security
+  - audit of the security and of the privacy
+  - protection of the emails on a test copy
+- Tasks
+  - run any job of any module, from the admin interface or the command line
+  - diagnose the background jobs (php-cli)
 
-Checks and fixes that are doable:
+The checks and fixes include:
 
-- list files in the file system (original and thumbnails), but not in the
-  database
-- remove useless files in the files directory (moved to files/check)
-- list files in the database, but not in the file system (for original and
-  thumbnails)
-- copy original files from a directory, for example after a disk crash or an
-  inadvertent deletion; files are copied via the hash, and they can be anywhere
-  in the directory or in subdirectories of the source path.
-- re-hash storage file names, for example after import or for security.
-- rebuild derivative files
-- remove empty directories in file system (original and thumbnails, mainly for
-  module [Archive Repertory])
-- check and update file size of media (required to fix Omeka installed before
-  Omeka 1.2 ([omeka/omeka-s#1257]), or after a hard update of files)
-- check and fix sha256 hashes of files
-- check and fix positions of media (start from 1, without missing number)
-- check and set precise media types (for example application/alto+xml instead of text/xml)
-- check and prepare dimensions of medias for module [Iiif Server]
-- check and fix the encoding (iso-8859 to utf-8) of resource values and page
-  contents (fix Windows issues)
-- check and update titles
-- check and update the primary media for each item
-- check and stop dead jobs (living in database, but non-existent in system)
-- check the size of the database table of sessions and remove them
-- check the size of the database table of logs and remove them
-- backup install
-- clear php caches
-- loop resources, for example to update them when a new settings is set
-- audit the security and privacy: protect sensitive directories of "files/" with
-  ".htaccess", detect executable php files, and list user and private data leaks
-- list useless database tables (orphan tables left by removed modules/libraries)
-- check background jobs: validity of php-cli path, version parity with php web,
-  required extensions and run a test job
-- adapt environment-specific settings, for example after copy of a production
-  database to a test server
+- files: missing or useless files, recovery of the original files from a
+  directory, rebuild of the thumbnails, sizes, hashes, media types, dimensions
+  for module [Iiif Server], renaming of the stored files, empty directories
+- database: positions of the media, titles, primary media, encoding of the
+  values (iso-8859 to utf-8), orphan rows, dead jobs, size of the sessions and
+  of the logs, useless tables left by removed modules
+- loop on all resources, for example to apply a new setting
 
-And many more.
+The feature "content lock" was moved to the module [Lock Edit] since version
+3.4.31.
 
-The feature "content lock" to avoid concurrent edition was moved to the module
-[Lock Edit] since version 3.4.31.
+Other modules add their own tasks:
 
-Modules that add tasks:
-
-- [Compilatio]
-  - Send files to https://compilatio.net, an anti-plagiarism app.
-  - Append urls to https://compilatio.net for files checked by Compilatio.
-- [Guest]
-  - Reset acceptation of conditions.
-- [Iiif Server]
-  - Convert old three-columns table contents to new four columns.
-- [Lock Edit]
-  - Check and reset content locks.
-- [Reference]
-  - Reindex references.
-- [Thesaurus]
-  - Reindex thesaurus.
-- [Zip]
-  - Create zips.
+- [Compilatio]: send files to compilatio.net, an anti-plagiarism app, and append
+  the urls of the checked files
+- [Guest]: reset the acceptance of the conditions
+- [Iiif Server]: convert the old tables of contents
+- [Lock Edit]: check and reset the content locks
+- [Reference]: reindex the references
+- [Thesaurus]: reindex the thesaurus
+- [Zip]: create the zips
 
 
 Installation
@@ -97,18 +66,22 @@ See general end user documentation for [installing a module].
 
 This module requires the module [Common], that should be installed first.
 
+With big bases or on shared hosts, it is recommended to install the optional
+module [Job Queue] to avoid to overload the server when backuping or recreating
+derivate thumbnails.
+
 The module [Cron] is recommended for advanced scheduling, but not required: the
 module can clean sessions and run scheduled tasks independently via page loads.
 
 The module uses external libraries, so use the release zip to install it, or use
 and init the source.
 
-- From the zip
+* From the zip
 
 Download the last release [EasyAdmin.zip] from the list of releases, and
 uncompress it in the `modules` directory.
 
-- From the source and for development
+* From the source and for development
 
 If the module was installed from the source, rename the name of the folder of
 the module to `EasyAdmin`, go to the root of the module, and run:
@@ -117,167 +90,118 @@ the module to `EasyAdmin`, go to the root of the module, and run:
 composer install --no-dev
 ```
 
-Then install it like any other Omeka module and follow the config instructions.
+* For test
 
-- For test
-
-The module includes a comprehensive test suite with unit and functional tests.
-Run them from the root of Omeka:
+The module includes a test suite. Run it from the root of Omeka:
 
 ```sh
 vendor/bin/phpunit -c modules/EasyAdmin/phpunit.xml --testdox
 ```
 
-- Proxy issue
-
-In some cases, in particular when the server is behind a proxy, a firewall or a
-specific infrastructure, your may need to add credentials in your config (omeka
-file "config/local.config.php"), depending on your linux distribution:
-
-```php
-    'http_client' => [
-        // 'adapter' => null,
-        'sslcapath' => '/usr/local/etc/ssl/certs',
-        'sslcafile' => '/usr/local/etc/ssl/certs/ca.crt',
-        // 'sslcapath' => '/etc/pki/tls/certs',
-        // 'sslcafile' => '/etc/pki/tls/certs/ca-bundle.crt',
-        'curloptions' => [],
-    ],
-```
-
-In some cases, the path should be relative:
-
-```php
-    'http_client' => [
-        // 'adapter' => null,
-        'sslcapath' => '/usr/local/etc/ssl/certs/',
-        'sslcafile' => 'ca.crt',
-        // 'sslcapath' => '/etc/pki/tls/certs/',
-        // 'sslcafile' => 'ca-bundle.crt',
-        'curloptions' => [],
-    ],
-```
-
-You can find more information on the params in [Laminas help] and [curl].
-
 
 Usage
 -----
 
-### Various settings
+### Main settings
 
-Some options are added in main settings:
+The module adds options in the main settings:
 
-- Display previous/next button in resource page.
-- Allow the reviewer to delete any resource.
-- Manage the maintenance.
-- Display a quick button to create a resource template
-- Add an "Apply" button on every module config form, to save the settings and
-  stay on the form (active tab included) instead of returning to the module
-  list.
-- Override the base URI of local files (section "Maintenance and tests"), to
-  serve file URLs from another server (for example production) while keeping
-  uploads and derivatives local. Useful to work on a copy of the database
-  without the files.
+- buttons in the resource pages (see below);
+- allow the reviewer to delete any resource;
+- maintenance mode;
+- quick button to create a resource template;
+- button "Apply" on every module config form, to save and stay on the form;
+- base URI of the files and emails of a test copy (section "Maintenance and
+  tests", see below).
 
-### Bulk Upload in item form and in separate form
+### Bulk upload
 
-The module adds a way to bulk upload files manually without limit of [size or number of files]
-in resource form and via a separate bulk upload form for future imports.
+Files can be uploaded in the resource form without the limits of the server on
+the [size or number of files]: select "Files" in the list of media. A separate
+form allows to upload files for future imports.
 
-Simply select "Files" in the media list in item form.
+Some characters are forbidden in the file names, and the media types and the
+extensions are checked according to the main settings.
 
-For security, some characters are forbidden in filenames. Media-types and
-extensions are checked according to main settings too.
+The uploaded files can be listed and deleted in the file manager: menu "Easy
+Admin" in the left sidebar, tab "File manager". Only the directories set in the
+main settings can be browsed, inside the directory "files/" and outside the
+directories managed by Omeka. An option of the config form allows any directory
+inside "files/". Another one, set in the file "config/local.config.php" with the
+key `easyadmin_local_path_any`, allows any writable directory: **warning**, it
+has security implications, so check the rights or use it only temporarily.
 
-To list files in this directory and to delete them, use the file manager, via
-the link Easy admin in the left sidebar, then tab File manager.
+### Directories by user
 
-Not all directories can be browsed: only the list of paths set in main settings
-can be browsed. Furthermore, by default, only paths inside directory files/ and
-that are not managed by Omeka are allowed. To bypass this limit, an option in
-the config form allows to use any path inside files/.
+An option allows a private directory for each user who can create items
+(author, reviewer, editor and administrators):
 
-Another option allows to use any other writeable directory. For this one, update
-the file local.config.php for key "easyadmin_local_path_any".
-**Warning**: there are security implications with this option, so check access
-rights or use it only temporarily.
+- each user has a directory `files/userdata/{user id}/`, created on first use;
+- a user sees and uses only their own directory;
+- the administrators can browse and download the files of all users, but they
+  cannot upload or delete files in the directory of another user;
+- the directories cannot be read from the web: the files are downloaded through
+  the file manager, after login, and can still be imported by their path, that
+  is displayed in the file manager.
 
-### Per-user directories
+When the option is disabled, the directories are kept on the disk.
 
-An option in settings allows to enable private directories for each user who can
-create items (author, reviewer, editor, and administrators). When enabled:
+### Buttons in resource pages
 
-- Each user gets a personal directory at `/files/userdata/{userId}/`.
-- The directory is created automatically on first access.
-- Administrators can browse and download files in all user directories, but
-  cannot upload or delete files in another user's directory.
-- Non-admin users (editors, reviewers, authors) can only see and use their own
-  directory.
-- Researchers do not have access to user directories (they cannot create items).
-- The `/files/userdata/` directory is protected by `.htaccess` to deny direct
-  HTTP access. The `.htaccess` is created automatically and recreated if deleted.
-- Files can still be imported via their filesystem path (sideload), since PHP
-  reads the disk directly and is not affected by the `.htaccess`. The filesystem
-  path is displayed in the file manager interface.
-- Download in the file manager works via a dedicated controller action that
-  streams the file after verifying authentication.
-- When the setting is disabled, existing directories remain on disk but no longer
-  appear in the dropdown.
+The buttons can be enabled in the main settings:
 
-### Buttons in resource page
-
-The option can be enabled in main settings.
-
-#### Button "Public view"
-
-Display a button "Public view" in resource show pages. The link is the resource
-page of the default user site or the default site.
-
-This feature has been integrated partially in Omeka S v4.1, but only for items
-integrated in a site, not for item sets or media.
-
-#### Buttons to previous next resources
-
-Allow to get the previous or the next resources, that simplifies browsing like
-in Omeka Classic.
+- "Public view": link to the resource page in the default site of the user or in
+  the default site. Omeka S 4.1 has a similar button, but only for the items
+  attached to a site.
+- "Previous/Next": browse the resources like in Omeka Classic.
 
 ### Settings filter and navigation
 
-On main settings and site settings pages, a live filter and a section navigation
-can be added: filter fields by label or value, jump to a section, and restrict
-to modified, default or unknown values, or to text or non-text fields. The known
-core defaults are used to flag each field as default or modified; fields whose
-default is not declared (mostly settings of modules that do not declare theirs)
-stay unknown. It can be enabled with the button "Enable filters" in main
-settings page.
+The settings and the site settings pages can have a live filter and a section
+navigation: filter the fields by label or value, jump to a section, display only
+the modified or the default values, or only the text fields. Enable it with the
+button "Enable filters" in the main settings page.
 
-Since Omeka 4.3, the settings pages have their own filter, with chips to select
-an element group. In that case, only the features that the core does not
-provide are added: the highlight of the matches, the status of each value and
-the filters on it, the filters on the type of field, and the search inside the
-current values.
+Since Omeka 4.3, the core has its own filter: the module adds only the features
+that the core does not have.
 
 ### Color of the admin sidebar
 
-The background color of the admin left sidebar can be set in main settings, for
-example to distinguish a test instance from the production one.
+The background color of the admin left sidebar can be set in the main settings,
+for example to distinguish a test instance from the production one.
+
+### Lazy loading of thumbnails
+
+The thumbnails are loaded only when they appear on the screen, so a page with
+many media is displayed quickly, in admin and in sites. A theme can still choose
+another behavior for its own thumbnails. The lazy loading can be disabled in
+main settings, with the option "Load all thumbnails at once".
+
+### Checks and fixes
+
+Go to the menu "Bulk Check", select the process, set the options if needed, and
+submit. The results are written in the logs.
+
+The processes cover all the resources, including the annotations and the digital
+objects when the related modules are installed. For the checks of files, the
+media and/or the digital objects can be selected.
+
+The quick tasks, flagged "instant", display their result directly on the page.
+The other ones run in background.
 
 ### Security and privacy
 
-An audit lists the security and privacy weaknesses of the install: sensitive
-directories of "files/" reachable from the web, executable php files, and
-possible user or private data leaks. It can add a ".htaccess" that denies direct
-web access to the sensitive directories, indicating the module each directory
-belongs to. The protection is also applied on upgrade. Directories owned by a
-feature that serves files directly (for example the "zip" directory of modules
-Derivative Media and Zip) are excluded.
+An audit lists the weaknesses of the install: sensitive directories of "files/"
+readable from the web, executable php files, and possible leaks of user or
+private data. It can protect the sensitive directories with a file ".htaccess",
+that is applied on upgrade too.
 
-The backups (database, modules, themes, config) are stored in `files/backup/`,
-protected by a ".htaccess" created with the directory, and downloaded through
-an authenticated action. A ".htaccess" is read only by Apache with the option
-`AllowOverride`: with nginx or another server, deny the access to the sensitive
-directories in the config of the server, for example for nginx:
+The backups (database, modules, themes, config) are stored in "files/backup/"
+and downloaded only after login.
+
+A file ".htaccess" is read only by Apache. With nginx or another server, deny
+the access to the sensitive directories in the config of the server, for
+example:
 
 ```nginx
 location ~ ^/files/(backup|userdata)/ {
@@ -285,188 +209,106 @@ location ~ ^/files/(backup|userdata)/ {
 }
 ```
 
-### Checks and fixes
-
-Go to the menu "Bulk Check", select your process, set your options if needed,
-and click the submit buttons. The results are available in logs currently.
-
-The processes cover items, item sets, media, annotations, value annotations and
-digital objects, when the related modules are installed. For file checks (hashes,
-sizes, dimensions, thumbnails, missing or excess files), the entities to process
-(media and/or digital objects) can be selected.
-
-A check also detects and removes orphan resource rows: rows in the `resource`
-table without a matching row in a sub-table (`item`, `item_set`, `media`,
-`annotation`, `value_annotation`, `digital_object`), and the reverse, which can
-happen after a crash or an incomplete deletion.
-
-Some tasks are quick enough to run directly, without the php-cli: they are
-flagged "instant" in the list, and their result is displayed on the page
-instead of the log only. They are still dispatched as jobs, so the log and the
-history are kept. Only the tasks doing bounded sql or looping on a fixed list
-(the stalled jobs, the sub-tables of `resource`) are in that case: anything
-looping on the resources or the files stays a background job.
-
 ### Background jobs (php-cli)
 
-Background jobs are run by a separate php-cli process whose path and version may
-differ from the web php, in particular on multi-distro or shared hosting. A
-diagnostic checks the configured php-cli path, its version parity with the web
-php, the required extensions, the SAPI, the php-cgi setups, and `open_basedir`,
-then recommends the right path when the configured one is invalid. A separate
-action runs a real test job to confirm that jobs actually start. A summary is
-also added to `/admin/system-info`.
+The background jobs are run by a separate php-cli, whose path and version may
+differ from the php of the web server, in particular on shared hosting. A
+diagnostic checks the php-cli, compares it with the php of the web server, and
+recommends the right path when the configured one is invalid. Another action
+runs a test job to check that the jobs start. A summary is added to the page
+"System information".
 
 ### Useless database tables
 
-A check lists the database tables that are not used any more: orphan tables left
-by removed modules, told apart from the tables of merely inactive (but still
-installed) modules, from the core Omeka tables, and from tables created by a
-third-party library of a module (for example the `triplestore_` tables created
-by the `arc2` library of module Sparql). The list of library-owned tables is
-extensible via configuration.
+A check lists the tables that are not used any more, for example the ones left
+by removed modules. The tables of the inactive modules, of the core and of the
+libraries used by modules are listed separately.
 
-### Settings after a database copy
+### Copy of a production database
 
-After copying a production database to a test install, several settings must be
-adapted to the new environment. A task lists these environment-specific settings
-(and site settings) so they can be reviewed and updated, without touching values
-that are not environment-related. An option adapts the settings for a test copy:
-the title is prefixed with « TEST », the admin sidebar is colored, the errors are
-displayed on screen for anybody and the statistics trackers are removed. Another
-option reverts them for the production, except the statistics trackers, that
-should be set again.
+After the copy of a production database on a test server, some settings must
+be adapted. A task lists these settings, the config of the http client (proxy
+and certificates) and the risks with the emails.
+
+Indeed, a copy contains the real accounts and the real recipients of the
+notifications, so they may receive the emails of the tests. The option "Emails
+of a test copy" (section "Maintenance and tests") protects them without
+modifying the database:
+
+- redirect all the emails to one address, with the original recipients in the
+  subject;
+- send only to the domains of the team;
+- send nothing and write the emails in the protected directory
+  "files/mailcapture/".
+
+An option adapts the settings for a test copy: title prefixed with « TEST »,
+colored admin sidebar, errors displayed on screen, statistics trackers removed,
+and grey images when the files are not served from another server. Another
+option reverts them for the production, except the statistics trackers.
+
+The base URI of the files can be replaced too, in order to serve the files from
+another server, for example the production one, while the uploads stay local.
+It is useful to work on a copy of the database without the files. When the
+other server is protected, the images may be replaced by grey images or by
+images of Wikimedia Commons matching a keyword. These images are downloaded
+once in "files/fake/", so the visitors do not request the servers of Wikimedia.
+
+For the keyword, use a free search like on Commons, preferably with English
+words (landscape, lighthouse, flower, castle, bird…): all words must match, and
+an empty keyword takes any image. Only the "Quality images" reviewed by the
+community are used. See the [quality images by subject], or try a search on
+Commons like `lighthouse incategory:"Quality images"`.
 
 ### Install and update modules and themes
 
-Simply select either the desired module or the desired theme and click "upload".
+Select a module or a theme and click "upload". See the lists of [modules] and of
+[themes].
 
-See more details on [modules] and [themes].
+When the files of a module are rolled back without the database, the module is
+not upgraded and stays in an inconsistent state. The page of the modules
+displays the two versions, with a button "Fix version" to store the version of
+the files in the database. The data are not modified, so use it only when the
+rolled back versions did not change them.
 
-When the files of a module are rolled back without rolling back the database,
-the database keeps a version greater than the one of the files, so Omeka does
-not run any upgrade and the module stays in an inconsistent state. The page of
-the modules displays both versions in that case, with a button "Fix version"
-to store the version of the files in the database. The database schema and the
-data are not modified, so it is useful only when the rolled back versions did
-not change them, or when they were reverted by other means.
-
-### Content lock (Easy Admin until version 3.4.30)
-
-The feature was moved to the module [Lock Edit] since version 3.4.31.
-
-This feature is inspired by Drupal [Content Lock] mechanism and allows to block
-concurrent editing: when a user is editing a resource, other users cannot edit
-it until submission.
+The batch actions of the pages of the modules and of the themes allow to copy
+the list of the addons or the urls to download them, for example to install the
+same addons on another server.
 
 ### Tasks and cron tasks
 
-Cron tasks are now managed via module [Cron]. Nevertheless, it is still possible
-to run any tasks (jobs) from this module.
-
-A script allows to run any job of any module from the command line, even if they
-are not initialized in the admin interface. It’s useful to run one time tasks or
-cron tasks, for example to harvest and update resources regularly with module
-[Bulk Import], or to clean up sessions (see included jobs), or to reindex
-resources in the search engine with module [Search SolR].
-
-Here is the command line to use:
+The cron tasks are managed with the module [Cron]. Any task (job) can still be
+run from this module, in the admin interface or with a script, for example to
+harvest resources regularly with module [Bulk Import], to clean the sessions, or
+to reindex the search engine with module [Search SolR]:
 
 ```sh
-php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --help
+sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/'
 ```
 
-In main cron tab or in the one of the user "www-data", you can add a task like
-that:
+| Argument             | Required    | Description                                                         |
+|----------------------|-------------|---------------------------------------------------------------------|
+| `-t`, `--task`       | yes         | class of the job ("EasyAdmin\Job\LoopItems") or its short name      |
+| `-u`, `--user-id`    | yes         | id of the user, whose rights are used by the job                    |
+| `-s`, `--server-url` | recommended | default "http://localhost"                                          |
+| `-b`, `--base-path`  | recommended | path of Omeka in the url, default "/"                               |
+| `-a`, `--args`       | no          | arguments of the job, as json, for example `'{"bulk_import_id": 1}'` |
+| `-k`, `--as-task`    | no          | run as a simple task, without creating a job                        |
 
-```sh
-/bin/su - www-data -c "php /path/to/omeka/modules/EasyAdmin/data/scripts/task.php --task 'EasyAdmin\Job\LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/'"
-```
+Run `task.php --help` for the full list. The job "LoopItems" saves all items, so
+all the modules that use the api events process them, for example after a new
+feature. The imports of [Bulk Import] and the exports of Bulk Export stored with
+the option "Store job as a task" can be run the same way, with their id in the
+args.
 
-To use the command with the user "www-data" (or equivalent) may be required when
-the task creates files inside Omeka "/files/" directory. If the task only uses
-the database, it is usually not needed, but you need to take care of modules
-that can create derivative or temp files. And you may need to take care of
-escaping json arguments.
+Notes:
 
-The script finds the root of Omeka from the path used to call it, so the path
-must be the one inside the directory of Omeka, for example
-"/path/to/omeka/modules/EasyAdmin/data/scripts/task.php". When the directory of
-the module is a symbolic link, for example when modules are shared between
-instances, the real path of the script ("/path/to/shared/modules/EasyAdmin/…")
-cannot be used, because it does not indicate the instance. The command displayed
-in the page "Cron" of the module uses the right path. The same rule applies to
-the script of the module [Cron].
-
-A sudo command may be used:
-
-```sh
-sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/omeka-s' --args '{"bulk_import_id": 1}'
-```
-
-Required arguments are:
-
-- `-t` `--task` [Name]
-  May be the full class of a job ("EasyAdmin\Job\LoopItems") or its basename
-  ("LoopItems"). You should take care of case sensitivity and escaping "\" or
-  quoting name on cli.
-- `-u` `--user-id` [#id]
-  The Omeka user id is required, else the job won’t have any rights.
-
-Recommended arguments:
-
-- `-s` `--server-url` [url] (default: "http://localhost")
-- `-b` `--base-path` [path] (default: "/")
-  The url path to complete the server url.
-
-Optional arguments:
-
-- `-a` `--args` [json]
-  Arguments to pass to the task. Arguments are specific to each job. To find
-  them, check the code, or run a job manually then check the job page in admin
-  interface.
-- `-k` `--as-task`
-  Process a a simple task and do not create a job. May be used for tasks that
-  do not need to be checked as a job. This is the inverse of the deprecated
-  argument `--job`.
-
-As an example, you can try the included job/task, for example "LoopItems" that
-loops all items to save them. This task allows to update all items, so all the
-modules that uses api events are triggered. This job can be use as a one-time
-task that help to process existing items when a new feature is added in a
-module:
-
-```sh
-php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'LoopItems' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{}'
-```
-
-Another example: run a bulk import job whose config is stored. Indeed, because
-the config of a bulk import may be complex, it is simpler to store it in the
-admin interface with its option "Store job as a task".
-
-```sh
-php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkImport\Job\Import' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_import_id": 1}'
-```
-
-Another example: run a bulk export job whose config is stored with option "Store job as a task".
-
-```sh
-php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'BulkExport\Job\Export' --user-id 1 --server-url 'https://example.org' --base-path '/' --args '{"bulk_export_id": 1}'
-```
-
-Another example: reindex statistics after import of hits:
-
-```sh
-sudo -u www-data php '/path/to/omeka/modules/EasyAdmin/data/scripts/task.php' --task 'Statistics\Job\AggregateHits' --user-id 1 --server-url 'https://example.org' --base-path '/'
-```
-
-Note that for jobs created manually in the admin interface, you can run them
-with the standard Omeka "perform-job.php". Of course, these job can be run one
-time only:
-
-```sh
-php '/path/to/omeka/application/data/scripts/perform-job.php' --job-id 1 --server-url 'https://example.org' --base-path '/'
-```
+- Use the user of the web server ("www-data") when the task creates files in
+  "files/".
+- Use the path of the script inside the directory of Omeka, not the real path
+  of a shared module, else the instance is unknown. The page "Cron" of the
+  module displays the right command.
+- A job created in the admin interface can be run once with the script of
+  Omeka: `php application/data/scripts/perform-job.php --job-id 1`.
 
 
 Development
@@ -518,6 +360,37 @@ Troubleshooting
 
 See online issues on the [module issues] page on GitLab.
 
+When the server is behind a proxy, a firewall or a specific infrastructure, the
+access to the web (installation of modules, checks) may fail. Add the
+certificates in the file "config/local.config.php" of Omeka, depending on the
+linux distribution:
+
+```php
+    'http_client' => [
+        // 'adapter' => null,
+        'sslcapath' => '/usr/local/etc/ssl/certs',
+        'sslcafile' => '/usr/local/etc/ssl/certs/ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs',
+        // 'sslcafile' => '/etc/pki/tls/certs/ca-bundle.crt',
+        'curloptions' => [],
+    ],
+```
+
+In some cases, the path should be relative:
+
+```php
+    'http_client' => [
+        // 'adapter' => null,
+        'sslcapath' => '/usr/local/etc/ssl/certs/',
+        'sslcafile' => 'ca.crt',
+        // 'sslcapath' => '/etc/pki/tls/certs/',
+        // 'sslcafile' => 'ca-bundle.crt',
+        'curloptions' => [],
+    ],
+```
+
+You can find more information on the params in [Laminas help] and [curl].
+
 
 License
 -------
@@ -554,12 +427,12 @@ Copyright
 
 - Copyright Daniel Berthereau, 2017-2026 (see [Daniel-KM] on GitLab)
 
-This module is a merge and improvement of previous modules [Easy Install], [Next],
-[Maintenance], [Bulk Check] and [Generic]. The idea of [Easy Install] comes from
-the plugin [Escher] for [Omeka Classic].
+This module is a merge and improvement of previous modules [Easy Install],
+[Next], [Maintenance], [Bulk Check] and [Generic]. The idea of [Easy Install]
+comes from the plugin [Escher] for [Omeka Classic].
 
-The curated selections of modules was implemented for the [digital library Manioc]
-of the [Université des Antilles et de la Guyane].
+The curated selections of modules was implemented for the
+[digital library Manioc] of the [Université des Antilles et de la Guyane].
 
 
 [Easy Admin]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin
@@ -578,19 +451,13 @@ of the [Université des Antilles et de la Guyane].
 [Thesaurus]: https://gitlab.com/Daniel-KM/Omeka-S-module-Thesaurus
 [Zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Zip
 [Cron]: https://gitlab.com/Daniel-KM/Omeka-S-module-Cron
-[installing a module]: https://omeka.org/s/docs/user-manual/modules/
 [EasyAdmin.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/releases
 [size or number of files]: https://github.com/omeka/omeka-s/issues/1785
 [Laminas help]: https://docs.laminas.dev/laminas-http/client/adapters
 [curl]: https://curl.se/libcurl/c/curl_easy_setopt.html
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/issues
-[Archive Repertory]: https://gitlab.com/Daniel-KM/Omeka-S-module-ArchiveRepertory
-[Iiif Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-IiifServer
-[omeka/omeka-s#1257]: https://github.com/omeka/omeka-s/pull/1257
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/work_items
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
-[Content Lock]: https://www.drupal.org/project/content_lock
-[Image Server]: https://gitlab.com/Daniel-KM/Omeka-S-module-ImageServer
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [Search SolR]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [modules]: https://daniel-km.github.io/UpgradeToOmekaS/omeka_s_modules.html
@@ -603,5 +470,7 @@ of the [Université des Antilles et de la Guyane].
 [Omeka Classic]: https://omeka.org/classic
 [digital library Manioc]: http://www.manioc.org
 [Université des Antilles et de la Guyane]: http://www.univ-ag.fr
+[Job Queue]: https://gitlab.com/Daniel-KM/Omeka-S-module-JobQueue
 [GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"
+[quality images by subject]: https://commons.wikimedia.org/wiki/Category:Quality_images_by_subject
