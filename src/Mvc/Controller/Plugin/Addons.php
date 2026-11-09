@@ -234,21 +234,40 @@ class Addons extends AbstractPlugin
 
     /**
      * Get addon data from the namespace of the module.
+     *
+     * An addon may be listed by omeka.org and by the github list, and any of
+     * them may be outdated, so the entry with the greatest version is returned
+     * when they have the same repository, like in the page of the addons. Two
+     * repositories with the same directory are two different addons, so the
+     * first one is kept. The type "module" or "theme" includes the list of
+     * omeka.org.
      */
     public function dataFromNamespace(string $namespace, ?string $type = null): array
     {
         $listAddons = $this->getAddons();
 
-        $list = $type
-            ? (isset($listAddons[$type]) ? [$type => $listAddons[$type]] : [])
-            : $listAddons;
-        foreach ($list as $type => $addonsForType) {
+        if ($type === null) {
+            $types = array_keys($listAddons);
+        } elseif ($type === 'module' || $type === 'theme') {
+            $types = ['omeka' . $type, $type];
+        } else {
+            $types = [$type];
+        }
+
+        $result = [];
+        foreach ($types as $type) {
+            $addonsForType = $listAddons[$type] ?? [];
             $addonsUrl = array_column($addonsForType, 'url', 'dir');
-            if (isset($addonsUrl[$namespace]) && isset($addonsForType[$addonsUrl[$namespace]])) {
-                return $addonsForType[$addonsUrl[$namespace]];
+            $addon = isset($addonsUrl[$namespace]) ? ($addonsForType[$addonsUrl[$namespace]] ?? null) : null;
+            if ($addon
+                && (!$result
+                    || ($addon['url'] === $result['url']
+                        && version_compare((string) ($addon['version'] ?? ''), (string) ($result['version'] ?? ''), '>')))
+            ) {
+                $result = $addon;
             }
         }
-        return [];
+        return $result;
     }
 
     /**
