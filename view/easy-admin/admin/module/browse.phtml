@@ -220,6 +220,8 @@ echo $this->form()->openTag($manageForm);
         <option value="remove" disabled="disabled"><?= $escape($translate('Remove selected')) ?></option>
         <option value="copy-selected" disabled="disabled"><?= $escape($translate('Copy the list of selected')) ?></option>
         <option value="copy-all" data-always="1"><?= $escape($translate('Copy the list of all')) ?></option>
+        <option value="copy-urls-selected" disabled="disabled"><?= $escape($translate('Copy the download urls of selected')) ?></option>
+        <option value="copy-urls-all" data-always="1"><?= $escape($translate('Copy the download urls of all')) ?></option>
     </select>
     <div class="batch-actions">
         <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
@@ -230,6 +232,8 @@ echo $this->form()->openTag($manageForm);
         <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected"><?= $translate('Go') ?></a>
         <button type="button" class="copy-selected" data-copy="selected" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
         <button type="button" class="copy-all" data-copy="all" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-urls-selected" data-copy="selected" data-field="download" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-urls-all" data-copy="all" data-field="download" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -277,11 +281,13 @@ echo $this->form()->openTag($manageForm);
         $catalogueVersion = null;
         $catalogueVersionCompatible = null;
         $hasVersionConstraints = false;
+        $downloadUrl = '';
         foreach ($catalogueModules as $cm) {
             if (($cm['dir'] ?? '') !== $moduleId) {
                 continue;
             }
             $catalogueVersion = $cm['version'] ?? null;
+            $downloadUrl = (string) ($cm['zip'] ?? '');
             // Per-version compatibility info is only available for addons from
             // omeka.org (json). The github/gitlab CSV list only carries the
             // latest version.
@@ -321,7 +327,7 @@ echo $this->form()->openTag($manageForm);
         // in the browser (js), without reload, like the filter by name.
         $isError = in_array($state, $errorStates, true);
     ?>
-        <tr data-copy="<?= $escapeAttr($moduleId) ?>" data-state="<?= $escape($state) ?>" data-update-available="<?= $hasUpdate ? '1' : '0' ?>" data-error="<?= $isError ? '1' : '0' ?>">
+        <tr data-copy="<?= $escapeAttr($moduleId) ?>" data-download="<?= $escapeAttr($downloadUrl) ?>" data-state="<?= $escape($state) ?>" data-update-available="<?= $hasUpdate ? '1' : '0' ?>" data-error="<?= $isError ? '1' : '0' ?>">
             <td>
                 <?php if (!$isComposer): ?>
                 <input type="checkbox" name="modules[]" value="<?= $escape($moduleId) ?>" aria-label="<?= $escape(sprintf($translate('Select %s'), $name)) ?>">

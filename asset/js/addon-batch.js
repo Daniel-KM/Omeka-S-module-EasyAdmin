@@ -44,7 +44,8 @@
         return done ? Promise.resolve() : Promise.reject(new Error('copy'));
     };
 
-    // Copy the list of the visible addons, all or selected, one per line.
+    // Copy the list of the visible addons, all or selected, one per line: the
+    // directory or, with the attribute "data-field", another value of the row.
     document.addEventListener('click', function (event) {
         var button = event.target.closest('.batch-actions [data-copy]');
         if (!button) {
@@ -59,8 +60,8 @@
             var checkbox = row.querySelector('input[type="checkbox"][name$="[]"]');
             return checkbox && checkbox.checked;
         }).map(function (row) {
-            return row.dataset.copy;
-        });
+            return button.dataset.field ? row.dataset[button.dataset.field] : row.dataset.copy;
+        }).filter(Boolean);
         if (!lines.length) {
             return;
         }

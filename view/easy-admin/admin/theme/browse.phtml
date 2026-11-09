@@ -126,6 +126,8 @@ echo $this->form()->openTag($manageForm);
         <option value="remove" disabled="disabled"><?= $escape($translate('Remove selected')) ?></option>
         <option value="copy-selected" disabled="disabled"><?= $escape($translate('Copy the list of selected')) ?></option>
         <option value="copy-all" data-always="1"><?= $escape($translate('Copy the list of all')) ?></option>
+        <option value="copy-urls-selected" disabled="disabled"><?= $escape($translate('Copy the download urls of selected')) ?></option>
+        <option value="copy-urls-all" data-always="1"><?= $escape($translate('Copy the download urls of all')) ?></option>
     </select>
     <div class="batch-actions">
         <button type="button" class="default active" disabled="disabled"><?= $translate('Go') ?></button>
@@ -133,6 +135,8 @@ echo $this->form()->openTag($manageForm);
         <a class="delete button sidebar-content remove" data-sidebar-selector="#sidebar-remove-selected"><?= $translate('Go') ?></a>
         <button type="button" class="copy-selected" data-copy="selected" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
         <button type="button" class="copy-all" data-copy="all" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-urls-selected" data-copy="selected" data-field="download" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
+        <button type="button" class="copy-urls-all" data-copy="all" data-field="download" data-copied="<?= $escapeAttr($translate('Copied: %d')) ?>"><?= $translate('Go') ?></button>
     </div>
 </div>
 
@@ -153,10 +157,12 @@ echo $this->form()->openTag($manageForm);
 
         $catalogueVersion = null;
         $catalogueVersionCompatible = null;
+        $downloadUrl = '';
         foreach ($catalogueThemes as $ct) {
             if (strcasecmp($ct['dir'] ?? '', $themeId) === 0) {
                 $catalogueVersion = $ct['version'] ?? null;
                 $catalogueVersionCompatible = $ct['compatible_version'] ?? null;
+                $downloadUrl = (string) ($ct['zip'] ?? '');
                 break;
             }
         }
@@ -180,7 +186,7 @@ echo $this->form()->openTag($manageForm);
             ? $this->basePath(substr($themePath, strlen(OMEKA_PATH) + 1) . '/theme.jpg')
             : null;
     ?>
-        <tr data-copy="<?= $escapeAttr($themeId) ?>">
+        <tr data-copy="<?= $escapeAttr($themeId) ?>" data-download="<?= $escapeAttr($downloadUrl) ?>">
             <td>
                 <?php if (!$isComposer): ?>
                 <input type="checkbox" name="themes[]" value="<?= $escape($themeId) ?>" aria-label="<?= $escape(sprintf($translate('Select %s'), $theme['name'])) ?>">
