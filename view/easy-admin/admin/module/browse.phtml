@@ -13,6 +13,7 @@
  * @var \EasyAdmin\Form\ModuleStateForm $refreshForm
  * @var bool $cataloguePending
  * @var string $catalogueUrl
+ * @var array $readOnlyLinks Names and targets of the read-only symbolic links.
  */
 
 $cataloguePending = $cataloguePending ?? false;
@@ -141,6 +142,12 @@ $states = [
 <?php if (!is_writeable(OMEKA_PATH . '/modules')): ?>
 <div class="messages error">
     <p><?= $escape(sprintf($translate('The directory "%s" is not writeable. Module installation, update and removal are disabled.'), 'modules/')) ?></p>
+</div>
+<?php endif ?>
+
+<?php if (!empty($readOnlyLinks)): ?>
+<div class="messages warning">
+    <p><?= $escape(sprintf($translate('These modules are symbolic links to a directory that is not writeable by the server, so they cannot be updated nor removed here: %s. Update them in the target directory.'), implode(', ', array_keys($readOnlyLinks)))) ?></p>
 </div>
 <?php endif ?>
 

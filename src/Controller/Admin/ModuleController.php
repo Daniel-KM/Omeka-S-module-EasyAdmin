@@ -146,6 +146,7 @@ class ModuleController extends AbstractActionController
             'installCatalogueForm' => $installCatalogueForm,
             'refreshForm' => $refreshForm,
             'cataloguePending' => $cataloguePending,
+            'readOnlyLinks' => $addons->readOnlyLinks('modules'),
             'catalogueUrl' => $catalogueUrl,
             // A module present in composer-addons/ may be overridden by a real
             // directory in modules/, that is managed here, so the full check is

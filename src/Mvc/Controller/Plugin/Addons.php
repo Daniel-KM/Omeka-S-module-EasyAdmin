@@ -459,6 +459,28 @@ class Addons extends AbstractPlugin
      * @param bool $force Update even when the installed version is already the
      *   same or more recent than the one of the catalogue.
      */
+    /**
+     * List the addons that are symbolic links to a directory not writeable by
+     * the server, so they cannot be updated or removed here.
+     *
+     * @param string $subDir "modules" or "themes".
+     * @return array<string, string> Name of the addon and target of the link.
+     */
+    public function readOnlyLinks(string $subDir): array
+    {
+        $result = [];
+        foreach (glob(OMEKA_PATH . '/' . $subDir . '/*', GLOB_ONLYDIR) ?: [] as $path) {
+            if (!is_link($path)) {
+                continue;
+            }
+            $target = realpath($path);
+            if (!$target || !is_writeable($target) || !is_writeable(dirname($target))) {
+                $result[basename($path)] = $target ?: (string) readlink($path);
+            }
+        }
+        return $result;
+    }
+
     public function updateAddon(array $addon, bool $force = false): bool
     {
         if ($this->isComposerManaged($addon)) {

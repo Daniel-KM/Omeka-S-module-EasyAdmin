@@ -165,6 +165,7 @@ class ThemeController extends AbstractActionController
             'refreshForm' => $refreshForm,
             'cataloguePending' => $cataloguePending,
             'catalogueUrl' => $catalogueUrl,
+            'readOnlyLinks' => $addons->readOnlyLinks('themes'),
             // A theme present in composer-addons/ may be overridden by a real
             // directory in themes/, that is managed here, so the full check is
             // needed, not only the presence in composer-addons/.
