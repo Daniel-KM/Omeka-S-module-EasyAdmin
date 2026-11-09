@@ -605,7 +605,7 @@ class Addons extends AbstractPlugin
             }
         }
         if (!$extractedPath) {
-            @rename($backupDir, $addonDir);
+            $this->restoreAddonFromZip($backupPath, $addonDir);
             $this->messenger->addError(new PsrMessage(
                 'The archive for "{name}" does not contain a directory.', // @translate
                 ['name' => $addon['name']]
