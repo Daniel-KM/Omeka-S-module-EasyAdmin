@@ -12,40 +12,37 @@
         if (!cfg || !cfg.url) {
             return;
         }
-        var content = document.getElementById('content');
-        var heading = document.querySelector('#content .fieldsets-heading');
-        if (!content || !heading) {
+        var actions = document.getElementById('page-actions');
+        if (!actions) {
             return;
         }
-        if (getComputedStyle(content).position === 'static') {
-            content.style.position = 'relative';
-        }
+
+        // The page actions are inside the form of the settings, so the button
+        // submits a separate form through its attribute "form".
         var form = document.createElement('form');
         form.method = 'post';
         form.action = cfg.url;
-        form.className = 'easyadmin-enable-enhancements';
-        form.style.cssText = 'position:absolute;right:.75rem;margin:0;';
+        form.id = 'easyadmin-enable-enhancements';
+        form.hidden = true;
 
         var csrf = document.createElement('input');
         csrf.type = 'hidden';
         csrf.name = 'csrf';
         csrf.value = cfg.csrf || '';
         form.appendChild(csrf);
+        document.body.appendChild(form);
 
         var button = document.createElement('button');
         button.type = 'submit';
-        button.className = 'button';
-        button.style.fontWeight = 'normal';
+        button.setAttribute('form', form.id);
+        button.className = 'button easyadmin-enable-enhancements';
         button.textContent = cfg.label || 'Enable filters';
         if (cfg.title) {
             button.title = cfg.title;
         }
-        form.appendChild(button);
 
-        content.appendChild(form);
-        var cRect = content.getBoundingClientRect();
-        var hRect = heading.getBoundingClientRect();
-        form.style.top = (hRect.top - cRect.top + content.scrollTop) + 'px';
+        var submit = actions.querySelector('button:not([type]), button[type="submit"], input[type="submit"]');
+        actions.insertBefore(button, submit);
     }
 
     if (document.readyState === 'loading') {
