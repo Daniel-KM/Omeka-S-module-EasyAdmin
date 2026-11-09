@@ -62,6 +62,9 @@ class ModuleController extends AbstractActionController
         // already cached, or on that async request, it is served synchronously.
         $isCatalogueRequest = $request->isXmlHttpRequest()
             && $this->params()->fromQuery('catalogue') === '1';
+        if (!$isCatalogueRequest) {
+            $this->warnStalledJob();
+        }
         $cataloguePending = false;
         if ($isCatalogueRequest || $addons->isCached()) {
             $catalogueAddons = $addons->getAddons();
@@ -165,6 +168,38 @@ class ModuleController extends AbstractActionController
         }
 
         return $view;
+    }
+
+    /**
+     * Warn when the last job to manage the addons did not start.
+     *
+     * A job without process after one minute means that the background process
+     * failed at its bootstrap, so it cannot write any log.
+     */
+    protected function warnStalledJob(): void
+    {
+        $job = $this->entityManager->getRepository(\Omeka\Entity\Job::class)->findOneBy(
+            ['class' => \EasyAdmin\Job\ManageAddons::class],
+            ['id' => 'DESC']
+        );
+        if (!$job
+            || $job->getStatus() !== \Omeka\Entity\Job::STATUS_STARTING
+            || $job->getPid()
+            || !$job->getStarted()
+            || $job->getStarted()->getTimestamp() > time() - 60
+        ) {
+            return;
+        }
+        $message = new PsrMessage(
+            'The job {link}#{job_id}{link_end} did not start: the background process probably fails at its bootstrap. Check the php-cli, the server logs and the duplicated modules (a symbolic link replaced by a directory).', // @translate
+            [
+                'link' => sprintf('<a href="%s">', htmlspecialchars($this->url()->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
+                'job_id' => $job->getId(),
+                'link_end' => '</a>',
+            ]
+        );
+        $message->setEscapeHtml(false);
+        $this->messenger()->addWarning($message);
     }
 
     public function refreshCatalogueAction()
