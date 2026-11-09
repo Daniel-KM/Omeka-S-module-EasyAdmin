@@ -313,6 +313,12 @@ class ThemeController extends AbstractActionController
 
         $addon['installed_version'] = $addons
             ->getInstalledVersion($addon);
+        // Display the version that will be installed: the latest one compatible
+        // with this Omeka S.
+        $compatible = $addons->pickCompatibleVersion($addon);
+        if ($compatible) {
+            $addon['version'] = $compatible['version'];
+        }
 
         $integrity = $addons->checkIntegrity($addon);
 
