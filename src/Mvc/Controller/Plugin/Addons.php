@@ -478,6 +478,21 @@ class Addons extends AbstractPlugin
             return false;
         }
 
+        // A symbolic link is kept and its target is updated, else the link would
+        // be replaced by a directory and two copies of the addon, with the same
+        // classes, would be loaded by the modules that use its real path.
+        if (is_link($addonDir)) {
+            $target = realpath($addonDir);
+            if (!$target || !is_writeable(dirname($target)) || !is_writeable($target)) {
+                $this->messenger->addError(new PsrMessage(
+                    'The addon "{name}" is a symbolic link to "{path}", that is not writeable by the server: update it there.', // @translate
+                    ['name' => $addon['name'], 'path' => $target ?: readlink($addonDir)]
+                ));
+                return false;
+            }
+            $addonDir = $target;
+        }
+
         $tempDir = sys_get_temp_dir() . '/easyadmin_update_'
             . $addon['dir'] . '_' . bin2hex(random_bytes(8));
         @mkdir($tempDir, 0775, true);
