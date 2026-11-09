@@ -912,6 +912,17 @@ class CheckAndFixController extends AbstractActionController
             ));
         }
 
+        // A copy has generally no files, so the images are replaced by grey
+        // placeholders, unless the files are served from another server.
+        if (!$settings->get('easyadmin_local_store_base_uri')
+            && !$settings->get('easyadmin_local_store_fake_images')
+        ) {
+            $settings->set('easyadmin_local_store_fake_images', 'placeholder');
+            $messenger->addSuccess(new PsrMessage(
+                'The images are now replaced by grey placeholders. Set the base url of the files or the images of Wikipedia in the settings if needed.' // @translate
+            ));
+        }
+
         // Tracking scripts and server-side tracker.
         $trackers = $connection->executeStatement(
             'UPDATE setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
@@ -966,6 +977,16 @@ class CheckAndFixController extends AbstractActionController
             $settings->set('easyadmin_display_exception', '');
             $messenger->addSuccess(new PsrMessage(
                 'The errors are no longer displayed on screen.' // @translate
+            ));
+        }
+
+        if ($settings->get('easyadmin_local_store_base_uri')
+            || $settings->get('easyadmin_local_store_fake_images')
+        ) {
+            $settings->set('easyadmin_local_store_base_uri', '');
+            $settings->set('easyadmin_local_store_fake_images', '');
+            $messenger->addSuccess(new PsrMessage(
+                'The files are now served locally, without fake images nor base url of another server.' // @translate
             ));
         }
 

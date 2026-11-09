@@ -311,6 +311,37 @@ class SettingsFieldset extends Fieldset
                     'placeholder' => 'https://example.org/files',
                 ],
             ])
+            ->add([
+                'name' => 'easyadmin_local_store_fake_images',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Fake images (dev/test)', // @translate
+                    'info' => 'Replace the images by fake ones, for example when the server of the files is protected. The other files keep their url.', // @translate
+                    'value_options' => [
+                        '' => 'No', // @translate
+                        'placeholder' => 'Grey placeholders, without any request', // @translate
+                        'wikimedia' => 'Images of Wikipedia (Wikimedia Commons) matching the keyword below', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_local_store_fake_images',
+                    'value' => '',
+                ],
+            ])
+            ->add([
+                'name' => 'easyadmin_local_store_wikimedia_keyword',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'maintenance',
+                    'label' => 'Keyword for the images of Wikipedia', // @translate
+                    'info' => 'The search is limited to the "Quality images" of Wikimedia Commons, reviewed by the community. Prefer a neutral keyword, for example "landscape", "lighthouse" or "flower". The images are downloaded once into "files/fake/" by a background job, so the visitors do not request the servers of Wikimedia.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'easyadmin_local_store_wikimedia_keyword',
+                    'placeholder' => 'landscape',
+                ],
+            ])
 
             ->add([
                 'name' => 'easyadmin_display_exception',

@@ -340,6 +340,10 @@ return [
             'easyadmin_allow_empty_files' => false,
             'easyadmin_config_apply_button' => false,
             'easyadmin_local_store_base_uri' => '',
+            'easyadmin_local_store_fake_images' => '',
+            'easyadmin_local_store_wikimedia_keyword' => 'landscape',
+            // Internal: local images of Wikimedia Commons, or state of the job.
+            'easyadmin_local_store_wikimedia_images' => [],
             'easyadmin_addon_notify_version_inactive' => true,
             'easyadmin_addon_notify_version_dev' => false,
             'easyadmin_display_exception' => '',

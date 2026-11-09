@@ -1707,8 +1707,8 @@ class CheckAndFixForm extends Form
                     'label' => 'Adapt the settings', // @translate
                     'value_options' => [
                         '' => 'No', // @translate
-                        'test' => 'For a test copy: prefix the title with « TEST », color the admin sidebar, display the errors on screen and remove the statistics trackers', // @translate
-                        'production' => 'For the production: remove the prefix « TEST » of the title, the color of the admin sidebar of the test and the display of the errors', // @translate
+                        'test' => 'For a test copy: prefix the title with « TEST », color the admin sidebar, display the errors on screen, remove the statistics trackers and replace the images by grey placeholders when the files are not served from another server', // @translate
+                        'production' => 'For the production: remove the prefix « TEST » of the title, the color of the admin sidebar of the test, the display of the errors, the fake images and the base url of the files', // @translate
                     ],
                 ],
                 'attributes' => [
