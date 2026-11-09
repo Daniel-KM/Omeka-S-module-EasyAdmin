@@ -913,8 +913,13 @@ class CheckAndFixController extends AbstractActionController
         }
 
         // A copy has generally no files, so the images are replaced by grey
-        // placeholders, unless the files are served from another server.
-        if (!$settings->get('easyadmin_local_store_base_uri')
+        // placeholders, unless the files are served from another server or are
+        // copied too.
+        if ($this->hasLocalOriginalFiles()) {
+            $messenger->addNotice(new PsrMessage(
+                'The original files are present, so the images are kept.' // @translate
+            ));
+        } elseif (!$settings->get('easyadmin_local_store_base_uri')
             && !$settings->get('easyadmin_local_store_fake_images')
         ) {
             $settings->set('easyadmin_local_store_fake_images', 'placeholder');
@@ -939,6 +944,29 @@ class CheckAndFixController extends AbstractActionController
                 ['count' => $trackers]
             ));
         }
+    }
+
+    /**
+     * Check if the original files of some media are present locally.
+     *
+     * Only the last media are checked, so a copy with its files is detected
+     * without scanning the whole directory.
+     */
+    protected function hasLocalOriginalFiles(): bool
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $config = $services->get('Config');
+        $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $rows = $services->get('Omeka\Connection')->executeQuery(
+            'SELECT storage_id, extension FROM media WHERE has_original = 1 AND storage_id IS NOT NULL ORDER BY id DESC LIMIT 10'
+        )->fetchAllAssociative();
+        foreach ($rows as $row) {
+            $filename = $row['storage_id'] . ($row['extension'] === null || $row['extension'] === '' ? '' : '.' . $row['extension']);
+            if (is_file($basePath . '/original/' . $filename)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
