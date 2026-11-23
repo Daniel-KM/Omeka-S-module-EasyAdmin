@@ -241,6 +241,9 @@ class Addons extends AbstractPlugin
      * repositories with the same directory are two different addons, so the
      * first one is kept. The type "module" or "theme" includes the list of
      * omeka.org.
+     *
+     * The form "owner/Directory" selects the repository of an owner when
+     * several addons have the same directory (original and forks).
      */
     public function dataFromNamespace(string $namespace, ?string $type = null): array
     {
@@ -252,6 +255,19 @@ class Addons extends AbstractPlugin
             $types = ['omeka' . $type, $type];
         } else {
             $types = [$type];
+        }
+
+        if (strpos($namespace, '/') !== false) {
+            [$owner, $dir] = explode('/', $namespace, 2);
+            foreach ($types as $type) {
+                foreach ($listAddons[$type] ?? [] as $url => $addon) {
+                    $urlOwner = explode('/', trim((string) parse_url((string) $url, PHP_URL_PATH), '/'))[0];
+                    if (($addon['dir'] ?? '') === $dir && strcasecmp($urlOwner, $owner) === 0) {
+                        return $addon;
+                    }
+                }
+            }
+            return [];
         }
 
         $result = [];
