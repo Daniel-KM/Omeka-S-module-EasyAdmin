@@ -549,6 +549,26 @@ class Module extends AbstractModule
             [$this, 'handleThumbnailAttribs']
         );
 
+        // Display the errors and warnings logged by the jobs. The module Log
+        // displays them from its table.
+        if (!$this->isModuleActive('Log')) {
+            $sharedEventManager->attach(
+                'Omeka\Controller\Admin\Job',
+                'view.browse.before',
+                [$this, 'handleViewBrowseBeforeJobs']
+            );
+            $sharedEventManager->attach(
+                'Omeka\Controller\Admin\Job',
+                'view.browse.after',
+                [$this, 'handleViewBrowseAfterJobs']
+            );
+            $sharedEventManager->attach(
+                \Omeka\Api\Adapter\JobAdapter::class,
+                'api.search.query',
+                [$this, 'handleApiSearchQueryJobs']
+            );
+        }
+
         // Warn on the dashboard when background jobs cannot start.
         $sharedEventManager->attach(
             'Omeka\Controller\Admin\Index',
@@ -1025,6 +1045,93 @@ class Module extends AbstractModule
     /**
      * Warn on the dashboard about the jobs that failed to start recently.
      */
+    /**
+     * Add links to list the failed jobs and the jobs with logged errors.
+     */
+    public function handleViewBrowseBeforeJobs(Event $event): void
+    {
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
+        $view = $event->getTarget();
+        $plugins = $view->getHelperPluginManager();
+        $url = $plugins->get('url');
+        $escape = $plugins->get('escapeHtml');
+        $translate = $plugins->get('translate');
+
+        $query = $view->params()->fromQuery();
+        unset($query['page'], $query['status'], $query['log_level']);
+        $current = $view->params()->fromQuery('log_level') ?: ($view->params()->fromQuery('status') === 'error' ? 'failed' : 'all');
+        $links = [
+            'all' => [$translate('All'), $query], // @translate
+            'failed' => [$translate('Failed'), ['status' => 'error'] + $query], // @translate
+            'errors' => [$translate('With errors'), ['log_level' => 'errors'] + $query], // @translate
+            'warnings' => [$translate('With warnings'), ['log_level' => 'warnings'] + $query], // @translate
+        ];
+        $html = [];
+        foreach ($links as $key => [$label, $linkQuery]) {
+            $html[] = $key === $current
+                ? '<strong>' . $escape($label) . '</strong>'
+                : '<a href="' . $escape($url(null, [], ['query' => $linkQuery], true)) . '">' . $escape($label) . '</a>';
+        }
+        echo '<nav class="easy-admin-job-filters" aria-label="' . $escape($translate('Filter jobs')) . '">' . implode(' · ', $html) . '</nav>'; // @translate
+    }
+
+    /**
+     * Display the counts of logged errors and warnings next to the status.
+     */
+    public function handleViewBrowseAfterJobs(Event $event): void
+    {
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
+        $view = $event->getTarget();
+        $jobIds = [];
+        foreach ($view->vars('jobs') ?: [] as $job) {
+            $jobIds[] = $job->id();
+        }
+
+        /** @var \EasyAdmin\Stdlib\JobLogCounter $counter */
+        $counter = $this->getServiceLocator()->get('EasyAdmin\JobLogCounter');
+        $counts = $counter->count($jobIds);
+        if (!$counts) {
+            return;
+        }
+
+        $plugins = $view->getHelperPluginManager();
+        $url = $plugins->get('url');
+        $translate = $plugins->get('translate');
+        $labels = [
+            \EasyAdmin\Stdlib\JobLogCounter::ERRORS => $translate('Errors: %d'), // @translate
+            \EasyAdmin\Stdlib\JobLogCounter::WARNINGS => $translate('Warnings: %d'), // @translate
+        ];
+        $data = [];
+        foreach ($counts as $jobId => $levels) {
+            foreach (array_filter($levels) as $level => $count) {
+                $data[$jobId][$level] = [
+                    'label' => sprintf($labels[$level], $count),
+                    'url' => $counter->url($url, $jobId),
+                ];
+            }
+        }
+
+        $assetUrl = $plugins->get('assetUrl');
+        $plugins->get('headLink')->appendStylesheet($assetUrl('css/job-log-counts.css', 'EasyAdmin'));
+        $plugins->get('headScript')->appendFile($assetUrl('js/job-log-counts.js', 'EasyAdmin'), 'text/javascript', ['defer' => 'defer']);
+        echo '<script type="application/json" id="easy-admin-job-log-counts">'
+            . json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            . '</script>';
+    }
+
+    /**
+     * Search jobs with logged errors or warnings via the argument "log_level".
+     */
+    public function handleApiSearchQueryJobs(Event $event): void
+    {
+        $level = $event->getParam('request')->getContent()['log_level'] ?? null;
+        if ($level && is_string($level)) {
+            /** @var \EasyAdmin\Stdlib\JobLogCounter $counter */
+            $counter = $this->getServiceLocator()->get('EasyAdmin\JobLogCounter');
+            $counter->addFilter($event->getParam('queryBuilder'), 'omeka_root', $level);
+        }
+    }
+
     public function handleDashboardJobsAlert(Event $event): void
     {
         $view = $event->getTarget();

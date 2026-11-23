@@ -19,6 +19,7 @@ return [
         'factories' => [
             'Omeka\HttpClient' => Service\HttpClientFactory::class,
             'EasyAdmin\File\Thumbnailer\Configured' => Service\File\Thumbnailer\ConfiguredThumbnailerFactory::class,
+            'EasyAdmin\JobLogCounter' => Service\Stdlib\JobLogCounterFactory::class,
         ],
         'delegators' => [
             'Omeka\File\Store\Local' => [

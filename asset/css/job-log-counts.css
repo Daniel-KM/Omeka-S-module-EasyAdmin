@@ -1,0 +1,33 @@
+.easy-admin-job-filters {
+    margin: 0 0 1em;
+}
+
+/* Tablesaw may wrap the cell content in a flex row. */
+.tablesaw-cell-content:has(> .easy-admin-job-log-counts) {
+    flex-wrap: wrap;
+}
+
+.easy-admin-job-log-counts {
+    flex-basis: 100%;
+    margin-top: 0.25em;
+}
+
+.jobs.browse a.easy-admin-job-log-count {
+    white-space: nowrap;
+    margin-right: 0.5em;
+    font-size: 0.85em;
+    text-decoration: none;
+}
+
+.jobs.browse a.easy-admin-job-log-count:hover,
+.jobs.browse a.easy-admin-job-log-count:focus {
+    text-decoration: underline;
+}
+
+.jobs.browse a.easy-admin-job-log-errors {
+    color: #a91919;
+}
+
+.jobs.browse a.easy-admin-job-log-warnings {
+    color: #8a6100;
+}
