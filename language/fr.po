@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 00:00+0000\n"
+"POT-Creation-Date: 2026-11-18 09:21+0000\n"
 "PO-Revision-Date: 2026-11-09 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -14,7 +14,7 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 "X-Generator: Poedit 3.6\n"
 
-#: data/scripts/upgrade.php:43 Module.php:267
+#: data/scripts/upgrade.php:43 Module.php:282
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr "Le module %1$s doit être mis à niveau à la version %2$s ou supérieure."
@@ -31,85 +31,101 @@ msgstr ""
 "Ce module ne peut pas installer ses tables car elles existent déjà. Essayez "
 "de les supprimer manuellement."
 
-#: Module.php:462
+#: Module.php:477
 msgid "WARNING:"
 msgstr "ATTENTION :"
 
-#: Module.php:474
+#: Module.php:489
 msgid "Remove directory \"files/check\""
 msgstr "Supprimer le dossier \"files/check\""
 
-#: Module.php:1424
+#: Module.php:1096
+msgid "Reset to the configuration of the theme"
+msgstr "Réinitialiser à la configuration du thème"
+
+#: Module.php:1097
+msgid ""
+"The blocks of this site will be removed, so the blocks configured by the "
+"theme will be used again."
+msgstr ""
+"Les blocs de ce site seront supprimés, de sorte que les blocs configurés par "
+"le thème seront de nouveau utilisés."
+
+#: Module.php:1098
+msgid "Confirm reset"
+msgstr "Confirmer la réinitialisation"
+
+#: Module.php:1582
 msgid "[not in site]"
 msgstr "[aucun site]"
 
-#: Module.php:1526
+#: Module.php:1684
 msgid "Enable filters"
 msgstr "Activer les filtres"
 
-#: Module.php:1527
+#: Module.php:1685
 msgid "Add a live filter and a section navigation to this page."
 msgstr "Ajouter un filtre direct et une section de navigation sur cette page."
 
-#: Module.php:1564
+#: Module.php:1722
 msgid "Filter settings…"
 msgstr "Filtrer les réglages…"
 
-#: Module.php:1565
+#: Module.php:1723
 #, php-format
 msgid "%s settings"
 msgstr "%s réglages"
 
-#: Module.php:1566
+#: Module.php:1724
 msgid "Sections"
 msgstr "Sections"
 
-#: Module.php:1567
+#: Module.php:1725
 msgid "Text fields"
 msgstr "Champs texte"
 
-#: Module.php:1568
+#: Module.php:1726
 msgid "Non-text fields"
 msgstr "Champs hors texte"
 
-#: Module.php:1569
+#: Module.php:1727
 msgid "Include values"
 msgstr "Inclure les valeurs"
 
-#: src/Controller/Admin/CheckAndFixController.php:476
+#: src/Controller/Admin/CheckAndFixController.php:572
 msgid "unknown"
 msgstr "inconnu"
 
-#: src/Controller/Admin/CheckAndFixController.php:557
+#: src/Controller/Admin/CheckAndFixController.php:653
 msgid "no proxy"
 msgstr "sans proxy"
 
-#: src/Controller/Admin/CheckAndFixController.php:615
+#: src/Controller/Admin/CheckAndFixController.php:711
 msgid "nothing is sent"
 msgstr "rien n’est envoyé"
 
-#: src/Controller/Admin/CheckAndFixController.php:616
+#: src/Controller/Admin/CheckAndFixController.php:712
 msgid "capture"
 msgstr "capture"
 
-#: src/Controller/Admin/CheckAndFixController.php:617
-#: src/Controller/Admin/CheckAndFixController.php:1203
+#: src/Controller/Admin/CheckAndFixController.php:713
+#: src/Controller/Admin/CheckAndFixController.php:1299
 msgid "none"
 msgstr "aucun"
 
-#: src/Controller/Admin/CheckAndFixController.php:747
+#: src/Controller/Admin/CheckAndFixController.php:843
 msgid "the options of curl in \"config/local.config.php\""
 msgstr "les options de curl dans \"config/local.config.php\""
 
-#: src/Controller/Admin/CheckAndFixController.php:750
+#: src/Controller/Admin/CheckAndFixController.php:846
 msgid "the environment of the server"
 msgstr "l’environnement du serveur"
 
-#: src/Controller/Admin/CheckAndFixController.php:1208
+#: src/Controller/Admin/CheckAndFixController.php:1304
 msgid "missing"
 msgstr "absent"
 
-#: src/Controller/Admin/CheckAndFixController.php:1827
+#: src/Controller/Admin/CheckAndFixController.php:2206
 msgid "the path is invalid"
 msgstr "le chemin est invalide"
 
@@ -740,9 +756,9 @@ msgid "Manage modules"
 msgstr "Gestion des modules"
 
 #: view/easy-admin/admin/module/browse.phtml:133
-#: view/easy-admin/admin/module/browse.phtml:162
+#: view/easy-admin/admin/module/browse.phtml:170
 #: view/easy-admin/admin/theme/browse.phtml:60
-#: view/easy-admin/admin/theme/browse.phtml:89
+#: view/easy-admin/admin/theme/browse.phtml:97
 msgid "The catalogue could not be loaded (connection problem). Click to retry."
 msgstr ""
 "Le catalogue n'a pas pu être chargé (problème de connexion). Cliquez ici "
@@ -776,114 +792,114 @@ msgstr ""
 "Le répertoire « %s » n'est pas accessible en écriture. L'installation, la "
 "mise à jour et la suppression de modules sont désactivées."
 
-#: view/easy-admin/admin/module/browse.phtml:150
+#: view/easy-admin/admin/module/browse.phtml:158
 #, php-format
 msgid ""
-"These modules are symbolic links to a directory that is not writeable by the "
-"server, so they cannot be updated nor removed here: %s. Update them in the "
+"Some modules are symbolic links to a directory that is not writeable by the "
+"server (%s), so they cannot be updated nor removed here. Update them in the "
 "target directory."
 msgstr ""
-"Ces modules sont des liens symboliques vers un dossier non inscriptible par "
-"le serveur, ils ne peuvent donc être ni mis à jour ni supprimés ici : %s. "
-"Mettez-les à jour dans le dossier cible."
+"Certains modules sont des liens symboliques vers un répertoire qui n’est pas "
+"accessible en écriture par le serveur (%s) : ils ne peuvent donc pas être "
+"mis à jour ni supprimés ici. Mettez-les à jour dans le répertoire cible."
 
-#: view/easy-admin/admin/module/browse.phtml:168
-#: view/easy-admin/admin/theme/browse.phtml:95
+#: view/easy-admin/admin/module/browse.phtml:176
+#: view/easy-admin/admin/theme/browse.phtml:103
 msgid "Refresh catalogue"
 msgstr "Rafraîchir le catalogue"
 
-#: view/easy-admin/admin/module/browse.phtml:171
+#: view/easy-admin/admin/module/browse.phtml:179
 msgid "Install new module"
 msgstr "Installer un nouveau module"
 
-#: view/easy-admin/admin/module/browse.phtml:177
-#: view/easy-admin/admin/module/browse.phtml:605
+#: view/easy-admin/admin/module/browse.phtml:185
+#: view/easy-admin/admin/module/browse.phtml:613
 msgid "Filter modules…"
 msgstr "Filtrer les modules…"
 
-#: view/easy-admin/admin/module/browse.phtml:188
+#: view/easy-admin/admin/module/browse.phtml:196
 msgid "Update available"
 msgstr "Mise à jour disponible"
 
-#: view/easy-admin/admin/module/browse.phtml:193
+#: view/easy-admin/admin/module/browse.phtml:201
 msgid "Filter by state"
 msgstr "Filtrer par état"
 
-#: view/easy-admin/admin/module/browse.phtml:216
+#: view/easy-admin/admin/module/browse.phtml:224
 msgid "Activate selected"
 msgstr "Activer la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:217
+#: view/easy-admin/admin/module/browse.phtml:225
 msgid "Deactivate selected"
 msgstr "Désactiver la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:218
+#: view/easy-admin/admin/module/browse.phtml:226
 msgid "Download the new version of selected"
 msgstr "Télécharger la nouvelle version de la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:219
+#: view/easy-admin/admin/module/browse.phtml:227
 msgid "Upgrade selected"
 msgstr "Mettre à jour la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:220
-#: view/easy-admin/admin/theme/browse.phtml:126
+#: view/easy-admin/admin/module/browse.phtml:228
+#: view/easy-admin/admin/theme/browse.phtml:134
 msgid "Remove selected"
 msgstr "Supprimer la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:221
-#: view/easy-admin/admin/theme/browse.phtml:127
+#: view/easy-admin/admin/module/browse.phtml:229
+#: view/easy-admin/admin/theme/browse.phtml:135
 msgid "Copy the list of selected"
 msgstr "Copier la liste de la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:222
-#: view/easy-admin/admin/theme/browse.phtml:128
+#: view/easy-admin/admin/module/browse.phtml:230
+#: view/easy-admin/admin/theme/browse.phtml:136
 msgid "Copy the list of all"
 msgstr "Copier la liste complète"
 
-#: view/easy-admin/admin/module/browse.phtml:223
-#: view/easy-admin/admin/theme/browse.phtml:129
+#: view/easy-admin/admin/module/browse.phtml:231
+#: view/easy-admin/admin/theme/browse.phtml:137
 msgid "Copy the download urls of selected"
 msgstr "Copier les urls de téléchargement de la sélection"
 
-#: view/easy-admin/admin/module/browse.phtml:224
-#: view/easy-admin/admin/theme/browse.phtml:130
+#: view/easy-admin/admin/module/browse.phtml:232
+#: view/easy-admin/admin/theme/browse.phtml:138
 msgid "Copy the download urls of all"
 msgstr "Copier toutes les urls de téléchargement"
 
-#: view/easy-admin/admin/module/browse.phtml:233
-#: view/easy-admin/admin/module/browse.phtml:234
-#: view/easy-admin/admin/module/browse.phtml:235
-#: view/easy-admin/admin/module/browse.phtml:236
-#: view/easy-admin/admin/theme/browse.phtml:136
-#: view/easy-admin/admin/theme/browse.phtml:137
-#: view/easy-admin/admin/theme/browse.phtml:138
-#: view/easy-admin/admin/theme/browse.phtml:139
+#: view/easy-admin/admin/module/browse.phtml:241
+#: view/easy-admin/admin/module/browse.phtml:242
+#: view/easy-admin/admin/module/browse.phtml:243
+#: view/easy-admin/admin/module/browse.phtml:244
+#: view/easy-admin/admin/theme/browse.phtml:144
+#: view/easy-admin/admin/theme/browse.phtml:145
+#: view/easy-admin/admin/theme/browse.phtml:146
+#: view/easy-admin/admin/theme/browse.phtml:147
 #, php-format
 msgid "Copied: %d"
 msgstr "Copié : %d"
 
-#: view/easy-admin/admin/module/browse.phtml:245
+#: view/easy-admin/admin/module/browse.phtml:253
 #: view/easy-admin/admin/module/integrity-report.phtml:35
 msgid "Module"
 msgstr "Module"
 
-#: view/easy-admin/admin/module/browse.phtml:247
-#: view/easy-admin/admin/theme/browse.phtml:150
+#: view/easy-admin/admin/module/browse.phtml:255
+#: view/easy-admin/admin/theme/browse.phtml:158
 msgid "Version"
 msgstr "Version"
 
-#: view/easy-admin/admin/module/browse.phtml:248
+#: view/easy-admin/admin/module/browse.phtml:256
 #: view/easy-admin/admin/module/show-details.phtml:32
 msgid "State"
 msgstr "État"
 
-#: view/easy-admin/admin/module/browse.phtml:333
-#: view/easy-admin/admin/theme/browse.phtml:192
+#: view/easy-admin/admin/module/browse.phtml:341
+#: view/easy-admin/admin/theme/browse.phtml:200
 #, php-format
 msgid "Select %s"
 msgstr "Choisir %s"
 
-#: view/easy-admin/admin/module/browse.phtml:429
+#: view/easy-admin/admin/module/browse.phtml:437
 #, php-format
 msgid ""
 "Set the version %1$s of the database to the version %2$s of the files. The "
@@ -892,25 +908,25 @@ msgstr ""
 "Mettre la version %1$s de la base de données à la version %2$s des fichiers. "
 "Le schéma de la base de données et les données ne sont pas modifiés."
 
-#: view/easy-admin/admin/module/browse.phtml:430
+#: view/easy-admin/admin/module/browse.phtml:438
 msgid "Set the version of the database to the version of the files"
 msgstr "Mettre la version de la base de données à la version des fichiers"
 
-#: view/easy-admin/admin/module/browse.phtml:431
+#: view/easy-admin/admin/module/browse.phtml:439
 msgid "Fix version"
 msgstr "Corriger la version"
 
-#: view/easy-admin/admin/module/browse.phtml:440
-#: view/easy-admin/admin/module/browse.phtml:441
+#: view/easy-admin/admin/module/browse.phtml:448
+#: view/easy-admin/admin/module/browse.phtml:449
 msgid "Download the new version"
 msgstr "Télécharger la nouvelle version"
 
-#: view/easy-admin/admin/module/browse.phtml:465
-#: view/easy-admin/admin/theme/browse.phtml:243
+#: view/easy-admin/admin/module/browse.phtml:473
+#: view/easy-admin/admin/theme/browse.phtml:251
 msgid "Managed by Composer"
 msgstr "Géré par Composer"
 
-#: view/easy-admin/admin/module/browse.phtml:480
+#: view/easy-admin/admin/module/browse.phtml:488
 #, php-format
 msgid ""
 "The database is on version %1$s and the files are on version %2$s: an "
@@ -919,7 +935,7 @@ msgstr ""
 "La version dans la base est %1$s et les fichiers sont en version %2$s : une "
 "mise à jour est en cours."
 
-#: view/easy-admin/admin/module/browse.phtml:486
+#: view/easy-admin/admin/module/browse.phtml:494
 #, php-format
 msgid ""
 "The database is on version %1$s but the installed files are on version %2$s. "
@@ -933,72 +949,72 @@ msgstr ""
 "Réinstallez une version compatible avec la base de données ou mettez à jour "
 "les fichiers à nouveau."
 
-#: view/easy-admin/admin/module/browse.phtml:489
+#: view/easy-admin/admin/module/browse.phtml:497
 #, php-format
 msgid "⚠ DB: %s"
 msgstr "⚠ Base de données : %s"
 
-#: view/easy-admin/admin/module/browse.phtml:493
+#: view/easy-admin/admin/module/browse.phtml:501
 #, php-format
 msgid "Latest version compatible with Omeka S %s"
 msgstr "Dernière version compatible avec Omeka S %s"
 
-#: view/easy-admin/admin/module/browse.phtml:496
+#: view/easy-admin/admin/module/browse.phtml:504
 msgid "Latest version, not compatible with this Omeka S"
 msgstr "Dernière version, non compatible avec cette version d'Omeka S"
 
-#: view/easy-admin/admin/module/browse.phtml:496
+#: view/easy-admin/admin/module/browse.phtml:504
 #, php-format
 msgid "latest: %s"
 msgstr "dernier : %s"
 
-#: view/easy-admin/admin/module/browse.phtml:499
-#: view/easy-admin/admin/theme/browse.phtml:260
+#: view/easy-admin/admin/module/browse.phtml:507
+#: view/easy-admin/admin/theme/browse.phtml:268
 msgid "No compatible version available"
 msgstr "Aucune version compatible n'est disponible"
 
-#: view/easy-admin/admin/module/browse.phtml:499
-#: view/easy-admin/admin/theme/browse.phtml:260
+#: view/easy-admin/admin/module/browse.phtml:507
+#: view/easy-admin/admin/theme/browse.phtml:268
 msgid "(incompatible)"
 msgstr "(incompatible)"
 
-#: view/easy-admin/admin/module/browse.phtml:502
+#: view/easy-admin/admin/module/browse.phtml:510
 msgid "Compatibility unknown (github/gitlab list)"
 msgstr "Compatibilité inconnue (liste GitHub/GitLab)"
 
-#: view/easy-admin/admin/module/browse.phtml:508
+#: view/easy-admin/admin/module/browse.phtml:516
 msgid "Error: invalid Module.php"
 msgstr "Erreur : Module.php non valide"
 
-#: view/easy-admin/admin/module/browse.phtml:510
+#: view/easy-admin/admin/module/browse.phtml:518
 msgid "Error: invalid module.ini"
 msgstr "Erreur : module.ini non valide"
 
-#: view/easy-admin/admin/module/browse.phtml:512
-#: view/easy-admin/admin/module/browse.phtml:626
-#: view/easy-admin/admin/theme/browse.phtml:263
-#: view/easy-admin/admin/theme/browse.phtml:367
+#: view/easy-admin/admin/module/browse.phtml:520
+#: view/easy-admin/admin/module/browse.phtml:634
+#: view/easy-admin/admin/theme/browse.phtml:271
+#: view/easy-admin/admin/theme/browse.phtml:375
 #, php-format
 msgid "Requires Omeka S %s"
 msgstr "Requiert Omeka S %s"
 
-#: view/easy-admin/admin/module/browse.phtml:514
+#: view/easy-admin/admin/module/browse.phtml:522
 msgid "Not in filesystem"
 msgstr "Absent du serveur"
 
-#: view/easy-admin/admin/module/browse.phtml:535
+#: view/easy-admin/admin/module/browse.phtml:543
 msgid "No modules found."
 msgstr "Aucun module trouvé."
 
-#: view/easy-admin/admin/module/browse.phtml:567
+#: view/easy-admin/admin/module/browse.phtml:575
 msgid "Remove modules"
 msgstr "Supprimer les modules"
 
-#: view/easy-admin/admin/module/browse.phtml:568
+#: view/easy-admin/admin/module/browse.phtml:576
 msgid "Are you sure you would like to remove the selected modules?"
 msgstr "Êtes-vous sûr de vouloir supprimer les modules sélectionnés ?"
 
-#: view/easy-admin/admin/module/browse.phtml:570
+#: view/easy-admin/admin/module/browse.phtml:578
 #, php-format
 msgid ""
 "%1$s: this action will uninstall the modules from the database, so their "
@@ -1009,20 +1025,20 @@ msgstr ""
 "perdues et les fichiers seront supprimées. Une sauvegarde des fichiers sera "
 "créée."
 
-#: view/easy-admin/admin/module/browse.phtml:573
-#: view/easy-admin/admin/theme/browse.phtml:327
+#: view/easy-admin/admin/module/browse.phtml:581
+#: view/easy-admin/admin/theme/browse.phtml:335
 msgid "Confirm remove"
 msgstr "Confirmer la suppression"
 
-#: view/easy-admin/admin/module/browse.phtml:585
+#: view/easy-admin/admin/module/browse.phtml:593
 msgid "Install new module from catalogue"
 msgstr "Installer un nouveau module à partir du catalogue"
 
-#: view/easy-admin/admin/module/browse.phtml:587
+#: view/easy-admin/admin/module/browse.phtml:595
 msgid "Select the modules to install or use a curated selection."
 msgstr "Choisir les modules à installer ou utiliser une sélection prédéfinie."
 
-#: view/easy-admin/admin/module/browse.phtml:588
+#: view/easy-admin/admin/module/browse.phtml:596
 #, php-format
 msgid ""
 "For more information, see pages of known %1$smodules%2$s or "
@@ -1031,16 +1047,16 @@ msgstr ""
 "Pour plus d’informations, consultez les pages %1$smodules%2$s connus ou "
 "%3$sOmeka.org%2$s."
 
-#: view/easy-admin/admin/module/browse.phtml:594
+#: view/easy-admin/admin/module/browse.phtml:602
 msgid "Curated selection"
 msgstr "Sélection de modules"
 
-#: view/easy-admin/admin/module/browse.phtml:596
+#: view/easy-admin/admin/module/browse.phtml:604
 msgid "Select a selection…"
 msgstr "Choisir une sélection…"
 
-#: view/easy-admin/admin/module/browse.phtml:639
-#: view/easy-admin/admin/theme/browse.phtml:380
+#: view/easy-admin/admin/module/browse.phtml:647
+#: view/easy-admin/admin/theme/browse.phtml:388
 msgid "Install selected"
 msgstr "Installer la sélection"
 
@@ -1263,57 +1279,57 @@ msgstr ""
 "Le répertoire « %s » n'est pas accessible en écriture. L'installation, la "
 "mise à jour et la suppression des thèmes sont désactivées."
 
-#: view/easy-admin/admin/theme/browse.phtml:77
+#: view/easy-admin/admin/theme/browse.phtml:85
 #, php-format
 msgid ""
-"These themes are symbolic links to a directory that is not writeable by the "
-"server, so they cannot be updated nor removed here: %s. Update them in the "
+"Some themes are symbolic links to a directory that is not writeable by the "
+"server (%s), so they cannot be updated nor removed here. Update them in the "
 "target directory."
 msgstr ""
-"Ces thèmes sont des liens symboliques vers un dossier non inscriptible par "
-"le serveur, ils ne peuvent donc être ni mis à jour ni supprimés ici : %s. "
-"Mettez-les à jour dans le dossier cible."
+"Certains thèmes sont des liens symboliques vers un répertoire qui n’est pas "
+"accessible en écriture par le serveur (%s) : ils ne peuvent donc pas être "
+"mis à jour ni supprimés ici. Mettez-les à jour dans le répertoire cible."
 
-#: view/easy-admin/admin/theme/browse.phtml:98
+#: view/easy-admin/admin/theme/browse.phtml:106
 msgid "Install new theme"
 msgstr "Installer un nouveau thème"
 
-#: view/easy-admin/admin/theme/browse.phtml:105
-#: view/easy-admin/admin/theme/browse.phtml:347
+#: view/easy-admin/admin/theme/browse.phtml:113
+#: view/easy-admin/admin/theme/browse.phtml:355
 msgid "Filter themes…"
 msgstr "Filtrer les thèmes…"
 
-#: view/easy-admin/admin/theme/browse.phtml:125
+#: view/easy-admin/admin/theme/browse.phtml:133
 msgid "Update selected"
 msgstr "Mettre à jour la sélection"
 
-#: view/easy-admin/admin/theme/browse.phtml:151
+#: view/easy-admin/admin/theme/browse.phtml:159
 msgid "Design"
 msgstr "Design"
 
-#: view/easy-admin/admin/theme/browse.phtml:228
-#: view/easy-admin/admin/theme/browse.phtml:229
+#: view/easy-admin/admin/theme/browse.phtml:236
+#: view/easy-admin/admin/theme/browse.phtml:237
 msgid "Update files"
 msgstr "Mettre à jour les fichiers"
 
-#: view/easy-admin/admin/theme/browse.phtml:258
+#: view/easy-admin/admin/theme/browse.phtml:266
 #, php-format
 msgid "→ %s"
 msgstr "→ %s"
 
-#: view/easy-admin/admin/theme/browse.phtml:289
+#: view/easy-admin/admin/theme/browse.phtml:297
 msgid "No themes found."
 msgstr "Aucun thème trouvé."
 
-#: view/easy-admin/admin/theme/browse.phtml:321
+#: view/easy-admin/admin/theme/browse.phtml:329
 msgid "Remove themes"
 msgstr "Supprimer les thèmes"
 
-#: view/easy-admin/admin/theme/browse.phtml:322
+#: view/easy-admin/admin/theme/browse.phtml:330
 msgid "Are you sure you would like to remove the selected themes?"
 msgstr "Êtes-vous sûr de vouloir supprimer les thèmes sélectionnés ?"
 
-#: view/easy-admin/admin/theme/browse.phtml:324
+#: view/easy-admin/admin/theme/browse.phtml:332
 #, php-format
 msgid ""
 "%1$s: this action will delete all files of the themes. A backup of the files "
@@ -1322,15 +1338,15 @@ msgstr ""
 "%1$s : cette action supprimera tous les fichiers des thèmes. Une sauvegarde "
 "sera créée."
 
-#: view/easy-admin/admin/theme/browse.phtml:339
+#: view/easy-admin/admin/theme/browse.phtml:347
 msgid "Install new theme from catalogue"
 msgstr "Installer un nouveau thème à partir du catalogue"
 
-#: view/easy-admin/admin/theme/browse.phtml:341
+#: view/easy-admin/admin/theme/browse.phtml:349
 msgid "Select the themes to install."
 msgstr "Sélectionnez les thèmes à installer."
 
-#: view/easy-admin/admin/theme/browse.phtml:342
+#: view/easy-admin/admin/theme/browse.phtml:350
 #, php-format
 msgid ""
 "For more information, see pages of known %1$sthemes%2$s or %3$sOmeka.org%2$s."
@@ -1711,7 +1727,26 @@ msgstr ""
 "Un filtre direct et une section de navigation simplifient la gestion des "
 "paramètres généraux et des paramètres de site."
 
-#: data/scripts/upgrade.php:652
+#: data/scripts/upgrade.php:656
+msgid ""
+"The color of the admin sidebar is now used for the whole admin interface: "
+"the logo, the buttons, the block of the sites and the borders are derived "
+"from it."
+msgstr ""
+"La couleur de la barre latérale est désormais utilisée pour toute "
+"l’interface d’administration : le logo, les boutons, le bloc des sites et "
+"les liserés en sont dérivés."
+
+#: data/scripts/upgrade.php:663
+msgid ""
+"The thumbnails are loaded only when they are displayed, so a page with many "
+"media is loaded quickly. This behavior can be disabled in the main settings."
+msgstr ""
+"Les vignettes sont chargées uniquement lorsqu’elles sont affichées, de sorte "
+"qu’une page comportant de nombreux médias s’affiche rapidement. Ce "
+"comportement peut être désactivé dans les paramètres généraux."
+
+#: data/scripts/upgrade.php:669
 msgid ""
 "The optional module {link}Job Queue{link_end} can be installed to avoid "
 "running the same background jobs several times in parallel and to limit the "
@@ -1913,11 +1948,11 @@ msgstr "Tâche terminée."
 msgid "Task \"%1$s\" ended."
 msgstr "Tâche « %1$s » terminée."
 
-#: Module.php:199
+#: Module.php:215
 msgid "Fatal error: {message} in {file}:{line}"
 msgstr "Erreur fatale : {message} dans {file} : {line}"
 
-#: Module.php:355
+#: Module.php:370
 msgid ""
 "Upgrading module BulkCheck: Unable to rename directory \"files/bulk_check\" "
 "into \"files/check\". Trying to create it."
@@ -1925,7 +1960,7 @@ msgstr ""
 "Mise à niveau du module BulkCheck : impossible de renommer le dossier "
 "\"files/bulk_check\" en \"files/check\". Essai de création."
 
-#: Module.php:365
+#: Module.php:380
 msgid ""
 "Upgrading module BulkCheck: {count} files of directory \"files/bulk_check\" "
 "were not moved into \"files/check\", because they exist there already or "
@@ -1936,7 +1971,7 @@ msgstr ""
 "déjà ou ne peuvent pas être déplacés. Vérifiez-les, puis supprimez le "
 "dossier."
 
-#: Module.php:384
+#: Module.php:399
 msgid ""
 "These directories are not writeable: {dirs}. Related features (check, "
 "backup, bulk import) are disabled until permissions are fixed."
@@ -1945,7 +1980,7 @@ msgstr ""
 "fonctionnalités associées (vérification, sauvegarde, importation en masse) "
 "sont désactivées jusqu'à ce que les autorisations soient corrigées."
 
-#: Module.php:431
+#: Module.php:446
 msgid ""
 "The module \"{module}\" was merged into module \"{module_2}\" and "
 "uninstalled."
@@ -1953,7 +1988,7 @@ msgstr ""
 "Le module « {module} » a été mis à niveau par le module « {module_2} » et "
 "supprimé."
 
-#: Module.php:468
+#: Module.php:483
 msgid ""
 "All stored files from checks and fixes, if any, will be removed from folder "
 "\"{folder}\"."
@@ -1961,72 +1996,72 @@ msgstr ""
 "Tous les enregistrements issus des vérifications seront supprimés du dossier "
 "« {folder} »."
 
-#: Module.php:1420
+#: Module.php:1578
 msgid "View this {resource_type} in \"{site}\""
 msgstr "Afficher le {resource_type} dans « {site} »"
 
-#: Module.php:1778
+#: Module.php:1936
 msgid "File successfuly uploaded."
 msgstr "Fichier téléversé avec succès."
 
-#: Module.php:1779
+#: Module.php:1937
 msgid "The total of file sizes exceeds the the server limit directive."
 msgstr "La taille des fichiers excède la valeur limite du serveur."
 
-#: Module.php:1780
+#: Module.php:1938
 msgid "The file size exceeds the specified limit."
 msgstr "La taille du fichier excède la taille maximale."
 
-#: Module.php:1781
+#: Module.php:1939
 msgid "The file was only partially uploaded."
 msgstr "Le fichier a été partiellement chargé."
 
-#: Module.php:1782
+#: Module.php:1940
 msgid "No file was uploaded."
 msgstr "Aucun fichier n’a été téléchargé."
 
-#: Module.php:1783
+#: Module.php:1941
 msgid "The temporary folder to store the file is missing."
 msgstr "Le dossier temporaire pour les fichiers est absent."
 
-#: Module.php:1784
+#: Module.php:1942
 msgid "Failed to write file to disk."
 msgstr "Impossible d’écrire le fichier sur le disque."
 
-#: Module.php:1785
+#: Module.php:1943
 msgid "A PHP extension stopped the file upload."
 msgstr "Une extension php a arrêté le téléchargement du fichier."
 
-#: Module.php:1810
+#: Module.php:1968
 msgid "There is no uploaded files."
 msgstr "Il n’y a aucun fichier téléchargé."
 
-#: Module.php:1829
+#: Module.php:1987
 msgid "File #{index} \"{filename}\" has an error: {error}."
 msgstr "Le fichier #{index} « {filename} » a une erreur : {error}."
 
-#: Module.php:1836
+#: Module.php:1994
 msgid "File #{index} \"{filename}\" must not start with a \".\"."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas commencer avec un « . »."
 
-#: Module.php:1843
+#: Module.php:2001
 msgid "File #{index} \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} « {filename} » ne doit pas avoir de caractère réservé."
 
-#: Module.php:1850
+#: Module.php:2008
 msgid ""
 "File #{index} temp name \"{filename}\" must not contain a reserved character."
 msgstr ""
 "Le fichier #{index} temporaire avec le nom « {filename} » ne doit pas "
 "contenir de caractère réservé."
 
-#: Module.php:1858
+#: Module.php:2016
 msgid "File #{index} \"{filename}\" is an empty file."
 msgstr "Le fichier #{index} « {filename} » est vide."
 
-#: Module.php:2029
+#: Module.php:2187
 msgid ""
 "An error occurred when fetching asset \"{asset_filename}\" (#{asset_id}): "
 "{errors}"
@@ -2034,7 +2069,7 @@ msgstr ""
 "Une erreur est survenue lors de la récupération du fichier "
 "« {asset_filename} » (#{asset_id}): {errors}"
 
-#: Module.php:2044
+#: Module.php:2202
 msgid ""
 "An error occurred when optimizing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
@@ -2042,7 +2077,7 @@ msgstr ""
 "Une erreur est survenue lors de l’optimisation du fichier "
 "« {asset_filename} » (#{asset_id}): {error}"
 
-#: Module.php:2073
+#: Module.php:2231
 msgid ""
 "An error occurred when storing asset \"{asset_filename}\" (#{asset_id}): "
 "{error}"
@@ -2050,7 +2085,7 @@ msgstr ""
 "Une erreur est survenue lors de l’enregistrement du fichier "
 "« {asset_filename} » (#{asset_id}): {error}."
 
-#: Module.php:2109
+#: Module.php:2267
 msgid ""
 "The asset \"{asset_filename}\" (#{asset_id}) has been successfully optimized "
 "by {percent}%, from {size_1} to {size_2} bytes."
@@ -2058,16 +2093,16 @@ msgstr ""
 "Le fichier « {asset_filename} » (#{asset_id}) a été optimisé de {percent}%, "
 "de {size_1} à {size_2} octets."
 
-#: Module.php:2139
+#: Module.php:2297
 msgid "Asset #{asset_id}: cannot rename, asset has no name."
 msgstr ""
 "Fichier #{asset_id} : impossible de renommer ; le fichier n’a pas de nom."
 
-#: Module.php:2151
+#: Module.php:2309
 msgid "Asset #{asset_id}: cannot rename, sanitized name is empty."
 msgstr "Fichier #{asset_id} : impossible de renommer ; le nouveau est vide."
 
-#: Module.php:2163
+#: Module.php:2321
 msgid ""
 "Asset #{asset_id}: cannot rename, file \"{filename}\" not found in asset "
 "directory."
@@ -2075,7 +2110,7 @@ msgstr ""
 "Ressource n° {asset_id} : impossible de renommer ; le fichier « {filename} » "
 "est introuvable dans le répertoire des ressources."
 
-#: Module.php:2209
+#: Module.php:2367
 msgid ""
 "Unable to rename asset file from \"{old}\" to \"{new}\": {error}. Check that "
 "the web server has write permission on the directory \"{dir}\"."
@@ -2083,11 +2118,11 @@ msgstr ""
 "Impossible de renommer le fichier \"{old}\" en \"{new}\": {error}. Vérifiez "
 "que le serveur web a les permissions d’écriture dans le dossier \"{dir}\"."
 
-#: Module.php:2266
+#: Module.php:2424
 msgid "Store with original name"
 msgstr "Conserver sous le nom d'origine"
 
-#: src/Mvc/Controller/Plugin/Addons.php:490
+#: src/Mvc/Controller/Plugin/Addons.php:506
 msgid ""
 "The addon \"{name}\" is managed by Composer and cannot be updated here. Run "
 "the command \"{command}\" on the server instead."
@@ -2095,7 +2130,7 @@ msgstr ""
 "L'extension « {name} » est gérée par Composer et ne peut pas être mise à "
 "jour ici. Lancer la commande \"{command}\" sur le serveur à la place."
 
-#: src/Mvc/Controller/Plugin/Addons.php:494
+#: src/Mvc/Controller/Plugin/Addons.php:510
 msgid ""
 "The addon \"{name}\" is managed by Composer and cannot be updated here. Run "
 "the command \"composer update\" on the server instead."
@@ -2103,18 +2138,18 @@ msgstr ""
 "L'extension « {name} » est gérée par Composer et ne peut pas être mise à "
 "jour ici. Lancer la commande \"composer update\" sur le serveur à la place."
 
-#: src/Mvc/Controller/Plugin/Addons.php:508
-#: src/Mvc/Controller/Plugin/Addons.php:722
-#: src/Mvc/Controller/Plugin/Addons.php:1458
+#: src/Mvc/Controller/Plugin/Addons.php:524
+#: src/Mvc/Controller/Plugin/Addons.php:738
+#: src/Mvc/Controller/Plugin/Addons.php:1474
 msgid "The {type} directory is not writeable by the server."
 msgstr "Le dossier {type} est protégé en écriture par le serveur."
 
-#: src/Mvc/Controller/Plugin/Addons.php:516
-#: src/Mvc/Controller/Plugin/Addons.php:730
+#: src/Mvc/Controller/Plugin/Addons.php:532
+#: src/Mvc/Controller/Plugin/Addons.php:746
 msgid "The addon \"{name}\" is not installed."
 msgstr "L’extension \"{name}\" n’est pas installée."
 
-#: src/Mvc/Controller/Plugin/Addons.php:529
+#: src/Mvc/Controller/Plugin/Addons.php:545
 msgid ""
 "The addon \"{name}\" is a symbolic link to \"{path}\", that is not writeable "
 "by the server: update it there."
@@ -2122,13 +2157,13 @@ msgstr ""
 "L’extension « {name} » est un lien symbolique vers « {path} », non "
 "inscriptible par le serveur : mettez-la à jour à cet endroit."
 
-#: src/Mvc/Controller/Plugin/Addons.php:550
-#: src/Mvc/Controller/Plugin/Addons.php:1493
+#: src/Mvc/Controller/Plugin/Addons.php:566
+#: src/Mvc/Controller/Plugin/Addons.php:1509
 msgid "No version of \"{name}\" is compatible with this Omeka S."
 msgstr ""
 "Aucune version de « {name} » n'est compatible avec cette version d'Omeka S."
 
-#: src/Mvc/Controller/Plugin/Addons.php:570
+#: src/Mvc/Controller/Plugin/Addons.php:586
 msgid ""
 "The addon \"{name}\" is already in version {version_installed} and was not "
 "updated to version {version_new}."
@@ -2136,11 +2171,11 @@ msgstr ""
 "L’extension \"{name}\" est déjà dans la même version {version_installed} et "
 "ne sera pas mise à jour à la version {version_new}."
 
-#: src/Mvc/Controller/Plugin/Addons.php:586
+#: src/Mvc/Controller/Plugin/Addons.php:602
 msgid "No download URL available for \"{name}\"."
 msgstr "Aucune URL de téléchargement n'est disponible pour « {name} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:596
+#: src/Mvc/Controller/Plugin/Addons.php:612
 msgid ""
 "Unable to fetch the update for \"{name}\" from {url}. Check the server "
 "internet access and that \"allow_url_fopen\" is enabled."
@@ -2149,11 +2184,11 @@ msgstr ""
 "Vérifiez la connexion Internet du serveur et assurez-vous que "
 "« allow_url_fopen » est activé."
 
-#: src/Mvc/Controller/Plugin/Addons.php:609
+#: src/Mvc/Controller/Plugin/Addons.php:625
 msgid "An error occurred during the unzipping of \"{name}\"."
 msgstr "Une erreur est survenue durant la décompression de « {name} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:621
+#: src/Mvc/Controller/Plugin/Addons.php:637
 msgid ""
 "Unable to backup the current version of \"{name}\": check that the directory "
 "\"files/backup/\" is writeable and that the php extension \"zip\" or the "
@@ -2163,7 +2198,7 @@ msgstr ""
 "le dossier \"files/backup/\" est inscriptible et que l’extension \"zip\" ou "
 "la commande \"zip\" est disponible."
 
-#: src/Mvc/Controller/Plugin/Addons.php:632
+#: src/Mvc/Controller/Plugin/Addons.php:648
 msgid ""
 "Unable to remove the current directory of \"{name}\": check the rights of "
 "the server on it."
@@ -2171,12 +2206,12 @@ msgstr ""
 "Impossible de supprimer le dossier en cours de « {name} » : vérifier les "
 "droits sur le serveur."
 
-#: src/Mvc/Controller/Plugin/Addons.php:651
-#: src/Mvc/Controller/Plugin/Addons.php:1533
+#: src/Mvc/Controller/Plugin/Addons.php:667
+#: src/Mvc/Controller/Plugin/Addons.php:1549
 msgid "The archive for \"{name}\" does not contain a directory."
 msgstr "Le zip de « {name} » ne contient pas de dossier."
 
-#: src/Mvc/Controller/Plugin/Addons.php:671
+#: src/Mvc/Controller/Plugin/Addons.php:687
 msgid ""
 "Failed to install the update for \"{name}\" (move from temp failed). The "
 "previous version has been restored."
@@ -2185,7 +2220,7 @@ msgstr ""
 "déplacement depuis le répertoire temporaire). La version précédente a été "
 "restaurée."
 
-#: src/Mvc/Controller/Plugin/Addons.php:683
+#: src/Mvc/Controller/Plugin/Addons.php:699
 msgid ""
 "The addon \"{name}\" was successfully updated. A backup is stored in "
 "\"{backup}\"."
@@ -2193,7 +2228,7 @@ msgstr ""
 "L'extension « {name} » a été mise à jour avec succès. Une sauvegarde est "
 "stockée dans « {backup} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:704
+#: src/Mvc/Controller/Plugin/Addons.php:720
 msgid ""
 "The addon \"{name}\" is managed by Composer and cannot be removed here. Run "
 "the command \"{command}\" on the server instead."
@@ -2201,7 +2236,7 @@ msgstr ""
 "L'extension « {name} » est gérée par Composer et ne peut pas être supprimée "
 "ici. Lancer la commande \"{command}\" sur le serveur à la place."
 
-#: src/Mvc/Controller/Plugin/Addons.php:708
+#: src/Mvc/Controller/Plugin/Addons.php:724
 msgid ""
 "The addon \"{name}\" is managed by Composer and cannot be removed here. Run "
 "the command \"composer remove\" on the server instead."
@@ -2209,17 +2244,17 @@ msgstr ""
 "L'extension « {name} » est gérée par Composer et ne peut pas être supprimée "
 "ici. La commande \"composer remove\" sur le serveur à la place."
 
-#: src/Mvc/Controller/Plugin/Addons.php:757
+#: src/Mvc/Controller/Plugin/Addons.php:773
 msgid "Error during uninstall of \"{name}\": {error}"
 msgstr "Erreur lors de la désinstallation de \"{name}\" : {error}"
 
-#: src/Mvc/Controller/Plugin/Addons.php:777
+#: src/Mvc/Controller/Plugin/Addons.php:793
 msgid "The theme \"{name}\" is used by site \"{site}\" and cannot be removed."
 msgstr ""
 "Le thème « {name} » est utilisé par le site « {site} » et ne peut pas être "
 "supprimé."
 
-#: src/Mvc/Controller/Plugin/Addons.php:794
+#: src/Mvc/Controller/Plugin/Addons.php:810
 msgid ""
 "Unable to backup \"{name}\" before removal: check that the directory \"files/"
 "backup/\" is writeable and that the php extension \"zip\" or the command "
@@ -2229,7 +2264,7 @@ msgstr ""
 "dossier \"files/backup/\" est inscriptible et que l’extension \"zip\" ou la "
 "commande \"zip\" est disponible."
 
-#: src/Mvc/Controller/Plugin/Addons.php:803
+#: src/Mvc/Controller/Plugin/Addons.php:819
 msgid ""
 "Unable to remove the directory of \"{name}\": check the rights of the server "
 "on it."
@@ -2237,13 +2272,13 @@ msgstr ""
 "Impossible de supprimer le dossier de « {name} » : vérifier les droits sur "
 "le serveur."
 
-#: src/Mvc/Controller/Plugin/Addons.php:819
+#: src/Mvc/Controller/Plugin/Addons.php:835
 msgid "The addon \"{name}\" was removed. A backup is stored in \"{backup}\"."
 msgstr ""
 "L'extension « {name} » a été supprimée. Une sauvegarde est stockée dans "
 "« {backup} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:879
+#: src/Mvc/Controller/Plugin/Addons.php:895
 msgid ""
 "The addon \"{name}\" was installed from a source archive without its "
 "dependencies ({libraries}), so it may not work. Install a release zip that "
@@ -2255,11 +2290,11 @@ msgstr ""
 "\"livraison\" qui contient le dossier \"vendor/\" ou lancer \"composer "
 "install --no-dev\" dans le dossier de l’extension sur le serveur."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1230
+#: src/Mvc/Controller/Plugin/Addons.php:1246
 msgid "Unable to fetch the url {url}."
 msgstr "Impossible de charger l’url {url}."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1428
+#: src/Mvc/Controller/Plugin/Addons.php:1444
 msgid ""
 "The addon \"{name}\" is managed by Composer: the local version installed "
 "here will override it and it will not be updated by Composer any more."
@@ -2267,7 +2302,7 @@ msgstr ""
 "L'extension « {name} » est gérée par Composer : la version locale installée "
 "va la cacher et elle ne pourra plus être mise à jour avec Composer."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1449
+#: src/Mvc/Controller/Plugin/Addons.php:1465
 msgid ""
 "The module \"{module}\" requires the dependencies \"{names}\" installed and "
 "enabled first."
@@ -2275,18 +2310,18 @@ msgstr ""
 "Le module « {module} » nécessite les dépendances \"{names}\" installées et "
 "activées."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1465
+#: src/Mvc/Controller/Plugin/Addons.php:1481
 msgid ""
 "Don’t forget to protect the {type} directory from writing after installation."
 msgstr ""
 "N’oubliez pas de protéger le dossier {type} contre l’écriture après "
 "installation."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1472
+#: src/Mvc/Controller/Plugin/Addons.php:1488
 msgid "The {type} \"{name}\" already exists. Use update instead."
 msgstr "Le {type} « {name} » existe déjà. Utiliser la mise à jour."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1504
+#: src/Mvc/Controller/Plugin/Addons.php:1520
 msgid ""
 "Unable to fetch the {type} \"{name}\". Check the server internet access and "
 "that \"allow_url_fopen\" is enabled."
@@ -2294,15 +2329,15 @@ msgstr ""
 "Impossible de récupérer le {type} « {name} ». Vérifiez la connexion Internet "
 "du serveur et assurez-vous que « allow_url_fopen » est activé."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1515
+#: src/Mvc/Controller/Plugin/Addons.php:1531
 msgid "An error occurred during the unzipping of the {type} \"{name}\"."
 msgstr "Une erreur est survenue durant la décompression de {type} « {name} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1549
+#: src/Mvc/Controller/Plugin/Addons.php:1565
 msgid "Failed to install the {type} \"{name}\"."
 msgstr "Erreur lors de l’installation du {type} « {name} »."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1570
+#: src/Mvc/Controller/Plugin/Addons.php:1586
 msgid ""
 "The module \"{name}\" requires the dependency \"Generic\" version \"{version}"
 "\" available first."
@@ -2310,7 +2345,7 @@ msgstr ""
 "Le module « {name} » a besoin que la dépendance « Generic » version "
 "« {version} » soit installée."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1583
+#: src/Mvc/Controller/Plugin/Addons.php:1599
 msgid ""
 "If \"{name}\" doesn’t appear in the list of {type}, its directory may need "
 "to be renamed."
@@ -2318,22 +2353,22 @@ msgstr ""
 "Si « {name} » n’apparaît pas dans la liste de {type}, le dossier doit être "
 "renommé."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1591
+#: src/Mvc/Controller/Plugin/Addons.php:1607
 msgid "{type} uploaded successfully"
 msgstr "{type} téléchargé correctement"
 
-#: src/Mvc/Controller/Plugin/Addons.php:1596
+#: src/Mvc/Controller/Plugin/Addons.php:1612
 msgid ""
 "It is always recommended to read the original readme or help of the addon."
 msgstr ""
 "Il est toujours recommandé de lire le fichier lisez-moi (readme) original ou "
 "l’aide de l’extension."
 
-#: src/Mvc/Controller/Plugin/Addons.php:1847
+#: src/Mvc/Controller/Plugin/Addons.php:1863
 msgid "/^[a-zA-Z]:/"
 msgstr "/^[a-zA-Z]:/"
 
-#: src/Mvc/Controller/Plugin/Addons.php:2042
+#: src/Mvc/Controller/Plugin/Addons.php:2058
 msgid "Failed to execute command: {command}"
 msgstr "Échec de la commande : {command}"
 
@@ -2773,7 +2808,7 @@ msgstr "Corrigé"
 #: src/Job/DbResourceIncomplete.php:20 src/Job/DbResourceInvalid.php:20
 #: src/Job/DbJob.php:24 src/Job/AbstractCheckFile.php:40
 #: src/Job/DbResourceTitle.php:60 src/Job/DbUtf8Encode.php:67
-#: src/Job/Backup.php:104 src/Job/DbSession.php:62 src/Job/DbLog.php:71
+#: src/Job/Backup.php:104 src/Job/DbSession.php:72 src/Job/DbLog.php:71
 #: src/Job/FileMediaNoOriginal.php:27 src/Job/FileDimension.php:49
 #: src/Job/DbItemPrimaryMedia.php:28 src/Job/DirExcess.php:16
 #: src/Job/DbItemNoValue.php:29 src/Job/DbValueAnnotationTemplate.php:38
@@ -3236,23 +3271,15 @@ msgstr ""
 "Sauvegarde créée avec succès : {total_dirs} dossiers, {total_files} "
 "fichiers, taille : {total_size} octets, compressé : {size} octets ({ratio}%)."
 
-#: src/Job/DbSession.php:52
+#: src/Job/DbSession.php:62
 msgid "A minimum number of days is needed to clean sessions."
 msgstr "Un nombre minimum de jours est nécessaire pour nettoyer les sessions."
 
-#: src/Job/DbSession.php:78
-msgid ""
-"Unable to add index \"{column}\" in table \"{table}\" to improve "
-"performance: {msg}"
-msgstr ""
-"Impossible d’ajouter l’index « {column} » dans la table « {table} » pour "
-"améliorer la performance : {msg}"
-
-#: src/Job/DbSession.php:96
+#: src/Job/DbSession.php:94
 msgid "Unable to delete last sessions: {msg}"
 msgstr "Impossible de supprimer les dernières sessions : {msg}"
 
-#: src/Job/DbSession.php:135
+#: src/Job/DbSession.php:132
 msgid ""
 "The table \"{table}\" has a size of {size} MB. {old}/{all} records are older "
 "than {total} seconds."
@@ -3260,7 +3287,7 @@ msgstr ""
 "La table \"{table}\" a une taille de {size} Mo. {old}/{all} enregistrements "
 "sont plus vieux que {total} secondes."
 
-#: src/Job/DbSession.php:146
+#: src/Job/DbSession.php:143
 msgid ""
 "{count} records older than {seconds} seconds were removed. The table "
 "\"{table}\" has a size of {size} MB."
@@ -3268,23 +3295,37 @@ msgstr ""
 "{count} enregistrements plus anciens que {seconds} secondes ont été "
 "supprimés. La table \"{table}\" a une taille de {size} Mo."
 
-#: src/Job/DbLog.php:16 src/Form/CheckAndFixForm.php:1377
+#: src/Job/DbSession.php:175
+msgid ""
+"The table \"{table}\" of {size} MB was recreated empty, except the session "
+"of the current user."
+msgstr ""
+
+#: src/Job/DbSession.php:196
+msgid ""
+"Unable to add index \"{column}\" in table \"{table}\" to improve "
+"performance: {msg}"
+msgstr ""
+"Impossible d’ajouter l’index « {column} » dans la table « {table} » pour "
+"améliorer la performance : {msg}"
+
+#: src/Job/DbLog.php:16 src/Form/CheckAndFixForm.php:1387
 msgid "Emergency"
 msgstr "Urgence"
 
-#: src/Job/DbLog.php:17 src/Form/CheckAndFixForm.php:1378
+#: src/Job/DbLog.php:17 src/Form/CheckAndFixForm.php:1388
 msgid "Alert"
 msgstr "Alerte"
 
-#: src/Job/DbLog.php:18 src/Form/CheckAndFixForm.php:1379
+#: src/Job/DbLog.php:18 src/Form/CheckAndFixForm.php:1389
 msgid "Critical"
 msgstr "Critique"
 
-#: src/Job/DbLog.php:21 src/Form/CheckAndFixForm.php:1382
+#: src/Job/DbLog.php:21 src/Form/CheckAndFixForm.php:1392
 msgid "Notice"
 msgstr "Avis"
 
-#: src/Job/DbLog.php:23 src/Form/CheckAndFixForm.php:1384
+#: src/Job/DbLog.php:23 src/Form/CheckAndFixForm.php:1394
 msgid "Debug"
 msgstr "Débogage"
 
@@ -4381,31 +4422,46 @@ msgstr ""
 "Améliorer les pages de paramètres avec un filtre et une section de navigation"
 
 #: src/Form/SettingsFieldset.php:96
-msgid "Color of the admin left sidebar"
-msgstr "Couleur de la barre latérale gauche de l’administration"
+msgid "Color of the admin interface"
+msgstr "Couleur de l’interface d’administration"
 
 #: src/Form/SettingsFieldset.php:97
 msgid ""
-"Useful to distinguish instances, for example a test one from the production "
-"one."
+"The sidebar, the logo, the buttons, the block of the sites and the borders "
+"are derived from this color. Useful to distinguish instances, for example a "
+"test one from the production one."
 msgstr ""
-"Utile pour distinguer les instances, par exemple une instance de test de "
-"celle de production."
+"La barre latérale, le logo, les boutons, le bloc des sites et les liserés "
+"sont dérivés de cette couleur. Utile pour distinguer les instances, par "
+"exemple une instance de test de celle de production."
 
 #: src/Form/SettingsFieldset.php:109
+msgid "Load all thumbnails at once (skip lazy loading)"
+msgstr "Charger toutes les vignettes en une fois (pas de chargement différé)"
+
+#: src/Form/SettingsFieldset.php:110
+msgid ""
+"By default, the thumbnails are loaded only when they are displayed, so a "
+"page with many media is loaded quickly."
+msgstr ""
+"Par défaut, les vignettes sont chargées uniquement lorsqu’elles sont "
+"affichées, de sorte qu’une page comportant de nombreux médias s’affiche "
+"rapidement."
+
+#: src/Form/SettingsFieldset.php:122
 msgid "Allow the reviewer to delete any resource"
 msgstr "Autoriser le relecteur à supprimer n’importe quelle ressource"
 
-#: src/Form/SettingsFieldset.php:121
+#: src/Form/SettingsFieldset.php:134
 msgid "Add a button to create resources directly from a template"
 msgstr ""
 "Ajouter un bouton pour créer des ressources directement à partir d’un modèle"
 
-#: src/Form/SettingsFieldset.php:128
+#: src/Form/SettingsFieldset.php:141
 msgid "Select resource templates…"
 msgstr "Choisir des modèles de ressources…"
 
-#: src/Form/SettingsFieldset.php:137
+#: src/Form/SettingsFieldset.php:150
 msgid ""
 "Add a button to create resources directly from a template specified with a "
 "class"
@@ -4413,15 +4469,15 @@ msgstr ""
 "Ajouter un bouton pour créer des ressources directement à partir du modèle "
 "indiqué avec une classe"
 
-#: src/Form/SettingsFieldset.php:146
+#: src/Form/SettingsFieldset.php:159
 msgid "Select resource classes…"
 msgstr "Choisir des classes de ressource…"
 
-#: src/Form/SettingsFieldset.php:155
+#: src/Form/SettingsFieldset.php:168
 msgid "Asset: allowed media types"
 msgstr "Fichiers : types de média autorisés"
 
-#: src/Form/SettingsFieldset.php:156
+#: src/Form/SettingsFieldset.php:169
 msgid ""
 "Additional media types allowed for assets. Common image types (jpeg, png, "
 "gif, webp) are included by default. One media type per line."
@@ -4430,11 +4486,11 @@ msgstr ""
 "d'images courants (jpeg, png, gif, webp) sont inclus par défaut. Un type de "
 "média par ligne."
 
-#: src/Form/SettingsFieldset.php:168
+#: src/Form/SettingsFieldset.php:181
 msgid "Asset: allowed extensions"
 msgstr "Fichiers : extensions autorisées"
 
-#: src/Form/SettingsFieldset.php:169
+#: src/Form/SettingsFieldset.php:182
 msgid ""
 "Additional extensions allowed for assets. Common image extensions (jpg, "
 "jpeg, png, gif, webp) are included by default. Separate with spaces."
@@ -4443,11 +4499,11 @@ msgstr ""
 "d'image courantes (jpg, jpeg, png, gif, webp) sont incluses par défaut. "
 "Séparer les éléments par des espaces."
 
-#: src/Form/SettingsFieldset.php:183
+#: src/Form/SettingsFieldset.php:196
 msgid "Disable creation of thumbnails"
 msgstr "Désactiver la création des vignettes"
 
-#: src/Form/SettingsFieldset.php:184
+#: src/Form/SettingsFieldset.php:197
 msgid ""
 "Skip creation of derivative images, for example to speed up imports. "
 "Recreate them later with the check and fix task."
@@ -4455,11 +4511,11 @@ msgstr ""
 "Ignorer la création des vignettes, par exemple pour accélérer les imports. À "
 "recréer par la suite avec la tâche de réparation."
 
-#: src/Form/SettingsFieldset.php:195
+#: src/Form/SettingsFieldset.php:208
 msgid "Default upload folder"
 msgstr "Dossier de téléversement par défaut"
 
-#: src/Form/SettingsFieldset.php:196
+#: src/Form/SettingsFieldset.php:209
 msgid ""
 "Default folder for file uploads. Must be inside /files but not in protected "
 "directories (original, asset, large, medium, square)."
@@ -4468,15 +4524,15 @@ msgstr ""
 "dans /files mais pas dans les répertoires protégés (original, asset, large, "
 "medium, square)."
 
-#: src/Form/SettingsFieldset.php:200
+#: src/Form/SettingsFieldset.php:213
 msgid "/var/www/html/files/upload"
 msgstr "var/www/html/files/upload"
 
-#: src/Form/SettingsFieldset.php:208
+#: src/Form/SettingsFieldset.php:221
 msgid "Additional folders"
 msgstr "Dossiers complémentaires"
 
-#: src/Form/SettingsFieldset.php:209
+#: src/Form/SettingsFieldset.php:222
 msgid ""
 "Additional folders available in the file manager. One path per line. "
 "Protected Omeka directories (original, asset, derivatives) are always "
@@ -4486,11 +4542,11 @@ msgstr ""
 "chemin par ligne. Les dossiers Omeka protégés (original, asset, dérivés) "
 "sont toujours disponibles pour la navigation, mais en lecture seule."
 
-#: src/Form/SettingsFieldset.php:221
+#: src/Form/SettingsFieldset.php:234
 msgid "Enable per-user directories"
 msgstr "Activer les répertoires par utilisateur"
 
-#: src/Form/SettingsFieldset.php:222
+#: src/Form/SettingsFieldset.php:235
 msgid ""
 "Each user who can create items gets a private directory for uploads and "
 "imports. Administrators can browse all user directories. Files are "
@@ -4502,19 +4558,19 @@ msgstr ""
 "accessibles pour l'importation via leur chemin d'accès au système de "
 "fichiers."
 
-#: src/Form/SettingsFieldset.php:233
+#: src/Form/SettingsFieldset.php:246
 msgid "Disable CSRF check for uploads"
 msgstr "Désactiver la vérification CSRF pour les téléchargements"
 
-#: src/Form/SettingsFieldset.php:234
+#: src/Form/SettingsFieldset.php:247
 msgid "May be required with some VPN/proxy configurations."
 msgstr "Cela peut être nécessaire avec certaines configurations VPN/proxy."
 
-#: src/Form/SettingsFieldset.php:245
+#: src/Form/SettingsFieldset.php:258
 msgid "Allow empty files"
 msgstr "Autoriser les fichiers vides"
 
-#: src/Form/SettingsFieldset.php:246
+#: src/Form/SettingsFieldset.php:259
 msgid ""
 "Allow uploading empty files. Requires disabling file validation or adding "
 "media type \"application/x-empty\" in main settings."
@@ -4523,13 +4579,13 @@ msgstr ""
 "désactiver la vérification des fichiers ou d’ajouter le type de média "
 "« application/x-empty » dans les paramètres généraux."
 
-#: src/Form/SettingsFieldset.php:257
+#: src/Form/SettingsFieldset.php:270
 msgid "Add an \"Apply\" button on the config form of each module"
 msgstr ""
 "Ajouter un bouton « Appliquer » sur le formulaire de configuration de chaque "
 "module"
 
-#: src/Form/SettingsFieldset.php:258
+#: src/Form/SettingsFieldset.php:271
 msgid ""
 "Save the settings and stay on the config form instead of returning to the "
 "module list."
@@ -4537,19 +4593,19 @@ msgstr ""
 "Enregistrer les paramètres et rester sur le formulaire de configuration au "
 "lieu de revenir à la liste des modules."
 
-#: src/Form/SettingsFieldset.php:270
+#: src/Form/SettingsFieldset.php:283
 msgid "Notify new versions for inactive modules"
 msgstr "Notifier des nouvelles versions des modules inactifs"
 
-#: src/Form/SettingsFieldset.php:281
+#: src/Form/SettingsFieldset.php:294
 msgid "Notify development versions of modules"
 msgstr "Notifier des versions de développement des modules"
 
-#: src/Form/SettingsFieldset.php:293
+#: src/Form/SettingsFieldset.php:306
 msgid "Base url of files (dev/test)"
 msgstr "Url de base des fichiers (dev/test)"
 
-#: src/Form/SettingsFieldset.php:294
+#: src/Form/SettingsFieldset.php:307
 msgid ""
 "Serve file from this base url (for example a production server). Useful to "
 "work on a copy of the database without the files."
@@ -4558,11 +4614,11 @@ msgstr ""
 "production). Utile pour travailler sur une copie de la base sans les "
 "fichiers."
 
-#: src/Form/SettingsFieldset.php:306
+#: src/Form/SettingsFieldset.php:319
 msgid "Fake images (dev/test)"
 msgstr "Images factices (dev/test)"
 
-#: src/Form/SettingsFieldset.php:307
+#: src/Form/SettingsFieldset.php:320
 msgid ""
 "Replace the images by fake ones, for example when the server of the files is "
 "protected. The other files keep their url."
@@ -4570,20 +4626,20 @@ msgstr ""
 "Remplacer les images par des images factices, par exemple quand le serveur "
 "des fichiers est protégé. Les autres fichiers conservent leur url."
 
-#: src/Form/SettingsFieldset.php:310
+#: src/Form/SettingsFieldset.php:323
 msgid "Grey placeholders, without any request"
 msgstr "Images grises de substitution, sans aucune requête"
 
-#: src/Form/SettingsFieldset.php:311
+#: src/Form/SettingsFieldset.php:324
 msgid "Images of Wikipedia (Wikimedia Commons) matching the keyword below"
 msgstr ""
 "Images de Wikipédia (Wikimedia Commons) correspondant au mot-clé ci-dessous"
 
-#: src/Form/SettingsFieldset.php:324
+#: src/Form/SettingsFieldset.php:337
 msgid "Keyword for the images of Wikipedia"
 msgstr "Mot-clé pour les images de Wikipédia"
 
-#: src/Form/SettingsFieldset.php:325
+#: src/Form/SettingsFieldset.php:338
 msgid ""
 "The search is limited to the \"Quality images\" of Wikimedia Commons, "
 "reviewed by the community. Prefer a neutral keyword, for example "
@@ -4597,11 +4653,11 @@ msgstr ""
 "une seule fois dans « files/fake/ » par une tâche de fond : les visiteurs "
 "n’interrogent donc pas les serveurs de Wikimedia."
 
-#: src/Form/SettingsFieldset.php:337
+#: src/Form/SettingsFieldset.php:350
 msgid "Emails of a test copy"
 msgstr "Mails pour une copie test"
 
-#: src/Form/SettingsFieldset.php:338
+#: src/Form/SettingsFieldset.php:351
 msgid ""
 "A copy of the database contains the real accounts and the real recipients of "
 "the notifications, so they may receive the emails of the tests (password, "
@@ -4613,11 +4669,11 @@ msgstr ""
 "tests (mot de passe, inscription, contact, contribution…). Tous les mails "
 "envoyés par Omeka sont pris en charge."
 
-#: src/Form/SettingsFieldset.php:340
+#: src/Form/SettingsFieldset.php:353
 msgid "Send normally"
 msgstr "Envoyer normalement"
 
-#: src/Form/SettingsFieldset.php:341
+#: src/Form/SettingsFieldset.php:354
 msgid ""
 "Redirect all emails to the address below, with the original recipients in "
 "the subject"
@@ -4625,30 +4681,30 @@ msgstr ""
 "Rediriger tous les mails vers l’adresse ci-dessous, avec les destinataires "
 "d’origine dans l’objet"
 
-#: src/Form/SettingsFieldset.php:342
+#: src/Form/SettingsFieldset.php:355
 msgid ""
 "Send only to the domains of the team below and skip the other recipients"
 msgstr ""
 "Envoyer uniquement aux domaines de l’équipe ci-dessous et ignorer les autres "
 "destinataires"
 
-#: src/Form/SettingsFieldset.php:343
+#: src/Form/SettingsFieldset.php:356
 msgid "Send nothing and write the emails in \"files/mailcapture/\""
 msgstr "Ne rien envoyer et écrire les mails dans « files/mailcapture/ »"
 
-#: src/Form/SettingsFieldset.php:356
+#: src/Form/SettingsFieldset.php:369
 msgid "Email to redirect all emails to"
 msgstr "Adresse vers laquelle rediriger tous les mails"
 
-#: src/Form/SettingsFieldset.php:357
+#: src/Form/SettingsFieldset.php:370
 msgid "Without address, the emails are captured."
 msgstr "Sans adresse, les mais sont capturés."
 
-#: src/Form/SettingsFieldset.php:368
+#: src/Form/SettingsFieldset.php:381
 msgid "Email domains of the team"
 msgstr "Domaines de messagerie de l’équipe"
 
-#: src/Form/SettingsFieldset.php:369
+#: src/Form/SettingsFieldset.php:382
 msgid ""
 "Domains separated by a space or a comma. Without domain, the one of the "
 "administrator email is used."
@@ -4656,11 +4712,11 @@ msgstr ""
 "Domaines séparés par une espace ou une virgule. Sans domaine, celui du mail "
 "de l’administrateur est utilisé."
 
-#: src/Form/SettingsFieldset.php:382
+#: src/Form/SettingsFieldset.php:395
 msgid "Display error on screen"
 msgstr "Afficher les erreurs sur l’écran"
 
-#: src/Form/SettingsFieldset.php:383
+#: src/Form/SettingsFieldset.php:396
 msgid ""
 "This option helps fix issues and should be unset in production. For "
 "development, use the key \"APPLICATION_ENV\" in file .htaccess."
@@ -4669,31 +4725,31 @@ msgstr ""
 "production. Pour le développement, utiliser la clé \"APPLICATION_ENV\" dans "
 "le fichier .htaccess."
 
-#: src/Form/SettingsFieldset.php:386
+#: src/Form/SettingsFieldset.php:399
 msgid "Admin only"
 msgstr "Admin seulement"
 
-#: src/Form/SettingsFieldset.php:387
+#: src/Form/SettingsFieldset.php:400
 msgid "All (short use only)"
 msgstr "Tout (utilisation temporaire uniquement)"
 
-#: src/Form/SettingsFieldset.php:401
+#: src/Form/SettingsFieldset.php:414
 msgid "Set Omeka under maintenance"
 msgstr "Placer Omeka en maintenance"
 
-#: src/Form/SettingsFieldset.php:407
+#: src/Form/SettingsFieldset.php:420
 msgid "Public front-end blocked for anonymous visitors"
 msgstr "Interface publique bloquée pour les visiteurs anonymes"
 
-#: src/Form/SettingsFieldset.php:408
+#: src/Form/SettingsFieldset.php:421
 msgid "Public front-end blocked for anybody except global admin"
 msgstr "Interface publique bloquée pour tous sauf l'administrateur global"
 
-#: src/Form/SettingsFieldset.php:409
+#: src/Form/SettingsFieldset.php:422
 msgid "Public front-end blocked for anybody"
 msgstr "Interface publique bloquée pour tous"
 
-#: src/Form/SettingsFieldset.php:410
+#: src/Form/SettingsFieldset.php:423
 msgid ""
 "Admin back-end blocked for anybody except global admin (public front-end "
 "remains open)"
@@ -4701,14 +4757,14 @@ msgstr ""
 "Interface d'administration bloquée pour tous sauf l'administrateur global "
 "(l'interface publique reste accessible)"
 
-#: src/Form/SettingsFieldset.php:411
+#: src/Form/SettingsFieldset.php:424
 msgid ""
 "Admin back-end and public front-end blocked for anybody except global admin"
 msgstr ""
 "Back-end d'administration et interface publique bloqués pour tout le monde "
 "sauf l'administrateur global"
 
-#: src/Form/SettingsFieldset.php:425
+#: src/Form/SettingsFieldset.php:438
 msgid "Text to display for maintenance"
 msgstr "Texte à afficher durant la maintenance"
 
@@ -4800,9 +4856,10 @@ msgstr ""
 #: src/Form/CheckAndFixForm.php:209 src/Form/CheckAndFixForm.php:217
 #: src/Form/CheckAndFixForm.php:232 src/Form/CheckAndFixForm.php:240
 #: src/Form/CheckAndFixForm.php:248 src/Form/CheckAndFixForm.php:257
-#: src/Form/CheckAndFixForm.php:283 src/Form/CheckAndFixForm.php:306
-#: src/Form/CheckAndFixForm.php:315 src/Form/CheckAndFixForm.php:323
-#: src/Form/CheckAndFixForm.php:346 src/Form/CheckAndFixForm.php:353
+#: src/Form/CheckAndFixForm.php:283 src/Form/CheckAndFixForm.php:305
+#: src/Form/CheckAndFixForm.php:314 src/Form/CheckAndFixForm.php:323
+#: src/Form/CheckAndFixForm.php:331 src/Form/CheckAndFixForm.php:354
+#: src/Form/CheckAndFixForm.php:361
 msgid "Check"
 msgstr "Vérification"
 
@@ -5051,37 +5108,51 @@ msgstr ""
 "Tables qu’aucun module actif ne référence, laissées par des modules "
 "désinstallés ou des fonctionnalités remplacées."
 
-#: src/Form/CheckAndFixForm.php:298 src/Form/CheckAndFixForm.php:330
+#: src/Form/CheckAndFixForm.php:298 src/Form/CheckAndFixForm.php:338
 msgid "List"
 msgstr "Liste"
 
+#: src/Form/CheckAndFixForm.php:302
+msgid "Database indexes"
+msgstr ""
+
 #: src/Form/CheckAndFixForm.php:303
+msgid ""
+"Indexes added by the module Common to speed up the queries, that may be "
+"missing when their creation failed on a big table."
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:306
+msgid "Add missing"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:311
 msgid "Theme templates (v4.1)"
 msgstr "Gabarits des thèmes (v4.1)"
 
-#: src/Form/CheckAndFixForm.php:304
+#: src/Form/CheckAndFixForm.php:312
 msgid "Templates to migrate in themes for Omeka S v4.1 (backup themes first)."
 msgstr ""
 "Migrer les gabarits dans les thèmes pour Omeka S v4.1 (sauvegarder les "
 "thèmes d’abord)"
 
-#: src/Form/CheckAndFixForm.php:307
+#: src/Form/CheckAndFixForm.php:315
 msgid "Migrate"
 msgstr "Migrer"
 
-#: src/Form/CheckAndFixForm.php:312
+#: src/Form/CheckAndFixForm.php:320
 msgid "Caches"
 msgstr "Caches"
 
-#: src/Form/CheckAndFixForm.php:313
+#: src/Form/CheckAndFixForm.php:321
 msgid "Application caches."
 msgstr "Caches de l’application."
 
-#: src/Form/CheckAndFixForm.php:320
+#: src/Form/CheckAndFixForm.php:328
 msgid "Installation"
 msgstr "Installation"
 
-#: src/Form/CheckAndFixForm.php:321
+#: src/Form/CheckAndFixForm.php:329
 msgid ""
 "Check the consistency of the installation, the http client, the proxy and "
 "the access to the web."
@@ -5089,11 +5160,11 @@ msgstr ""
 "Vérifiez la cohérence de l’installation, le client http, le proxy et les "
 "accès au web."
 
-#: src/Form/CheckAndFixForm.php:327
+#: src/Form/CheckAndFixForm.php:335
 msgid "Environment settings"
 msgstr "Réglages liés au serveur"
 
-#: src/Form/CheckAndFixForm.php:328
+#: src/Form/CheckAndFixForm.php:336
 msgid ""
 "Settings depending on the server to review after a copy of the database "
 "(title, urls, paths, hosts, emails, api keys…), optionally adapted for a "
@@ -5103,11 +5174,11 @@ msgstr ""
 "urls, chemins, hôtes, mails, clés api…), éventuellement adaptés pour une "
 "copie de test ou de production."
 
-#: src/Form/CheckAndFixForm.php:335 src/Form/CheckAndFixForm.php:1742
+#: src/Form/CheckAndFixForm.php:343 src/Form/CheckAndFixForm.php:1754
 msgid "Security and privacy"
 msgstr "Sécurité et confidentialité"
 
-#: src/Form/CheckAndFixForm.php:336
+#: src/Form/CheckAndFixForm.php:344
 msgid ""
 "Audit file protection, user data leaks, private data leaks and dangerous "
 "settings."
@@ -5115,23 +5186,23 @@ msgstr ""
 "Auditer la protection des fichiers, les fuites de données utilisateurs, les "
 "fuites de données privées et les réglages dangereux."
 
-#: src/Form/CheckAndFixForm.php:338
+#: src/Form/CheckAndFixForm.php:346
 msgid "Audit"
 msgstr "Auditer"
 
-#: src/Form/CheckAndFixForm.php:339
+#: src/Form/CheckAndFixForm.php:347
 msgid "Protect directories"
 msgstr "Protéger les dossiers"
 
-#: src/Form/CheckAndFixForm.php:344
+#: src/Form/CheckAndFixForm.php:352
 msgid "Email configuration; sends a test email."
 msgstr "Configuration de la messagerie ; envoyer un mail de test."
 
-#: src/Form/CheckAndFixForm.php:350
+#: src/Form/CheckAndFixForm.php:358
 msgid "Background jobs (PHP-CLI)"
 msgstr "Tâches en arrière-plan (PHP-CLI)"
 
-#: src/Form/CheckAndFixForm.php:351
+#: src/Form/CheckAndFixForm.php:359
 msgid ""
 "Check the PHP-CLI path, its version alignment with the web server and the "
 "required extensions."
@@ -5139,11 +5210,11 @@ msgstr ""
 "Vérifier le chemin du PHP-CLI, son alignement de version avec le serveur web "
 "et les extensions requises."
 
-#: src/Form/CheckAndFixForm.php:354
+#: src/Form/CheckAndFixForm.php:362
 msgid "Test job"
 msgstr "Tâche de test"
 
-#: src/Form/CheckAndFixForm.php:609
+#: src/Form/CheckAndFixForm.php:617
 msgid ""
 "List files that are present in \"/files/\", but not in database (originals "
 "only)"
@@ -5151,7 +5222,7 @@ msgstr ""
 "Lister les fichiers présents dans \"/files/\" mais pas dans la base de "
 "données (originaux seuls)"
 
-#: src/Form/CheckAndFixForm.php:610
+#: src/Form/CheckAndFixForm.php:618
 msgid ""
 "List files that are present in \"/files/\", but not in database (include "
 "derivatives)"
@@ -5159,7 +5230,7 @@ msgstr ""
 "Lister les fichiers présents dans \"/files/\" mais pas dans la base de "
 "données (inclure les dérivés)"
 
-#: src/Form/CheckAndFixForm.php:611
+#: src/Form/CheckAndFixForm.php:619
 msgid ""
 "Move files that are present in \"/files/\", but not in database, into \"/"
 "files/check/\""
@@ -5167,14 +5238,14 @@ msgstr ""
 "Déplacer les fichiers présents dans \"/files/\" mais pas dans la base de "
 "données, vers \"/files/check/\""
 
-#: src/Form/CheckAndFixForm.php:612
+#: src/Form/CheckAndFixForm.php:620
 msgid ""
 "List files that are present in database, not in \"/files/\" (original only)"
 msgstr ""
 "Lister les fichiers présents dans la base de données mais pas dans \"/files/"
 "\" (originaux seuls)"
 
-#: src/Form/CheckAndFixForm.php:613
+#: src/Form/CheckAndFixForm.php:621
 msgid ""
 "List files that are present in database, not in \"/files/\" (include "
 "derivatives)"
@@ -5182,7 +5253,7 @@ msgstr ""
 "Lister les fichiers présents dans la base de données mais pas dans \"/files/"
 "\" (fichiers dérivés inclus)"
 
-#: src/Form/CheckAndFixForm.php:614
+#: src/Form/CheckAndFixForm.php:622
 msgid ""
 "Copy missing original files from the source directory below (recover a "
 "disaster)"
@@ -5190,7 +5261,7 @@ msgstr ""
 "Copier les fichiers manquants à partir du dossier source ci-dessous "
 "(récupération après désastre)"
 
-#: src/Form/CheckAndFixForm.php:615
+#: src/Form/CheckAndFixForm.php:623
 msgid ""
 "Delete items with one file that is missing and missing medias (WARNING: "
 "export your items first)"
@@ -5198,28 +5269,28 @@ msgstr ""
 "Supprimer les contenus qui ont un seul fichier et qui manque (ATTENTION : "
 "exportez vos contenus d’abord)"
 
-#: src/Form/CheckAndFixForm.php:616
+#: src/Form/CheckAndFixForm.php:624
 msgid ""
 "Delete empty directories in \"/files/\" (mainly for module Archive Repertory)"
 msgstr ""
 "Supprimer les dossiers vides dans \"/files\" (principalement pour le module "
 "Archive Repertory)"
 
-#: src/Form/CheckAndFixForm.php:617
+#: src/Form/CheckAndFixForm.php:625
 msgid "Rebuild derivative images (thumbnails)"
 msgstr "Reconstruire les fichiers dérivés (vignettes)"
 
-#: src/Form/CheckAndFixForm.php:618
+#: src/Form/CheckAndFixForm.php:626
 msgid "Quick rebuild all derivative images (from terminal, 10x times faster)"
 msgstr ""
 "Reconstruire les fichiers dérivés (vignettes) rapidement (depuis le "
 "terminal, 10x plus rapide)"
 
-#: src/Form/CheckAndFixForm.php:643
+#: src/Form/CheckAndFixForm.php:651
 msgid "Resources to process"
 msgstr "Ressources à traiter"
 
-#: src/Form/CheckAndFixForm.php:644
+#: src/Form/CheckAndFixForm.php:652
 msgid ""
 "Most file tasks apply to medias and, when the module is present, to digital "
 "objects."
@@ -5227,71 +5298,71 @@ msgstr ""
 "La plupart des tâches de fichiers s'appliquent aux médias et, lorsque le "
 "module est présent, aux objets numériques."
 
-#: src/Form/CheckAndFixForm.php:647 src/Form/CheckAndFixForm.php:1068
+#: src/Form/CheckAndFixForm.php:655 src/Form/CheckAndFixForm.php:1076
 msgid "Digital objects"
 msgstr "Objets numériques"
 
-#: src/Form/CheckAndFixForm.php:664
+#: src/Form/CheckAndFixForm.php:672
 msgid "Options for excess files"
 msgstr "Options pour les fichiers en trop"
 
-#: src/Form/CheckAndFixForm.php:675
+#: src/Form/CheckAndFixForm.php:683
 msgid "Compute the SHA-256 of each file (to find duplicates)"
 msgstr "Calculer le SHA-256 de chaque fichier (pour détecter les doublons)"
 
-#: src/Form/CheckAndFixForm.php:687
+#: src/Form/CheckAndFixForm.php:695
 msgid "Options for fix missing files"
 msgstr "Options pour réparer les fichiers manquants"
 
-#: src/Form/CheckAndFixForm.php:698
+#: src/Form/CheckAndFixForm.php:706
 msgid "Source for restoration"
 msgstr "Source pour la restauration"
 
-#: src/Form/CheckAndFixForm.php:702
+#: src/Form/CheckAndFixForm.php:710
 msgid "/server/path/to/my/source/directory"
 msgstr "/serveur/chemin/vers/mon/dossier/source"
 
-#: src/Form/CheckAndFixForm.php:709
+#: src/Form/CheckAndFixForm.php:717
 msgid "Limit to extensions"
 msgstr "Limiter aux extensions"
 
-#: src/Form/CheckAndFixForm.php:714
+#: src/Form/CheckAndFixForm.php:722
 msgid "pdf, jpeg"
 msgstr "pdf, jpeg"
 
-#: src/Form/CheckAndFixForm.php:721
+#: src/Form/CheckAndFixForm.php:729
 msgid "Exclude extensions"
 msgstr "Exclure les extensions"
 
-#: src/Form/CheckAndFixForm.php:730
+#: src/Form/CheckAndFixForm.php:738
 msgid "DS_Store, db"
 msgstr "DS_Store, db"
 
-#: src/Form/CheckAndFixForm.php:737
+#: src/Form/CheckAndFixForm.php:745
 msgid "Exclude source files ending with strings"
 msgstr "Exclure les fichiers source se terminant par les chaînes"
 
-#: src/Form/CheckAndFixForm.php:742
+#: src/Form/CheckAndFixForm.php:750
 msgid "_low, _medium"
 msgstr "_low, _medium"
 
-#: src/Form/CheckAndFixForm.php:749
+#: src/Form/CheckAndFixForm.php:757
 msgid "Matching mode"
 msgstr "Mode de traitement"
 
-#: src/Form/CheckAndFixForm.php:751
+#: src/Form/CheckAndFixForm.php:759
 msgid "Hash sha256 (recommended)"
 msgstr "Code de contrôle sha256 (recommandé)"
 
-#: src/Form/CheckAndFixForm.php:752
+#: src/Form/CheckAndFixForm.php:760
 msgid "Source file path"
 msgstr "Chemin du fichier source"
 
-#: src/Form/CheckAndFixForm.php:753
+#: src/Form/CheckAndFixForm.php:761
 msgid "Source file name (warning: they should be unique)"
 msgstr "Nom du fichier source (attention : ils doivent être uniques)"
 
-#: src/Form/CheckAndFixForm.php:754
+#: src/Form/CheckAndFixForm.php:762
 msgid ""
 "Hash md5 (when stored as sha256; the real sha256 must be set next with "
 "another task)"
@@ -5299,11 +5370,11 @@ msgstr ""
 "Code de contrôle md5 (si enregistré comme sha256 ; le vrai sha256 doit être "
 "défini ensuite par une autre tâche)"
 
-#: src/Form/CheckAndFixForm.php:765 src/Form/CheckAndFixForm.php:1246
+#: src/Form/CheckAndFixForm.php:773 src/Form/CheckAndFixForm.php:1254
 msgid "Report type"
 msgstr "Type de rapport"
 
-#: src/Form/CheckAndFixForm.php:766
+#: src/Form/CheckAndFixForm.php:774
 msgid ""
 "Full report: all files are listed (slower). Partial report: only missing and "
 "restored files are listed (faster, recommended for large collections)."
@@ -5312,72 +5383,72 @@ msgstr ""
 "partiel : seuls les fichiers manquants et restaurés sont répertoriés (plus "
 "rapide, recommandé pour les collections volumineuses)."
 
-#: src/Form/CheckAndFixForm.php:768
+#: src/Form/CheckAndFixForm.php:776
 msgid "Partial: only missing/restored files (faster)"
 msgstr "Partiel : uniquement les fichiers manquants/restaurés (plus rapide)"
 
-#: src/Form/CheckAndFixForm.php:769
+#: src/Form/CheckAndFixForm.php:777
 msgid "Full: all files including existing ones (slower)"
 msgstr ""
 "Complet : tous les fichiers, y compris ceux qui existent déjà (plus lent)"
 
-#: src/Form/CheckAndFixForm.php:784
+#: src/Form/CheckAndFixForm.php:792
 msgid "Options to rebuild derivative files (thumbnails)"
 msgstr "Options pour reconstruire les fichiers dérivés (vignettes)"
 
-#: src/Form/CheckAndFixForm.php:802
+#: src/Form/CheckAndFixForm.php:810
 msgid "Select one or more item sets…"
 msgstr "Choisir une ou plusieurs collections…"
 
-#: src/Form/CheckAndFixForm.php:809
+#: src/Form/CheckAndFixForm.php:817
 msgid "Ingesters to process"
 msgstr "Ingéreurs à traiter"
 
-#: src/Form/CheckAndFixForm.php:810
+#: src/Form/CheckAndFixForm.php:818
 msgid "All ingesters"
 msgstr "Tous les ingéreurs"
 
-#: src/Form/CheckAndFixForm.php:824
+#: src/Form/CheckAndFixForm.php:832
 msgid "Renderers to process"
 msgstr "Gestionnaire de rendu à traiter"
 
-#: src/Form/CheckAndFixForm.php:825
+#: src/Form/CheckAndFixForm.php:833
 msgid "All renderers"
 msgstr "Tous les gestionnaires de rendu"
 
-#: src/Form/CheckAndFixForm.php:839
+#: src/Form/CheckAndFixForm.php:847
 msgid "Media types to process"
 msgstr "Types de média à traiter"
 
-#: src/Form/CheckAndFixForm.php:840
+#: src/Form/CheckAndFixForm.php:848
 msgid "All media types"
 msgstr "Tous les types de média"
 
-#: src/Form/CheckAndFixForm.php:854
+#: src/Form/CheckAndFixForm.php:862
 msgid "Media ids"
 msgstr "Id médias"
 
-#: src/Form/CheckAndFixForm.php:865 src/Form/CheckAndFixForm.php:941
+#: src/Form/CheckAndFixForm.php:873 src/Form/CheckAndFixForm.php:949
 msgid "Thumbnails to create"
 msgstr "Vignettes à créer"
 
-#: src/Form/CheckAndFixForm.php:867 src/Form/CheckAndFixForm.php:943
+#: src/Form/CheckAndFixForm.php:875 src/Form/CheckAndFixForm.php:951
 msgid "Only missing thumbnails"
 msgstr "Seulement les vignettes manquantes"
 
-#: src/Form/CheckAndFixForm.php:868 src/Form/CheckAndFixForm.php:944
+#: src/Form/CheckAndFixForm.php:876 src/Form/CheckAndFixForm.php:952
 msgid "All thumbnails"
 msgstr "Toutes les vignettes"
 
-#: src/Form/CheckAndFixForm.php:880
+#: src/Form/CheckAndFixForm.php:888
 msgid "Only originals marked without thumbnails in database"
 msgstr "Seulement les originaux marqués sans vignette dans la base"
 
-#: src/Form/CheckAndFixForm.php:890
+#: src/Form/CheckAndFixForm.php:898
 msgid "Types of media to rebuild"
 msgstr "Types de supports à reconstruire"
 
-#: src/Form/CheckAndFixForm.php:891
+#: src/Form/CheckAndFixForm.php:899
 msgid ""
 "Uncheck \"Local originals\" to rebuild only remote sources. Local originals "
 "covers any media with a stored original file (file, upload, url, bulkimport, "
@@ -5390,41 +5461,41 @@ msgstr ""
 "masse, etc.). Les vignettes distantes sont récupérées à partir de la source "
 "pour chaque ingéreur sélectionné."
 
-#: src/Form/CheckAndFixForm.php:893
+#: src/Form/CheckAndFixForm.php:901
 msgid "Local originals (any ingester)"
 msgstr "Originaux locaux (tout ingéreur)"
 
-#: src/Form/CheckAndFixForm.php:894
+#: src/Form/CheckAndFixForm.php:902
 msgid "IIIF Image"
 msgstr "Image IIIF"
 
-#: src/Form/CheckAndFixForm.php:895
+#: src/Form/CheckAndFixForm.php:903
 msgid "IIIF Presentation"
 msgstr "Présentation IIIF"
 
-#: src/Form/CheckAndFixForm.php:897
+#: src/Form/CheckAndFixForm.php:905
 msgid "URL (refetch from source)"
 msgstr "URL (récupération à partir de la source)"
 
-#: src/Form/CheckAndFixForm.php:913
+#: src/Form/CheckAndFixForm.php:921
 msgid "Options to rebuild derivative files via file system"
 msgstr ""
 "Options pour reconstruire les fichiers dérivés (vignettes) via le système de "
 "fichier"
 
-#: src/Form/CheckAndFixForm.php:919
+#: src/Form/CheckAndFixForm.php:927
 msgid "files_derivative_file_system"
 msgstr "files_derivative_file_system"
 
-#: src/Form/CheckAndFixForm.php:964
+#: src/Form/CheckAndFixForm.php:972
 msgid "Files and database"
 msgstr "Fichiers et base de données"
 
-#: src/Form/CheckAndFixForm.php:984
+#: src/Form/CheckAndFixForm.php:992
 msgid "Check media rendered as \"file\", but without original"
 msgstr "Vérifier les médias rendus en tant que \"fichier\", mais sans original"
 
-#: src/Form/CheckAndFixForm.php:985
+#: src/Form/CheckAndFixForm.php:993
 msgid ""
 "Delete media rendered as \"file\", but without original (WARNING: export "
 "your media first)"
@@ -5432,7 +5503,7 @@ msgstr ""
 "Supprimer les médias rendus en tant que \"fichier\", mais sans original "
 "(ATTENTION : exportez vos médias d’abord)"
 
-#: src/Form/CheckAndFixForm.php:986
+#: src/Form/CheckAndFixForm.php:994
 msgid ""
 "Check missing file sizes in database (not managed during upgrade to Omeka "
 "1.2.0)"
@@ -5440,83 +5511,83 @@ msgstr ""
 "Vérifier les tailles de fichiers manquantes dans la base de données (non "
 "gérées lors de la mise à niveau vers Omeka 1.2.0)"
 
-#: src/Form/CheckAndFixForm.php:987
+#: src/Form/CheckAndFixForm.php:995
 msgid "Fix all file sizes in database (for example after hard import)"
 msgstr ""
 "Réparer toutes les tailles de fichier dans la base de données (par exemple "
 "après un import direct)"
 
-#: src/Form/CheckAndFixForm.php:988
+#: src/Form/CheckAndFixForm.php:996
 msgid "Check sha256 hashes of files"
 msgstr "Vérifier les sommes de contrôles sha256 des fichiers"
 
-#: src/Form/CheckAndFixForm.php:989
+#: src/Form/CheckAndFixForm.php:997
 msgid "Fix wrong sha256 of files"
 msgstr "Réparer les sommes de contrôle sha256 incorrectes des fichiers"
 
-#: src/Form/CheckAndFixForm.php:990
+#: src/Form/CheckAndFixForm.php:998
 msgid "Check hashes of storage names of files"
 msgstr "Vérifier les noms de stockage des fichiers"
 
-#: src/Form/CheckAndFixForm.php:991
+#: src/Form/CheckAndFixForm.php:999
 msgid "Re-hash storage names of files"
 msgstr "Randomiser les noms de stockage des fichiers"
 
-#: src/Form/CheckAndFixForm.php:992
+#: src/Form/CheckAndFixForm.php:1000
 msgid "Check use of precise media type of files, mainly for xml"
 msgstr ""
 "Vérifier les média-types précis des fichiers, principalement pour le xml"
 
-#: src/Form/CheckAndFixForm.php:993
+#: src/Form/CheckAndFixForm.php:1001
 msgid "Fill precise media type of files"
 msgstr "Définir les média-types précis des fichiers"
 
-#: src/Form/CheckAndFixForm.php:994
+#: src/Form/CheckAndFixForm.php:1002
 msgid "Check files dimensions (modules IIIF Server / Image Server)"
 msgstr "Vérifier les dimensions (modules IIIF Server / Image Server)"
 
-#: src/Form/CheckAndFixForm.php:995
+#: src/Form/CheckAndFixForm.php:1003
 msgid "Fix files dimensions (modules IIIF Server / Image Server)"
 msgstr "Corriger les dimensions (modules IIIF Server / Image Server)"
 
-#: src/Form/CheckAndFixForm.php:996
+#: src/Form/CheckAndFixForm.php:1004
 msgid "Check positions of media (start from 1, without missing number)"
 msgstr ""
 "Vérifier les positions des médias (commencer à un, sans omettre de nombre)"
 
-#: src/Form/CheckAndFixForm.php:997
+#: src/Form/CheckAndFixForm.php:1005
 msgid "Fix wrong positions of media"
 msgstr "Réparer les positions incorrectes des médias"
 
-#: src/Form/CheckAndFixForm.php:1017
+#: src/Form/CheckAndFixForm.php:1025
 msgid "Resources and values"
 msgstr "Ressources et valeurs"
 
-#: src/Form/CheckAndFixForm.php:1038
+#: src/Form/CheckAndFixForm.php:1046
 msgid "Save all resources, for example to apply new settings via triggers"
 msgstr ""
 "Enregistrer toutes les ressources, par exemple pour appliquer les nouveaux "
 "paramètres via des déclencheurs"
 
-#: src/Form/CheckAndFixForm.php:1039
+#: src/Form/CheckAndFixForm.php:1047
 msgid "Check if all resource have valid types. (Item, ItemSet, etc)"
 msgstr ""
 "Vérifier si les ressources ont un type correct (contenus, collection, etc)."
 
-#: src/Form/CheckAndFixForm.php:1040
+#: src/Form/CheckAndFixForm.php:1048
 msgid "Fix all resource with invalid types."
 msgstr "Corriger toutes les ressources avec des types incorrects."
 
-#: src/Form/CheckAndFixForm.php:1041
+#: src/Form/CheckAndFixForm.php:1049
 msgid "Check if all resources are specified as items, medias, etc."
 msgstr ""
 "Vérifier si les ressources sont spécifiés en tant que contenu, média, etc."
 
-#: src/Form/CheckAndFixForm.php:1042
+#: src/Form/CheckAndFixForm.php:1050
 msgid "Delete all resources that are not specified"
 msgstr "Supprimer toutes les ressources non spécifiées"
 
-#: src/Form/CheckAndFixForm.php:1043
+#: src/Form/CheckAndFixForm.php:1051
 msgid ""
 "Check rows in sub-tables (item, media, item_set, value_annotation, "
 "annotation, digital_object) without a matching resource"
@@ -5524,89 +5595,89 @@ msgstr ""
 "Vérifier les lignes des sous-tables (item, media, item_set, "
 "value_annotation, annotation, digital_object) sans ressource correspondante"
 
-#: src/Form/CheckAndFixForm.php:1044
+#: src/Form/CheckAndFixForm.php:1052
 msgid "Delete orphan rows in sub-tables without a matching resource"
 msgstr ""
 "Supprimer les lignes orphelines des sous-tables qui ne correspondent à "
 "aucune ressource"
 
-#: src/Form/CheckAndFixForm.php:1045
+#: src/Form/CheckAndFixForm.php:1053
 msgid "Check items without value (media values are not checked)"
 msgstr ""
 "Vérifier les contenus sans valeurs (les valeurs des médias ne sont pas "
 "prises en compte)"
 
-#: src/Form/CheckAndFixForm.php:1046
+#: src/Form/CheckAndFixForm.php:1054
 msgid "Delete items without value (files are moved into \"/files/check/\")"
 msgstr ""
 "Supprimer les contenus sans valeurs (les fichiers sont déplacés vers \"/"
 "files/check/\")"
 
-#: src/Form/CheckAndFixForm.php:1047
+#: src/Form/CheckAndFixForm.php:1055
 msgid ""
 "Check if all values are utf-8 encoded (Windows issues like \"Ã©\" for \"é\")"
 msgstr ""
 "Vérifier si toutes les valeurs sont encodées en utf-8 (problèmes Windows "
 "tels que « Ã© » pour « é »)"
 
-#: src/Form/CheckAndFixForm.php:1048
+#: src/Form/CheckAndFixForm.php:1056
 msgid "Fix utf-8 encoding issues"
 msgstr "Corriger les problèmes d’encodage utf-8"
 
-#: src/Form/CheckAndFixForm.php:1049
+#: src/Form/CheckAndFixForm.php:1057
 msgid "Clean and deduplicate values"
 msgstr "Nettoyer et dédoublonner les valeurs"
 
-#: src/Form/CheckAndFixForm.php:1050
+#: src/Form/CheckAndFixForm.php:1058
 msgid "Check resource titles, for example after hard import"
 msgstr "Vérifier les titres des ressources, par exemple après un import direct"
 
-#: src/Form/CheckAndFixForm.php:1051
+#: src/Form/CheckAndFixForm.php:1059
 msgid "Update resource titles"
 msgstr "Mettre à jour le titre des ressources"
 
-#: src/Form/CheckAndFixForm.php:1052
+#: src/Form/CheckAndFixForm.php:1060
 msgid "Check if the primary medias are set"
 msgstr "Vérifier si le média principal de chaque contenu est défini"
 
-#: src/Form/CheckAndFixForm.php:1053
+#: src/Form/CheckAndFixForm.php:1061
 msgid "Set the primary medias to all items"
 msgstr "Définir le média principal pour tous les contenus"
 
-#: src/Form/CheckAndFixForm.php:1056
+#: src/Form/CheckAndFixForm.php:1064
 msgid ""
 "Check templates for value annotations (module Advanced Resource Template)"
 msgstr ""
 "Vérifier les modèles des annotations de valeur (module Advanced Resource "
 "Template)"
 
-#: src/Form/CheckAndFixForm.php:1057
+#: src/Form/CheckAndFixForm.php:1065
 msgid "Fix templates for value annotations (module Advanced Resource Template)"
 msgstr ""
 "Corriger les modèles pour les annotations de valeur (module Advanced "
 "Resource Template)"
 
-#: src/Form/CheckAndFixForm.php:1064
+#: src/Form/CheckAndFixForm.php:1072
 msgid "Medias"
 msgstr "Médias"
 
-#: src/Form/CheckAndFixForm.php:1067
+#: src/Form/CheckAndFixForm.php:1075
 msgid "Concepts"
 msgstr "Concepts"
 
-#: src/Form/CheckAndFixForm.php:1102
+#: src/Form/CheckAndFixForm.php:1110
 msgid "Options to loop resources"
 msgstr "Options pour la boucle sur les ressources"
 
-#: src/Form/CheckAndFixForm.php:1113 src/Form/CheckAndFixForm.php:1208
+#: src/Form/CheckAndFixForm.php:1121 src/Form/CheckAndFixForm.php:1216
 msgid "Type of resources to process"
 msgstr "Types de ressources à traiter"
 
-#: src/Form/CheckAndFixForm.php:1126 src/Form/CheckAndFixForm.php:1221
+#: src/Form/CheckAndFixForm.php:1134 src/Form/CheckAndFixForm.php:1229
 msgid "Query to limit resources to process"
 msgstr "Requête pour limiter les ressources à traiter"
 
-#: src/Form/CheckAndFixForm.php:1127 src/Form/CheckAndFixForm.php:1222
+#: src/Form/CheckAndFixForm.php:1135 src/Form/CheckAndFixForm.php:1230
 msgid ""
 "The query is scoped to the selected resource type. With \"All\", it is "
 "applied identically to every type and unsupported filters are ignored."
@@ -5615,67 +5686,67 @@ msgstr ""
 "l’option « Tout », elle s'applique pareil à tous les types et les filtres "
 "incorrects sont ignorés."
 
-#: src/Form/CheckAndFixForm.php:1140
+#: src/Form/CheckAndFixForm.php:1148
 msgid "Records to process (experimental: back up before fixing)"
 msgstr "Notices à traiter (expérimental : sauvegarder avant correction)"
 
-#: src/Form/CheckAndFixForm.php:1151
+#: src/Form/CheckAndFixForm.php:1159
 msgid "Types of resources to process"
 msgstr "Types de ressources à traiter"
 
-#: src/Form/CheckAndFixForm.php:1154
+#: src/Form/CheckAndFixForm.php:1162
 msgid "Resources titles"
 msgstr "Titre des ressources"
 
-#: src/Form/CheckAndFixForm.php:1155
+#: src/Form/CheckAndFixForm.php:1163
 msgid "Resources values"
 msgstr "Valeurs des ressources"
 
-#: src/Form/CheckAndFixForm.php:1156
+#: src/Form/CheckAndFixForm.php:1164
 msgid "Site title"
 msgstr "Titre du site"
 
-#: src/Form/CheckAndFixForm.php:1157
+#: src/Form/CheckAndFixForm.php:1165
 msgid "Site summary"
 msgstr "Sommaire des sites"
 
-#: src/Form/CheckAndFixForm.php:1158
+#: src/Form/CheckAndFixForm.php:1166
 msgid "Pages titles"
 msgstr "Titres des pages"
 
-#: src/Form/CheckAndFixForm.php:1159
+#: src/Form/CheckAndFixForm.php:1167
 msgid "Pages blocks"
 msgstr "Blocs des pages"
 
-#: src/Form/CheckAndFixForm.php:1173
+#: src/Form/CheckAndFixForm.php:1181
 msgid "Options to clean and deduplicate"
 msgstr "Options pour nettoyer et dédoublonner"
 
-#: src/Form/CheckAndFixForm.php:1184
+#: src/Form/CheckAndFixForm.php:1192
 msgid "Actions to process"
 msgstr "Actions à réaliser"
 
-#: src/Form/CheckAndFixForm.php:1186
+#: src/Form/CheckAndFixForm.php:1194
 msgid "Trim property values"
 msgstr "Nettoyer les espaces dans les valeurs"
 
-#: src/Form/CheckAndFixForm.php:1188
+#: src/Form/CheckAndFixForm.php:1196
 msgid "Set null for empty values or uris"
 msgstr "Mettre la valeur nulle pour les valeurs et les uris vides"
 
-#: src/Form/CheckAndFixForm.php:1189
+#: src/Form/CheckAndFixForm.php:1197
 msgid "Set null when language is empty"
 msgstr "Mettre la valeur nulle quand la langue est vide"
 
-#: src/Form/CheckAndFixForm.php:1190
+#: src/Form/CheckAndFixForm.php:1198
 msgid "Deduplicate property values case insensitively"
 msgstr "Dédoublonner les valeurs des propriétés sans tenir compte de la casse"
 
-#: src/Form/CheckAndFixForm.php:1235
+#: src/Form/CheckAndFixForm.php:1243
 msgid "Options for resource titles"
 msgstr "Mettre à jour le titre des ressources"
 
-#: src/Form/CheckAndFixForm.php:1247
+#: src/Form/CheckAndFixForm.php:1255
 msgid ""
 "Full report: all resources are listed (slower). Partial report: only "
 "resources with different titles are listed (faster, recommended for large "
@@ -5685,19 +5756,19 @@ msgstr ""
 "Rapport partiel : seules les ressources dont les titres diffèrent sont "
 "répertoriées (plus rapide, recommandé pour les grandes collections)."
 
-#: src/Form/CheckAndFixForm.php:1249
+#: src/Form/CheckAndFixForm.php:1257
 msgid "Partial: only different titles (faster)"
 msgstr "Partiel : uniquement les titres différents (plus rapide)"
 
-#: src/Form/CheckAndFixForm.php:1250
+#: src/Form/CheckAndFixForm.php:1258
 msgid "Full: all resources (slower)"
 msgstr "Complet : toutes les ressources (plus lent)"
 
-#: src/Form/CheckAndFixForm.php:1262
+#: src/Form/CheckAndFixForm.php:1270
 msgid "Update mode (fix only)"
 msgstr "Mode mise à jour (correction uniquement)"
 
-#: src/Form/CheckAndFixForm.php:1263
+#: src/Form/CheckAndFixForm.php:1271
 msgid ""
 "Direct mode: fast update via database, but does not trigger Omeka events "
 "(modules like AdvancedResourceTemplate will not update titles). API mode: "
@@ -5708,21 +5779,21 @@ msgstr ""
 "mettront pas à jour les titres). Mode API : plus lent, mais déclenche tous "
 "les événements et modules, garantissant ainsi une cohérence totale."
 
-#: src/Form/CheckAndFixForm.php:1265
+#: src/Form/CheckAndFixForm.php:1273
 msgid "Direct (fast, no events)"
 msgstr "Direct (rapide, pas d'événements)"
 
-#: src/Form/CheckAndFixForm.php:1266
+#: src/Form/CheckAndFixForm.php:1274
 msgid "API (slower, triggers all events and modules)"
 msgstr "API (plus lent, déclenche tous les événements et modules)"
 
-#: src/Form/CheckAndFixForm.php:1306
+#: src/Form/CheckAndFixForm.php:1314
 msgid "Check dead jobs (living in database, but non-existent in system)"
 msgstr ""
 "Vérifier les tâches abandonnées (existe dans la base de données, mais pas "
 "dans le système)"
 
-#: src/Form/CheckAndFixForm.php:1307
+#: src/Form/CheckAndFixForm.php:1315
 msgid ""
 "Set status \"stopped\" for jobs that never started, and \"error\" for the "
 "jobs that never ended"
@@ -5730,46 +5801,46 @@ msgstr ""
 "Indiquer le statut \"arrêté\" pour les tâches qui n’ont jamais commencé et "
 "\"erreur\" pour les tâches qui n’ont jamais terminé"
 
-#: src/Form/CheckAndFixForm.php:1308
+#: src/Form/CheckAndFixForm.php:1316
 msgid ""
 "Fix status as above for all jobs (when check cannot be done after a reboot)"
 msgstr ""
 "Réparer les statuts comme ci-dessus pour toutes les tâches (quand la "
 "vérification ne peut pas être réalisée après un redémarrage)"
 
-#: src/Form/CheckAndFixForm.php:1309
+#: src/Form/CheckAndFixForm.php:1317
 msgid "Check the size of the table of sessions in database"
 msgstr "Vérifier la taille de la table des sessions dans la base de données"
 
-#: src/Form/CheckAndFixForm.php:1310
+#: src/Form/CheckAndFixForm.php:1318
 msgid "Delete old sessions"
 msgstr "Effacer les anciennes sessions"
 
-#: src/Form/CheckAndFixForm.php:1311
+#: src/Form/CheckAndFixForm.php:1319
 msgid "Delete all sessions (when table is too big)"
 msgstr "Supprimer toutes les sessions (quand la table est trop grande)"
 
-#: src/Form/CheckAndFixForm.php:1312
+#: src/Form/CheckAndFixForm.php:1320
 msgid "Check the size of the table of logs in database (module Log)"
 msgstr ""
 "Vérifier la taille de la table des journaux dans la base de données (module "
 "Log)"
 
-#: src/Form/CheckAndFixForm.php:1313
+#: src/Form/CheckAndFixForm.php:1321
 msgid "Delete old logs"
 msgstr "Supprimer les anciens journaux"
 
-#: src/Form/CheckAndFixForm.php:1314
+#: src/Form/CheckAndFixForm.php:1322
 msgid "Check if all custom vocabs with item sets have an existing item set"
 msgstr ""
 "Vérifier si tous les vocabulaires personnalisés avec des collections ont une "
 "collection qui existe"
 
-#: src/Form/CheckAndFixForm.php:1315
+#: src/Form/CheckAndFixForm.php:1323
 msgid "Fix missing item sets of custom vocabs"
 msgstr "Corriger les collections manquantes des vocabulaires personnalisés"
 
-#: src/Form/CheckAndFixForm.php:1316
+#: src/Form/CheckAndFixForm.php:1324
 msgid ""
 "List useless tables (left by uninstalled modules or replaced features: "
 "reference_metadata, triplestore, term…)"
@@ -5777,71 +5848,80 @@ msgstr ""
 "Lister les tables inutiles (laissées par des modules désinstallés ou des "
 "fonctionnalités remplacées : reference_metadata, triplestore, term…)"
 
-#: src/Form/CheckAndFixForm.php:1331
+#: src/Form/CheckAndFixForm.php:1325
+msgid "Check the database indexes added by the module Common"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:1326
+msgid ""
+"Add the missing database indexes in background (may be long on a big table)"
+msgstr ""
+
+#: src/Form/CheckAndFixForm.php:1341
 msgid "Options to delete sessions"
 msgstr "Options pour supprimer les sessions"
 
-#: src/Form/CheckAndFixForm.php:1342 src/Form/CheckAndFixForm.php:1365
+#: src/Form/CheckAndFixForm.php:1352 src/Form/CheckAndFixForm.php:1375
 msgid "Older than this number of days"
 msgstr "Plus anciens que ce nombre de jours"
 
-#: src/Form/CheckAndFixForm.php:1354
+#: src/Form/CheckAndFixForm.php:1364
 msgid "Options to delete logs (module Log)"
 msgstr "Options pour supprimer les journaux (module Log)"
 
-#: src/Form/CheckAndFixForm.php:1375
+#: src/Form/CheckAndFixForm.php:1385
 msgid "Maximum severity"
 msgstr "Gravité maximale"
 
-#: src/Form/CheckAndFixForm.php:1395
+#: src/Form/CheckAndFixForm.php:1405
 msgid "Maximum length of message"
 msgstr "Longueur maximale du message"
 
-#: src/Form/CheckAndFixForm.php:1407
+#: src/Form/CheckAndFixForm.php:1417
 msgid "Options for custom vocabs"
 msgstr "Options pour les vocabulaires personnalisés"
 
-#: src/Form/CheckAndFixForm.php:1418
+#: src/Form/CheckAndFixForm.php:1428
 msgid "Fix mode"
 msgstr "Mode de correction"
 
-#: src/Form/CheckAndFixForm.php:1422
+#: src/Form/CheckAndFixForm.php:1432
 msgid "Replace by a standard empty custom vocab"
 msgstr "Remplacer par un vocabulaire personnalisé vide"
 
-#: src/Form/CheckAndFixForm.php:1423
+#: src/Form/CheckAndFixForm.php:1433
 msgid "Delete the custom vocab"
 msgstr "Supprimer le vocabulaire personnalisé"
 
-#: src/Form/CheckAndFixForm.php:1463
+#: src/Form/CheckAndFixForm.php:1473
 msgid "Check templates to migrate in themes for Omeka S v4.1"
 msgstr "Vérifier les gabarits à migrer dans les thèmes pour Omeka S v4.1"
 
-#: src/Form/CheckAndFixForm.php:1464
+#: src/Form/CheckAndFixForm.php:1474
 msgid ""
 "Migrate templates in themes for Omeka S v4.1 (WARNING: backup themes first)"
 msgstr ""
 "Migrer les gabarits dans les thèmes pour Omeka S v4.1 (ATTENTION : "
 "sauvegarder vos thèmes d’abord)"
 
-#: src/Form/CheckAndFixForm.php:1479
+#: src/Form/CheckAndFixForm.php:1489
 msgid "Options to migrate templates in themes"
 msgstr "Options pour migrer les gabarits dans les thèmes"
 
-#: src/Form/CheckAndFixForm.php:1507
+#: src/Form/CheckAndFixForm.php:1517
 msgid "Check backup"
 msgstr "Vérifier la sauvegarde"
 
-#: src/Form/CheckAndFixForm.php:1518
+#: src/Form/CheckAndFixForm.php:1528
 msgid "I confirm to have an external backup of my themes and files"
 msgstr ""
 "Je confirme que je dispose d’une sauvegarde externe de mes thèmes et fichiers"
 
-#: src/Form/CheckAndFixForm.php:1536
+#: src/Form/CheckAndFixForm.php:1546
 msgid "System"
 msgstr "Système"
 
-#: src/Form/CheckAndFixForm.php:1556
+#: src/Form/CheckAndFixForm.php:1566
 msgid ""
 "Run installation checks (after a copy of the database on a new server), with "
 "the http client, the proxy and the access to the web"
@@ -5850,7 +5930,7 @@ msgstr ""
 "données sur un nouveau serveur), avec le client http, le proxy et l'accès au "
 "web"
 
-#: src/Form/CheckAndFixForm.php:1557
+#: src/Form/CheckAndFixForm.php:1567
 msgid ""
 "List environment-specific settings to review after a copy of the database "
 "(title, urls, paths, hosts, emails, api keys…), optionally adapted for a "
@@ -5860,20 +5940,20 @@ msgstr ""
 "(titre, urls, chemins, hôtes, mails, clés api…), éventuellement adaptés pour "
 "une copie de test ou de production"
 
-#: src/Form/CheckAndFixForm.php:1558
+#: src/Form/CheckAndFixForm.php:1568
 msgid "Check caches"
 msgstr "Vérifier les caches"
 
-#: src/Form/CheckAndFixForm.php:1559
+#: src/Form/CheckAndFixForm.php:1569
 msgid "Clear caches (after update or modifications of code)"
 msgstr "Vider les caches (après une mise à jour ou des modifications de code)"
 
-#: src/Form/CheckAndFixForm.php:1560
+#: src/Form/CheckAndFixForm.php:1570
 msgid "Check email configuration and send test email"
 msgstr ""
 "Vérifier la configuration de la messagerie et envoyer un e-mail de test"
 
-#: src/Form/CheckAndFixForm.php:1561
+#: src/Form/CheckAndFixForm.php:1571
 msgid ""
 "Check the PHP-CLI used by background jobs (path, version alignment with the "
 "web server, extensions) and suggest the correct path"
@@ -5882,53 +5962,53 @@ msgstr ""
 "alignement de version avec le serveur web, extensions) et proposer le bon "
 "chemin"
 
-#: src/Form/CheckAndFixForm.php:1562
+#: src/Form/CheckAndFixForm.php:1572
 msgid "Run a test job in the background to check the whole pipeline end to end"
 msgstr ""
 "Lancer une tâche de test en arrière-plan pour vérifier toute la chaîne de "
 "bout en bout"
 
-#: src/Form/CheckAndFixForm.php:1577
+#: src/Form/CheckAndFixForm.php:1587
 msgid "Options to clear cache"
 msgstr "Options pour effacer le cache"
 
-#: src/Form/CheckAndFixForm.php:1588
+#: src/Form/CheckAndFixForm.php:1598
 msgid "Types of cache"
 msgstr "Types de cache"
 
-#: src/Form/CheckAndFixForm.php:1590
+#: src/Form/CheckAndFixForm.php:1600
 msgid "Application (Symfony Doctrine ORM)"
 msgstr "Application (Symfony Doctrine ORM)"
 
-#: src/Form/CheckAndFixForm.php:1591
+#: src/Form/CheckAndFixForm.php:1601
 msgid "Code (opcache)"
 msgstr "Code (opcache)"
 
-#: src/Form/CheckAndFixForm.php:1592
+#: src/Form/CheckAndFixForm.php:1602
 msgid "Data (apcu)"
 msgstr "Données (apcu)"
 
-#: src/Form/CheckAndFixForm.php:1593
+#: src/Form/CheckAndFixForm.php:1603
 msgid "Real paths"
 msgstr "Chemins réels"
 
-#: src/Form/CheckAndFixForm.php:1613
+#: src/Form/CheckAndFixForm.php:1623
 msgid "Options for email check"
 msgstr "Options pour la vérification des mails"
 
-#: src/Form/CheckAndFixForm.php:1624
+#: src/Form/CheckAndFixForm.php:1634
 msgid "Recipient email for test"
 msgstr "Adresse e-mail du destinataire pour le test"
 
-#: src/Form/CheckAndFixForm.php:1628
+#: src/Form/CheckAndFixForm.php:1638
 msgid "test@example.org"
 msgstr "test@example.org"
 
-#: src/Form/CheckAndFixForm.php:1635
+#: src/Form/CheckAndFixForm.php:1645
 msgid "Check DNS records (SPF, DKIM, DMARC)"
 msgstr "Vérifier les enregistrements DNS (SPF, DKIM, DMARC)"
 
-#: src/Form/CheckAndFixForm.php:1636
+#: src/Form/CheckAndFixForm.php:1646
 msgid ""
 "Check the DNS records of the mail domain to help configure your registrar "
 "and mail server."
@@ -5936,11 +6016,11 @@ msgstr ""
 "Vérifiez les enregistrements DNS du domaine de messagerie pour faciliter la "
 "configuration de votre registraire et de votre serveur de messagerie."
 
-#: src/Form/CheckAndFixForm.php:1646
+#: src/Form/CheckAndFixForm.php:1656
 msgid "Domain (optional)"
 msgstr "Domaine (facultatif)"
 
-#: src/Form/CheckAndFixForm.php:1647
+#: src/Form/CheckAndFixForm.php:1657
 msgid ""
 "The domain to check DNS records for. If not provided, it will be extracted "
 "from the sender email."
@@ -5948,12 +6028,12 @@ msgstr ""
 "Le domaine pour lequel vérifier les enregistrements DNS. S'il n'est pas "
 "fourni, il sera extrait de l'adresse e-mail de l'expéditeur."
 
-#: src/Form/CheckAndFixForm.php:1658
+#: src/Form/CheckAndFixForm.php:1668
 msgid "Mail server IP address (optional, auto-detected)"
 msgstr ""
 "Adresse IP du serveur de messagerie (facultatif, détectée automatiquement)"
 
-#: src/Form/CheckAndFixForm.php:1659
+#: src/Form/CheckAndFixForm.php:1669
 msgid ""
 "The IP address of your mail server. If empty, it will be auto-detected from "
 "SMTP config, server IP, or domain A record."
@@ -5962,11 +6042,11 @@ msgstr ""
 "sera détectée automatiquement à partir de la configuration SMTP, de "
 "l'adresse IP du serveur ou de l'enregistrement A du domaine."
 
-#: src/Form/CheckAndFixForm.php:1670
+#: src/Form/CheckAndFixForm.php:1680
 msgid "DKIM selector (optional)"
 msgstr "Sélecteur DKIM (facultatif)"
 
-#: src/Form/CheckAndFixForm.php:1671
+#: src/Form/CheckAndFixForm.php:1681
 msgid ""
 "The DKIM selector used in your DNS records (e.g., \"mail\", \"default\", "
 "\"selector1\"). Default is \"mail\"."
@@ -5974,11 +6054,11 @@ msgstr ""
 "Le sélecteur DKIM utilisé dans vos enregistrements DNS (par exemple, "
 "« mail », « default », « selector1 »). La valeur par défaut est « mail »."
 
-#: src/Form/CheckAndFixForm.php:1682
+#: src/Form/CheckAndFixForm.php:1692
 msgid "Generate DKIM key if missing"
 msgstr "Générer une clé DKIM si elle est manquante"
 
-#: src/Form/CheckAndFixForm.php:1683
+#: src/Form/CheckAndFixForm.php:1693
 msgid ""
 "Generate a new DKIM key pair using OpenSSL. The public key will be shown for "
 "DNS configuration."
@@ -5986,40 +6066,63 @@ msgstr ""
 "Générer une nouvelle paire de clés DKIM à l'aide d'OpenSSL. La clé publique "
 "s'affichera pour la configuration DNS."
 
-#: src/Form/CheckAndFixForm.php:1696
+#: src/Form/CheckAndFixForm.php:1706
 msgid "Options for environment settings"
 msgstr "Options pour les réglages liés au serveur"
 
-#: src/Form/CheckAndFixForm.php:1707
+#: src/Form/CheckAndFixForm.php:1717
 msgid "Adapt the settings"
 msgstr "Adapter les réglages"
 
-#: src/Form/CheckAndFixForm.php:1710
+#: src/Form/CheckAndFixForm.php:1718
 msgid ""
-"For a test copy: prefix the title with « TEST », color the admin sidebar, "
+"The settings of the production are saved before a test or a preproduction "
+"adaptation, so the mode \"production\" restores them, the statistics "
+"trackers included."
+msgstr ""
+"Les paramètres de la production sont enregistrés avant une adaptation en "
+"test ou en préproduction, de sorte que le mode « production » les rétablit, "
+"traqueurs de statistiques compris."
+
+#: src/Form/CheckAndFixForm.php:1721
+msgid ""
+"For a test copy: prefix the title with « TEST », color the admin interface, "
 "display the errors on screen, remove the statistics trackers and replace the "
 "images by grey placeholders when the files are not served from another server"
 msgstr ""
-"Pour une copie test : préfixe le titre avec « TEST », change la couleur de "
-"la barre latérale, affiche les erreurs, supprime les codes de suivis et "
-"remplace les images par une zone grises quand les fichiers ne sont pas "
-"servis depuis un serveur tiers"
+"Pour une copie de test : préfixer le titre par « TEST », colorer l’interface "
+"d’administration, afficher les erreurs à l’écran, retirer les traqueurs de "
+"statistiques et remplacer les images par des images grises lorsque les "
+"fichiers ne sont pas servis depuis un autre serveur"
 
-#: src/Form/CheckAndFixForm.php:1711
+#: src/Form/CheckAndFixForm.php:1722
 msgid ""
-"For the production: remove the prefix « TEST » of the title, the color of "
-"the admin sidebar of the test, the display of the errors, the fake images "
-"and the base url of the files"
+"For a preproduction: prefix the title with « PREPROD », color the admin "
+"interface, display the errors to the admins only, redirect the emails, "
+"remove the statistics trackers and serve the files from the production"
 msgstr ""
-"Pour la production : supprime le préfixe « TEST » du titre, remet la couleur "
-"par défaut pour la barre latérale, cache les erreurs sur l'écran et les "
-"images factices et remet l'url de base des fichiers"
+"Pour une préproduction : préfixer le titre par « PREPROD », colorer "
+"l’interface d’administration, afficher les erreurs aux administrateurs "
+"seulement, rediriger les courriels, retirer les traqueurs de statistiques et "
+"servir les fichiers depuis la production"
 
 #: src/Form/CheckAndFixForm.php:1723
+msgid ""
+"For the production: restore the settings saved before the adaptation, or, "
+"without them, remove the prefix of the title, the color of the admin "
+"interface of the copy, the display of the errors, the fake images and the "
+"base url of the files"
+msgstr ""
+"Pour la production : rétablir les paramètres enregistrés avant l’adaptation "
+"ou, à défaut, retirer le préfixe du titre, la couleur de l’interface "
+"d’administration de la copie, l’affichage des erreurs, les fausses images et "
+"l’url de base des fichiers"
+
+#: src/Form/CheckAndFixForm.php:1735
 msgid "Include empty settings"
 msgstr "Inclure les réglages vides"
 
-#: src/Form/CheckAndFixForm.php:1724
+#: src/Form/CheckAndFixForm.php:1736
 msgid ""
 "List settings whose value is currently empty (they may need a server-"
 "specific value)."
@@ -6027,7 +6130,7 @@ msgstr ""
 "Lister les réglages dont la valeur est actuellement vide (ils peuvent "
 "nécessiter une valeur spécifique au serveur)."
 
-#: src/Form/CheckAndFixForm.php:1761
+#: src/Form/CheckAndFixForm.php:1773
 msgid ""
 "Audit the security and privacy of the system (file protection, user data "
 "leaks, private data leaks, dangerous settings)"
@@ -6036,7 +6139,7 @@ msgstr ""
 "fichiers, fuites de données utilisateurs, fuites de données privées, "
 "réglages dangereux)"
 
-#: src/Form/CheckAndFixForm.php:1762
+#: src/Form/CheckAndFixForm.php:1774
 msgid ""
 "Protect the sensitive directories of \"files/\" with a \".htaccess\" "
 "(backups, imports, exports, logs, contributions, user data…)"
@@ -6045,15 +6148,15 @@ msgstr ""
 "(sauvegardes, imports, exports, journaux, contributions, données "
 "utilisateurs…)"
 
-#: src/Form/CheckAndFixForm.php:1775
+#: src/Form/CheckAndFixForm.php:1787
 msgid "Options for the audit"
 msgstr "Options pour l’audit"
 
-#: src/Form/CheckAndFixForm.php:1786
+#: src/Form/CheckAndFixForm.php:1798
 msgid "Probe the api anonymously"
 msgstr "Sonder l’api en anonyme"
 
-#: src/Form/CheckAndFixForm.php:1787
+#: src/Form/CheckAndFixForm.php:1799
 msgid ""
 "Send two http requests to this install to check that the api does not expose "
 "user emails or private resources to anonymous visitors. Uncheck it when the "
@@ -6064,11 +6167,11 @@ msgstr ""
 "visiteurs anonymes. Décochez si le serveur ne se répond pas à lui-même : "
 "chaque requête attend jusqu’à cinq secondes."
 
-#: src/Form/CheckAndFixForm.php:1806
+#: src/Form/CheckAndFixForm.php:1818
 msgid "Module tasks and indexations"
 msgstr "Tâches des modules et indexations"
 
-#: src/Form/CheckAndFixForm.php:1826
+#: src/Form/CheckAndFixForm.php:1838
 msgid "Omeka: Index full-text search"
 msgstr "Omeka : indexer la recherche plein-texte"
 
@@ -6112,43 +6215,43 @@ msgstr "Par jour"
 msgid "Weekly"
 msgstr "Par semaine"
 
-#: src/Form/CronForm.php:116 config/module.config.php:440
+#: src/Form/CronForm.php:116 config/module.config.php:443
 msgid "Clear old sessions"
 msgstr "Effacer les anciennes sessions"
 
-#: src/Form/CronForm.php:123 config/module.config.php:447
+#: src/Form/CronForm.php:123 config/module.config.php:450
 msgid "Session age"
 msgstr "Ancienneté de la session"
 
-#: src/Form/CronForm.php:125 config/module.config.php:449
+#: src/Form/CronForm.php:125 config/module.config.php:452
 msgid "older than 1 hour"
 msgstr "plus d’une heure"
 
-#: src/Form/CronForm.php:126 config/module.config.php:450
+#: src/Form/CronForm.php:126 config/module.config.php:453
 msgid "older than 2 hours"
 msgstr "plus de 2 heures"
 
-#: src/Form/CronForm.php:127 config/module.config.php:451
+#: src/Form/CronForm.php:127 config/module.config.php:454
 msgid "older than 4 hours"
 msgstr "plus de 4 heures"
 
-#: src/Form/CronForm.php:128 config/module.config.php:452
+#: src/Form/CronForm.php:128 config/module.config.php:455
 msgid "older than 12 hours"
 msgstr "plus de 12 heures"
 
-#: src/Form/CronForm.php:129 config/module.config.php:453
+#: src/Form/CronForm.php:129 config/module.config.php:456
 msgid "older than 1 day"
 msgstr "plus d’un jour"
 
-#: src/Form/CronForm.php:130 config/module.config.php:454
+#: src/Form/CronForm.php:130 config/module.config.php:457
 msgid "older than 2 days"
 msgstr "plus de 2 jours"
 
-#: src/Form/CronForm.php:131 config/module.config.php:455
+#: src/Form/CronForm.php:131 config/module.config.php:458
 msgid "older than 8 days"
 msgstr "plus de 8 jours"
 
-#: src/Form/CronForm.php:132 config/module.config.php:456
+#: src/Form/CronForm.php:132 config/module.config.php:459
 msgid "older than 30 days"
 msgstr "plus de 30 jours"
 
@@ -6287,30 +6390,30 @@ msgstr "Impossible de supprimer la sauvegarde."
 msgid "backup"
 msgstr "sauvegarde"
 
-#: src/Controller/Admin/CheckAndFixController.php:48
+#: src/Controller/Admin/CheckAndFixController.php:87
 msgid "The settings filter is now enabled."
 msgstr "Le filtre des paramètres est désormais activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:50
+#: src/Controller/Admin/CheckAndFixController.php:89
 msgid "Invalid or expired CSRF token."
 msgstr "Jeton CSRF expiré, invalide ou manquant."
 
-#: src/Controller/Admin/CheckAndFixController.php:94
+#: src/Controller/Admin/CheckAndFixController.php:133
 msgid "No process submitted."
 msgstr "Aucun traitement soumis."
 
-#: src/Controller/Admin/CheckAndFixController.php:278
+#: src/Controller/Admin/CheckAndFixController.php:329
 msgid "Unknown process \"{process}\""
 msgstr "Processus inconnu « {process} »"
 
-#: src/Controller/Admin/CheckAndFixController.php:291
+#: src/Controller/Admin/CheckAndFixController.php:342
 msgid ""
 "Process done (job {link_job}#{job_id}{link_end}, {link_log}logs{link_end})."
 msgstr ""
 "Traitement terminé (tâche {link_job}#{job_id}{link_end}, {link_log}"
 "journaux{link_end})."
 
-#: src/Controller/Admin/CheckAndFixController.php:292
+#: src/Controller/Admin/CheckAndFixController.php:343
 msgid ""
 "Processing checks in background (job {link_job}#{job_id}{link_end}, "
 "{link_log}logs{link_end})."
@@ -6318,28 +6421,28 @@ msgstr ""
 "Traitement en arrière-plan (tâche {link_job}#{job_id}{link_end}, {link_log}"
 "journaux{link_end})."
 
-#: src/Controller/Admin/CheckAndFixController.php:318
+#: src/Controller/Admin/CheckAndFixController.php:369
 msgid "No type of cache selected."
 msgstr "Aucun type de cache n’a été sélectionné."
 
-#: src/Controller/Admin/CheckAndFixController.php:330
+#: src/Controller/Admin/CheckAndFixController.php:381
 msgid "The application cache of Symfony Doctrine is available."
 msgstr "Le cache de l’application Symfony Doctrine est disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:339
+#: src/Controller/Admin/CheckAndFixController.php:390
 msgid "The application cache of Symfony Doctrine was reset."
 msgstr "Le cache de l’application Symfony Doctrine a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:341
+#: src/Controller/Admin/CheckAndFixController.php:392
 msgid "The application cache of Symfony Doctrine cannot be reset."
 msgstr ""
 "Le cache de l’application Symfony Doctrine ne peut pas être réinitialisé."
 
-#: src/Controller/Admin/CheckAndFixController.php:345
+#: src/Controller/Admin/CheckAndFixController.php:396
 msgid "The application cache of Symfony Doctrine is disabled."
 msgstr "Le cache de l’application Symfony Doctrine est désactivé."
 
-#: src/Controller/Admin/CheckAndFixController.php:354
+#: src/Controller/Admin/CheckAndFixController.php:405
 msgid ""
 "An issue occurred when checking status of \"opcache\" or the status is not "
 "enabled."
@@ -6347,42 +6450,42 @@ msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « opcache » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:371
+#: src/Controller/Admin/CheckAndFixController.php:422
 msgid "The cache \"opcache\" was reset."
 msgstr "Le cache « opcache » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:373
+#: src/Controller/Admin/CheckAndFixController.php:424
 msgid "The cache \"opcache\" is disabled."
 msgstr "Le cache « opcache » est désactivé."
 
-#: src/Controller/Admin/CheckAndFixController.php:377
+#: src/Controller/Admin/CheckAndFixController.php:428
 msgid "The php extension \"opcache\" is not available."
 msgstr "L’extension php « opcache » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:386
+#: src/Controller/Admin/CheckAndFixController.php:437
 msgid ""
 "An issue occurred when checking status of \"apcu\" or the status is disabled."
 msgstr ""
 "Il y a eu une erreur lors de la vérification du statu de « apcu » ou le "
 "statut n’est pas activé."
 
-#: src/Controller/Admin/CheckAndFixController.php:395
+#: src/Controller/Admin/CheckAndFixController.php:446
 msgid "The cache \"apcu\" was reset."
 msgstr "Le cache « apcu » a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:398
+#: src/Controller/Admin/CheckAndFixController.php:449
 msgid "The php extension \"apcu\" is not available."
 msgstr "L’extension php « apcu » n’est pas disponible."
 
-#: src/Controller/Admin/CheckAndFixController.php:406
+#: src/Controller/Admin/CheckAndFixController.php:457
 msgid "The cache of real paths was reset."
 msgstr "Le cache des chemins réels a été effacé."
 
-#: src/Controller/Admin/CheckAndFixController.php:421
+#: src/Controller/Admin/CheckAndFixController.php:472
 msgid "Install tasks were run without errors."
 msgstr "La vérification de l’installation n’a pas trouvé d’erreur."
 
-#: src/Controller/Admin/CheckAndFixController.php:428
+#: src/Controller/Admin/CheckAndFixController.php:479
 msgid ""
 "The php extension \"intl\" is not available. It is recommended to install it "
 "to translate dates."
@@ -6390,7 +6493,27 @@ msgstr ""
 "L’extension php \"intl\" n’est pas disponible. Il est recommandé de "
 "l’installer pour traduire les dates."
 
-#: src/Controller/Admin/CheckAndFixController.php:475
+#: src/Controller/Admin/CheckAndFixController.php:502
+msgid "The module Common should be upgraded to check the database indexes."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:509
+msgid "All the database indexes added by the module Common exist."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:516
+msgid ""
+"Some database indexes that should have been added by the module Common are "
+"missing: {list}. Run the task to add them."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:526
+msgid ""
+"Some database indexes that should have been added by the module Common are "
+"missing: {list}. They are being added in background (job #{job_id})."
+msgstr ""
+
+#: src/Controller/Admin/CheckAndFixController.php:571
 msgid ""
 "Web server ({server}): the file \".htaccess\" is compatible with the active "
 "modules."
@@ -6398,7 +6521,7 @@ msgstr ""
 "Serveur web ({server}) : le fichier « .htaccess » est compatible avec les "
 "modules actifs."
 
-#: src/Controller/Admin/CheckAndFixController.php:522
+#: src/Controller/Admin/CheckAndFixController.php:618
 msgid ""
 "The protection of the directories could not be checked with a request to "
 "{url}: {error}"
@@ -6406,7 +6529,7 @@ msgstr ""
 "La protection des dossiers n’a pas pu être vérifiée par une requête vers "
 "{url} : {error}"
 
-#: src/Controller/Admin/CheckAndFixController.php:530
+#: src/Controller/Admin/CheckAndFixController.php:626
 msgid ""
 "The protected file {url} is public: the files \".htaccess\" are not applied "
 "by the web server (option \"AllowOverride\" of Apache, or another server), "
@@ -6418,7 +6541,7 @@ msgstr ""
 "serveur), les dossiers sensibles de « files/ » sont donc publics. Protégez-"
 "les dans la configuration du serveur."
 
-#: src/Controller/Admin/CheckAndFixController.php:535
+#: src/Controller/Admin/CheckAndFixController.php:631
 msgid ""
 "The files \".htaccess\" are applied: the protected file {url} is not public "
 "(http status {status})."
@@ -6426,15 +6549,15 @@ msgstr ""
 "Les fichiers « .htaccess » sont appliqués : le fichier protégé {url} n’est "
 "pas public (statut http {status})."
 
-#: src/Controller/Admin/CheckAndFixController.php:552
+#: src/Controller/Admin/CheckAndFixController.php:648
 msgid "The http client uses the adapter \"{adapter}\" and {proxy}."
 msgstr "Le client http utilise l’adaptateur « {adapter} » et {proxy}."
 
-#: src/Controller/Admin/CheckAndFixController.php:556
+#: src/Controller/Admin/CheckAndFixController.php:652
 msgid "source"
 msgstr "source"
 
-#: src/Controller/Admin/CheckAndFixController.php:563
+#: src/Controller/Admin/CheckAndFixController.php:659
 msgid ""
 "The environment defines a proxy ({vars}), but the adapter \"{adapter}\" "
 "ignores it: set the keys \"proxy_host\" and \"proxy_port\" of "
@@ -6446,7 +6569,7 @@ msgstr ""
 "« http_client » dans le fichier « config/local.config.php », ou utilisez "
 "l’adaptateur « curl »."
 
-#: src/Controller/Admin/CheckAndFixController.php:570
+#: src/Controller/Admin/CheckAndFixController.php:666
 msgid ""
 "The path set in the key \"{key}\" of \"http_client\" does not exist on this "
 "server: {path}. The secure requests will fail."
@@ -6454,11 +6577,11 @@ msgstr ""
 "Le chemin défini dans la clé « {key} » de « http_client » n’existe pas sur "
 "ce serveur : {path}. Les requêtes sécurisées échoueront."
 
-#: src/Controller/Admin/CheckAndFixController.php:582
+#: src/Controller/Admin/CheckAndFixController.php:678
 msgid "The server can access the web ({url}: http status {status})."
 msgstr "Le serveur peut accéder au web ({url} : statut http {status})."
 
-#: src/Controller/Admin/CheckAndFixController.php:587
+#: src/Controller/Admin/CheckAndFixController.php:683
 msgid ""
 "The server cannot access the web ({url}): {error}. Check the proxy and the "
 "firewall: the catalogue of modules, the updates, the imports and the value "
@@ -6468,19 +6591,19 @@ msgstr ""
 "et le pare-feu : le catalogue des modules, les mises à jour, les imports et "
 "les suggestions de valeurs échoueront."
 
-#: src/Controller/Admin/CheckAndFixController.php:607
+#: src/Controller/Admin/CheckAndFixController.php:703
 msgid "redirection to {email}"
 msgstr "redirection vers{email}"
 
-#: src/Controller/Admin/CheckAndFixController.php:608
+#: src/Controller/Admin/CheckAndFixController.php:704
 msgid "only to the domains of the team"
 msgstr "seulement pour les domaines de l'équipe"
 
-#: src/Controller/Admin/CheckAndFixController.php:609
+#: src/Controller/Admin/CheckAndFixController.php:705
 msgid "capture in files, nothing sent"
 msgstr "capture dans des fichiers, rien n’est envoyé"
 
-#: src/Controller/Admin/CheckAndFixController.php:612
+#: src/Controller/Admin/CheckAndFixController.php:708
 msgid ""
 "Emails: transport \"{transport}\"{sent}, protection of a test copy: "
 "{protection}. Domains of the team: {domains}."
@@ -6488,7 +6611,7 @@ msgstr ""
 "Mails : transport « {transport} »{sent}, protection d’une copie test : "
 "{protection}. Domaines de l’équipe : {domains}."
 
-#: src/Controller/Admin/CheckAndFixController.php:622
+#: src/Controller/Admin/CheckAndFixController.php:718
 msgid ""
 "Accounts: {total} ({active} active, {admins} administrators), including "
 "{outside} active accounts outside the domains of the team."
@@ -6496,13 +6619,13 @@ msgstr ""
 "Comptes : {total} ({active} actifs, {admins} administrateurs), dont "
 "{outside} comptes actifs hors des domaines de l’équipe."
 
-#: src/Controller/Admin/CheckAndFixController.php:628
+#: src/Controller/Admin/CheckAndFixController.php:724
 msgid "Recipients set in the settings outside the domains of the team: {list}."
 msgstr ""
 "Destinataires définis dans les paramètres hors des domaines de l’équipe : "
 "{list}."
 
-#: src/Controller/Admin/CheckAndFixController.php:638
+#: src/Controller/Admin/CheckAndFixController.php:734
 msgid ""
 "This install can send emails to {users} real users and {recipients} "
 "recipients set in the settings. On a test copy, set the option \"Emails of a "
@@ -6514,7 +6637,7 @@ msgstr ""
 "définissez l’option « Mails pour une copie test » dans les paramètres ou "
 "lancez la tâche des paramètres d’environnement en mode test."
 
-#: src/Controller/Admin/CheckAndFixController.php:821
+#: src/Controller/Admin/CheckAndFixController.php:917
 msgid ""
 "The mapping of the entities could not be read ({message}); the list of "
 "useless tables cannot be built."
@@ -6522,7 +6645,7 @@ msgstr ""
 "Le mapping des entités n’a pas pu être lu ({message}) ; la liste des tables "
 "inutiles ne peut pas être construite."
 
-#: src/Controller/Admin/CheckAndFixController.php:908
+#: src/Controller/Admin/CheckAndFixController.php:1004
 msgid ""
 "No useless table found: every table is declared by the core or an installed "
 "module."
@@ -6530,7 +6653,7 @@ msgstr ""
 "Aucune table inutile trouvée : chaque table est déclarée par le cœur ou un "
 "module installé."
 
-#: src/Controller/Admin/CheckAndFixController.php:915
+#: src/Controller/Admin/CheckAndFixController.php:1011
 msgid ""
 "Tables of installed but inactive modules (kept, they are used again once the "
 "module is reactivated):\n"
@@ -6540,7 +6663,7 @@ msgstr ""
 "le module est réactivé) :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:924
+#: src/Controller/Admin/CheckAndFixController.php:1020
 msgid ""
 "Tables likely useless (module uninstalled or removed feature):\n"
 "{list}"
@@ -6549,7 +6672,7 @@ msgstr ""
 "supprimée) :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:933
+#: src/Controller/Admin/CheckAndFixController.php:1029
 msgid ""
 "Tables declared by no installed module (review before dropping; they may "
 "hold data):\n"
@@ -6559,47 +6682,47 @@ msgstr ""
 "elles peuvent contenir des données) :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:939
+#: src/Controller/Admin/CheckAndFixController.php:1035
 msgid "This task never drops any table: verify each one before removing it."
 msgstr ""
 "Cette tâche ne supprime jamais de table : vérifier chacune avant de la "
 "retirer."
 
-#: src/Controller/Admin/CheckAndFixController.php:1074
-msgid "Installation title and color of the admin sidebar"
-msgstr "Titre et couleur de la barre admin latérale"
+#: src/Controller/Admin/CheckAndFixController.php:1170
+msgid "Installation title and color of the admin interface"
+msgstr "Titre de l’installation et couleur de l’interface d’administration"
 
-#: src/Controller/Admin/CheckAndFixController.php:1075
+#: src/Controller/Admin/CheckAndFixController.php:1171
 msgid "Statistics trackers (scripts sending the visits to an analytics server)"
 msgstr ""
 "Outils de suivi statistique (scripts envoyant les données de visite à un "
 "serveur d'analyse)"
 
-#: src/Controller/Admin/CheckAndFixController.php:1076
+#: src/Controller/Admin/CheckAndFixController.php:1172
 msgid "Urls, hosts and endpoints"
 msgstr "Urls, hôtes et points d’accès"
 
-#: src/Controller/Admin/CheckAndFixController.php:1077
+#: src/Controller/Admin/CheckAndFixController.php:1173
 msgid "Host names used as identifiers"
 msgstr "Noms d'hôtes utilisés comme identifiants"
 
-#: src/Controller/Admin/CheckAndFixController.php:1078
+#: src/Controller/Admin/CheckAndFixController.php:1174
 msgid "Paths and directories"
 msgstr "Chemins et dossiers"
 
-#: src/Controller/Admin/CheckAndFixController.php:1079
+#: src/Controller/Admin/CheckAndFixController.php:1175
 msgid "Emails"
 msgstr "Emails"
 
-#: src/Controller/Admin/CheckAndFixController.php:1080
+#: src/Controller/Admin/CheckAndFixController.php:1176
 msgid "Api keys, tokens and secrets (redacted)"
 msgstr "Clés d’api, jetons et secrets (masqués)"
 
-#: src/Controller/Admin/CheckAndFixController.php:1175
+#: src/Controller/Admin/CheckAndFixController.php:1271
 msgid "No environment-specific setting found."
 msgstr "Aucun réglage spécifique au serveur trouvé."
 
-#: src/Controller/Admin/CheckAndFixController.php:1178
+#: src/Controller/Admin/CheckAndFixController.php:1274
 msgid ""
 "Settings to review after a copy of the database:\n"
 "{list}"
@@ -6607,7 +6730,7 @@ msgstr ""
 "Réglages à revoir après une copie de la base de données :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1187
+#: src/Controller/Admin/CheckAndFixController.php:1283
 msgid ""
 "Settings with an url of another server than this one ({host}), to check "
 "first:\n"
@@ -6617,7 +6740,7 @@ msgstr ""
 "premier :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1211
+#: src/Controller/Admin/CheckAndFixController.php:1307
 msgid ""
 "Http client and proxy (file config/local.config.php and environment), to "
 "check after a copy on another server:\n"
@@ -6627,7 +6750,7 @@ msgstr ""
 "vérifier après une copie sur un autre serveur :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1225
+#: src/Controller/Admin/CheckAndFixController.php:1321
 msgid ""
 "Also review configurations stored outside the settings: search engines "
 "(SearchSolr cores/nodes, url and host), file paths and mailer in \"config/"
@@ -6638,38 +6761,104 @@ msgstr ""
 "messagerie dans « config/local.config.php », et tout service externe des "
 "modules."
 
-#: src/Controller/Admin/CheckAndFixController.php:1251
-msgid "The installation title already starts with « TEST »: {title}"
-msgstr "Le titre de l’installation commence déjà par « TEST » : {title}"
+#: src/Controller/Admin/CheckAndFixController.php:1358
+msgid ""
+"The settings of the server \"{host}\", saved on {date}, are kept, so this "
+"production can still be restored. Use the mode \"production\" to restore and "
+"remove them when they are not the ones of the production any more."
+msgstr ""
+"Les paramètres du serveur « {host} », enregistrés le {date}, sont conservés, "
+"afin que cette production puisse toujours être rétablie. Utilisez le mode "
+"« production » pour les rétablir et les supprimer lorsqu’ils ne sont plus "
+"ceux de la production."
 
-#: src/Controller/Admin/CheckAndFixController.php:1258
-#: src/Controller/Admin/CheckAndFixController.php:1367
+#: src/Controller/Admin/CheckAndFixController.php:1387
+msgid ""
+"The settings of the server \"{host}\" were saved ({count} settings): they "
+"will be restored with the mode \"production\"."
+msgstr ""
+"Les paramètres du serveur « {host} » ont été enregistrés ({count} "
+"paramètres) : ils seront rétablis avec le mode « production »."
+
+#: src/Controller/Admin/CheckAndFixController.php:1421
+msgid ""
+"The settings of the server \"{host}\", saved on {date}, were restored, the "
+"statistics trackers and the external services included."
+msgstr ""
+"Les paramètres du serveur « {host} », enregistrés le {date}, ont été "
+"rétablis, y compris les traqueurs de statistiques et les services externes."
+
+#: src/Controller/Admin/CheckAndFixController.php:1467
+msgid "The installation title already starts with « PREPROD »: {title}"
+msgstr "Le titre de l’installation commence déjà par « PREPROD » : {title}"
+
+#: src/Controller/Admin/CheckAndFixController.php:1474
+#: src/Controller/Admin/CheckAndFixController.php:1557
+#: src/Controller/Admin/CheckAndFixController.php:1746
 msgid "The installation title is now: {title}"
 msgstr "Le titre de l’installation est maintenant : {title}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1267
-msgid "The admin sidebar is now colored ({color})."
-msgstr "La barre admin latérale est désormais colorée ({color})."
+#: src/Controller/Admin/CheckAndFixController.php:1483
+#: src/Controller/Admin/CheckAndFixController.php:1566
+msgid "The admin interface is now colored ({color})."
+msgstr "L’interface d’administration est maintenant colorée ({color})."
 
-#: src/Controller/Admin/CheckAndFixController.php:1275
-msgid "The errors are now displayed on screen for anybody."
-msgstr "Les erreurs sont désormais affichées pour tous."
+#: src/Controller/Admin/CheckAndFixController.php:1492
+msgid "The errors are now displayed on screen for the admins only."
+msgstr ""
+"Les erreurs sont désormais affichées à l’écran pour les administrateurs "
+"seulement."
 
-#: src/Controller/Admin/CheckAndFixController.php:1287
+#: src/Controller/Admin/CheckAndFixController.php:1503
+#: src/Controller/Admin/CheckAndFixController.php:1586
 msgid "email"
 msgstr "mail"
 
-#: src/Controller/Admin/CheckAndFixController.php:1288
+#: src/Controller/Admin/CheckAndFixController.php:1504
+#: src/Controller/Admin/CheckAndFixController.php:1587
 msgid "All the emails are now captured in files, without being sent."
 msgstr ""
 "Tous les mails sont désormais capturés dans des fichiers, sans être envoyés."
 
-#: src/Controller/Admin/CheckAndFixController.php:1296
+#: src/Controller/Admin/CheckAndFixController.php:1509
+msgid "The original files are present, so they are served locally."
+msgstr ""
+"Les fichiers originaux sont présents : ils sont donc servis localement."
+
+#: src/Controller/Admin/CheckAndFixController.php:1513
+msgid "The files are already served by another server: {url}"
+msgstr "Les fichiers sont déjà servis par un autre serveur : {url}"
+
+#: src/Controller/Admin/CheckAndFixController.php:1521
+msgid ""
+"The files are now served by the production ({url}): check the url and the "
+"access rights."
+msgstr ""
+"Les fichiers sont désormais servis par la production ({url}) : vérifiez "
+"l’url et les droits d’accès."
+
+#: src/Controller/Admin/CheckAndFixController.php:1526
+msgid ""
+"The original files are missing and the host of the production is unknown: "
+"set the base url of the files in the main settings."
+msgstr ""
+"Les fichiers originaux sont absents et l’hôte de la production est inconnu : "
+"indiquez l’url de base des fichiers dans les paramètres généraux."
+
+#: src/Controller/Admin/CheckAndFixController.php:1550
+msgid "The installation title already starts with « TEST »: {title}"
+msgstr "Le titre de l’installation commence déjà par « TEST » : {title}"
+
+#: src/Controller/Admin/CheckAndFixController.php:1574
+msgid "The errors are now displayed on screen for anybody."
+msgstr "Les erreurs sont désormais affichées pour tous."
+
+#: src/Controller/Admin/CheckAndFixController.php:1595
 msgid "The original files are present, so the images are kept."
 msgstr ""
 "Les fichiers originaux sont présents : les images sont donc conservées."
 
-#: src/Controller/Admin/CheckAndFixController.php:1303
+#: src/Controller/Admin/CheckAndFixController.php:1602
 msgid ""
 "The images are now replaced by grey placeholders. Set the base url of the "
 "files or the images of Wikipedia in the settings if needed."
@@ -6678,7 +6867,7 @@ msgstr ""
 "Définissez si besoin l’url de base des fichiers ou les images de Wikipédia "
 "dans les paramètres."
 
-#: src/Controller/Admin/CheckAndFixController.php:1319
+#: src/Controller/Admin/CheckAndFixController.php:1632
 msgid ""
 "The statistics trackers were removed ({count} settings), so the visits of "
 "this copy are not sent to the analytics server of the original site."
@@ -6686,19 +6875,48 @@ msgstr ""
 "Les outils de suivi ont été supprimés ({count} paramètres) ; les visites sur "
 "cette copie ne sont donc pas transmises au serveur du site d'origine."
 
-#: src/Controller/Admin/CheckAndFixController.php:1376
-msgid "The admin sidebar has now its default color."
-msgstr "La barre admin latérale a retrouvé sa couleur par défaut."
+#: src/Controller/Admin/CheckAndFixController.php:1649
+msgid ""
+"The setting \"{setting}\" was emptied, so this copy does not write in the "
+"external service of the original site."
+msgstr ""
+"Le paramètre « {setting} » a été vidé : cette copie n’écrit plus dans le "
+"service externe du site d’origine."
 
-#: src/Controller/Admin/CheckAndFixController.php:1383
+#: src/Controller/Admin/CheckAndFixController.php:1678
+msgid ""
+"The setting \"{setting}\" uses the host of another server ({host}): set it "
+"manually for this copy."
+msgstr ""
+"Le paramètre « {setting} » utilise l’hôte d’un autre serveur ({host}) : "
+"définissez-le manuellement pour cette copie."
+
+#: src/Controller/Admin/CheckAndFixController.php:1688
+msgid "The setting \"{setting}\" now uses the host of this server: {value}."
+msgstr ""
+"Le paramètre « {setting} » utilise désormais l’hôte de ce serveur : {value}."
+
+#: src/Controller/Admin/CheckAndFixController.php:1738
+msgid ""
+"The settings of the production were not saved, so only the values set for "
+"the test are reverted."
+msgstr ""
+"Les paramètres de la production n’ont pas été enregistrés : seules les "
+"valeurs définies pour le test sont annulées."
+
+#: src/Controller/Admin/CheckAndFixController.php:1755
+msgid "The admin interface has now its default colors."
+msgstr "L’interface d’administration a retrouvé ses couleurs par défaut."
+
+#: src/Controller/Admin/CheckAndFixController.php:1762
 msgid "The errors are no longer displayed on screen."
 msgstr "Les erreurs ne sont plus affichées."
 
-#: src/Controller/Admin/CheckAndFixController.php:1390
+#: src/Controller/Admin/CheckAndFixController.php:1769
 msgid "The emails are now sent normally to their recipients."
 msgstr "Les mails sont désormais envoyés normalement à leurs destinataires."
 
-#: src/Controller/Admin/CheckAndFixController.php:1400
+#: src/Controller/Admin/CheckAndFixController.php:1779
 msgid ""
 "The files are now served locally, without fake images nor base url of "
 "another server."
@@ -6706,7 +6924,7 @@ msgstr ""
 "Les fichiers sont désormais servis localement, sans images factices ni url "
 "de base d’un autre serveur."
 
-#: src/Controller/Admin/CheckAndFixController.php:1411
+#: src/Controller/Admin/CheckAndFixController.php:1790
 msgid ""
 "The statistics trackers are empty ({count} settings): set them again if "
 "needed."
@@ -6714,7 +6932,7 @@ msgstr ""
 "Les traqueurs de suivi sont vides ({count} réglages) : définissez les à "
 "nouveaux si besoin."
 
-#: src/Controller/Admin/CheckAndFixController.php:1445
+#: src/Controller/Admin/CheckAndFixController.php:1824
 msgid ""
 "An external image server answers to the iiif urls ({server}), but the module "
 "Image Server creates local tiles for each new media (option \"Tile "
@@ -6726,21 +6944,21 @@ msgstr ""
 "\"Mode de tuilage\" = auto). Définissez-le sur \"externe\" si un serveur "
 "d'images externe sert les images."
 
-#: src/Controller/Admin/CheckAndFixController.php:1515
-#: src/Controller/Admin/CheckAndFixController.php:1551
+#: src/Controller/Admin/CheckAndFixController.php:1894
+#: src/Controller/Admin/CheckAndFixController.php:1930
 msgid "The files directory was not found: {path}"
 msgstr "Le dossier des fichiers est introuvable : {path}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1525
+#: src/Controller/Admin/CheckAndFixController.php:1904
 msgid "A \".htaccess\" was added to {count} directory(ies): {list}"
 msgstr "Un « .htaccess » a été ajouté à {count} dossier(s) : {list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1531
+#: src/Controller/Admin/CheckAndFixController.php:1910
 msgid ""
 "{count} directory(ies) already have a \".htaccess\" (not modified): {list}"
 msgstr "{count} dossier(s) ont déjà un « .htaccess » (non modifiés) : {list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1537
+#: src/Controller/Admin/CheckAndFixController.php:1916
 msgid ""
 "A \".htaccess\" could not be written in {count} directory(ies) (check "
 "permissions): {list}"
@@ -6748,11 +6966,11 @@ msgstr ""
 "Un « .htaccess » n’a pas pu être écrit dans {count} dossier(s) (vérifier les "
 "permissions) : {list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1542
+#: src/Controller/Admin/CheckAndFixController.php:1921
 msgid "No sensitive directory to protect was found."
 msgstr "Aucun dossier sensible à protéger n’a été trouvé."
 
-#: src/Controller/Admin/CheckAndFixController.php:1562
+#: src/Controller/Admin/CheckAndFixController.php:1941
 msgid ""
 "The files directory contains executable php file(s), which is a code "
 "execution risk: {list}. Remove them and forbid php execution under \"files/"
@@ -6762,7 +6980,7 @@ msgstr ""
 "risque d’exécution de code : {list}. Les supprimer et interdire l’exécution "
 "de php sous « files/ »."
 
-#: src/Controller/Admin/CheckAndFixController.php:1568
+#: src/Controller/Admin/CheckAndFixController.php:1947
 msgid ""
 "Sensitive directories without a \".htaccess\" are publicly accessible "
 "(backups, imports, exports, logs…): {list}. Use the fix to protect them."
@@ -6771,7 +6989,7 @@ msgstr ""
 "(sauvegardes, imports, exports, journaux…) : {list}. Utiliser la correction "
 "pour les protéger."
 
-#: src/Controller/Admin/CheckAndFixController.php:1575
+#: src/Controller/Admin/CheckAndFixController.php:1954
 msgid ""
 "Other directories of \"files/\" have no \".htaccess\"; review whether they "
 "should be public (no \".htaccess\" is added automatically, as they may serve "
@@ -6781,13 +6999,13 @@ msgstr ""
 "doivent être publics (aucun « .htaccess » n’est ajouté automatiquement, car "
 "ils peuvent servir des fichiers publics) : {list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1580
+#: src/Controller/Admin/CheckAndFixController.php:1959
 msgid "File protection: no sensitive directory left publicly accessible."
 msgstr ""
 "Protection des fichiers : aucun dossier sensible laissé accessible "
 "publiquement."
 
-#: src/Controller/Admin/CheckAndFixController.php:1619
+#: src/Controller/Admin/CheckAndFixController.php:1998
 msgid ""
 "Private data: {items} private items, {media} private media, {values} private "
 "values."
@@ -6795,7 +7013,7 @@ msgstr ""
 "Données privées : {items} contenus privés, {media} médias privés, {values} "
 "valeurs privées."
 
-#: src/Controller/Admin/CheckAndFixController.php:1633
+#: src/Controller/Admin/CheckAndFixController.php:2012
 msgid ""
 "{count} public media belong to a private item: their file and metadata leak. "
 "Set them private or make the item public."
@@ -6803,7 +7021,7 @@ msgstr ""
 "{count} médias publics appartiennent à un contenu privé : leur fichier et "
 "leurs métadonnées fuient. Les passer en privé ou rendre le contenu public."
 
-#: src/Controller/Admin/CheckAndFixController.php:1649
+#: src/Controller/Admin/CheckAndFixController.php:2028
 msgid ""
 "{count} private media have an original file. The module Access is active, so "
 "their direct download should be controlled; check its configuration."
@@ -6812,7 +7030,7 @@ msgstr ""
 "leur téléchargement direct devrait donc être contrôlé ; vérifier sa "
 "configuration."
 
-#: src/Controller/Admin/CheckAndFixController.php:1654
+#: src/Controller/Admin/CheckAndFixController.php:2033
 msgid ""
 "{count} private media have an original file directly downloadable from "
 "\"files/original/\": no module protects private files. Install and configure "
@@ -6822,7 +7040,7 @@ msgstr ""
 "depuis « files/original/ » : aucun module ne protège les fichiers privés. "
 "Installer et configurer le module Access."
 
-#: src/Controller/Admin/CheckAndFixController.php:1666
+#: src/Controller/Admin/CheckAndFixController.php:2045
 msgid ""
 "{count} user(s) have a placeholder email (@example.*): remove test accounts "
 "or set real emails."
@@ -6830,7 +7048,7 @@ msgstr ""
 "{count} utilisateur(s) ont un email fictif (@example.*) : supprimer les "
 "comptes de test ou renseigner de vrais emails."
 
-#: src/Controller/Admin/CheckAndFixController.php:1673
+#: src/Controller/Admin/CheckAndFixController.php:2052
 msgid ""
 "User accounts: {admins} active administrators. Apply the least privilege "
 "principle and review them."
@@ -6838,7 +7056,7 @@ msgstr ""
 "Comptes utilisateurs : {admins} administrateurs actifs. Appliquer le "
 "principe de moindre privilège et les revoir."
 
-#: src/Controller/Admin/CheckAndFixController.php:1680
+#: src/Controller/Admin/CheckAndFixController.php:2059
 msgid ""
 "{count} api key(s) are registered: they are long lived credentials, revoke "
 "the unused ones."
@@ -6846,18 +7064,18 @@ msgstr ""
 "{count} clé(s) d’api sont enregistrées : ce sont des identifiants à longue "
 "durée de vie, révoquer celles inutilisées."
 
-#: src/Controller/Admin/CheckAndFixController.php:1714
+#: src/Controller/Admin/CheckAndFixController.php:2093
 msgid ""
 "Dangerous settings are enabled and should be disabled in production: {list}"
 msgstr ""
 "Des réglages dangereux sont activés et devraient être désactivés en "
 "production : {list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1718
+#: src/Controller/Admin/CheckAndFixController.php:2097
 msgid "Settings: no dangerous option enabled."
 msgstr "Réglages : aucune option dangereuse activée."
 
-#: src/Controller/Admin/CheckAndFixController.php:1731
+#: src/Controller/Admin/CheckAndFixController.php:2110
 msgid ""
 "Session cookie hardening is not enforced in the configuration ({list}); make "
 "sure it is set at the server level (https only, http only)."
@@ -6866,22 +7084,22 @@ msgstr ""
 "({list}) ; s’assurer qu’il est défini au niveau du serveur (https "
 "uniquement, http uniquement)."
 
-#: src/Controller/Admin/CheckAndFixController.php:1760
+#: src/Controller/Admin/CheckAndFixController.php:2139
 msgid ""
 "Privacy leak: the api exposes user emails to anonymous requests (/api/users)."
 msgstr ""
 "Fuite de confidentialité : l’api expose les emails des utilisateurs aux "
 "requêtes anonymes (/api/users)."
 
-#: src/Controller/Admin/CheckAndFixController.php:1762
+#: src/Controller/Admin/CheckAndFixController.php:2141
 msgid "Api probe: anonymous access to users does not expose emails."
 msgstr "Sonde api : l’accès anonyme aux utilisateurs n’expose pas d’emails."
 
-#: src/Controller/Admin/CheckAndFixController.php:1765
+#: src/Controller/Admin/CheckAndFixController.php:2144
 msgid "Api probe: anonymous access to users is forbidden."
 msgstr "Sonde api : l’accès anonyme aux utilisateurs est interdit."
 
-#: src/Controller/Admin/CheckAndFixController.php:1774
+#: src/Controller/Admin/CheckAndFixController.php:2153
 msgid ""
 "Privacy leak: the private item #{id} is readable by anonymous requests "
 "through the api."
@@ -6889,11 +7107,11 @@ msgstr ""
 "Fuite de confidentialité : le contenu privé #{id} est lisible par des "
 "requêtes anonymes via l’api."
 
-#: src/Controller/Admin/CheckAndFixController.php:1778
+#: src/Controller/Admin/CheckAndFixController.php:2157
 msgid "Api probe: anonymous access to a private item is forbidden."
 msgstr "Sonde api : l’accès anonyme à un contenu privé est interdit."
 
-#: src/Controller/Admin/CheckAndFixController.php:1783
+#: src/Controller/Admin/CheckAndFixController.php:2162
 msgid ""
 "The anonymous api probe could not be run ({message}); check the api access "
 "manually."
@@ -6901,7 +7119,7 @@ msgstr ""
 "La sonde api anonyme n’a pas pu être exécutée ({message}) ; vérifier l’accès "
 "à l’api manuellement."
 
-#: src/Controller/Admin/CheckAndFixController.php:1815
+#: src/Controller/Admin/CheckAndFixController.php:2194
 msgid ""
 "Jobs use the \"Synchronous\" strategy: they run in the web process and do "
 "not use the PHP-CLI, so this check is only informational."
@@ -6910,7 +7128,7 @@ msgstr ""
 "le processus web et n’utilisent pas le PHP-CLI, donc cette vérification est "
 "purement informative."
 
-#: src/Controller/Admin/CheckAndFixController.php:1820
+#: src/Controller/Admin/CheckAndFixController.php:2199
 msgid ""
 "The web PHP cannot spawn a process (\"proc_open\" and \"exec\" are both "
 "disabled); no background job can start, whatever the PHP-CLI path. Remove "
@@ -6920,7 +7138,7 @@ msgstr ""
 "tous deux désactivés) ; aucune tâche en arrière-plan ne peut démarrer, quel "
 "que soit le chemin PHP-CLI. En retirer un de « disable_functions »."
 
-#: src/Controller/Admin/CheckAndFixController.php:1826
+#: src/Controller/Admin/CheckAndFixController.php:2205
 msgid ""
 "The configured PHP-CLI path is invalid ({reason}): {path}. This is the cause "
 "of the error \"PHP-CLI error: invalid PHP path\"; jobs cannot run."
@@ -6929,11 +7147,11 @@ msgstr ""
 "de l’erreur « PHP-CLI error: invalid PHP path » ; les tâches ne peuvent pas "
 "s’exécuter."
 
-#: src/Controller/Admin/CheckAndFixController.php:1827
+#: src/Controller/Admin/CheckAndFixController.php:2206
 msgid "configured"
 msgstr "configuré"
 
-#: src/Controller/Admin/CheckAndFixController.php:1831
+#: src/Controller/Admin/CheckAndFixController.php:2210
 msgid ""
 "No PHP-CLI path is configured and none could be auto-detected (\"command -v "
 "php\" failed); jobs cannot run."
@@ -6942,7 +7160,7 @@ msgstr ""
 "automatiquement (« command -v php » a échoué) ; les tâches ne peuvent pas "
 "s’exécuter."
 
-#: src/Controller/Admin/CheckAndFixController.php:1834
+#: src/Controller/Admin/CheckAndFixController.php:2213
 msgid ""
 "No PHP-CLI path is configured; Omeka auto-detects \"{path}\". It is safer to "
 "set it explicitly to the binary matching the web version."
@@ -6951,11 +7169,11 @@ msgstr ""
 "« {path} ». Il est plus sûr de le définir explicitement vers le binaire "
 "correspondant à la version web."
 
-#: src/Controller/Admin/CheckAndFixController.php:1841
+#: src/Controller/Admin/CheckAndFixController.php:2220
 msgid "Web PHP version (this page): {version} (SAPI {sapi})."
 msgstr "Version PHP web (cette page) : {version} (SAPI {sapi})."
 
-#: src/Controller/Admin/CheckAndFixController.php:1849
+#: src/Controller/Admin/CheckAndFixController.php:2228
 msgid ""
 "The PHP binary could not be executed from the web context ({path}); check "
 "open_basedir, disabled functions and permissions."
@@ -6963,7 +7181,7 @@ msgstr ""
 "Le binaire PHP n’a pas pu être exécuté depuis le contexte web ({path}) ; "
 "vérifier open_basedir, les fonctions désactivées et les permissions."
 
-#: src/Controller/Admin/CheckAndFixController.php:1855
+#: src/Controller/Admin/CheckAndFixController.php:2234
 msgid ""
 "The configured PHP binary uses the \"{sapi}\" SAPI, not CLI ({path}); php-"
 "cgi and php-fpm binaries emit headers and mishandle arguments (perform-"
@@ -6975,12 +7193,12 @@ msgstr ""
 "arguments (perform-job.php les lit avec getopt, vide sous cgi, donc la tâche "
 "sort et reste en « starting »). Préférer un binaire php-cli."
 
-#: src/Controller/Admin/CheckAndFixController.php:1861
+#: src/Controller/Admin/CheckAndFixController.php:2240
 msgid "The PHP-CLI version ({cli}) matches the web version ({web}): {path}."
 msgstr ""
 "La version PHP-CLI ({cli}) correspond à la version web ({web}) : {path}."
 
-#: src/Controller/Admin/CheckAndFixController.php:1866
+#: src/Controller/Admin/CheckAndFixController.php:2245
 msgid ""
 "The PHP-CLI version ({cli}) differs from the web version ({web}); jobs may "
 "fail or behave differently (deprecations, missing extensions, "
@@ -6991,7 +7209,7 @@ msgstr ""
 "manquantes, sérialisation). Configurer un binaire PHP {major}. Chemin "
 "actuel : {path}."
 
-#: src/Controller/Admin/CheckAndFixController.php:1872
+#: src/Controller/Admin/CheckAndFixController.php:2251
 msgid ""
 "The PHP binary {path} is missing the extension \"pdo_mysql\", required by "
 "jobs to access the database."
@@ -6999,7 +7217,7 @@ msgstr ""
 "Le binaire PHP {path} n’a pas l’extension « pdo_mysql », requise par les "
 "tâches pour accéder à la base de données."
 
-#: src/Controller/Admin/CheckAndFixController.php:1878
+#: src/Controller/Admin/CheckAndFixController.php:2257
 msgid ""
 "The PHP-CLI is missing {count} extension(s) loaded on the web (jobs run the "
 "full application, so it should have the same): {list}."
@@ -7007,7 +7225,7 @@ msgstr ""
 "Le PHP-CLI n’a pas {count} extension(s) chargée(s) côté web (les tâches "
 "exécutent l’application complète, il devrait donc avoir les mêmes) : {list}."
 
-#: src/Controller/Admin/CheckAndFixController.php:1889
+#: src/Controller/Admin/CheckAndFixController.php:2268
 msgid ""
 "open_basedir is active on the web ({dirs}); a PHP binary outside this "
 "perimeter is neither testable nor usable by jobs. If the correct binary is "
@@ -7017,7 +7235,7 @@ msgstr ""
 "périmètre n’est ni testable ni utilisable par les tâches. Si le bon binaire "
 "est à l’extérieur, ajouter son dossier à open_basedir."
 
-#: src/Controller/Admin/CheckAndFixController.php:1914
+#: src/Controller/Admin/CheckAndFixController.php:2293
 msgid ""
 "Available PHP binaries:\n"
 "{list}"
@@ -7025,7 +7243,7 @@ msgstr ""
 "Binaires PHP disponibles :\n"
 "{list}"
 
-#: src/Controller/Admin/CheckAndFixController.php:1923
+#: src/Controller/Admin/CheckAndFixController.php:2302
 msgid ""
 "Recommended PHP-CLI path (matches the web version {web} and has pdo_mysql): "
 "{path}. Set the key [\"cli\"][\"phpcli_path\"] to it in config/"
@@ -7035,7 +7253,7 @@ msgstr ""
 "pdo_mysql) : {path}. Définir la clé [\"cli\"][\"phpcli_path\"] dessus dans "
 "config/local.config.php, puis recharger php-fpm."
 
-#: src/Controller/Admin/CheckAndFixController.php:1928
+#: src/Controller/Admin/CheckAndFixController.php:2307
 msgid ""
 "No php-cli binary was found, only a php-cgi one ({path}); a php-cli binary "
 "is strongly preferred for jobs. If you must use it, set [\"cli\"]"
@@ -7046,7 +7264,7 @@ msgstr ""
 "définir [\"cli\"][\"phpcli_path\"] dessus et vérifier que les tâches se "
 "terminent réellement."
 
-#: src/Controller/Admin/CheckAndFixController.php:1933
+#: src/Controller/Admin/CheckAndFixController.php:2312
 msgid ""
 "No PHP {major} binary with pdo_mysql was found in the usual locations; "
 "install one or set the path manually."
@@ -7054,7 +7272,7 @@ msgstr ""
 "Aucun binaire PHP {major} avec pdo_mysql n’a été trouvé aux emplacements "
 "habituels ; en installer un ou définir le chemin manuellement."
 
-#: src/Controller/Admin/CheckAndFixController.php:1951
+#: src/Controller/Admin/CheckAndFixController.php:2330
 msgid ""
 "The test job could not be dispatched ({message}). Fix the PHP-CLI "
 "configuration (check the audit above)."
@@ -7062,11 +7280,11 @@ msgstr ""
 "La tâche de test n’a pas pu être lancée ({message}). Corriger la "
 "configuration PHP-CLI (voir l’audit ci-dessus)."
 
-#: src/Controller/Admin/CheckAndFixController.php:1957
+#: src/Controller/Admin/CheckAndFixController.php:2336
 msgid "The test job could not be dispatched."
 msgstr "La tâche de test n’a pas pu être lancée."
 
-#: src/Controller/Admin/CheckAndFixController.php:1962
+#: src/Controller/Admin/CheckAndFixController.php:2341
 msgid ""
 "Test job dispatched ({link_job}#{job_id}{link_end}). If it reaches the "
 "status \"completed\", the background pipeline works; if it stays "
@@ -7078,7 +7296,7 @@ msgstr ""
 "en « starting », le PHP-CLI s’est exécuté mais n’a pas pu démarrer (version, "
 "extensions, base de données, ou getopt sous un SAPI cgi)."
 
-#: src/Controller/Admin/CheckAndFixController.php:1989
+#: src/Controller/Admin/CheckAndFixController.php:2368
 msgid ""
 "Current email configuration:\n"
 "{config}"
@@ -7087,21 +7305,21 @@ msgstr ""
 "\n"
 "{config}"
 
-#: src/Controller/Admin/CheckAndFixController.php:2006
+#: src/Controller/Admin/CheckAndFixController.php:2385
 msgid "No recipient email provided. Test email was not sent."
 msgstr ""
 "Aucune adresse e-mail de destinataire n'a été fournie. L'e-mail de test n'a "
 "pas été envoyé."
 
-#: src/Controller/Admin/CheckAndFixController.php:2012
+#: src/Controller/Admin/CheckAndFixController.php:2391
 msgid "Invalid recipient email address: {email}"
 msgstr "Adresse e-mail du destinataire non valide : {email}"
 
-#: src/Controller/Admin/CheckAndFixController.php:2025
+#: src/Controller/Admin/CheckAndFixController.php:2404
 msgid "[{title}] Test email"
 msgstr "[{title}] E-mail de test"
 
-#: src/Controller/Admin/CheckAndFixController.php:2029
+#: src/Controller/Admin/CheckAndFixController.php:2408
 msgid ""
 "This is a test email from {title}.\n"
 "\n"
@@ -7124,15 +7342,15 @@ msgstr ""
 "\n"
 "Envoyé le : {datetime}"
 
-#: src/Controller/Admin/CheckAndFixController.php:2041
+#: src/Controller/Admin/CheckAndFixController.php:2420
 msgid "Test email successfully sent to {email}."
 msgstr "Un e-mail de test a été envoyé avec succès à {email}."
 
-#: src/Controller/Admin/CheckAndFixController.php:2046
+#: src/Controller/Admin/CheckAndFixController.php:2425
 msgid "Failed to send test email: {error}"
 msgstr "Impossible d’envoyer un mail de test : {error}"
 
-#: src/Controller/Admin/CheckAndFixController.php:2065
+#: src/Controller/Admin/CheckAndFixController.php:2444
 msgid ""
 "Hint: Your current security setting is \"ssl\" => \"{current}\" (port "
 "{port}). A common fix is to try \"ssl\" => \"{alternative}\" with port "
@@ -7142,15 +7360,15 @@ msgstr ""
 "(port {port}). Une solution courante consiste à essayer « ssl » => "
 "« {alternative} » avec le port {alt_port}."
 
-#: src/Controller/Admin/ThemeController.php:223
+#: src/Controller/Admin/ThemeController.php:229
 msgid "No theme selected."
 msgstr "Aucun thème sélectionné."
 
-#: src/Controller/Admin/ThemeController.php:246
+#: src/Controller/Admin/ThemeController.php:252
 msgid "No new theme to install."
 msgstr "Aucun nouveau thème à installer."
 
-#: src/Controller/Admin/ThemeController.php:264
+#: src/Controller/Admin/ThemeController.php:270
 msgid ""
 "Installing {count} themes in background (job {link_job}#{job_id}{link_end}, "
 "{link_log}logs{link_end})."
@@ -7158,17 +7376,39 @@ msgstr ""
 "Installation de {count} thèmes en arrière-plan (tâche {link_job}#{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: src/Controller/Admin/ThemeController.php:305
-#: src/Controller/Admin/ThemeController.php:372
+#: src/Controller/Admin/ThemeController.php:311
+#: src/Controller/Admin/ThemeController.php:378
 msgid "Unknown theme \"{name}\"."
 msgstr "Thème inconnu \"{name}\"."
 
-#: src/Controller/Admin/ThemeController.php:358
-#: src/Controller/Admin/ThemeController.php:481
+#: src/Controller/Admin/ThemeController.php:364
+#: src/Controller/Admin/ThemeController.php:487
 msgid "No theme specified."
 msgstr "Aucun thème indiqué."
 
-#: src/Controller/Admin/ThemeController.php:653
+#: src/Controller/Admin/ThemeController.php:550
+msgid "The site \"{site_slug}\" does not exist."
+msgstr "Le site « {site_slug} » n’existe pas."
+
+#: src/Controller/Admin/ThemeController.php:558
+msgid "You are not allowed to configure the theme of the site \"{site_slug}\"."
+msgstr ""
+"Vous n’êtes pas autorisé à configurer le thème du site « {site_slug} »."
+
+#: src/Controller/Admin/ThemeController.php:571
+msgid ""
+"The site has no resource page blocks of its own: the blocks of the theme are "
+"already used."
+msgstr ""
+"Le site n’a pas de blocs de pages de ressources qui lui soient propres : les "
+"blocs du thème sont déjà utilisés."
+
+#: src/Controller/Admin/ThemeController.php:579
+msgid "The resource pages were reset to the configuration of the theme."
+msgstr ""
+"Les pages de ressources ont été réinitialisées à la configuration du thème."
+
+#: src/Controller/Admin/ThemeController.php:723
 #: src/Controller/Admin/ModuleController.php:988
 msgid ""
 "Processing {action} in background (job {link_job}#{job_id}{link_end}, "
@@ -7177,19 +7417,19 @@ msgstr ""
 "Lancement de {action} de en arrière-plan (tâche {link_job}#{job_id}"
 "{link_end}, {link_log}journaux{link_end})."
 
-#: src/Controller/Admin/ThemeController.php:717
+#: src/Controller/Admin/ThemeController.php:787
 msgid "Removed themes: {themes}."
 msgstr "Thèmes supprimés : {themes}."
 
-#: src/Controller/Admin/ThemeController.php:718
+#: src/Controller/Admin/ThemeController.php:788
 msgid "Updated themes: {themes}."
 msgstr "Thèmes mis à jour : {themes}."
 
-#: src/Controller/Admin/ThemeController.php:725
+#: src/Controller/Admin/ThemeController.php:795
 msgid "Failed to remove themes: {themes}."
 msgstr "Échec de la suppression des thèmes : {themes}."
 
-#: src/Controller/Admin/ThemeController.php:726
+#: src/Controller/Admin/ThemeController.php:796
 msgid "Failed to update themes: {themes}."
 msgstr "Échec de la mise à jour des thèmes : {themes}."
 
@@ -7480,33 +7720,125 @@ msgstr ""
 "{line}), la règle du module {module_2} (ligne {line_2}) ne leur est donc pas "
 "appliquée."
 
-#: config/module.config.php:463
+#: config/module.config.php:466
 msgid "Backup database"
 msgstr "Sauvegarde de la base de données"
 
-#: config/module.config.php:472
+#: config/module.config.php:475
 msgid "Compressed (gzip)"
 msgstr "Compressé (gzip)"
 
-#: config/module.config.php:473
+#: config/module.config.php:476
 msgid "Plain SQL"
 msgstr "SQL brut"
 
-#: config/module.config.php:480
+#: config/module.config.php:483
 msgid "Backup files (modules, themes, config)"
 msgstr "Fichiers de sauvegarde (modules, thèmes, configuration)"
 
-#: config/module.config.php:487
+#: config/module.config.php:490
 msgid "Scope"
 msgstr "Portée"
 
-#: config/module.config.php:489
+#: config/module.config.php:492
 msgid "Full backup (core, modules, themes, config)"
 msgstr "Sauvegarde complète (noyau, modules, thèmes, configuration)"
 
-#: config/module.config.php:490
+#: config/module.config.php:493
 msgid "Configuration only"
 msgstr "Configuration uniquement"
+
+#~ msgid ""
+#~ "The settings of the production were already saved: they are kept, so the "
+#~ "production can still be restored."
+#~ msgstr ""
+#~ "Les paramètres de la production ont déjà été enregistrés : ils sont "
+#~ "conservés, afin que la production puisse toujours être rétablie."
+
+#~ msgid ""
+#~ "The settings of the production were saved ({count} settings): they will "
+#~ "be restored with the mode \"production\"."
+#~ msgstr ""
+#~ "Les paramètres de la production ont été enregistrés ({count} "
+#~ "paramètres) : ils seront rétablis avec le mode « production »."
+
+#~ msgid ""
+#~ "The settings of the production were restored, the statistics trackers and "
+#~ "the external services included."
+#~ msgstr ""
+#~ "Les paramètres de la production ont été rétablis, y compris les traqueurs "
+#~ "de statistiques et les services externes."
+
+#~ msgid ""
+#~ "For the production: remove the prefix « TEST » of the title, the color of "
+#~ "the admin interface of the test, the display of the errors, the fake "
+#~ "images and the base url of the files"
+#~ msgstr ""
+#~ "Pour la production : retirer le préfixe « TEST » du titre, la couleur de "
+#~ "l’interface d’administration de test, l’affichage des erreurs, les "
+#~ "fausses images et l’url de base des fichiers"
+
+#~ msgid "Color of the admin left sidebar"
+#~ msgstr "Couleur de la barre latérale gauche de l’administration"
+
+#~ msgid ""
+#~ "Useful to distinguish instances, for example a test one from the "
+#~ "production one."
+#~ msgstr ""
+#~ "Utile pour distinguer les instances, par exemple une instance de test de "
+#~ "celle de production."
+
+#~ msgid ""
+#~ "For a test copy: prefix the title with « TEST », color the admin sidebar, "
+#~ "display the errors on screen, remove the statistics trackers and replace "
+#~ "the images by grey placeholders when the files are not served from "
+#~ "another server"
+#~ msgstr ""
+#~ "Pour une copie test : préfixe le titre avec « TEST », change la couleur "
+#~ "de la barre latérale, affiche les erreurs, supprime les codes de suivis "
+#~ "et remplace les images par une zone grises quand les fichiers ne sont pas "
+#~ "servis depuis un serveur tiers"
+
+#~ msgid ""
+#~ "For the production: remove the prefix « TEST » of the title, the color of "
+#~ "the admin sidebar of the test, the display of the errors, the fake images "
+#~ "and the base url of the files"
+#~ msgstr ""
+#~ "Pour la production : supprime le préfixe « TEST » du titre, remet la "
+#~ "couleur par défaut pour la barre latérale, cache les erreurs sur l'écran "
+#~ "et les images factices et remet l'url de base des fichiers"
+
+#~ msgid "Installation title and color of the admin sidebar"
+#~ msgstr "Titre et couleur de la barre admin latérale"
+
+#~ msgid "The admin sidebar is now colored ({color})."
+#~ msgstr "La barre admin latérale est désormais colorée ({color})."
+
+#~ msgid "The admin sidebar has now its default color."
+#~ msgstr "La barre admin latérale a retrouvé sa couleur par défaut."
+
+#~ msgid "Display the list"
+#~ msgstr "Afficher la liste"
+
+#, php-format
+#~ msgid ""
+#~ "These modules are symbolic links to a directory that is not writeable by "
+#~ "the server, so they cannot be updated nor removed here: %s. Update them "
+#~ "in the target directory."
+#~ msgstr ""
+#~ "Ces modules sont des liens symboliques vers un dossier non inscriptible "
+#~ "par le serveur, ils ne peuvent donc être ni mis à jour ni supprimés ici : "
+#~ "%s. Mettez-les à jour dans le dossier cible."
+
+#, php-format
+#~ msgid ""
+#~ "These themes are symbolic links to a directory that is not writeable by "
+#~ "the server, so they cannot be updated nor removed here: %s. Update them "
+#~ "in the target directory."
+#~ msgstr ""
+#~ "Ces thèmes sont des liens symboliques vers un dossier non inscriptible "
+#~ "par le serveur, ils ne peuvent donc être ni mis à jour ni supprimés ici : "
+#~ "%s. Mettez-les à jour dans le dossier cible."
 
 #~ msgid ")"
 #~ msgstr ")"
@@ -8150,3 +8482,18 @@ msgstr "Configuration uniquement"
 #~ msgstr ""
 #~ "Média #{media_id} ({processed}/{total}) : le fichier \"{filename}\" "
 #~ "n’existe pas pour le type \"{type}\"."
+
+msgid "With errors"
+msgstr "Avec erreurs"
+
+msgid "With warnings"
+msgstr "Avec avertissements"
+
+msgid "Filter jobs"
+msgstr "Filtrer les tâches"
+
+msgid "Errors: %d"
+msgstr "Erreurs : %d"
+
+msgid "Warnings: %d"
+msgstr "Avertissements : %d"
