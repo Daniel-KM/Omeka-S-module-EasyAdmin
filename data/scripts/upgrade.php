@@ -647,6 +647,17 @@ if (version_compare($oldVersion, '3.4.48', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.52', '<')) {
+    // The option colors the whole admin interface now, and not only the
+    // sidebar, so it is renamed.
+    $settings->set('easyadmin_admin_color', $settings->get('easyadmin_admin_board_color') ?: '');
+    $settings->delete('easyadmin_admin_board_color');
+    if ($settings->get('easyadmin_admin_color')) {
+        $message = new PsrMessage(
+            'The color of the admin sidebar is now used for the whole admin interface: the logo, the buttons, the block of the sites and the borders are derived from it.' // @translate
+        );
+        $messenger->addSuccess($message);
+    }
+
     $settings->set('easyadmin_skip_lazy_loading', false);
     $message = new PsrMessage(
         'The thumbnails are loaded only when they are displayed, so a page with many media is loaded quickly. This behavior can be disabled in the main settings.' // @translate
