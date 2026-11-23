@@ -74,7 +74,15 @@ foreach ($webThemes as $catUrl => $catAddon) {
 
 <?php if (!empty($readOnlyLinks)): ?>
 <div class="messages warning">
-    <p><?= $escape(sprintf($translate('These themes are symbolic links to a directory that is not writeable by the server, so they cannot be updated nor removed here: %s. Update them in the target directory.'), implode(', ', array_keys($readOnlyLinks)))) ?></p>
+    <?php
+    // Only the target directories are displayed: on an instance where the
+    // addons are shared, the list of the names is too long for a message.
+    $readOnlyDirs = [];
+    foreach ($readOnlyLinks as $readOnlyTarget) {
+        $readOnlyDirs[dirname($readOnlyTarget)] = true;
+    }
+    ?>
+    <p><?= $escape(sprintf($translate('Some themes are symbolic links to a directory that is not writeable by the server (%s), so they cannot be updated nor removed here. Update them in the target directory.'), implode(', ', array_keys($readOnlyDirs)))) ?></p>
 </div>
 <?php endif ?>
 
