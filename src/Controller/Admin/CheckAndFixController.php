@@ -1312,10 +1312,11 @@ class CheckAndFixController extends AbstractActionController
             ));
         }
 
-        // Tracking scripts and server-side tracker.
+        // Tracking scripts and server-side tracker, with its site and its
+        // token, that is a secret of the analytics server of the original site.
         $trackers = $connection->executeStatement(
             'UPDATE setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
-            ['""', ['analyticssnippet_inline_public', 'analyticssnippet_inline_admin', 'analyticssnippetpiwik_tracker_url'], ['""', 'null', '']],
+            ['""', ['analyticssnippet_inline_public', 'analyticssnippet_inline_admin', 'analyticssnippetpiwik_tracker_url', 'analyticssnippetpiwik_site_id', 'analyticssnippetpiwik_token_auth'], ['""', 'null', '']],
             [\Doctrine\DBAL\ParameterType::STRING, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
         ) + $connection->executeStatement(
             'UPDATE site_setting SET value = ? WHERE id IN (?) AND value NOT IN (?)',
@@ -1326,6 +1327,58 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addSuccess(new PsrMessage(
                 'The statistics trackers were removed ({count} settings), so the visits of this copy are not sent to the analytics server of the original site.', // @translate
                 ['count' => $trackers]
+            ));
+        }
+
+        // External services where the copy would write: Scripto saves the
+        // transcriptions in the wiki of the original site.
+        foreach (['scripto_apiurl'] as $key) {
+            if ($settings->get($key)) {
+                $settings->set($key, '');
+                $messenger->addSuccess(new PsrMessage(
+                    'The setting "{setting}" was emptied, so this copy does not write in the external service of the original site.', // @translate
+                    ['setting' => $key]
+                ));
+            }
+        }
+
+        $this->adaptSettingsHostForTest();
+    }
+
+    /**
+     * Replace the host of the original site by the current one in the settings
+     * that identify the server, like the base url of the image server, used in
+     * the iiif urls, and the namespace of the oai-pmh repository.
+     */
+    protected function adaptSettingsHostForTest(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $this->messenger();
+
+        $serverUrl = (string) $this->viewHelpers()->get('ServerUrl')->__invoke();
+        $currentHost = strtolower((string) parse_url($serverUrl, PHP_URL_HOST));
+
+        foreach (['imageserver_base_url', 'oaipmhrepository_namespace_id'] as $key) {
+            $value = (string) $settings->get($key, '');
+            $host = strtolower((string) (str_contains($value, '//') ? parse_url($value, PHP_URL_HOST) : $value));
+            if ($host === '' || $host === $currentHost) {
+                continue;
+            }
+            if ($currentHost === '') {
+                $messenger->addWarning(new PsrMessage(
+                    'The setting "{setting}" uses the host of another server ({host}): set it manually for this copy.', // @translate
+                    ['setting' => $key, 'host' => $host]
+                ));
+                continue;
+            }
+            $newValue = str_contains($value, '//')
+                ? rtrim($serverUrl, '/') . '/' . ltrim((string) parse_url($value, PHP_URL_PATH), '/')
+                : $currentHost;
+            $settings->set($key, $newValue);
+            $messenger->addSuccess(new PsrMessage(
+                'The setting "{setting}" now uses the host of this server: {value}.', // @translate
+                ['setting' => $key, 'value' => $newValue]
             ));
         }
     }
