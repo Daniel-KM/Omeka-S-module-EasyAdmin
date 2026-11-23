@@ -19,7 +19,8 @@
             return;
         }
         var checked = document.querySelectorAll(
-            '.batch-edit tbody input[type="checkbox"]:checked'
+            '.batch-edit tbody tr:not(.addon-hidden-filter)'
+                + ' input[type="checkbox"][name$="[]"]:checked'
         ).length;
         Array.prototype.forEach.call(select.options, function (option) {
             if (option.value !== 'default' && !option.dataset.always) {
@@ -82,11 +83,17 @@
         // here through delegation. They are idempotent with the core ones on
         // the initial (non-swapped) load.
         if (target.matches('.select-all')) {
-            var rows = document.querySelectorAll(
-                '.batch-edit td input[type="checkbox"]:not(:disabled)'
+            // The core checks every row, even the ones hidden by a filter, and
+            // its handler is bound on the element, so it runs before this one:
+            // the state of all the rows is set again here, and a hidden row is
+            // never selected, so a batch process applies to what is displayed.
+            var checkboxes = document.querySelectorAll(
+                '.batch-edit tbody input[type="checkbox"][name$="[]"]:not(:disabled)'
             );
-            Array.prototype.forEach.call(rows, function (checkbox) {
-                checkbox.checked = target.checked;
+            Array.prototype.forEach.call(checkboxes, function (checkbox) {
+                var row = checkbox.closest('tr');
+                checkbox.checked = target.checked
+                    && !(row && row.classList.contains('addon-hidden-filter'));
             });
             updateBatchActions();
             return;
