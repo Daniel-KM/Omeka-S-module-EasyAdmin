@@ -2,7 +2,7 @@
 
 (function ($) {
 
-    $(document).ready(function() {
+    $(function() {
 
         const basePath = window.location.pathname.replace(/\/admin\/.*/, '/');
         const uploadUrl = basePath + 'admin/easy-admin/upload';

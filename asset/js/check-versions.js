@@ -1,6 +1,6 @@
 'use strict';
 
-$(document).ready(function() {
+$(function() {
     /**
      * Compare two software version numbers (e.g. 1.7.1).
      *

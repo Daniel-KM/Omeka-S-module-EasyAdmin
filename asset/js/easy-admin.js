@@ -1,6 +1,6 @@
 'use strict';
 
-$(document).ready(function () {
+$(function () {
 
     if (!$('body').hasClass('check-and-fix')) {
         return;
@@ -322,7 +322,7 @@ $(document).ready(function () {
         var placeholder = $form.data('filter-placeholder') || 'Filter tasks…';
         var $filter = $('<div class="task-filter"><input type="search" class="task-filter-input"></div>');
         $filter.find('input').attr('placeholder', placeholder).attr('aria-label', placeholder);
-        $filter.insertBefore('.check-and-fix fieldset.field-container:first');
+        $filter.insertBefore($('.check-and-fix fieldset.field-container').first());
         $filter.find('input').on('input', filterTasks);
     };
 

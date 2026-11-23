@@ -62,7 +62,7 @@
         sync();
     }
 
-    $(document).ready(function () {
+    $(function () {
         var warningText = $('#check-and-fix-form').data('dbLoopWarning') || '';
         FIELDSETS.forEach(function (prefix) {
             setup(prefix, warningText);

@@ -13,7 +13,7 @@
 (function($) {
     'use strict';
 
-    $(document).ready(function() {
+    $(function() {
         if (typeof Sortable === 'undefined') {
             return;
         }

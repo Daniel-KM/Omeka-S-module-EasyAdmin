@@ -6,7 +6,7 @@
  * @see https://github.com/Daniel-KM/Omeka-S-module-Common/issues/3
  */
 (function ($) {
-    $(document).ready(function () {
+    $(function () {
         var searchTimeout = null;
         var pendingFocusRestore = null;
 

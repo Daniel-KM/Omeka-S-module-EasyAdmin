@@ -1,16 +1,16 @@
 'use strict';
 
 (function ($) {
-    $(document).ready(function() {
+    $(function() {
 
         // Auto-submit directory selector on change.
         $('#dir_path').on('change', function() {
-            $('#dir-select-form').submit();
+            $('#dir-select-form').trigger('submit');
         });
 
         // Auto-submit when display_dir checkbox changes.
         $('.display-dir-label input').on('change', function() {
-            $('#dir-select-form').submit();
+            $('#dir-select-form').trigger('submit');
         });
 
         // Select all checkbox.
