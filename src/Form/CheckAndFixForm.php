@@ -298,6 +298,14 @@ class CheckAndFixForm extends Form
                     'db_orphan_tables_check' => 'List', // @translate
                 ],
             ],
+            'db_indexes' => [
+                'name' => 'Database indexes', // @translate
+                'description' => 'Indexes added by the module Common to speed up the queries, that may be missing when their creation failed on a big table.', // @translate
+                'actions' => [
+                    'db_indexes_check' => 'Check', // @translate
+                    'db_indexes_fix' => 'Add missing', // @translate
+                ],
+            ],
             // Themes.
             'theme_templates' => [
                 'name' => 'Theme templates (v4.1)', // @translate
@@ -1314,6 +1322,8 @@ class CheckAndFixForm extends Form
                         'db_customvocab_missing_itemsets_check' => 'Check if all custom vocabs with item sets have an existing item set', // @translate
                         'db_customvocab_missing_itemsets_clean' => 'Fix missing item sets of custom vocabs', // @translate
                         'db_orphan_tables_check' => 'List useless tables (left by uninstalled modules or replaced features: reference_metadata, triplestore, term…)', // @translate
+                        'db_indexes_check' => 'Check the database indexes added by the module Common', // @translate
+                        'db_indexes_fix' => 'Add the missing database indexes in background (may be long on a big table)', // @translate
                     ],
                 ],
                 'attributes' => [

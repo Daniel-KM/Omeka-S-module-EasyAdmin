@@ -306,6 +306,12 @@ class CheckAndFixController extends AbstractActionController
             case 'db_orphan_tables_check':
                 $this->checkOrphanTables();
                 break;
+            case 'db_indexes_check':
+                $this->checkDatabaseIndexes(false);
+                break;
+            case 'db_indexes_fix':
+                $job = $this->checkDatabaseIndexes(true);
+                break;
             default:
                 $eventManager = $this->getEventManager();
                 $args = $eventManager->prepareArgs([
@@ -476,8 +482,53 @@ class CheckAndFixController extends AbstractActionController
 
         $this->checkPhpCli();
         $this->messenger()->addNotice('The PHP-CLI was checked without running a job, so the check of the background jobs is not complete: run the task "Test job" of the background jobs to check them fully.'); // @translate
+        $this->checkDatabaseIndexes(true);
         $this->checkHttpClient();
         $this->checkWebServer(true);
+    }
+
+    /**
+     * Check the indexes that should have been added by the module Common.
+     *
+     * The indexes of the big tables are added in background on upgrade of the
+     * module Common, so they may be missing when the background process failed.
+     * When fixed, the missing indexes are added by the job of the module Common,
+     * that may be long on a big table.
+     */
+    protected function checkDatabaseIndexes(bool $fix): ?\Omeka\Entity\Job
+    {
+        $messenger = $this->messenger();
+        if (!class_exists(\Common\Stdlib\DatabaseIndexes::class)
+            || !class_exists(\Common\Job\AddDatabaseIndexes::class)
+        ) {
+            $messenger->addWarning('The module Common should be upgraded to check the database indexes.'); // @translate
+            return null;
+        }
+
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $missingIndexes = \Common\Stdlib\DatabaseIndexes::missing($services->get('Omeka\Connection'));
+        if (!$missingIndexes) {
+            $messenger->addSuccess('All the database indexes added by the module Common exist.'); // @translate
+            return null;
+        }
+
+        $list = implode(', ', array_map(fn ($entry) => $entry['table'] . '/' . $entry['index'], $missingIndexes));
+        if (!$fix) {
+            $messenger->addWarning(new PsrMessage(
+                'Some database indexes that should have been added by the module Common are missing: {list}. Run the task to add them.', // @translate
+                ['list' => $list]
+            ));
+            return null;
+        }
+
+        /** @var \Omeka\Job\Dispatcher $dispatcher */
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+        $job = $dispatcher->dispatch(\Common\Job\AddDatabaseIndexes::class);
+        $messenger->addNotice(new PsrMessage(
+            'Some database indexes that should have been added by the module Common are missing: {list}. They are being added in background (job #{job_id}).', // @translate
+            ['list' => $list, 'job_id' => $job->getId()]
+        ));
+        return $job;
     }
 
     /**
