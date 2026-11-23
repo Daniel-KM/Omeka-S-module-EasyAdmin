@@ -14,6 +14,45 @@ class CheckAndFixController extends AbstractActionController
     const TEST_BOARD_COLOR = '#8b1a1a';
 
     /**
+     * Color of the admin interface of a preprod copy.
+     */
+    const PREPROD_BOARD_COLOR = '#1a4b8b';
+
+    /**
+     * Setting that keeps the values of the production before an adaptation.
+     */
+    const SETTING_SNAPSHOT = 'easyadmin_settings_production';
+
+    /**
+     * Settings saved before an adaptation, so the production can be restored.
+     */
+    const SNAPSHOT_SETTINGS = [
+        'installation_title',
+        'easyadmin_admin_color',
+        'easyadmin_display_exception',
+        'easyadmin_mail_test_copy',
+        'easyadmin_mail_redirect_to',
+        'easyadmin_local_store_base_uri',
+        'easyadmin_local_store_fake_images',
+        'analyticssnippet_inline_public',
+        'analyticssnippet_inline_admin',
+        'analyticssnippetpiwik_tracker_url',
+        'analyticssnippetpiwik_site_id',
+        'analyticssnippetpiwik_token_auth',
+        'scripto_apiurl',
+        'imageserver_base_url',
+        'oaipmhrepository_namespace_id',
+    ];
+
+    /**
+     * Site settings saved before an adaptation.
+     */
+    const SNAPSHOT_SITE_SETTINGS = [
+        'analyticssnippet_inline_public',
+        'analyticssnippet_inline_admin',
+    ];
+
+    /**
      * Processes quick enough to run in the web process, with instant feedback.
      *
      * They are dispatched as jobs anyway, so the job log and history are kept,
@@ -1234,10 +1273,195 @@ class CheckAndFixController extends AbstractActionController
         ));
 
         if ($mode === 'test') {
+            $this->snapshotSettingsForProduction();
             $this->adaptSettingsForTest();
+        } elseif ($mode === 'preprod') {
+            $this->snapshotSettingsForProduction();
+            $this->adaptSettingsForPreprod();
         } elseif ($mode === 'production') {
             $this->adaptSettingsForProduction();
         }
+    }
+
+    /**
+     * Save the settings of the production before they are adapted.
+     *
+     * Without it, the adaptation is a one way process: the statistics
+     * trackers, the external services and the settings that identify the
+     * server are emptied or rewritten, and the production cannot be restored.
+     * The snapshot is kept in the settings, so it follows a copy of the
+     * database.
+     */
+    protected function snapshotSettingsForProduction(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $connection = $services->get('Omeka\Connection');
+
+        // A second adaptation must not save the values of the first one.
+        if ($settings->get(self::SETTING_SNAPSHOT)) {
+            $this->messenger()->addNotice(new PsrMessage(
+                'The settings of the production were already saved: they are kept, so the production can still be restored.' // @translate
+            ));
+            return;
+        }
+
+        $snapshot = ['settings' => [], 'site_settings' => []];
+        foreach (self::SNAPSHOT_SETTINGS as $key) {
+            $snapshot['settings'][$key] = $settings->get($key);
+        }
+        foreach ($connection->fetchFirstColumn('SELECT id FROM site ORDER BY id') as $siteId) {
+            $siteSettings->setTargetId((int) $siteId);
+            foreach (self::SNAPSHOT_SITE_SETTINGS as $key) {
+                $snapshot['site_settings'][(int) $siteId][$key] = $siteSettings->get($key);
+            }
+        }
+
+        $settings->set(self::SETTING_SNAPSHOT, $snapshot);
+        $this->messenger()->addSuccess(new PsrMessage(
+            'The settings of the production were saved ({count} settings): they will be restored with the mode "production".', // @translate
+            ['count' => count($snapshot['settings'])]
+        ));
+    }
+
+    /**
+     * Restore the settings saved before the adaptation.
+     *
+     * @return bool False when there is no snapshot, for a copy adapted before
+     * this feature or adapted by hand.
+     */
+    protected function restoreSettingsFromSnapshot(): bool
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $siteSettings = $services->get('Omeka\Settings\Site');
+
+        $snapshot = $settings->get(self::SETTING_SNAPSHOT);
+        if (!$snapshot || !is_array($snapshot)) {
+            return false;
+        }
+
+        foreach ($snapshot['settings'] ?? [] as $key => $value) {
+            $settings->set($key, $value);
+        }
+        foreach ($snapshot['site_settings'] ?? [] as $siteId => $values) {
+            $siteSettings->setTargetId((int) $siteId);
+            foreach ($values as $key => $value) {
+                $siteSettings->set($key, $value);
+            }
+        }
+        $settings->delete(self::SETTING_SNAPSHOT);
+
+        $this->messenger()->addSuccess(new PsrMessage(
+            'The settings of the production were restored, the statistics trackers and the external services included.' // @translate
+        ));
+        return true;
+    }
+
+    /**
+     * Get the host of the original server, still present in the settings.
+     */
+    protected function originalHost(): ?string
+    {
+        $settings = $this->getEvent()->getApplication()->getServiceManager()->get('Omeka\Settings');
+        $currentHost = strtolower((string) parse_url((string) $this->viewHelpers()->get('ServerUrl')->__invoke(), PHP_URL_HOST));
+        foreach (['imageserver_base_url', 'oaipmhrepository_namespace_id'] as $key) {
+            $value = (string) $settings->get($key, '');
+            $host = strtolower((string) (str_contains($value, '//') ? parse_url($value, PHP_URL_HOST) : $value));
+            if ($host !== '' && $host !== $currentHost) {
+                return $host;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Adapt the settings for a preprod copy of a site.
+     *
+     * Unlike a test copy, a preprod is a real instance, that may become the
+     * production: the files are served by the production instead of being
+     * replaced by fake images, and the errors are displayed to the admins
+     * only. Like a test copy, it must never send the emails of the users nor
+     * the statistics of the production.
+     */
+    protected function adaptSettingsForPreprod(): void
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $this->messenger();
+
+        $originalHost = $this->originalHost();
+
+        $title = (string) $settings->get('installation_title', '');
+        if (mb_strpos($title, 'PREPROD') === 0) {
+            $messenger->addNotice(new PsrMessage(
+                'The installation title already starts with « PREPROD »: {title}', // @translate
+                ['title' => $title]
+            ));
+        } else {
+            $newTitle = trim('PREPROD ' . $title);
+            $settings->set('installation_title', $newTitle);
+            $messenger->addSuccess(new PsrMessage(
+                'The installation title is now: {title}', // @translate
+                ['title' => $newTitle]
+            ));
+        }
+
+        // A color already chosen is kept.
+        if (!$settings->get('easyadmin_admin_color')) {
+            $settings->set('easyadmin_admin_color', self::PREPROD_BOARD_COLOR);
+            $messenger->addSuccess(new PsrMessage(
+                'The admin interface is now colored ({color}).', // @translate
+                ['color' => self::PREPROD_BOARD_COLOR]
+            ));
+        }
+
+        // A preprod is used by real users, so the errors stay for the admins.
+        if ($settings->get('easyadmin_display_exception') !== 'admin') {
+            $settings->set('easyadmin_display_exception', 'admin');
+            $messenger->addSuccess(new PsrMessage(
+                'The errors are now displayed on screen for the admins only.' // @translate
+            ));
+        }
+
+        // The real users must never receive the emails of a preprod, so the
+        // redirection is forced, even when another mode was set.
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        $email = (string) ($settings->get('easyadmin_mail_redirect_to') ?: ($user ? $user->getEmail() : ''));
+        $settings->set('easyadmin_mail_redirect_to', $email);
+        $settings->set('easyadmin_mail_test_copy', $email ? 'redirect' : 'capture');
+        $messenger->addSuccess($email
+            ? new PsrMessage('All the emails are now redirected to {email}.', ['email' => $email]) // @translate
+            : new PsrMessage('All the emails are now captured in files, without being sent.')); // @translate
+
+        // A preprod shows the real files, served by the production.
+        if ($this->hasLocalOriginalFiles()) {
+            $messenger->addNotice(new PsrMessage(
+                'The original files are present, so they are served locally.' // @translate
+            ));
+        } elseif ($settings->get('easyadmin_local_store_base_uri')) {
+            $messenger->addNotice(new PsrMessage(
+                'The files are already served by another server: {url}', // @translate
+                ['url' => $settings->get('easyadmin_local_store_base_uri')]
+            ));
+        } elseif ($originalHost) {
+            $baseUri = 'https://' . $originalHost . '/files';
+            $settings->set('easyadmin_local_store_base_uri', $baseUri);
+            $settings->set('easyadmin_local_store_fake_images', '');
+            $messenger->addSuccess(new PsrMessage(
+                'The files are now served by the production ({url}): check the url and the access rights.', // @translate
+                ['url' => $baseUri]
+            ));
+        } else {
+            $messenger->addWarning(new PsrMessage(
+                'The original files are missing and the host of the production is unknown: set the base url of the files in the main settings.' // @translate
+            ));
+        }
+
+        $this->removeStatisticsTrackers();
+        $this->removeExternalServices();
+        $this->adaptSettingsHostForTest();
     }
 
     /**
@@ -1249,7 +1473,6 @@ class CheckAndFixController extends AbstractActionController
     protected function adaptSettingsForTest(): void
     {
         $services = $this->getEvent()->getApplication()->getServiceManager();
-        $connection = $services->get('Omeka\Connection');
         $settings = $services->get('Omeka\Settings');
         $messenger = $this->messenger();
 
@@ -1312,6 +1535,19 @@ class CheckAndFixController extends AbstractActionController
             ));
         }
 
+        $this->removeStatisticsTrackers();
+        $this->removeExternalServices();
+        $this->adaptSettingsHostForTest();
+    }
+
+    /**
+     * Empty the statistics trackers, so the visits of a copy are not sent to
+     * the analytics server of the original site.
+     */
+    protected function removeStatisticsTrackers(): void
+    {
+        $connection = $this->getEvent()->getApplication()->getServiceManager()->get('Omeka\Connection');
+
         // Tracking scripts and server-side tracker, with its site and its
         // token, that is a secret of the analytics server of the original site.
         $trackers = $connection->executeStatement(
@@ -1324,25 +1560,29 @@ class CheckAndFixController extends AbstractActionController
             [\Doctrine\DBAL\ParameterType::STRING, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY]
         );
         if ($trackers) {
-            $messenger->addSuccess(new PsrMessage(
+            $this->messenger()->addSuccess(new PsrMessage(
                 'The statistics trackers were removed ({count} settings), so the visits of this copy are not sent to the analytics server of the original site.', // @translate
                 ['count' => $trackers]
             ));
         }
+    }
 
-        // External services where the copy would write: Scripto saves the
-        // transcriptions in the wiki of the original site.
+    /**
+     * Empty the external services where a copy would write in place of the
+     * original site, for example the wiki of the transcriptions of Scripto.
+     */
+    protected function removeExternalServices(): void
+    {
+        $settings = $this->getEvent()->getApplication()->getServiceManager()->get('Omeka\Settings');
         foreach (['scripto_apiurl'] as $key) {
             if ($settings->get($key)) {
                 $settings->set($key, '');
-                $messenger->addSuccess(new PsrMessage(
+                $this->messenger()->addSuccess(new PsrMessage(
                     'The setting "{setting}" was emptied, so this copy does not write in the external service of the original site.', // @translate
                     ['setting' => $key]
                 ));
             }
         }
-
-        $this->adaptSettingsHostForTest();
     }
 
     /**
@@ -1409,9 +1649,10 @@ class CheckAndFixController extends AbstractActionController
     /**
      * Restore the settings of a test copy for the production.
      *
-     * Only the values set for the test are reverted: the prefix of the title,
-     * the color of the admin interface and the display of the errors. The removed
-     * statistics trackers cannot be restored.
+     * The settings saved before the adaptation are restored when they exist.
+     * Else, for a copy adapted before this feature or by hand, only the values
+     * set for the test are reverted, and the removed statistics trackers and
+     * external services cannot be restored.
      */
     protected function adaptSettingsForProduction(): void
     {
@@ -1419,6 +1660,15 @@ class CheckAndFixController extends AbstractActionController
         $connection = $services->get('Omeka\Connection');
         $settings = $services->get('Omeka\Settings');
         $messenger = $this->messenger();
+
+        // The settings saved before the adaptation are the only way to get the
+        // statistics trackers and the external services back.
+        if ($this->restoreSettingsFromSnapshot()) {
+            return;
+        }
+        $messenger->addWarning(new PsrMessage(
+            'The settings of the production were not saved, so only the values set for the test are reverted.' // @translate
+        ));
 
         $title = (string) $settings->get('installation_title', '');
         if (mb_strpos($title, 'TEST') === 0) {

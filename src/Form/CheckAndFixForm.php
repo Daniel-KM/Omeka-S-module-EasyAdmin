@@ -1705,10 +1705,12 @@ class CheckAndFixForm extends Form
                 'type' => Element\Radio::class,
                 'options' => [
                     'label' => 'Adapt the settings', // @translate
+                    'info' => 'The settings of the production are saved before a test or a preproduction adaptation, so the mode "production" restores them, the statistics trackers included.', // @translate
                     'value_options' => [
                         '' => 'No', // @translate
                         'test' => 'For a test copy: prefix the title with « TEST », color the admin interface, display the errors on screen, remove the statistics trackers and replace the images by grey placeholders when the files are not served from another server', // @translate
-                        'production' => 'For the production: remove the prefix « TEST » of the title, the color of the admin interface of the test, the display of the errors, the fake images and the base url of the files', // @translate
+                        'preprod' => 'For a preproduction: prefix the title with « PREPROD », color the admin interface, display the errors to the admins only, redirect the emails, remove the statistics trackers and serve the files from the production', // @translate
+                        'production' => 'For the production: restore the settings saved before the adaptation, or, without them, remove the prefix of the title, the color of the admin interface of the copy, the display of the errors, the fake images and the base url of the files', // @translate
                     ],
                 ],
                 'attributes' => [
