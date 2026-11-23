@@ -2,6 +2,10 @@
  * Context of the last browse or search, kept by the browser in the session
  * storage, so the navigation between resources requires no server session.
  *
+ * A new tab does not get the session storage of the tab that opened it, so the
+ * context is copied in the local storage too and used as fallback for a new
+ * tab, during one day only.
+ *
  * Duplicated in modules AdvancedSearch, BlockPlus, EasyAdmin and Menu: keep the
  * copies identical. The first loaded copy is used.
  *
@@ -36,25 +40,39 @@
 
     const key = 'omeka:browse-context';
 
-    const read = function () {
+    const maxAgeShared = 86400000;
+
+    const parse = function (storage) {
         try {
-            const context = JSON.parse(window.sessionStorage.getItem(key));
+            const context = JSON.parse(storage.getItem(key));
             return context && typeof context === 'object' ? context : null;
         } catch (e) {
             return null;
         }
     };
 
+    const read = function () {
+        const context = parse(window.sessionStorage);
+        if (context) {
+            return context;
+        }
+        const shared = parse(window.localStorage);
+        return shared && Date.now() - (shared.time || 0) < maxAgeShared
+            ? shared
+            : null;
+    };
+
     const write = function (data) {
         try {
             const page = window.location.pathname + window.location.search;
-            const current = read();
+            const current = parse(window.sessionStorage);
             const context = current && current.page === page
                 ? Object.assign(current, data)
                 : Object.assign({}, data);
             context.page = page;
             context.time = Date.now();
             window.sessionStorage.setItem(key, JSON.stringify(context));
+            window.localStorage.setItem(key, JSON.stringify(context));
         } catch (e) {
             // The storage may be disabled: no navigation context.
         }
