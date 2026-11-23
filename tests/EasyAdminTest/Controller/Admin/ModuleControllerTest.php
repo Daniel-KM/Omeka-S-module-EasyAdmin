@@ -173,7 +173,9 @@ class ModuleControllerTest extends AbstractHttpControllerTestCase
             $this->assertResponseStatusCode(200);
             $body = $this->getResponse()->getBody();
             $this->assertStringContainsString('symbolic links to a directory that is not writeable', $body);
-            $this->assertStringContainsString('ZzReadOnlyLink', $body);
+            // The message displays the target directory and not the names of
+            // the addons, that are too many on a shared instance.
+            $this->assertStringContainsString(dirname(realpath($readOnly)), $body);
         } finally {
             unlink($linkReadOnly);
             unlink($linkWriteable);

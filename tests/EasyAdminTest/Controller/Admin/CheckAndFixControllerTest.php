@@ -111,6 +111,182 @@ class CheckAndFixControllerTest extends AbstractHttpControllerTestCase
     }
 
     /**
+     * A preproduction is a real instance: the files are served by the
+     * production and the errors are displayed to the admins only, but the
+     * emails and the statistics of the production are never sent.
+     */
+    public function testEnvironmentSettingsForPreprod(): void
+    {
+        $services = $this->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $keys = [
+            'installation_title', 'easyadmin_admin_color', 'easyadmin_display_exception',
+            'easyadmin_local_store_base_uri', 'easyadmin_local_store_fake_images',
+            'easyadmin_mail_test_copy', 'easyadmin_mail_redirect_to',
+            'imageserver_base_url', 'analyticssnippet_inline_public',
+            CheckAndFixController::SETTING_SNAPSHOT,
+        ];
+        $previous = array_combine($keys, array_map([$settings, 'get'], $keys));
+
+        try {
+            foreach ($keys as $key) {
+                $settings->set($key, '');
+            }
+            $settings->set('installation_title', 'Site');
+            // The host of the production, still in the copied settings.
+            $settings->set('imageserver_base_url', 'https://production.example.org/iiif');
+            $settings->set('analyticssnippet_inline_public', '<script>tracker</script>');
+
+            $this->invokeEnvironment('preprod');
+
+            $this->assertSame('PREPROD Site', $settings->get('installation_title'));
+            $this->assertSame(CheckAndFixController::PREPROD_BOARD_COLOR, $settings->get('easyadmin_admin_color'));
+            $this->assertSame('admin', $settings->get('easyadmin_display_exception'));
+            $this->assertSame('redirect', $settings->get('easyadmin_mail_test_copy'));
+            // The files are served by the production, without fake images.
+            $this->assertSame('https://production.example.org/files', $settings->get('easyadmin_local_store_base_uri'));
+            $this->assertSame('', $settings->get('easyadmin_local_store_fake_images'));
+            $this->assertSame('""', $this->settingInDatabase('analyticssnippet_inline_public'));
+        } finally {
+            foreach ($previous as $key => $value) {
+                $settings->set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * The save describes the original server, that the copied settings still
+     * identify, and not the server of the copy.
+     */
+    public function testSnapshotKeepsTheHostOfTheOriginalServer(): void
+    {
+        $services = $this->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $keys = ['imageserver_base_url', CheckAndFixController::SETTING_SNAPSHOT];
+        $previous = array_combine($keys, array_map([$settings, 'get'], $keys));
+
+        try {
+            $settings->set(CheckAndFixController::SETTING_SNAPSHOT, '');
+            $settings->set('imageserver_base_url', 'https://production.example.org/iiif');
+
+            $this->invokeEnvironment('test');
+
+            $snapshot = $settings->get(CheckAndFixController::SETTING_SNAPSHOT);
+            $this->assertSame('production.example.org', $snapshot['host']);
+        } finally {
+            foreach ($previous as $key => $value) {
+                $settings->set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * The settings saved before the adaptation are the only way to get the
+     * statistics trackers and the external services back.
+     */
+    public function testEnvironmentSettingsAreRestoredFromTheSnapshot(): void
+    {
+        $services = $this->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $keys = [
+            'installation_title', 'easyadmin_admin_color', 'easyadmin_display_exception',
+            'easyadmin_local_store_base_uri', 'easyadmin_local_store_fake_images',
+            'easyadmin_mail_test_copy', 'easyadmin_mail_redirect_to',
+            'analyticssnippet_inline_public', 'analyticssnippetpiwik_token_auth',
+            'scripto_apiurl', CheckAndFixController::SETTING_SNAPSHOT,
+        ];
+        $previous = array_combine($keys, array_map([$settings, 'get'], $keys));
+
+        try {
+            foreach ($keys as $key) {
+                $settings->set($key, '');
+            }
+            $settings->set('installation_title', 'Site');
+            // Values of the production that the adaptation empties.
+            $settings->set('analyticssnippet_inline_public', '<script>tracker</script>');
+            $settings->set('analyticssnippetpiwik_token_auth', 'secret-token');
+            $settings->set('scripto_apiurl', 'https://production.example.org/w/api.php');
+            // A value of the production that the old revert did not know.
+            $settings->set('easyadmin_display_exception', 'admin');
+
+            $this->invokeEnvironment('test');
+            $this->assertNotEmpty($settings->get(CheckAndFixController::SETTING_SNAPSHOT));
+            $this->assertSame('""', $this->settingInDatabase('analyticssnippet_inline_public'));
+            $this->assertSame('', $settings->get('scripto_apiurl'));
+            $this->assertSame('all', $settings->get('easyadmin_display_exception'));
+
+            $this->invokeEnvironment('production');
+            $this->assertSame('<script>tracker</script>', $settings->get('analyticssnippet_inline_public'));
+            $this->assertSame('secret-token', $settings->get('analyticssnippetpiwik_token_auth'));
+            $this->assertSame('https://production.example.org/w/api.php', $settings->get('scripto_apiurl'));
+            $this->assertSame('admin', $settings->get('easyadmin_display_exception'));
+            $this->assertSame('Site', $settings->get('installation_title'));
+            $this->assertEmpty($settings->get(CheckAndFixController::SETTING_SNAPSHOT));
+        } finally {
+            foreach ($previous as $key => $value) {
+                $settings->set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * A second adaptation must not save the values of the first one.
+     */
+    public function testSnapshotIsNotOverwrittenByASecondAdaptation(): void
+    {
+        $services = $this->getApplication()->getServiceManager();
+        $settings = $services->get('Omeka\Settings');
+        $keys = ['installation_title', 'easyadmin_admin_color', CheckAndFixController::SETTING_SNAPSHOT];
+        $previous = array_combine($keys, array_map([$settings, 'get'], $keys));
+
+        try {
+            $settings->set(CheckAndFixController::SETTING_SNAPSHOT, '');
+            $settings->set('easyadmin_admin_color', '');
+            $settings->set('installation_title', 'Site');
+
+            $this->invokeEnvironment('test');
+            $this->invokeEnvironment('test');
+            $snapshot = $settings->get(CheckAndFixController::SETTING_SNAPSHOT);
+
+            $this->assertSame('Site', $snapshot['settings']['installation_title']);
+            $this->assertSame('', $snapshot['settings']['easyadmin_admin_color']);
+            // The save follows a copy of the database, so it says which server
+            // it describes and when it was made.
+            $this->assertArrayHasKey('host', $snapshot);
+            $this->assertNotEmpty($snapshot['created']);
+        } finally {
+            foreach ($previous as $key => $value) {
+                $settings->set($key, $value);
+            }
+        }
+    }
+
+    /**
+     * The trackers are emptied with sql, so the cache of the settings service
+     * is stale inside the same request.
+     */
+    protected function settingInDatabase(string $id): ?string
+    {
+        $value = $this->getApplication()->getServiceManager()->get('Omeka\Connection')
+            ->fetchOne('SELECT value FROM setting WHERE id = ?', [$id]);
+        return $value === false ? null : (string) $value;
+    }
+
+    protected function invokeEnvironment(string $mode): void
+    {
+        $app = $this->getApplication();
+        $services = $app->getServiceManager();
+        $controller = $services->get('ControllerManager')->get(CheckAndFixController::class);
+        $event = new \Laminas\Mvc\MvcEvent();
+        $event->setApplication($app);
+        $controller->setEvent($event);
+        $controller->setPluginManager($services->get('ControllerPluginManager'));
+        $method = new \ReflectionMethod($controller, 'checkSettingsEnvironment');
+        $method->setAccessible(true);
+        $method->invoke($controller, $mode, false);
+    }
+
+    /**
      * The modes "test" and "production" of the environment settings set and
      * revert the settings that distinguish a test copy, files included.
      */
@@ -120,7 +296,7 @@ class CheckAndFixControllerTest extends AbstractHttpControllerTestCase
         $services = $app->getServiceManager();
         $settings = $services->get('Omeka\Settings');
         $keys = [
-            'installation_title', 'easyadmin_admin_board_color', 'easyadmin_display_exception',
+            'installation_title', 'easyadmin_admin_color', 'easyadmin_display_exception',
             'easyadmin_local_store_base_uri', 'easyadmin_local_store_fake_images',
             'easyadmin_mail_test_copy', 'easyadmin_mail_redirect_to',
         ];
@@ -136,7 +312,7 @@ class CheckAndFixControllerTest extends AbstractHttpControllerTestCase
 
         try {
             $settings->set('installation_title', 'Site');
-            $settings->set('easyadmin_admin_board_color', '');
+            $settings->set('easyadmin_admin_color', '');
             $settings->set('easyadmin_display_exception', '');
             $settings->set('easyadmin_local_store_base_uri', '');
             $settings->set('easyadmin_local_store_fake_images', '');
@@ -150,14 +326,14 @@ class CheckAndFixControllerTest extends AbstractHttpControllerTestCase
                 $settings->get('easyadmin_mail_redirect_to')
             );
             $this->assertSame('TEST Site', $settings->get('installation_title'));
-            $this->assertSame(CheckAndFixController::TEST_BOARD_COLOR, $settings->get('easyadmin_admin_board_color'));
+            $this->assertSame(CheckAndFixController::TEST_BOARD_COLOR, $settings->get('easyadmin_admin_color'));
             $this->assertSame('all', $settings->get('easyadmin_display_exception'));
             $this->assertSame('placeholder', $settings->get('easyadmin_local_store_fake_images'));
 
             $settings->set('easyadmin_local_store_base_uri', 'https://example.org/files');
             $method->invoke($controller, 'production', false);
             $this->assertSame('Site', $settings->get('installation_title'));
-            $this->assertSame('', $settings->get('easyadmin_admin_board_color'));
+            $this->assertSame('', $settings->get('easyadmin_admin_color'));
             $this->assertSame('', $settings->get('easyadmin_display_exception'));
             $this->assertSame('', $settings->get('easyadmin_local_store_base_uri'));
             $this->assertSame('', $settings->get('easyadmin_local_store_fake_images'));
@@ -315,7 +491,7 @@ class CheckAndFixControllerTest extends AbstractHttpControllerTestCase
             'easyadmin_local_store_base_uri' => $settings->get('easyadmin_local_store_base_uri'),
             'easyadmin_mail_test_copy' => $settings->get('easyadmin_mail_test_copy'),
             'easyadmin_mail_redirect_to' => $settings->get('easyadmin_mail_redirect_to'),
-            'easyadmin_admin_board_color' => $settings->get('easyadmin_admin_board_color'),
+            'easyadmin_admin_color' => $settings->get('easyadmin_admin_color'),
             'easyadmin_display_exception' => $settings->get('easyadmin_display_exception'),
             'installation_title' => $settings->get('installation_title'),
         ];

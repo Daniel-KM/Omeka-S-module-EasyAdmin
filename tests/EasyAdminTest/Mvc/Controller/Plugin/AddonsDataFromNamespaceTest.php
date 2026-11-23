@@ -65,4 +65,21 @@ class AddonsDataFromNamespaceTest extends TestCase
         $this->assertSame('0.23.2', $addons->dataFromNamespace('Mapping', 'module')['version']);
     }
 
+    /**
+     * The form "owner/Directory" selects the repository of an owner.
+     */
+    public function testOwnerSelectsRepository(): void
+    {
+        $addons = $this->addons([
+            'omekamodule' => [],
+            'module' => $this->entry('https://github.com/omeka-s-modules/Mapping', '2.4.0')
+                + $this->entry('https://gitlab.com/Daniel-KM/Omeka-S-module-Mapping', '3.4.1'),
+            'omekatheme' => [],
+            'theme' => [],
+        ]);
+        $this->assertSame('3.4.1', $addons->dataFromNamespace('Daniel-KM/Mapping', 'module')['version']);
+        $this->assertSame('3.4.1', $addons->dataFromNamespace('daniel-km/Mapping')['version']);
+        $this->assertSame('2.4.0', $addons->dataFromNamespace('omeka-s-modules/Mapping')['version']);
+        $this->assertSame([], $addons->dataFromNamespace('Unknown/Mapping'));
+    }
 }
