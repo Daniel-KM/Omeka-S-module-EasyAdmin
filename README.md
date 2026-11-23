@@ -15,7 +15,7 @@ admin interface, without access to the server.
 - Interface
   - buttons "Public view" and "Previous/Next" in the resource pages
   - filter and navigation in the settings pages
-  - color of the admin sidebar, to distinguish a test instance
+  - color of the admin interface, to distinguish a test instance
   - thumbnails loaded only when they are displayed, so long pages load quickly
   - button "Apply" in the config forms of the modules
 - Modules and themes
@@ -165,10 +165,20 @@ button "Enable filters" in the main settings page.
 Since Omeka 4.3, the core has its own filter: the module adds only the features
 that the core does not have.
 
-### Color of the admin sidebar
+### Color of the admin interface
 
-The background color of the admin left sidebar can be set in the main settings,
-for example to distinguish a test instance from the production one.
+The main color of the admin interface can be set in the main settings, for
+example to distinguish a test instance from the production one. The admin theme
+builds its whole palette from one color, so the shades of the logo, of the
+buttons, of the block of the sites and of the borders are derived from it, and
+the color of the texts is light or dark according to it.
+
+The colors are available as the css variables `--easyadmin-admin-color`,
+`--easyadmin-admin-color-5`, `--easyadmin-admin-color-10`,
+`--easyadmin-admin-color-15` and `--easyadmin-admin-color-text`, so a module or
+a theme can reuse them. The variables of the core (`--omeka-admin-color` and
+its shades) are set too, so the palette will follow when the core will expose
+them.
 
 ### Lazy loading of thumbnails
 
@@ -188,6 +198,22 @@ media and/or the digital objects can be selected.
 
 The quick tasks, flagged "instant", display their result directly on the page.
 The other ones run in background.
+
+### Installation checks
+
+After a copy of the database or of the files on a new server, the task "Check"
+of the section "Installation" runs the install checks of Omeka and checks the
+server directly on the page:
+
+- the files of Omeka, of the modules and of the themes must be readable by the
+  server: an unreadable file breaks the pages that use it, or all of them for a
+  language file, and it may work until the cache of php is reset;
+- the directories of the files, of the logs and of the doctrine proxies must be
+  writeable by the server;
+- the php-cli is diagnosed, but no job is run, so the check of the background
+  jobs is not complete: run the task "Test job" of the background jobs too;
+- the missing database indexes, the http client, the proxy, the access to the
+  web and the config of the web server are checked too.
 
 ### Security and privacy
 
@@ -216,7 +242,14 @@ differ from the php of the web server, in particular on shared hosting. A
 diagnostic checks the php-cli, compares it with the php of the web server, and
 recommends the right path when the configured one is invalid. Another action
 runs a test job to check that the jobs start. A summary is added to the page
-"System information".
+"System information". The dashboard warns when some jobs failed to start during
+the last seven days.
+
+A job ends with the status "completed" even when it logged errors, unless it
+failed globally. So the list of the jobs displays the number of errors and of
+warnings written in the log of each job, with links to filter the failed jobs,
+the jobs with errors or the jobs with warnings. When the module [Log] is
+active, it displays them itself from its table.
 
 ### Useless database tables
 
@@ -241,10 +274,31 @@ modifying the database:
 - send nothing and write the emails in the protected directory
   "files/mailcapture/".
 
-An option adapts the settings for a test copy: title prefixed with « TEST »,
-colored admin sidebar, errors displayed on screen, statistics trackers removed,
-and grey images when the files are not served from another server. Another
-option reverts them for the production, except the statistics trackers.
+Three modes adapt the settings:
+
+- **test**: title prefixed with « TEST », colored admin interface, errors
+  displayed on screen, emails redirected, statistics trackers removed, and grey
+  images when the files are not served from another server;
+- **preproduction**: a preproduction is a real instance, that may become the
+  production, so the files are served by the production instead of being
+  replaced by grey images and the errors are displayed to the admins only. Like
+  a test copy, it never sends the emails of the users nor the statistics of the
+  production;
+- **production**: the settings are restored.
+
+Before a test or a preproduction adaptation, the settings of the production are
+saved in the setting "easyadmin_settings_production", so the mode production
+restores them, the statistics trackers, the external services and the settings
+that identify the server included. Without this save, these values would be
+lost, since they are emptied or rewritten and not simply replaced: it matters
+for a preproduction, that goes back to the production, more than for a test
+copy, that is thrown away. A second adaptation keeps the first save.
+
+The save follows a copy of the database, so it may describe a server that is
+not the production any more, for example after a preproduction was promoted to
+production. It keeps the host of the server it describes and the date it was
+made, and they are displayed when it is kept and when it is restored, so they
+can be checked. The mode production restores the save and removes it.
 
 The base URI of the files can be replaced too, in order to serve the files from
 another server, for example the production one, while the uploads stay local.
@@ -273,6 +327,10 @@ rolled back versions did not change them.
 The batch actions of the pages of the modules and of the themes allow to copy
 the list of the addons or the urls to download them, for example to install the
 same addons on another server.
+
+In a selection, an addon can be written "owner/Directory" to choose the
+repository of an owner when several addons have the same directory, for example
+an original module and its fork.
 
 ### Tasks and cron tasks
 
@@ -339,6 +397,7 @@ TODO
 - [x] Find a way to increase duration of csrf when there are very a large number of files to upload, instead of skipping csrf.
 - [ ] Add a module setting for the csrf lifetime for bulk uploads and for main resource edit page.
 - [x] check and remove orphan resource rows (rows in table `resource` without a matching row in `item`, `item_set` or `media`, which can happen after a crash or an incomplete deletion)
+- [ ] Check integrity of the install and modules and themes.
 
 
 Warning
@@ -457,6 +516,7 @@ The curated selections of modules was implemented for the
 [curl]: https://curl.se/libcurl/c/curl_easy_setopt.html
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-EasyAdmin/-/work_items
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
 [Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [Search SolR]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
