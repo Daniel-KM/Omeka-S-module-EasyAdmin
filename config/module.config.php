@@ -531,6 +531,10 @@ return [
             'EasyAdmin\Job\DatabaseBackup' => [
                 'group' => 'backup',
             ],
+            'EasyAdmin\Job\DbSession' => [
+            ],
+            'EasyAdmin\Job\FakeImages' => [
+            ],
             'EasyAdmin\Job\FileDerivativeBulkUpload' => [
                 'group' => 'heavy',
             ],
