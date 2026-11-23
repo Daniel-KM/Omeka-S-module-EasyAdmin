@@ -435,6 +435,8 @@ class CheckAndFixController extends AbstractActionController
             );
         }
 
+        $this->checkPhpCli();
+        $this->messenger()->addNotice('The PHP-CLI was checked without running a job, so the check of the background jobs is not complete: run the task "Test job" of the background jobs to check them fully.'); // @translate
         $this->checkHttpClient();
         $this->checkWebServer(true);
     }
