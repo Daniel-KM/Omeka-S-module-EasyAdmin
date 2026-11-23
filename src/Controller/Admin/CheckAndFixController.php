@@ -1299,15 +1299,30 @@ class CheckAndFixController extends AbstractActionController
         $siteSettings = $services->get('Omeka\Settings\Site');
         $connection = $services->get('Omeka\Connection');
 
-        // A second adaptation must not save the values of the first one.
-        if ($settings->get(self::SETTING_SNAPSHOT)) {
+        // A second adaptation must not save the values of the first one. The
+        // save follows a copy of the database, so it may describe a server
+        // that is not the production any more: the server and the date are
+        // displayed, so the administrator can check them.
+        $existing = $settings->get(self::SETTING_SNAPSHOT);
+        if ($existing) {
             $this->messenger()->addNotice(new PsrMessage(
-                'The settings of the production were already saved: they are kept, so the production can still be restored.' // @translate
+                'The settings of the server "{host}", saved on {date}, are kept, so this production can still be restored. Use the mode "production" to restore and remove them when they are not the ones of the production any more.', // @translate
+                [
+                    'host' => ($existing['host'] ?? '') ?: '[?]',
+                    'date' => ($existing['created'] ?? '') ?: '[?]',
+                ]
             ));
             return;
         }
 
-        $snapshot = ['settings' => [], 'site_settings' => []];
+        // The settings still identify the original server at this point.
+        $snapshot = [
+            'host' => $this->originalHost()
+                ?: strtolower((string) parse_url((string) $this->viewHelpers()->get('ServerUrl')->__invoke(), PHP_URL_HOST)),
+            'created' => (new \DateTime('now'))->format('Y-m-d H:i:s'),
+            'settings' => [],
+            'site_settings' => [],
+        ];
         foreach (self::SNAPSHOT_SETTINGS as $key) {
             $snapshot['settings'][$key] = $settings->get($key);
         }
@@ -1320,8 +1335,8 @@ class CheckAndFixController extends AbstractActionController
 
         $settings->set(self::SETTING_SNAPSHOT, $snapshot);
         $this->messenger()->addSuccess(new PsrMessage(
-            'The settings of the production were saved ({count} settings): they will be restored with the mode "production".', // @translate
-            ['count' => count($snapshot['settings'])]
+            'The settings of the server "{host}" were saved ({count} settings): they will be restored with the mode "production".', // @translate
+            ['host' => $snapshot['host'] ?: '[?]', 'count' => count($snapshot['settings'])]
         ));
     }
 
@@ -1354,7 +1369,11 @@ class CheckAndFixController extends AbstractActionController
         $settings->delete(self::SETTING_SNAPSHOT);
 
         $this->messenger()->addSuccess(new PsrMessage(
-            'The settings of the production were restored, the statistics trackers and the external services included.' // @translate
+            'The settings of the server "{host}", saved on {date}, were restored, the statistics trackers and the external services included.', // @translate
+            [
+                'host' => ($snapshot['host'] ?? '') ?: '[?]',
+                'date' => ($snapshot['created'] ?? '') ?: '[?]',
+            ]
         ));
         return true;
     }
