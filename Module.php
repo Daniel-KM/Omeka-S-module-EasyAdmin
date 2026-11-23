@@ -183,33 +183,43 @@ class Module extends AbstractModule
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
         $displayException = $settings->get('easyadmin_display_exception');
         if ($displayException) {
-            /** @var \Omeka\Mvc\Status $status */
-            $status = $this->getServiceLocator()->get('Omeka\Status');
-            if ($displayException === 'all' || $status->isAdminRequest()) {
-                ini_set('display_errors', '1');
-                ini_set('log_errors', '1');
-                // Log uncaught fatal php errors through the standard logger.
-                // Unlike mvc exceptions handled by Omeka\Mvc\ExceptionListener, fatal
-                // errors don't go through mvc layer, so they are only displayed and
-                // never recorded.
-                // See the job fatal handling in Job\DispatchStrategy\Synchronous.
-                if (version_compare(\Omeka\Module::VERSION, '4.3', '<')) {
-                    $services = $this->getServiceLocator();
-                    register_shutdown_function(function () use ($services): void {
-                        $error = error_get_last();
-                        $fatals = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
-                        if ($error && ($error['type'] & $fatals)) {
-                            try {
-                                $services->get('Omeka\Logger')->err(
-                                    'Fatal error: {message} in {file}:{line}', // @translate
-                                    ['message' => $error['message'], 'file' => $error['file'], 'line' => $error['line']]
-                                );
-                            } catch (\Throwable $e) {
-                                // Logger may be unavailable during shutdown.
-                            }
+            // Display as soon as possible for "all", so an error of the
+            // bootstrap is displayed too. For "admin", knowing the request
+            // requires the route, so it is checked on the route event: asking
+            // Omeka\Status here would run a whole routing pass before the
+            // route event, and with the module CleanUrl that pass resolves
+            // identifiers in the database on every request.
+            if ($displayException === 'all') {
+                $this->displayErrors();
+            } else {
+                $event->getApplication()->getEventManager()->attach(
+                    MvcEvent::EVENT_ROUTE,
+                    [$this, 'handleDisplayErrorsAdmin'],
+                    -100
+                );
+            }
+
+            // Log uncaught fatal php errors through the standard logger.
+            // Unlike mvc exceptions handled by Omeka\Mvc\ExceptionListener, fatal
+            // errors don't go through mvc layer, so they are only displayed and
+            // never recorded.
+            // See the job fatal handling in Job\DispatchStrategy\Synchronous.
+            if (version_compare(\Omeka\Module::VERSION, '4.3', '<')) {
+                $services = $this->getServiceLocator();
+                register_shutdown_function(function () use ($services): void {
+                    $error = error_get_last();
+                    $fatals = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+                    if ($error && ($error['type'] & $fatals)) {
+                        try {
+                            $services->get('Omeka\Logger')->err(
+                                'Fatal error: {message} in {file}:{line}', // @translate
+                                ['message' => $error['message'], 'file' => $error['file'], 'line' => $error['line']]
+                            );
+                        } catch (\Throwable $e) {
+                            // Logger may be unavailable during shutdown.
                         }
-                    });
-                }
+                    }
+                });
             }
         }
 
@@ -480,6 +490,23 @@ class Module extends AbstractModule
         $html .= '</label>';
 
         echo $html;
+    }
+
+    /**
+     * Display the errors on an admin request, once the route is known.
+     */
+    public function handleDisplayErrorsAdmin(MvcEvent $event): void
+    {
+        $routeMatch = $event->getRouteMatch();
+        if ($routeMatch && $routeMatch->getParam('__ADMIN__')) {
+            $this->displayErrors();
+        }
+    }
+
+    protected function displayErrors(): void
+    {
+        ini_set('display_errors', '1');
+        ini_set('log_errors', '1');
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
