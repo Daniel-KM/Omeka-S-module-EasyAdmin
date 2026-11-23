@@ -89,15 +89,15 @@ class SettingsFieldset extends Fieldset
             ])
 
             ->add([
-                'name' => 'easyadmin_admin_board_color',
+                'name' => 'easyadmin_admin_color',
                 'type' => OmekaElement\ColorPicker::class,
                 'options' => [
                     'element_group' => 'display',
-                    'label' => 'Color of the admin left sidebar', // @translate
-                    'info' => 'Useful to distinguish instances, for example a test one from the production one.', // @translate
+                    'label' => 'Color of the admin interface', // @translate
+                    'info' => 'The sidebar, the logo, the buttons, the block of the sites and the borders are derived from this color. Useful to distinguish instances, for example a test one from the production one.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'easyadmin_admin_board_color',
+                    'id' => 'easyadmin_admin_color',
                 ],
             ])
 

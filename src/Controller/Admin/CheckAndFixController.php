@@ -9,7 +9,7 @@ use Laminas\View\Model\ViewModel;
 class CheckAndFixController extends AbstractActionController
 {
     /**
-     * Color of the admin sidebar of a test copy.
+     * Color of the admin interface of a test copy.
      */
     const TEST_BOARD_COLOR = '#8b1a1a';
 
@@ -1050,7 +1050,7 @@ class CheckAndFixController extends AbstractActionController
             if (in_array($key, $excluded, true)) {
                 return null;
             }
-            if ($key === 'installation_title' || $key === 'easyadmin_admin_board_color') {
+            if ($key === 'installation_title' || $key === 'easyadmin_admin_color') {
                 return 'title';
             }
             // Scripts of statistics: a copy sends its visits to the analytics
@@ -1077,7 +1077,7 @@ class CheckAndFixController extends AbstractActionController
         };
 
         $labels = [
-            'title' => 'Installation title and color of the admin sidebar', // @translate
+            'title' => 'Installation title and color of the admin interface', // @translate
             'tracking' => 'Statistics trackers (scripts sending the visits to an analytics server)', // @translate
             'url' => 'Urls, hosts and endpoints', // @translate
             'host' => 'Host names used as identifiers', // @translate
@@ -1267,10 +1267,10 @@ class CheckAndFixController extends AbstractActionController
         }
 
         // A color already chosen is kept.
-        if (!$settings->get('easyadmin_admin_board_color')) {
-            $settings->set('easyadmin_admin_board_color', self::TEST_BOARD_COLOR);
+        if (!$settings->get('easyadmin_admin_color')) {
+            $settings->set('easyadmin_admin_color', self::TEST_BOARD_COLOR);
             $messenger->addSuccess(new PsrMessage(
-                'The admin sidebar is now colored ({color}).', // @translate
+                'The admin interface is now colored ({color}).', // @translate
                 ['color' => self::TEST_BOARD_COLOR]
             ));
         }
@@ -1355,7 +1355,7 @@ class CheckAndFixController extends AbstractActionController
      * Restore the settings of a test copy for the production.
      *
      * Only the values set for the test are reverted: the prefix of the title,
-     * the color of the admin sidebar and the display of the errors. The removed
+     * the color of the admin interface and the display of the errors. The removed
      * statistics trackers cannot be restored.
      */
     protected function adaptSettingsForProduction(): void
@@ -1376,10 +1376,10 @@ class CheckAndFixController extends AbstractActionController
         }
 
         // A color chosen for the production is kept.
-        if ($settings->get('easyadmin_admin_board_color') === self::TEST_BOARD_COLOR) {
-            $settings->set('easyadmin_admin_board_color', '');
+        if ($settings->get('easyadmin_admin_color') === self::TEST_BOARD_COLOR) {
+            $settings->set('easyadmin_admin_color', '');
             $messenger->addSuccess(new PsrMessage(
-                'The admin sidebar has now its default color.' // @translate
+                'The admin interface has now its default colors.' // @translate
             ));
         }
 

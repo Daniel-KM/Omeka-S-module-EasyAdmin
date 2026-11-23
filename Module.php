@@ -535,11 +535,11 @@ class Module extends AbstractModule
             );
         }
 
-        // Set the color of the admin left sidebar.
+        // Set the colors of the admin interface.
         $sharedEventManager->attach(
             '*',
             'view.layout',
-            [$this, 'handleAdminBoardColor']
+            [$this, 'handleAdminColor']
         );
 
         // Load the thumbnails only when they are displayed.
@@ -884,23 +884,57 @@ class Module extends AbstractModule
      * This method is triggered on view.layout to execute scheduled tasks
      * without requiring the Cron module.
      */
-    public function handleAdminBoardColor(Event $event): void
+    public function handleAdminColor(Event $event): void
     {
         $services = $this->getServiceLocator();
         if (!$services->get('Omeka\Status')->isAdminRequest()) {
             return;
         }
 
-        $color = (string) $services->get('Omeka\Settings')
-            ->get('easyadmin_admin_board_color', '');
-        if ($color === '') {
+        $palette = (new \EasyAdmin\Stdlib\AdminPalette())(
+            $services->get('Omeka\Settings')->get('easyadmin_admin_color', '')
+        );
+        if ($palette === null) {
             return;
         }
 
-        // The class "admin-board" is not set in all versions of the layout.
-        $event->getTarget()->headStyle()->appendStyle(
-            'body > .flex > header { background-color: ' . $color . '; }'
-        );
+        // The selectors are the ones of the admin theme that use the main
+        // color and its shades, so the design is kept with any color. The
+        // style is appended after the stylesheet of the core, so it wins with
+        // the same specificity. The class "admin-board" is not set in all
+        // versions of the layout, so the element is used.
+        $event->getTarget()->headStyle()->appendStyle(sprintf(
+            ':root {'
+                // The variables of the core, used when it exposes its palette.
+                . ' --omeka-admin-color: %1$s;'
+                . ' --omeka-admin-color-shade-5: %2$s;'
+                . ' --omeka-admin-color-shade-10: %3$s;'
+                . ' --omeka-admin-color-shade-15: %4$s;'
+                . ' --omeka-admin-color-text: %5$s;'
+                . ' --easyadmin-admin-color: %1$s;'
+                . ' --easyadmin-admin-color-5: %2$s;'
+                . ' --easyadmin-admin-color-10: %3$s;'
+                . ' --easyadmin-admin-color-15: %4$s;'
+                . ' --easyadmin-admin-color-text: %5$s;'
+                . ' }'
+            . ' header,'
+            . ' body.minimal,'
+            . ' .selector li.total-count-heading { background-color: var(--easyadmin-admin-color); }'
+            . ' header { color: var(--easyadmin-admin-color-text); }'
+            . ' .logo a, #user a, #search button,'
+            . ' header nav a:link, header nav a:visited { color: var(--easyadmin-admin-color-text); }'
+            . ' .logo, header .button, #search button,'
+            . ' #user .user-id a.button, #user .logout { background-color: var(--easyadmin-admin-color-15); }'
+            . ' #site-nav { background-color: var(--easyadmin-admin-color-5); }'
+            . ' header nav h4 { border-bottom-color: var(--easyadmin-admin-color-5); }'
+            . ' #menu h5 { border-top-color: var(--easyadmin-admin-color-5); }'
+            . ' #site-nav h5 { border-bottom-color: var(--easyadmin-admin-color-10); }',
+            $palette['base'],
+            $palette['shade_5'],
+            $palette['shade_10'],
+            $palette['shade_15'],
+            $palette['text']
+        ));
     }
 
     /**
