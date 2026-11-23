@@ -7,6 +7,11 @@
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 $escape = $plugins->get('escapeHtml');
+
+// The unavailability is temporary, so the page should not be indexed. The
+// header "X-Robots-Tag" is set by the controller for the themes that do not
+// render the head meta.
+$this->headMeta()->appendName('robots', 'noindex');
 ?>
 
 <h2><?= $escape($translate('Site under maintenance')) ?></h2>

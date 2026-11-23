@@ -81,8 +81,10 @@ return [
         'invokables' => [
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
             'EasyAdmin\Controller\Admin\Cron' => Controller\Admin\CronController::class,
-            'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
             'EasyAdmin\Controller\Site\PreviousNext' => Controller\Site\PreviousNextController::class,
+            // The key is the one of the core, used by the route "maintenance",
+            // and not an admin one: the page is displayed on the public side.
+            'Omeka\Controller\Maintenance' => Controller\MaintenanceController::class,
         ],
         'factories' => [
             // Class is not used as key, since it's set dynamically by sub-route
