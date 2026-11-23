@@ -232,6 +232,13 @@
 	    content: "\f056"; /* fa-minus-circle */
 	}
 
+	/* Addon details: a link with an icon and a label needs a gap between
+	   them, since the core styles the icons for links without label. */
+	.modules.browse .sidebar .meta-group .value a[class*="o-icon-"]::before,
+	.themes.browse .sidebar .meta-group .value a[class*="o-icon-"]::before {
+	    margin-right: 6px;
+	}
+
 	/* Addon browse: version column */
 	.themes.browse td.col-version,
 	.modules.browse td.col-version {
