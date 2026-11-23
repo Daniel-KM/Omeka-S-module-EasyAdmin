@@ -4,6 +4,7 @@ namespace EasyAdmin\Service\File\Store;
 
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use EasyAdmin\File\Store\LocalFakeImages;
+use EasyAdmin\File\Store\LocalFallback;
 use EasyAdmin\Job\FakeImages;
 use Omeka\File\Store\Local;
 use Psr\Container\ContainerInterface;
@@ -15,7 +16,8 @@ class LocalStoreBaseUriDelegatorFactory implements DelegatorFactoryInterface
      * keeping the base path local. This allows to serve file URLs from a remote
      * server (for example production) while working on a local copy of the
      * database without the files. Uploads and derivatives are still stored
-     * locally; only the generated URLs are affected.
+     * locally and the local files are served locally; only the urls of the
+     * missing files are affected.
      *
      * The images may be replaced by placeholders or by images of Wikimedia
      * Commons stored locally, when the remote server is not available or
@@ -45,13 +47,15 @@ class LocalStoreBaseUriDelegatorFactory implements DelegatorFactoryInterface
         }
 
         if ($fakeImages === 'placeholder') {
-            return LocalFakeImages::fromStore($store, 'placeholder');
+            return LocalFakeImages::fromStore($store, 'placeholder', [], $localBaseUri);
         }
         if ($fakeImages === 'wikimedia') {
-            return LocalFakeImages::fromStore($store, 'wikimedia', $this->wikimediaUrls($container, $settings, $localBaseUri));
+            return LocalFakeImages::fromStore($store, 'wikimedia', $this->wikimediaUrls($container, $settings, $localBaseUri), $localBaseUri);
         }
 
-        return $store;
+        return $baseUri === ''
+            ? $store
+            : LocalFallback::fromStore($store, $localBaseUri);
     }
 
     /**

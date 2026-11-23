@@ -5,13 +5,14 @@ namespace EasyAdmin\File\Store;
 use Omeka\File\Store\Local;
 
 /**
- * Local file store that serves fake images instead of the image files.
+ * Local file store that serves fake images instead of the missing image files.
  *
  * It is useful to work on a copy of the database without the files, when the
- * server of the files is not available or protected. The other files and the
- * storage are not modified.
+ * server of the files is not available or protected. The local files, for
+ * example the ones uploaded on the copy, are served as is. The other files and
+ * the storage are not modified.
  */
-class LocalFakeImages extends Local
+class LocalFakeImages extends LocalFallback
 {
     /**
      * Maximum width of each type of file.
@@ -42,10 +43,13 @@ class LocalFakeImages extends Local
 
     /**
      * Create the store from another one, with the same paths and logger.
+     *
+     * The local base uri serves the local files, by default the store one.
      */
-    public static function fromStore(Local $store, string $mode, array $wikimediaUrls = []): self
+    public static function fromStore(Local $store, string $mode, array $wikimediaUrls = [], ?string $localBaseUri = null): self
     {
         $fakeStore = new self($store->basePath, $store->baseUri, $store->logger);
+        $fakeStore->localBaseUri = rtrim($localBaseUri ?? $store->baseUri, '/');
         $fakeStore->mode = $mode;
         $fakeStore->wikimediaUrls = array_values($wikimediaUrls);
         return $fakeStore;
@@ -53,12 +57,16 @@ class LocalFakeImages extends Local
 
     public function getUri($storagePath)
     {
+        if ($this->isLocal((string) $storagePath)) {
+            return $this->localBaseUri . '/' . $storagePath;
+        }
+
         $type = strtok((string) $storagePath, '/');
         $extension = strtolower(pathinfo((string) $storagePath, PATHINFO_EXTENSION));
         if (!isset(self::WIDTHS[$type])
             || !in_array($extension, self::IMAGE_EXTENSIONS, true)
         ) {
-            return parent::getUri($storagePath);
+            return Local::getUri($storagePath);
         }
 
         $width = self::WIDTHS[$type];
