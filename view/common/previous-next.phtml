@@ -30,7 +30,7 @@ endif;
 
 if (!empty($back)):
     if ($lastBrowseUrl):
-        echo $hyperlink('^', $lastBrowseUrl, ['class' => 'button', 'rel' => 'search', 'title' => $translate('Back to last search'), 'aria-label' => $translate('Back to last search')]);
+        echo $hyperlink('^', $lastBrowseUrl, ['class' => 'button', 'rel' => 'search', 'data-browse-back' => '', 'title' => $translate('Back to last search'), 'aria-label' => $translate('Back to last search')]);
     else:
         echo $disabledLink('^', $translate('Back to last search'));
     endif;

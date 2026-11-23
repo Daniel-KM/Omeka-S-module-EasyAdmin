@@ -81,6 +81,7 @@ return [
             'EasyAdmin\Controller\Admin\CheckAndFix' => Controller\Admin\CheckAndFixController::class,
             'EasyAdmin\Controller\Admin\Cron' => Controller\Admin\CronController::class,
             'Omeka\Controller\Admin\Maintenance' => Controller\Admin\MaintenanceController::class,
+            'EasyAdmin\Controller\Site\PreviousNext' => Controller\Site\PreviousNextController::class,
         ],
         'factories' => [
             // Class is not used as key, since it's set dynamically by sub-route
@@ -102,6 +103,27 @@ return [
     // Refactoring to admin/default would break urls.
     'router' => [
         'routes' => [
+            'site' => [
+                'child_routes' => [
+                    // Render the previous/next navigation for the query of the
+                    // browser. See asset/js/browse-context.js.
+                    'previous-next' => [
+                        'type' => \Laminas\Router\Http\Segment::class,
+                        'options' => [
+                            'route' => '/previous-next/:resource-name/:id',
+                            'constraints' => [
+                                'resource-name' => 'items|item_sets',
+                                'id' => '\d+',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'EasyAdmin\Controller\Site',
+                                'controller' => 'PreviousNext',
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'admin' => [
                 'child_routes' => [
                     'easy-admin' => [

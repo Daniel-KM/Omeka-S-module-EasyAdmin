@@ -235,6 +235,11 @@ class Module extends AbstractModule
         ];
 
         $acl
+            // The previous/next navigation of the sites is rendered for all.
+            ->allow(
+                null,
+                ['EasyAdmin\Controller\Site\PreviousNext']
+            )
             ->allow(
                 $roles,
                 ['EasyAdmin\Controller\Upload'],
@@ -1504,25 +1509,28 @@ class Module extends AbstractModule
     }
 
     /**
-     * Copy in:
+     * Keep the last browse page and query of the admin in the session.
+     *
+     * On the sites, the context is kept by the browser, so no session is
+     * created for the visitors.
      * @see \BlockPlus\Module::handleViewBrowse()
-     * @see \EasyAdmin\Module::handleViewBrowse()
      */
     public function handleViewBrowse(Event $event): void
     {
+        // The search controller of AdvancedSearch is used on sites too.
+        if (!$this->getServiceLocator()->get('Omeka\Status')->isAdminRequest()) {
+            return;
+        }
         $session = new Container('EasyAdmin');
         if (!isset($session->lastBrowsePage)) {
             $session->lastBrowsePage = [];
             $session->lastQuery = [];
         }
         $params = $event->getTarget()->params();
-        // $ui = $params->fromRoute('__SITE__') ? 'public' : 'admin';
-        $ui = 'admin';
-        // Why not use $this->getServiceLocator()->get('Request')->getServer()->get('REQUEST_URI')?
-        $session->lastBrowsePage[$ui]['items'] = $_SERVER['REQUEST_URI'];
+        $session->lastBrowsePage['admin']['items'] = $_SERVER['REQUEST_URI'];
         // Store the processed query too for quicker process later and because
         // the controller may modify it (default sort order).
-        $session->lastQuery[$ui]['items'] = $params->fromQuery();
+        $session->lastQuery['admin']['items'] = $params->fromQuery();
     }
 
     public function addHeadersAdmin(Event $event): void

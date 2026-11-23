@@ -46,7 +46,9 @@ class PreviousNext extends AbstractHelper
 
         $query = $this->getQuery($resourceName, $options['source_query'], $options['query']);
 
-        if ($options['source_query'] === 'session') {
+        if (!empty($options['back_url'])) {
+            $lastBrowseUrl = $options['back_url'];
+        } elseif ($options['source_query'] === 'session') {
             $lastBrowseUrl = $options['back'] || $asArray ? $view->lastBrowsePage() : null;
         } else {
             $lastBrowseUrl = $options['back'] || $asArray ? $view->url($this->site ? 'site/resource' : 'admin/default', ['action' => ''], [], true) : null;
@@ -81,8 +83,30 @@ class PreviousNext extends AbstractHelper
         $vars['back'] = $options['back'];
         $vars['options'] = $options;
 
-        return $options['template'] !== self::PARTIAL_NAME && $view->resolver($options['template'])
+        $html = $options['template'] !== self::PARTIAL_NAME && $view->resolver($options['template'])
             ? $view->partial($options['template'], $vars)
             : $view->partial(self::PARTIAL_NAME, $vars);
+
+        // On a site, the last query is kept by the browser, so the navigation
+        // is replaced via the endpoint when the browser has a context.
+        if (!$this->site || $options['source_query'] !== 'session' || $resourceName === 'media') {
+            return $html;
+        }
+
+        // The prefix of the site is forced, because the url helper of the
+        // module CleanUrl removes it for the main site, and the route requires
+        // it.
+        $endpoint = $view->basePath('s/' . rawurlencode($this->site->slug()) . '/previous-next/' . $resourceName . '/' . $resource->id());
+        $escapeAttr = $view->plugin('escapeHtmlAttr');
+        $view->headScript()->appendFile($view->assetUrl('js/browse-context.js', 'EasyAdmin'));
+        return sprintf(
+            '<div class="previous-next-browse-context" data-browse-context-endpoint="%1$s" data-browse-context-require="query" data-browse-context-options="%2$s" data-site="%3$s" data-resource-name="%4$s" data-resource-id="%5$s">%6$s</div>',
+            $escapeAttr($endpoint),
+            $escapeAttr(json_encode(['template' => $options['template'], 'back' => $options['back']])),
+            $escapeAttr($this->site->slug()),
+            $escapeAttr($resourceName),
+            $resource->id(),
+            $html
+        );
     }
 }

@@ -97,9 +97,13 @@ trait PreviousNextResourceTrait
         $view = $this->getView();
 
         if ($sourceQuery === 'session') {
-            $ui = $this->site ? 'public' : 'admin';
+            // On a site, the last query is kept by the browser, so no session
+            // is created for the visitors: see asset/js/browse-context.js.
+            if ($this->site) {
+                return [];
+            }
             $session = new Container('EasyAdmin');
-            return $session->lastQuery[$ui][$resourceName] ?? [];
+            return $session->lastQuery['admin'][$resourceName] ?? [];
         } elseif ($sourceQuery === 'setting') {
             switch ($resourceName) {
                 case 'items':
