@@ -480,30 +480,48 @@ class CheckAndFixController extends AbstractActionController
             );
         }
 
-        $this->checkLanguageFiles();
         $this->checkDatabaseIndexes(true);
         $this->checkPhpCli();
         $this->messenger()->addNotice('The PHP-CLI was checked without running a job, so the check of the background jobs is not complete: run the task "Test job" of the background jobs to check them fully.'); // @translate
+        $this->checkFilePermissions();
         $this->checkHttpClient();
         $this->checkWebServer(true);
     }
 
     /**
-     * Check that the web server can read all the language files.
+     * Check that the web server can read the code and write in its directories.
      */
-    protected function checkLanguageFiles(): void
+    protected function checkFilePermissions(): void
     {
-        $checker = new \EasyAdmin\Stdlib\LanguageFilesChecker();
-        $unreadable = $checker->unreadable($checker->directories(OMEKA_PATH));
-        if (!$unreadable) {
-            $this->messenger()->addSuccess('All the language files are readable by the server.'); // @translate
-            return;
+        $messenger = $this->messenger();
+        $config = $this->getEvent()->getApplication()->getServiceManager()->get('Config');
+        $filesPath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
+        $checker = new \EasyAdmin\Stdlib\FilePermissionsChecker();
+        $relative = fn ($path) => strpos($path, OMEKA_PATH . '/') === 0 ? substr($path, strlen(OMEKA_PATH) + 1) : $path;
+
+        $unreadable = $checker->unreadable($checker->codeDirectories(OMEKA_PATH));
+        foreach ($unreadable as $directory => $paths) {
+            $messenger->addError(new PsrMessage(
+                '{count} files or directories of "{directory}" are not readable by the server, so some pages may fail: {list}. Check their permissions.', // @translate
+                [
+                    'count' => count($paths),
+                    'directory' => $relative($directory),
+                    'list' => implode(', ', array_map($relative, array_slice($paths, 0, 5))) . (count($paths) > 5 ? ', …' : ''),
+                ]
+            ));
         }
-        $length = strlen(OMEKA_PATH) + 1;
-        $this->messenger()->addError(new PsrMessage(
-            'Some language files are not readable by the server, so the pages may fail: {list}. Check their permissions.', // @translate
-            ['list' => implode(', ', array_map(fn ($path) => substr($path, $length), $unreadable))]
-        ));
+
+        $unwritable = $checker->unwritable($checker->writableDirectories(OMEKA_PATH, $filesPath));
+        if ($unwritable) {
+            $messenger->addError(new PsrMessage(
+                'Some directories are not writeable by the server, so the uploads, the derivatives or the logs may fail: {list}.', // @translate
+                ['list' => implode(', ', array_map($relative, $unwritable))]
+            ));
+        }
+
+        if (!$unreadable && !$unwritable) {
+            $messenger->addSuccess('The files of Omeka, of the modules and of the themes are readable, and the directories of the files are writeable by the server.'); // @translate
+        }
     }
 
     /**
