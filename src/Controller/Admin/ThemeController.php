@@ -14,9 +14,15 @@ class ThemeController extends AbstractActionController
      */
     protected $basePath;
 
-    public function __construct(string $basePath)
+    /**
+     * @var \Omeka\Site\Theme\Manager
+     */
+    protected $themeManager;
+
+    public function __construct(string $basePath, \Omeka\Site\Theme\Manager $themeManager)
     {
         $this->basePath = $basePath;
+        $this->themeManager = $themeManager;
     }
 
     public function indexAction()
@@ -509,6 +515,70 @@ class ThemeController extends AbstractActionController
             'admin/easy-admin/default',
             ['controller' => 'theme']
         );
+    }
+
+    /**
+     * Remove the resource page blocks of a site, so the blocks configured by
+     * the theme are used again.
+     *
+     * The page of the core has no way to go back to the blocks of the theme
+     * once they were saved for the site.
+     */
+    public function resetResourcePagesAction()
+    {
+        $siteSlug = (string) $this->params()->fromPost('site-slug');
+        $redirect = $siteSlug
+            ? $this->redirect()->toRoute('admin/site/slug/action', ['site-slug' => $siteSlug, 'action' => 'theme-resource-pages'])
+            : $this->redirect()->toRoute('admin/site');
+
+        if (!$this->getRequest()->isPost()) {
+            return $redirect;
+        }
+
+        $form = $this->getForm(ModuleStateForm::class);
+        $form->setData($this->params()->fromPost());
+        if (!$form->isValid()) {
+            $this->messenger()->addFormErrors($form);
+            return $redirect;
+        }
+
+        /** @var \Omeka\Api\Representation\SiteRepresentation $site */
+        try {
+            $site = $this->api()->read('sites', ['slug' => $siteSlug])->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
+            $this->messenger()->addError(new PsrMessage(
+                'The site "{site_slug}" does not exist.', // @translate
+                ['site_slug' => $siteSlug]
+            ));
+            return $this->redirect()->toRoute('admin/site');
+        }
+
+        if (!$site->userIsAllowed('update')) {
+            $this->messenger()->addError(new PsrMessage(
+                'You are not allowed to configure the theme of the site "{site_slug}".', // @translate
+                ['site_slug' => $siteSlug]
+            ));
+            return $redirect;
+        }
+
+        $theme = $this->themeManager->getTheme($site->theme());
+        $siteSettings = $this->siteSettings();
+        $siteSettings->setTargetId($site->id());
+        $settingsKey = $theme->getSettingsKey();
+        $themeSettings = $siteSettings->get($settingsKey) ?: [];
+        if (empty($themeSettings['resource_page_blocks'])) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'The site has no resource page blocks of its own: the blocks of the theme are already used.' // @translate
+            ));
+            return $redirect;
+        }
+
+        unset($themeSettings['resource_page_blocks']);
+        $siteSettings->set($settingsKey, $themeSettings);
+        $this->messenger()->addSuccess(new PsrMessage(
+            'The resource pages were reset to the configuration of the theme.' // @translate
+        ));
+        return $redirect;
     }
 
     public function integrityAction()

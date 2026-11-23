@@ -14,6 +14,6 @@ class ThemeControllerFactory implements FactoryInterface
         $basePath = $config['file_store']['local']['base_path']
             ?: (OMEKA_PATH . '/files');
 
-        return new ThemeController($basePath);
+        return new ThemeController($basePath, $services->get('Omeka\\Site\\ThemeManager'));
     }
 }

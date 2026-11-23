@@ -586,6 +586,14 @@ class Module extends AbstractModule
             [$this, 'handleSystemInfo']
         );
 
+        // Add a button to reset the resource pages of a site to the blocks
+        // configured by the theme, that the core page does not provide.
+        $sharedEventManager->attach(
+            'Omeka\Controller\SiteAdmin\Index',
+            'view.layout',
+            [$this, 'handleThemeResourcePagesReset']
+        );
+
         // Add the "Apply" button (save and stay on the form) on every module
         // config page. The button is added on render (configure GET) and the
         // core redirect to the module list is rewritten to the config form on
@@ -1162,6 +1170,62 @@ class Module extends AbstractModule
             $escape($url),
             $escape($translate('Check the PHP-CLI with the task "Check" of the background jobs')) // @translate
         );
+     }
+
+    /**
+     * Add a button to reset the resource pages to the blocks of the theme.
+     *
+     * The page of the core keeps the blocks of the site once they are saved,
+     * even after a change of theme, and it has no way to go back to the ones
+     * configured by the theme.
+     */
+    public function handleThemeResourcePagesReset(Event $event): void
+    {
+        /** @var \Laminas\View\Renderer\PhpRenderer $view */
+        $view = $event->getTarget();
+        $params = $view->params();
+        if (($params->fromRoute('action') ?? '') !== 'theme-resource-pages') {
+            return;
+        }
+
+        $siteSlug = (string) $params->fromRoute('site-slug');
+        $services = $this->getServiceLocator();
+        try {
+            $site = $services->get('Omeka\ApiManager')->read('sites', ['slug' => $siteSlug])->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
+            return;
+        }
+
+        // The reset is useful only when the site has its own blocks.
+        $theme = $services->get('Omeka\Site\ThemeManager')->getTheme($site->theme());
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $siteSettings->setTargetId($site->id());
+        $themeSettings = $siteSettings->get($theme->getSettingsKey()) ?: [];
+        if (empty($themeSettings['resource_page_blocks'])) {
+            return;
+        }
+
+        $form = $services->get('FormElementManager')->get(\EasyAdmin\Form\ModuleStateForm::class);
+        $csrf = null;
+        foreach ($form->getElements() as $element) {
+            if ($element instanceof \Laminas\Form\Element\Csrf) {
+                $csrf = $element;
+                break;
+            }
+        }
+
+        $view->headScript()
+            ->appendScript(sprintf('var EasyAdminResetResourcePages = %s;', json_encode([
+                'url' => $view->url('admin/easy-admin/default', ['controller' => 'theme', 'action' => 'reset-resource-pages']),
+                'siteSlug' => $siteSlug,
+                'csrfName' => $csrf ? $csrf->getName() : '',
+                'csrfValue' => $csrf ? $csrf->getValue() : '',
+                'label' => $view->translate('Reset to the configuration of the theme'), // @translate
+                'warning' => $view->translate('The blocks of this site will be removed, so the blocks configured by the theme will be used again.'), // @translate
+                'confirm' => $view->translate('Confirm reset'), // @translate
+                'close' => $view->translate('Close'), // @translate
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))
+            ->appendFile($view->assetUrl('js/theme-resource-pages-reset.js', 'EasyAdmin'));
     }
 
     public function handleConfigApplyButton(Event $event): void
