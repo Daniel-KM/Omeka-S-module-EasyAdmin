@@ -480,11 +480,30 @@ class CheckAndFixController extends AbstractActionController
             );
         }
 
+        $this->checkLanguageFiles();
+        $this->checkDatabaseIndexes(true);
         $this->checkPhpCli();
         $this->messenger()->addNotice('The PHP-CLI was checked without running a job, so the check of the background jobs is not complete: run the task "Test job" of the background jobs to check them fully.'); // @translate
-        $this->checkDatabaseIndexes(true);
         $this->checkHttpClient();
         $this->checkWebServer(true);
+    }
+
+    /**
+     * Check that the web server can read all the language files.
+     */
+    protected function checkLanguageFiles(): void
+    {
+        $checker = new \EasyAdmin\Stdlib\LanguageFilesChecker();
+        $unreadable = $checker->unreadable($checker->directories(OMEKA_PATH));
+        if (!$unreadable) {
+            $this->messenger()->addSuccess('All the language files are readable by the server.'); // @translate
+            return;
+        }
+        $length = strlen(OMEKA_PATH) + 1;
+        $this->messenger()->addError(new PsrMessage(
+            'Some language files are not readable by the server, so the pages may fail: {list}. Check their permissions.', // @translate
+            ['list' => implode(', ', array_map(fn ($path) => substr($path, $length), $unreadable))]
+        ));
     }
 
     /**
