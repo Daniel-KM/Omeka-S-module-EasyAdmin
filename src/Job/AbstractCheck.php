@@ -249,8 +249,22 @@ abstract class AbstractCheck extends AbstractJob
             return $this;
         }
         fclose($this->handle);
+        $this->handle = null;
         $this->messageResultFile();
         return $this;
+    }
+
+    /**
+     * Remove the partial output file when the job fails before finalizing it.
+     */
+    public function __destruct()
+    {
+        if (is_resource($this->handle)
+            && $this->job->getStatus() !== \Omeka\Entity\Job::STATUS_STOPPING
+        ) {
+            fclose($this->handle);
+            @unlink($this->filepath);
+        }
     }
 
     /**

@@ -47,6 +47,12 @@ class JobCliChecker
             $effective = $this->cli->getCommandPath('php');
         }
 
+        $exitCodes = $this->exitCodes();
+        $strategy = $this->executeStrategy();
+        $exitCodeLost = !empty($exitCodes[$strategy]['lost']);
+        // Omeka cannot detect php when the exit code is lost, but it exists.
+        $detected = $effective === false && $exitCodeLost ? $this->commandPath('php') : null;
+
         $result = [
             'configured' => $configured,
             'auto' => $auto,
@@ -58,6 +64,11 @@ class JobCliChecker
                 'sapi' => php_sapi_name(),
             ],
             'canSpawn' => $this->canSpawn(),
+            'executeStrategy' => $strategy,
+            'exitCodes' => $exitCodes,
+            'exitCodeLost' => $exitCodeLost,
+            'recommendedStrategy' => $this->recommendedStrategy($exitCodes, $strategy),
+            'detected' => $detected,
             'dispatchStrategy' => $this->dispatchStrategyClass
                 ? substr((string) strrchr('\\' . $this->dispatchStrategyClass, '\\'), 1)
                 : null,
@@ -72,13 +83,14 @@ class JobCliChecker
             'recommendedCgi' => null,
         ];
 
-        if (is_string($effective) && $effective !== '') {
-            $info = $this->probe($effective);
+        $binary = is_string($effective) && $effective !== '' ? $effective : $detected;
+        if ($binary) {
+            $info = $this->probe($binary);
             $result['effectiveInfo'] = $info;
             if ($info) {
                 $result['versionMatch'] = $this->majorMinor($info['version']) === $webMajorMinor;
                 $result['sapiIsCli'] = $this->isCli($info['sapi']);
-                $exts = $this->extensions($effective);
+                $exts = $this->extensions($binary);
                 if ($exts !== null) {
                     $result['hasPdoMysql'] = in_array('pdo_mysql', $exts, true);
                     $result['missingExtensions'] = $this->missingExtensions($exts);
@@ -111,7 +123,7 @@ class JobCliChecker
      */
     public function probe(string $path): ?array
     {
-        $output = $this->cli->execute(escapeshellarg($path) . ' --version');
+        $output = $this->run(escapeshellarg($path) . ' --version');
         if (!is_string($output) || !preg_match('/PHP (\d+\.\d+\.\d+)(?:\s*\(([^)]+)\))?/', $output, $m)) {
             return null;
         }
@@ -125,7 +137,7 @@ class JobCliChecker
      */
     public function extensions(string $path): ?array
     {
-        $output = $this->cli->execute(escapeshellarg($path) . ' -m');
+        $output = $this->run(escapeshellarg($path) . ' -m');
         if (!is_string($output)) {
             return null;
         }
@@ -166,6 +178,98 @@ class JobCliChecker
     }
 
     /**
+     * Strategy used by the Omeka Cli, resolved like its factory.
+     */
+    public function executeStrategy(): string
+    {
+        $strategy = $this->config['cli']['execute_strategy'] ?? 'exec';
+        if ($strategy !== 'auto') {
+            return $strategy === 'proc_open' ? 'proc_open' : 'exec';
+        }
+        return $this->canSpawn()['procOpen'] ? 'proc_open' : 'exec';
+    }
+
+    /**
+     * Run a trivial command with each strategy to check the exit code.
+     *
+     * Some shared hosts lose the exit code of the child process (status -1
+     * although the command succeeded), so Omeka considers that every command
+     * failed and cannot start any job.
+     */
+    public function exitCodes(): array
+    {
+        $spawn = $this->canSpawn();
+        $result = [];
+        foreach (['proc_open' => $spawn['procOpen'], 'exec' => $spawn['exec']] as $strategy => $available) {
+            $run = $available ? $this->runRaw('printf ok', $strategy) : null;
+            $result[$strategy] = [
+                'available' => $available,
+                'output' => $run['output'] ?? null,
+                'code' => $run['code'] ?? null,
+                'lost' => $run !== null && $run['output'] === 'ok' && $run['code'] !== 0,
+            ];
+        }
+        return $result;
+    }
+
+    protected function recommendedStrategy(array $exitCodes, string $strategy): ?string
+    {
+        if (empty($exitCodes[$strategy]['lost'])) {
+            return null;
+        }
+        foreach ($exitCodes as $other => $check) {
+            if ($other !== $strategy && $check['available'] && $check['output'] === 'ok' && !$check['lost']) {
+                return $other;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Output of a command, even when the host loses the exit code.
+     */
+    protected function run(string $command): ?string
+    {
+        $output = $this->cli->execute($command);
+        if (is_string($output)) {
+            return $output;
+        }
+        $run = $this->runRaw($command, $this->executeStrategy());
+        return $run && $run['output'] !== '' ? $run['output'] : null;
+    }
+
+    protected function commandPath(string $command): ?string
+    {
+        return $this->run('command -v ' . escapeshellarg($command));
+    }
+
+    /**
+     * Run a command without the Omeka Cli, that discards the output when the
+     * exit code is not 0.
+     *
+     * @return array|null Trimmed output and exit code, or null if not run.
+     */
+    protected function runRaw(string $command, string $strategy): ?array
+    {
+        if ($strategy === 'proc_open') {
+            $proc = @proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+            if (!is_resource($proc)) {
+                return null;
+            }
+            $output = (string) stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            return ['output' => trim($output), 'code' => proc_close($proc)];
+        }
+        $lines = [];
+        $code = null;
+        if (@exec($command, $lines, $code) === false) {
+            return null;
+        }
+        return ['output' => trim(implode("\n", $lines)), 'code' => $code];
+    }
+
+    /**
      * @return string[]
      */
     public function openBasedirDirs(): array
@@ -182,9 +286,9 @@ class JobCliChecker
         $versionNoDot = str_replace('.', '', $webMajorMinor);
         $paths = [
             PHP_BINARY,
-            (string) $this->cli->getCommandPath('php'),
-            (string) $this->cli->getCommandPath('php' . $webMajorMinor),
-            (string) $this->cli->getCommandPath('php' . $versionNoDot),
+            (string) $this->commandPath('php'),
+            (string) $this->commandPath('php' . $webMajorMinor),
+            (string) $this->commandPath('php' . $versionNoDot),
             '/opt/php/' . $webMajorMinor . '/bin/php',
             '/usr/bin/php' . $webMajorMinor,
             '/usr/bin/php' . $versionNoDot,
@@ -194,7 +298,7 @@ class JobCliChecker
             '/usr/bin/php',
             '/usr/local/bin/php',
             // Cgi binaries: usable but not preferred.
-            (string) $this->cli->getCommandPath('php-cgi'),
+            (string) $this->commandPath('php-cgi'),
             '/opt/php/' . $webMajorMinor . '/bin/php-cgi',
             '/usr/bin/php-cgi' . $webMajorMinor,
             '/usr/bin/php-cgi' . $versionNoDot,

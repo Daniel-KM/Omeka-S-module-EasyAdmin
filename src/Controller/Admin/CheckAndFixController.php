@@ -1826,6 +1826,21 @@ class CheckAndFixController extends AbstractActionController
             $messenger->addError('The web PHP cannot spawn a process ("proc_open" and "exec" are both disabled); no background job can start, whatever the PHP-CLI path. Remove one of them from "disable_functions".'); // @translate
         }
 
+        // A lost exit code makes every command look failed.
+        if ($r['exitCodeLost']) {
+            if ($r['recommendedStrategy']) {
+                $messenger->addError(new PsrMessage(
+                    'The server loses the exit code of the commands run with "{strategy}" (status -1 although the command succeeded), so Omeka considers that every command failed and no job can start. Set the key ["cli"]["execute_strategy"] to "{recommended}" in config/local.config.php.', // @translate
+                    ['strategy' => $r['executeStrategy'], 'recommended' => $r['recommendedStrategy']]
+                ));
+            } else {
+                $messenger->addError(new PsrMessage(
+                    'The server loses the exit code of the commands run with "{strategy}" (status -1 although the command succeeded), so Omeka considers that every command failed and no job can start. No other strategy returns it, so the configuration of the server must be fixed.', // @translate
+                    ['strategy' => $r['executeStrategy']]
+                ));
+            }
+        }
+
         // Configured or auto-detected path.
         if ($r['configured'] && $r['effective'] === false) {
             $messenger->addError(new PsrMessage(
@@ -1833,7 +1848,12 @@ class CheckAndFixController extends AbstractActionController
                 ['reason' => $this->translate($r['invalidReason'] ?? 'the path is invalid'), 'path' => $r['configured']] // @translate
             ));
         } elseif ($r['auto']) {
-            if ($r['effective'] === false) {
+            if ($r['effective'] === false && $r['detected']) {
+                $messenger->addError(new PsrMessage(
+                    'No PHP-CLI path is configured and its auto-detection failed because of the lost exit code, although PHP exists: {path}. Set the key ["cli"]["phpcli_path"] to it in config/local.config.php.', // @translate
+                    ['path' => $r['detected']]
+                ));
+            } elseif ($r['effective'] === false) {
                 $messenger->addError('No PHP-CLI path is configured and none could be auto-detected ("command -v php" failed); jobs cannot run.'); // @translate
             } else {
                 $messenger->addNotice(new PsrMessage(
@@ -1849,34 +1869,35 @@ class CheckAndFixController extends AbstractActionController
         ));
 
         // Effective binary: SAPI, version match, pdo_mysql, extensions parity.
-        if (is_string($r['effective']) && $r['effective'] !== '') {
+        $binary = is_string($r['effective']) && $r['effective'] !== '' ? $r['effective'] : $r['detected'];
+        if ($binary) {
             if ($r['effectiveInfo'] === null) {
                 $messenger->addWarning(new PsrMessage(
                     'The PHP binary could not be executed from the web context ({path}); check open_basedir, disabled functions and permissions.', // @translate
-                    ['path' => $r['effective']]
+                    ['path' => $binary]
                 ));
             } else {
                 if ($r['sapiIsCli'] === false) {
                     $messenger->addWarning(new PsrMessage(
                         'The configured PHP binary uses the "{sapi}" SAPI, not CLI ({path}); php-cgi and php-fpm binaries emit headers and mishandle arguments (perform-job.php reads them with getopt, empty under cgi, so the job exits and stays "starting"). Prefer a php-cli binary.', // @translate
-                        ['sapi' => $r['effectiveInfo']['sapi'], 'path' => $r['effective']]
+                        ['sapi' => $r['effectiveInfo']['sapi'], 'path' => $binary]
                     ));
                 }
                 if ($r['versionMatch']) {
                     $messenger->addSuccess(new PsrMessage(
                         'The PHP-CLI version ({cli}) matches the web version ({web}): {path}.', // @translate
-                        ['cli' => $r['effectiveInfo']['version'], 'web' => $webVersion, 'path' => $r['effective']]
+                        ['cli' => $r['effectiveInfo']['version'], 'web' => $webVersion, 'path' => $binary]
                     ));
                 } else {
                     $messenger->addError(new PsrMessage(
                         'The PHP-CLI version ({cli}) differs from the web version ({web}); jobs may fail or behave differently (deprecations, missing extensions, serialization). Configure a PHP {major} binary. Current path: {path}.', // @translate
-                        ['cli' => $r['effectiveInfo']['version'], 'web' => $webVersion, 'major' => $webMajorMinor, 'path' => $r['effective']]
+                        ['cli' => $r['effectiveInfo']['version'], 'web' => $webVersion, 'major' => $webMajorMinor, 'path' => $binary]
                     ));
                 }
                 if ($r['hasPdoMysql'] === false) {
                     $messenger->addError(new PsrMessage(
                         'The PHP binary {path} is missing the extension "pdo_mysql", required by jobs to access the database.', // @translate
-                        ['path' => $r['effective']]
+                        ['path' => $binary]
                     ));
                 }
                 if ($r['missingExtensions']) {

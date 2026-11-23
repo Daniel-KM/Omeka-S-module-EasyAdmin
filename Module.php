@@ -549,6 +549,13 @@ class Module extends AbstractModule
             [$this, 'handleThumbnailAttribs']
         );
 
+        // Warn on the dashboard when background jobs cannot start.
+        $sharedEventManager->attach(
+            'Omeka\Controller\Admin\Index',
+            'view.browse.after',
+            [$this, 'handleDashboardJobsAlert']
+        );
+
         // Enrich the system information page with the diagnostics of the
         // PHP-CLI used by background jobs. The core triggers the "system_info"
         // event since Omeka S 4.2 (before, the listener is simply never
@@ -991,9 +998,16 @@ class Module extends AbstractModule
             );
         }
 
+        $exitCode = 'ok';
+        if ($r['exitCodeLost']) {
+            $exitCode = sprintf('lost with %s', $r['executeStrategy'])
+                . ($r['recommendedStrategy'] ? sprintf(' (set execute_strategy to "%s")', $r['recommendedStrategy']) : ' (no strategy returns it)');
+        }
+
         $block = [
             'Dispatch strategy' => $r['dispatchStrategy'] ?? '[default]',
             'Web can spawn process' => $r['canSpawn']['ok'] ? 'yes' : 'no (proc_open and exec disabled)',
+            'Exit code of commands' => $exitCode,
             'PHP-CLI path' => $path,
             'PHP-CLI version' => $version,
             'pdo_mysql' => $r['hasPdoMysql'] === null ? '[unknown]' : ($r['hasPdoMysql'] ? 'yes' : 'no'),
@@ -1006,6 +1020,41 @@ class Module extends AbstractModule
         $info = $event->getParam('info');
         $info['Background jobs'] = $block;
         $event->setParam('info', $info);
+    }
+
+    /**
+     * Warn on the dashboard about the jobs that failed to start recently.
+     */
+    public function handleDashboardJobsAlert(Event $event): void
+    {
+        $view = $event->getTarget();
+        $plugins = $view->getHelperPluginManager();
+        if (!$plugins->get('userIsAllowed')('Omeka\Controller\Admin\Module', 'browse')) {
+            return;
+        }
+
+        $sql = <<<'SQL'
+            SELECT COUNT(`id`)
+            FROM `job`
+            WHERE `status` = 'error'
+                AND `started` >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                AND (`log` LIKE '%PHP-CLI error%' OR `log` LIKE '%failed with status code -1%')
+            SQL;
+        $count = (int) $this->getServiceLocator()->get('Omeka\Connection')->fetchOne($sql);
+        if (!$count) {
+            return;
+        }
+
+        $translate = $plugins->get('translate');
+        $escape = $plugins->get('escapeHtml');
+        $url = $plugins->get('url')('admin/easy-admin/default', ['controller' => 'check-and-fix']);
+        echo sprintf(
+            '<div id="easy-admin-jobs-alert" class="panel"><h2>%1$s</h2><p class="error">%2$s</p><p><a href="%3$s">%4$s</a></p></div>',
+            $escape($translate('Background jobs')), // @translate
+            $escape(sprintf($translate('%d background jobs failed to start during the last seven days because of the PHP-CLI configuration.'), $count)), // @translate
+            $escape($url),
+            $escape($translate('Check the PHP-CLI with the task "Check" of the background jobs')) // @translate
+        );
     }
 
     public function handleConfigApplyButton(Event $event): void
