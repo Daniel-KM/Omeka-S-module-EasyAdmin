@@ -15,9 +15,6 @@ class FileMediaNoOriginal extends AbstractCheckFile
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
 

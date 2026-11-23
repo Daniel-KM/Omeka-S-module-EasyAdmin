@@ -9,14 +9,9 @@ class DbItemPrimaryMedia extends AbstractCheck
         parent::perform();
 
         if (version_compare(\Omeka\Module::VERSION, '4', '<')) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'This task requires Omeka S v4.' // @translate
             );
-        }
-
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
         }
 
         $process = $this->getArg('process');

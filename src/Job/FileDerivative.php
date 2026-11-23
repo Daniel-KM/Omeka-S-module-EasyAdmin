@@ -37,9 +37,6 @@ class FileDerivative extends AbstractCheck
         // The api cannot update value "has_thumbnails", so use entity manager.
 
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         /**
          * @var \Omeka\File\TempFileFactory $tempFileFactory

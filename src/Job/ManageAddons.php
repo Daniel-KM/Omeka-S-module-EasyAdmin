@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use Laminas\I18n\Translator\TranslatorAwareInterface;
 use Laminas\Log\Logger;
 use Omeka\Job\AbstractJob;
@@ -162,10 +163,12 @@ class ManageAddons extends AbstractJob
 
         $this->flushMessages($messenger);
 
-        if ($errors) {
-            $this->job->setStatus(
-                \Omeka\Entity\Job::STATUS_ERROR
+        if ($errors && !$updated) {
+            throw new RuntimeException(
+                'Failed to update: {addons}.', // @translate
+                ['addons' => implode(', ', $errors)]
             );
+        } elseif ($errors) {
             $this->logger->err(
                 'Failed to update: {addons}.', // @translate
                 ['addons' => implode(', ', $errors)]
@@ -229,10 +232,12 @@ class ManageAddons extends AbstractJob
                 ['addons' => implode(', ', $skipped)]
             );
         }
-        if ($errors) {
-            $this->job->setStatus(
-                \Omeka\Entity\Job::STATUS_ERROR
+        if ($errors && !$upgraded) {
+            throw new RuntimeException(
+                'Failed to upgrade: {addons}.', // @translate
+                ['addons' => implode(', ', $errors)]
             );
+        } elseif ($errors) {
             $this->logger->err(
                 'Failed to upgrade: {addons}.', // @translate
                 ['addons' => implode(', ', $errors)]
@@ -286,10 +291,12 @@ class ManageAddons extends AbstractJob
 
         $this->flushMessages($messenger);
 
-        if ($errors) {
-            $this->job->setStatus(
-                \Omeka\Entity\Job::STATUS_ERROR
+        if ($errors && !$removed) {
+            throw new RuntimeException(
+                'Failed to remove: {addons}.', // @translate
+                ['addons' => implode(', ', $errors)]
             );
+        } elseif ($errors) {
             $this->logger->err(
                 'Failed to remove: {addons}.', // @translate
                 ['addons' => implode(', ', $errors)]
@@ -393,10 +400,15 @@ class ManageAddons extends AbstractJob
                 ['addons' => implode(', ', $existings)]
             );
         }
-        if ($errors) {
-            $this->job->setStatus(
-                \Omeka\Entity\Job::STATUS_ERROR
+        if ($errors && !$success) {
+            throw new RuntimeException(
+                'The following addons failed to {operation}: {addons}.', // @translate
+                [
+                    'operation' => $operation,
+                    'addons' => implode(', ', $errors),
+                ]
             );
+        } elseif ($errors) {
             $this->logger->err(
                 'The following addons failed to {operation}: {addons}.', // @translate
                 [

@@ -7,9 +7,6 @@ class DbResourceIncomplete extends AbstractCheck
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
         $processFix = $process === 'db_resource_incomplete_fix';

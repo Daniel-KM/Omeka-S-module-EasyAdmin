@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 abstract class AbstractCheckFile extends AbstractCheck
 {
     /**
@@ -27,9 +29,6 @@ abstract class AbstractCheckFile extends AbstractCheck
     protected function performFileDataCheck(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
         $fix = $this->fixProcessName && $process === $this->fixProcessName;
@@ -50,12 +49,10 @@ abstract class AbstractCheckFile extends AbstractCheck
     protected function checkFileData(string $column, bool $fix = false): bool
     {
         if (!in_array($column, ['size', 'sha256', 'media_type', 'storage_id'])) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'Column {type} does not exist or cannot be checked.', // @translate
                 ['type' => $column]
             );
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return false;
         }
 
         // This total should be 0.
@@ -632,11 +629,12 @@ abstract class AbstractCheckFile extends AbstractCheck
                 yield $absolute ? $filePath : mb_substr($filePath, $dirLength);
             }
         } catch (\Throwable $e) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'Directory or file not readable: {error}', // @translate
-                ['error' => $e->getMessage()]
+                ['error' => $e->getMessage()],
+                0,
+                $e
             );
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
         }
     }
 }

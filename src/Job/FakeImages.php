@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use EasyAdmin\File\Store\LocalFakeImages;
 use Omeka\Job\AbstractJob;
 
@@ -40,7 +41,10 @@ class FakeImages extends AbstractJob
         $dir = $basePath . '/' . self::DIRECTORY . '/' . $subDir;
         if (!$services->get('Common\DirectoryManager')->checkDestinationDir($dir)) {
             $settings->set(self::SETTING, ['keyword' => $keyword, 'failed' => time()]);
-            return;
+            throw new RuntimeException(
+                'The directory "{path}" is not writeable.', // @translate
+                ['path' => $dir]
+            );
         }
 
         $context = stream_context_create(['http' => [
@@ -85,11 +89,10 @@ class FakeImages extends AbstractJob
 
         if (!$files) {
             $settings->set(self::SETTING, ['keyword' => $keyword, 'failed' => time()]);
-            $logger->err(
+            throw new RuntimeException(
                 'No image of Wikimedia Commons could be downloaded for the keyword "{keyword}".', // @translate
                 ['keyword' => $keyword]
             );
-            return;
         }
 
         $settings->set(self::SETTING, ['keyword' => $keyword, 'files' => $files]);

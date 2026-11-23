@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use Doctrine\DBAL\Connection;
 
 class FileExcess extends AbstractCheckFile
@@ -32,18 +33,14 @@ class FileExcess extends AbstractCheckFile
         }
 
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
 
         if ($process === 'files_excess_move' && !$this->createDir($this->basePath . '/check')) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'Unable to prepare directory "{path}". Check rights.', // @translate
                 ['path' => '/files/check']
             );
-            return;
         }
 
         $this->checkExcessFiles($process === 'files_excess_move');
@@ -61,11 +58,10 @@ class FileExcess extends AbstractCheckFile
         if ($move) {
             $path = $this->basePath . '/check/original';
             if (!$this->createDir($path)) {
-                $this->logger->err(
+                throw new RuntimeException(
                     'Unable to prepare directory "{path}". Check rights.', // @translate
                     ['path' => '/files/check/original']
                 );
-                return false;
             }
         }
 
@@ -84,11 +80,10 @@ class FileExcess extends AbstractCheckFile
             if ($move) {
                 $path = $this->basePath . '/check/' . $type;
                 if (!$this->createDir($path)) {
-                    $this->logger->err(
+                    throw new RuntimeException(
                         'Unable to prepare directory "{path}". Check rights.', // @translate
                         ['path' => '/files/check/' . $type]
                     );
-                    return false;
                 }
             }
 
@@ -311,11 +306,10 @@ class FileExcess extends AbstractCheckFile
                     if (!$this->createDir($dirname)) {
                         $row['fixed'] = $no;
                         $this->writeRow($row);
-                        $this->logger->err(
+                        throw new RuntimeException(
                             'Unable to prepare directory "{path}". Check rights.', // @translate
                             ['path' => '/files/check/' . $type . '/' . $filename]
                         );
-                        return false;
                     }
                 }
                 $result = @rename($path . '/' . $filename, $movePath . '/' . $filename);
@@ -328,11 +322,10 @@ class FileExcess extends AbstractCheckFile
                 } else {
                     $row['fixed'] = $no;
                     $this->writeRow($row);
-                    $this->logger->err(
+                    throw new RuntimeException(
                         "File \"{filename}\" (type \"{type}\") doesn't exist in database, and cannot be moved.", // @translate
                         ['filename' => $filename, 'type' => $type]
                     );
-                    return false;
                 }
             } else {
                 $this->logger->warn(

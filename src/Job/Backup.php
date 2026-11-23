@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 class Backup extends AbstractCheck
 {
     use ZipTrait;
@@ -42,25 +44,17 @@ class Backup extends AbstractCheck
 
         parent::perform();
 
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
-
         if (!$this->prepareZipProcessor()) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'To do a backup, the php extension "zip" or the command "zip" should be installed on the server.' // @translate
             );
-            return;
         }
 
         $include = $this->getArg('include');
         if (!$include) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Nothing selected for backup.' // @translate
             );
-            return;
         }
 
         $includeArg = $include;
@@ -110,8 +104,10 @@ class Backup extends AbstractCheck
     {
         $destinationDir = $this->basePath . '/backup';
         if (!$this->checkDestinationDir($destinationDir)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return null;
+            throw new RuntimeException(
+                'The directory "{path}" is not writeable.', // @translate
+                ['path' => $destinationDir]
+            );
         }
 
         $label = $this->getArg('process', '');
@@ -132,8 +128,8 @@ class Backup extends AbstractCheck
         $exclude = $this->includeToExclude($include);
 
         $result = $this->zip(OMEKA_PATH, $filePath, $exclude, $options['compression']);
+        // The process may have been stopped.
         if ($result['error']) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return null;
         }
 

@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 class FileDerivativeFileSystem extends AbstractCheck
 {
     /**
@@ -12,9 +14,6 @@ class FileDerivativeFileSystem extends AbstractCheck
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $services = $this->getServiceLocator();
         $this->cli = $services->get('Omeka\Cli');
@@ -23,21 +22,17 @@ class FileDerivativeFileSystem extends AbstractCheck
         $hasCliVips = (bool) $this->cli->getCommandPath('vips');
         $hasCliConvert = (bool) $this->cli->getCommandPath('convert');
         if (!$hasCliVips && !$hasCliConvert) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'The command line tools "vips" (recommended) or "convert" (image magick) are required to run this job.' // @translate
             );
-            return;
         }
 
         // Ensure php CLI exists.
         $phpPath = $this->cli->getCommandPath('php');
         if (!$phpPath) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'The command line tool "php" is required to run this job.' // @translate
             );
-            return;
         }
 
         // Include center option from config.
@@ -47,8 +42,10 @@ class FileDerivativeFileSystem extends AbstractCheck
 
         $logDir = $basePath . '/result/';
         if (!$this->checkDestinationDir($logDir)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return;
+            throw new RuntimeException(
+                'The directory "{path}" is not writeable.', // @translate
+                ['path' => $logDir]
+            );
         }
 
         // Run the process via the script in data/scripts.
@@ -70,18 +67,14 @@ class FileDerivativeFileSystem extends AbstractCheck
 
         $result = $this->cli->execute($command);
         if ($result === false) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Thumbnailization script failed.' // @translate
             );
-            return;
         } elseif ($result) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->warn(
+            throw new RuntimeException(
                 'Thumbnailization script output: {output}', // @translate
-                ['output' => $result ?? '']
+                ['output' => $result]
             );
-            return;
         }
 
         $this->logger->notice(

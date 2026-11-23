@@ -80,6 +80,13 @@ class CronTasks extends AbstractJob
             }
         }
 
+        if ($errorCount && !$executedCount) {
+            throw new \Common\Job\Exception\RuntimeException(
+                'Cron execution failed: all {errors} tasks failed.', // @translate
+                ['errors' => $errorCount]
+            );
+        }
+
         $this->logger->notice(
             'Cron execution completed: {executed} tasks executed, {errors} errors.', // @translate
             ['executed' => $executedCount, 'errors' => $errorCount]

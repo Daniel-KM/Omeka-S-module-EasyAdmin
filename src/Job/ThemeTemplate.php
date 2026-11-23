@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 class ThemeTemplate extends AbstractCheck
 {
     protected $columns = [
@@ -30,9 +32,6 @@ class ThemeTemplate extends AbstractCheck
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
 
@@ -58,10 +57,9 @@ class ThemeTemplate extends AbstractCheck
         $isFix = $process === 'theme_templates_fix';
 
         if ($isFix && !$this->getArg('backup_confirmed')) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'The process is not run because there is no confirmation that an external backup of themes and files exist.' // @translate
             );
-            return;
         }
 
         $themesDirs = array_filter([
@@ -70,9 +68,6 @@ class ThemeTemplate extends AbstractCheck
         ], 'is_dir');
         foreach ($themesDirs as $themesDir) {
             $this->checkDirectory($themesDir, $isFix);
-            if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-                return;
-            }
         }
 
         $this->totalProcessed = 0;
@@ -99,21 +94,17 @@ class ThemeTemplate extends AbstractCheck
     {
         $dir = rtrim($directory, '/');
         if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'The directory "{path}" is not set or not readable.', // @translate
                 ['path' => $dir]
             );
-            return $this;
         }
 
         if (realpath($dir) !== $dir || strlen($dir) <= 1) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'The directory "{path}" should be a real path ({realpath}).', // @translate
                 ['path' => $dir, 'realpath' => realpath($dir)]
             );
-            return $this;
         }
 
         return $this;

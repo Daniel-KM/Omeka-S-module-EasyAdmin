@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 class DbLog extends AbstractCheck
 {
     /**
@@ -28,12 +30,10 @@ class DbLog extends AbstractCheck
         parent::perform();
 
         if (!$this->checkTableExists('log')) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'There is no table "{table}" to check.', // @translate
                 ['table' => $this->table]
             );
-            return;
         }
 
         $process = $this->getArg('process');
@@ -52,12 +52,10 @@ class DbLog extends AbstractCheck
         $severity = (int) $severity;
         if (!isset($this->severities[$severity])) {
             if ($processFix) {
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                $this->logger->err(
+                throw new RuntimeException(
                     'The severity "{severity}" is not managed.', // @translate
                     ['severity' => $severity]
                 );
-                return;
             }
             // For check, fallback to 0 (no severity filter).
             $severity = 0;

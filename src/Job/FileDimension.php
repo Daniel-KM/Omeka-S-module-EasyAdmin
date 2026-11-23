@@ -20,19 +20,13 @@ class FileDimension extends AbstractCheckFile
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $services = $this->getServiceLocator();
         if (!$services->get('ControllerPluginManager')->has('mediaDimension')) {
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'This process requires module "{module}".', // @translate
                 ['module' => 'Iiif Server']
             );
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->finalizeOutput();
-            return;
         }
 
         $process = $this->getArg('process');

@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 class FileMissing extends AbstractCheckFile
 {
     protected $columns = [
@@ -59,9 +61,6 @@ class FileMissing extends AbstractCheckFile
         // ini_set('memory_limit', '3G');
 
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
 
@@ -95,23 +94,17 @@ class FileMissing extends AbstractCheckFile
         $isFix = in_array($process, ['files_missing_fix', 'files_missing_fix_db']);
         if ($isFix) {
             if (empty($this->matchingMode)) {
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                $this->logger->err(
+                throw new RuntimeException(
                     'Matching mode is required for process "{process}".', // @translate
                     ['process' => $process]
                 );
-                $this->finalizeOutput();
-                return;
             }
 
             if (!in_array($this->matchingMode, $matchingModes)) {
-                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                $this->logger->err(
+                throw new RuntimeException(
                     'Matching mode "{mode}" is not supported.', // @translate
                     ['mode' => $this->matchingMode]
                 );
-                $this->finalizeOutput();
-                return;
             }
         }
 
@@ -120,9 +113,6 @@ class FileMissing extends AbstractCheckFile
 
         if ($process === 'files_missing_fix') {
             $this->prepareSourceDirectory();
-            if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-                return;
-            }
         }
 
         $fix = in_array($process, ['files_missing_fix', 'files_missing_fix_db'])
@@ -167,21 +157,17 @@ class FileMissing extends AbstractCheckFile
     {
         $dir = rtrim($this->getArg('source_dir'), '/');
         if (!$dir || !file_exists($dir) || !is_dir($dir) || !is_readable($dir)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Source directory "{path}" is not set or not readable.', // @translate
                 ['path' => $dir]
             );
-            return $this;
         }
 
         if (realpath($dir) !== $dir || strlen($dir) <= 1) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Source directory "{path}" should be a real path ({realpath}).', // @translate
                 ['path' => $dir, 'realpath' => realpath($dir)]
             );
-            return $this;
         }
 
         $this->sourceDir = $dir;
@@ -310,12 +296,10 @@ class FileMissing extends AbstractCheckFile
         }
 
         if (!count($this->files)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Source directory "{path}" is empty.', // @translate
                 ['path' => $dir]
             );
-            return $this;
         }
 
         $this->logger->notice(

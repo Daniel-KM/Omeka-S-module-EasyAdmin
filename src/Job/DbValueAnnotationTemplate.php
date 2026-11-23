@@ -19,14 +19,9 @@ class DbValueAnnotationTemplate extends AbstractCheck
         parent::perform();
 
         if (!$this->isModuleActive('AdvancedResourceTemplate')) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'To update value annotation templates requires the module Advanced Resource Template.' // @translate
             );
-        }
-
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
         }
 
         $process = $this->getArg('process');

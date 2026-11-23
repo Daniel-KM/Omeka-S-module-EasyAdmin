@@ -2,6 +2,8 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
+
 /**
  * Adapted:
  * @see \EasyAdmin\Job\DbValueClean
@@ -16,9 +18,6 @@ class DbValueClean extends AbstractCheck
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $availableActions = [
             'trim',
@@ -71,12 +70,10 @@ class DbValueClean extends AbstractCheck
         if ($allResourceTypes) {
             $resourceTypes = $allowedResourceTypes;
         } elseif (count(array_intersect($allowedResourceTypes, $resourceTypes)) !== count($resourceTypes)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'There are invalid resource types to process: {resource_types}.', // @translate
                 ['resource_types' => implode(', ', array_diff($resourceTypes, $allowedResourceTypes))]
             );
-            return;
         } else {
             $resourceTypes = array_intersect($allowedResourceTypes, $resourceTypes);
             if ($resourceTypes === $allowedResourceTypes) {
@@ -91,11 +88,9 @@ class DbValueClean extends AbstractCheck
         }
 
         if ($query && ($allResourceTypes || count($resourceTypes) > 1)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
-                'When a query is set, only one resource type can be processed.', // @translate
+            throw new RuntimeException(
+                'When a query is set, only one resource type can be processed.' // @translate
             );
-            return;
         }
 
         if ($allResourceTypes) {

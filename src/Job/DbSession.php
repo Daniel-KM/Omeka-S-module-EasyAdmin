@@ -89,10 +89,11 @@ class DbSession extends AbstractCheck
                 ['time' => \Doctrine\DBAL\ParameterType::INTEGER]
             );
         } catch (\Throwable $e) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'Unable to delete last sessions: {msg}', // @translate
-                ['msg' => $e->getMessage()]
+                ['msg' => $e->getMessage()],
+                0,
+                $e
             );
         }
     }

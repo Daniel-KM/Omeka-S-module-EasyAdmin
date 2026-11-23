@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use FilesystemIterator;
 use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
@@ -52,7 +53,7 @@ trait ZipTrait
      * @param array $exclude Relative paths of folders and files from source.
      * @param int $compression From 0 to 9; -1 means auto.
      * @return array The result contains:
-     *   - error (bool): true if error
+     *   - error (bool): true if stopped
      *   - total (int): Number of compressed directories and files
      *   - total_dirs (int): Number of compressed directories
      *   - total_files (int): Number of compressed files
@@ -86,11 +87,9 @@ trait ZipTrait
             // Create the zip.
             $zip = new ZipArchive();
             if ($zip->open($destination, ZipArchive::CREATE) !== true) {
-                $this->logger->err(
+                throw new RuntimeException(
                     'An error occurred during creation of the zip archive.' // @translate
                 );
-                $result['error'] = true;
-                return $result;
             }
 
             $skipHidden = in_array('.*', $exclude);
@@ -237,14 +236,16 @@ trait ZipTrait
             // Zip the file.
             $resultZip = $zip->close();
             if (!$resultZip) {
-                $this->logger->err(
+                if ($this->shouldStop()) {
+                    $result['error'] = true;
+                    return $result;
+                }
+                throw new RuntimeException(
                     'An error occurred during finalization of the zip archive.' // @translate
                 );
-                $result['error'] = true;
-            } else {
-                $result['size'] = filesize($destination);
             }
 
+            $result['size'] = filesize($destination);
             return $result;
         }
 
@@ -283,14 +284,12 @@ trait ZipTrait
 
         $resultZip = $this->cli->execute($cmd);
         if ($resultZip === false) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'An error occurred during preparation of the zip archive.' // @translate
             );
-            $result['error'] = true;
-        } else {
-            $result['size'] = filesize($destination);
         }
 
+        $result['size'] = filesize($destination);
         return $result;
     }
 }

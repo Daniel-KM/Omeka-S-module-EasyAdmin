@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use Common\Stdlib\PsrMessage;
 
 class DbItemNoValue extends AbstractCheckFile
@@ -17,9 +18,6 @@ class DbItemNoValue extends AbstractCheckFile
     public function perform(): void
     {
         parent::perform();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
 
@@ -112,12 +110,10 @@ class DbItemNoValue extends AbstractCheckFile
                             if (!$this->createDir($dirname)) {
                                 $row['fixed'] = $no;
                                 $this->writeRow($row);
-                                $this->logger->err(
+                                throw new RuntimeException(
                                     'Unable to prepare directory "{path}". Check rights.', // @translate
                                     ['path' => '/files/check/original/' . $filename]
                                 );
-                                $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                                return;
                             }
                         }
                         $result = @copy($originalPath . '/' . $filename, $movePath . '/' . $filename);
@@ -134,10 +130,9 @@ class DbItemNoValue extends AbstractCheckFile
                                 ['media_id' => $media->getId(), 'filename' => $filename]
                             );
                             $row['note'] .= $message . "\n";
-                            $this->logger->err($message->getMessage(), $message->getContext());
                             $row['fixed'] = $no;
                             $this->writeRow($row);
-                            return;
+                            throw new RuntimeException($message->getMessage(), $message->getContext());
                         }
                     }
                 }

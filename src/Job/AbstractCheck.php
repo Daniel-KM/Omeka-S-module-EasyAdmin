@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use Omeka\Job\AbstractJob;
 
 /**
@@ -143,9 +144,6 @@ abstract class AbstractCheck extends AbstractJob
         $this->basePath = $this->config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
 
         $this->initializeOutput();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return;
-        }
 
         $process = $this->getArg('process');
         if ($process) {
@@ -170,18 +168,13 @@ abstract class AbstractCheck extends AbstractJob
         }
 
         $this->prepareFilename();
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            return $this;
-        }
 
         $this->handle = fopen($this->filepath, 'w+');
         if (!$this->handle) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Unable to open output: {error}.', // @translate
                 ['error' => error_get_last()['message'] ?? 'unknown error']
             );
-            return $this;
         }
 
         // Prepend the utf-8 bom.
@@ -242,7 +235,7 @@ abstract class AbstractCheck extends AbstractJob
     }
 
     /**
-     * Finalize the output file. The output file is removed in case of error.
+     * Finalize the output file.
      *
      * @return self
      */
@@ -252,16 +245,7 @@ abstract class AbstractCheck extends AbstractJob
             return $this;
         }
 
-        if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
-            if ($this->handle) {
-                fclose($this->handle);
-                @unlink($this->filepath);
-            }
-            return $this;
-        }
-
         if (!$this->handle) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return $this;
         }
         fclose($this->handle);
@@ -310,21 +294,19 @@ abstract class AbstractCheck extends AbstractJob
                 try {
                     $result = @touch($filePath);
                 } catch (\Throwable $e) {
-                    $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                    $this->logger->err(
+                    throw new RuntimeException(
                         'Error when saving "{filename}" (temp file: "{tempfile}"): {exception}', // @translate
-                        ['filename' => $filename, 'tempfile' => $filePath, 'exception' => $e]
+                        ['filename' => $filename, 'tempfile' => $filePath, 'exception' => $e],
+                        0,
+                        $e
                     );
-                    return $this;
                 }
 
                 if (!$result) {
-                    $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-                    $this->logger->err(
+                    throw new RuntimeException(
                         'Error when saving "{filename}" (temp file: "{tempfile}"): {error}', // @translate
                         ['filename' => $filename, 'tempfile' => $filePath, 'error' => error_get_last()['message'] ?? 'unknown error']
                     );
-                    return $this;
                 }
 
                 break;

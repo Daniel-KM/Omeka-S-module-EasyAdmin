@@ -2,6 +2,7 @@
 
 namespace EasyAdmin\Job;
 
+use Common\Job\Exception\RuntimeException;
 use Omeka\Job\AbstractJob;
 
 /**
@@ -71,18 +72,18 @@ class DatabaseBackup extends AbstractJob
         // Get database configuration.
         $this->dbConfig = $this->getDatabaseConfig();
         if (!$this->dbConfig) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'Unable to read database configuration.' // @translate
             );
-            return;
         }
 
         // Create backup directory.
         $backupDir = $this->basePath . '/backup';
         if (!$this->checkDestinationDir($backupDir)) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            return;
+            throw new RuntimeException(
+                'The directory "{path}" is not writeable.', // @translate
+                ['path' => $backupDir]
+            );
         }
 
         // Get options.
@@ -95,11 +96,9 @@ class DatabaseBackup extends AbstractJob
         $skipDataTables = $this->getArg('skip_data_tables', []);
 
         if (!$includeStructure && !$includeData) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new RuntimeException(
                 'At least one of structure or data must be included.' // @translate
             );
-            return;
         }
 
         // Generate filename.
@@ -147,11 +146,12 @@ class DatabaseBackup extends AbstractJob
         }
 
         if (!$success) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            if ($this->shouldStop()) {
+                return;
+            }
+            throw new RuntimeException(
                 'Database backup failed.' // @translate
             );
-            return;
         }
 
         $filename = basename($filepath);

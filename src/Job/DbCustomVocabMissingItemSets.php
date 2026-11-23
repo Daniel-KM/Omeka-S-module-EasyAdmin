@@ -14,12 +14,10 @@ class DbCustomVocabMissingItemSets extends AbstractCheck
         parent::perform();
 
         if (!$this->checkTableExists('custom_vocab')) {
-            $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
-            $this->logger->err(
+            throw new \Common\Job\Exception\RuntimeException(
                 'There is no table "{table}" to check.', // @translate
                 ['table' => $this->table]
             );
-            return;
         }
 
         $process = $this->getArg('process');
