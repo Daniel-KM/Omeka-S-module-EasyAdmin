@@ -210,7 +210,13 @@ class CheckAndFixController extends AbstractActionController
             case 'db_session_check':
             case 'db_session_clean':
             case 'db_session_recreate':
-                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $defaultParams + $params['database']['db_session'], $strategy);
+                // The session of the current user is kept when the table is
+                // recreated. The id is removed from the job args by the job as
+                // soon as it starts.
+                $sessionArgs = $process === 'db_session_recreate'
+                    ? ['session_id' => (string) session_id()]
+                    : [];
+                $job = $dispatcher->dispatch(\EasyAdmin\Job\DbSession::class, $defaultParams + $params['database']['db_session'] + $sessionArgs, $strategy);
                 break;
             case 'db_log_check':
             case 'db_log_clean':

@@ -34,6 +34,16 @@ class DbSession extends AbstractCheck
     {
         parent::perform();
 
+        // The session id allows to impersonate the user, so it is removed from
+        // the args stored in the database as soon as it is read.
+        $sessionId = (string) $this->getArg('session_id');
+        if ($sessionId !== '') {
+            $args = $this->job->getArgs();
+            unset($args['session_id']);
+            $this->job->setArgs($args);
+            $this->entityManager->flush();
+        }
+
         $process = $this->getArg('process');
         $processFix = $process === 'db_session_clean';
         $processRecreate = $process === 'db_session_recreate';
@@ -56,7 +66,7 @@ class DbSession extends AbstractCheck
 
         $seconds = (int) $days * 86400;
 
-        $this->checkDbSession($processFix, $seconds, $processRecreate);
+        $this->checkDbSession($processFix, $seconds, $processRecreate, $sessionId);
 
         $this->logger->notice(
             'Process "{process}" completed.', // @translate
@@ -67,19 +77,7 @@ class DbSession extends AbstractCheck
     protected function deleteLastSession(int $seconds): void
     {
         // No message, except error.
-        $table = 'session';
-        $column = 'modified';
-        $result = $this->connectionDbal->executeQuery("SHOW INDEX FROM `$table` WHERE `column_name` = '$column';");
-        if (!$result->fetchOne()) {
-            try {
-                $this->connectionDbal->executeStatement("ALTER TABLE `$table` ADD INDEX `$column` (`$column`);");
-            } catch (\Throwable $e) {
-                $this->logger->warn(
-                    'Unable to add index "{column}" in table "{table}" to improve performance: {msg}', // @translate
-                    ['column' => $column, 'table' => $table, 'msg' => $e->getMessage()]
-                );
-            }
-        }
+        $this->addIndexModified('session');
 
         $time = time();
         $sql = 'DELETE `session` FROM `session` WHERE `modified` < :time;';
@@ -102,7 +100,7 @@ class DbSession extends AbstractCheck
     /**
      * Check the size of the db table "session".
      */
-    protected function checkDbSession(bool $fix = false, int $seconds = 0, bool $recreate = false): void
+    protected function checkDbSession(bool $fix = false, int $seconds = 0, bool $recreate = false, string $sessionId = ''): void
     {
         $timestamp = time() - $seconds;
 
@@ -116,13 +114,12 @@ class DbSession extends AbstractCheck
         $size = $this->connection->executeQuery($sqlSize, [$dbname, $this->table])->fetchOne();
 
         if ($recreate) {
-            $this->connection->executeStatement('SET foreign_key_checks = 0');
-            $this->connection->executeStatement('CREATE TABLE `session_new` LIKE `session`');
-            $this->connection->executeStatement('RENAME TABLE `session` TO `session_old`, `session_new` TO `session`');
-            $this->connection->executeStatement('DROP TABLE `session_old`');
-            $this->connection->executeStatement('SET foreign_key_checks = 1');
+            $this->recreateTable($sessionId, (float) $size);
             return;
         }
+
+        // The old sessions are selected and deleted by the column "modified".
+        $this->addIndexModified($this->table);
 
         $sql = "SELECT COUNT(id) FROM $this->table WHERE modified < :timestamp;";
         $stmt = $this->connection->prepare($sql);
@@ -145,6 +142,59 @@ class DbSession extends AbstractCheck
             $this->logger->notice(
                 '{count} records older than {seconds} seconds were removed. The table "{table}" has a size of {size} MB.', // @translate
                 ['count' => $count, 'seconds' => $seconds, 'size' => $size, 'table' => $this->table]
+            );
+        }
+    }
+
+    /**
+     * Replace the table of sessions by an empty copy, except the current one.
+     *
+     * The copy is swapped in a single atomic rename, so the requests are not
+     * blocked, whatever the size of the table. The session of the user who
+     * launched the task is copied, so the user remains logged in. The index on
+     * the column "modified" is added to the empty table, where it is instant.
+     *
+     * @see \LazySession\Module::emptySessionTable()
+     */
+    protected function recreateTable(string $sessionId, float $size): void
+    {
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `session_new`');
+        $this->connection->executeStatement('CREATE TABLE `session_new` LIKE `session`');
+        $this->addIndexModified('session_new');
+        if ($sessionId !== '') {
+            $this->connection->executeStatement(
+                'INSERT INTO `session_new` SELECT * FROM `session` WHERE `id` = :id',
+                ['id' => $sessionId]
+            );
+        }
+        // A previous table may remain when a previous process failed.
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `session_old`');
+        $this->connection->executeStatement('RENAME TABLE `session` TO `session_old`, `session_new` TO `session`');
+        $this->connection->executeStatement('DROP TABLE `session_old`');
+        $this->logger->notice(
+            'The table "{table}" of {size} MB was recreated empty, except the session of the current user.', // @translate
+            ['table' => $this->table, 'size' => $size]
+        );
+    }
+
+    /**
+     * Add the index on the column "modified" when missing.
+     *
+     * The garbage collector of the sessions deletes the old ones by this column,
+     * so without index, it scans and locks the whole table.
+     */
+    protected function addIndexModified(string $table): void
+    {
+        $result = $this->connection->executeQuery("SHOW INDEX FROM `$table` WHERE `Column_name` = 'modified'");
+        if ($result->fetchOne()) {
+            return;
+        }
+        try {
+            $this->connection->executeStatement("ALTER TABLE `$table` ADD INDEX `modified` (`modified`)");
+        } catch (\Throwable $e) {
+            $this->logger->warn(
+                'Unable to add index "{column}" in table "{table}" to improve performance: {msg}', // @translate
+                ['column' => 'modified', 'table' => $table, 'msg' => $e->getMessage()]
             );
         }
     }
